@@ -5,7 +5,8 @@
 ##Project No.1
 
 ### `Lexer` -- [*Java*, Using Regex built with NFA & DFA] 
-	* Technologic reference: `vzch`'s *RegexDebugger* & *FreeScript*)
+Technologic reference: `vzch`'s *RegexDebugger* & *FreeScript*)
+
 #### Procedure:
 	* Regex Expression String
 	* Regex Syntax Tree (Rep. Charset. Section)
