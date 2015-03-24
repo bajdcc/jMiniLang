@@ -112,6 +112,50 @@ public class Regex extends RegexStringIterator {
 	}
 
 	/**
+	 * 匹配（默认为贪婪匹配）
+	 * 
+	 * @param string
+	 *            被匹配的字符串
+	 * @return 匹配结果（若不成功则返回空）
+	 */
+	public String match(String string) {
+		return match(string, true);
+	}
+
+	/**
+	 * 匹配
+	 * 
+	 * @param string
+	 *            被匹配的字符串
+	 * @return 匹配结果（若不成功则返回空）
+	 */
+	public String match(String string, boolean greed) {
+		String matchString = null;
+		IRegexStringAttribute attr = new IRegexStringAttribute() {
+			public String result;
+
+			@Override
+			public void setResult(String result) {
+				this.result = result;
+			}
+
+			@Override
+			public String getResult() {
+				return result;
+			}
+
+			@Override
+			public boolean getGreedMode() {
+				return greed;
+			}
+		};
+		if (match(new RegexStringIterator(string), attr)) {
+			matchString = attr.getResult();
+		}
+		return matchString;
+	}
+
+	/**
 	 * 匹配算法（DFA状态表）
 	 * 
 	 * @param iterator

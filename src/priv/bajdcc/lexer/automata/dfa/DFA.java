@@ -324,24 +324,30 @@ public class DFA extends NFA {
 	 * DFA最小化
 	 */
 	private void minimization() {
-		/* 终态集合 */
-		ArrayList<Integer> finalStatus = new ArrayList<Integer>();
-		/* 非终态集合 */
-		ArrayList<Integer> nonFinalStatus = new ArrayList<Integer>();
-		/* DFA状态转移表，填充终态集合 */
-		int[][] transition = buildTransition(finalStatus);
-		/* 填充非终态集合和状态集合的哈希表 */
-		for (int i = 0; i < transition.length; i++) {
-			if (!finalStatus.contains(i)) {
-				nonFinalStatus.add(i);// 添加非终态序号
+		/* 是否存在等价类的flag */
+		boolean bExistequivalentClass = true;
+		while (bExistequivalentClass) {
+			/* 终态集合 */
+			ArrayList<Integer> finalStatus = new ArrayList<Integer>();
+			/* 非终态集合 */
+			ArrayList<Integer> nonFinalStatus = new ArrayList<Integer>();
+			/* DFA状态转移表，填充终态集合 */
+			int[][] transition = buildTransition(finalStatus);
+			/* 填充非终态集合和状态集合的哈希表 */
+			for (int i = 0; i < transition.length; i++) {
+				if (!finalStatus.contains(i)) {
+					nonFinalStatus.add(i);// 添加非终态序号
+				}
 			}
+			/* DFA状态表 */
+			ArrayList<DFAStatus> statusList = getDFATable();
+			/* 处理终态 */
+			bExistequivalentClass = mergeStatus(
+					partition(finalStatus, transition), statusList);
+			/* 处理非终态 */
+			bExistequivalentClass |= mergeStatus(
+					partition(nonFinalStatus, transition), statusList);
 		}
-		/* DFA状态表 */
-		ArrayList<DFAStatus> statusList = getDFATable();
-		/* 处理终态 */
-		mergeStatus(partition(finalStatus, transition), statusList);
-		/* 处理非终态 */
-		mergeStatus(partition(nonFinalStatus, transition), statusList);
 	}
 
 	/**
@@ -389,7 +395,7 @@ public class DFA extends NFA {
 	 * @param statusList
 	 *            状态转移表
 	 */
-	private void mergeStatus(ArrayList<ArrayList<Integer>> pat,
+	private boolean mergeStatus(ArrayList<ArrayList<Integer>> pat,
 			ArrayList<DFAStatus> statusList) {
 		/* 保存要处理的多状态合并的划分 */
 		ArrayList<ArrayList<Integer>> dealWith = new ArrayList<ArrayList<Integer>>();
@@ -397,6 +403,10 @@ public class DFA extends NFA {
 			if (collection.size() > 1) {// 有多个状态
 				dealWith.add(collection);
 			}
+		}
+		/* 是否已经没有等价类，若没有，就返回false，这样算法就结束（收敛 ） */
+		if (dealWith.isEmpty()) {
+			return false;
 		}
 		/* 合并每一分组 */
 		for (ArrayList<Integer> collection : dealWith) {
@@ -420,6 +430,7 @@ public class DFA extends NFA {
 				disconnect(dupStatus);
 			}
 		}
+		return true;
 	}
 
 	/**
@@ -507,7 +518,7 @@ public class DFA extends NFA {
 		}
 		return sb.toString();
 	}
-	
+
 	/**
 	 * 获取状态转移矩阵描述
 	 */

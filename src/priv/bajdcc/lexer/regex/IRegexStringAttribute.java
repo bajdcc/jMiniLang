@@ -7,15 +7,25 @@ package priv.bajdcc.lexer.regex;
  *
  */
 public interface IRegexStringAttribute {
+
 	/**
 	 * 设置匹配结果
-	 * @param result 匹配结果
+	 * 
+	 * @param result
+	 *            匹配结果
 	 */
 	public void setResult(String result);
-	
-	
+
+	/**
+	 * 返回匹配结果
+	 * 
+	 * @return 匹配结果
+	 */
+	public String getResult();
+
 	/**
 	 * 返回贪婪模式
+	 * 
 	 * @return 是否为贪婪模式
 	 */
 	public boolean getGreedMode();

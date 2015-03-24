@@ -67,13 +67,24 @@ public class Lexer extends RegexStringIterator implements
 	 * @throws RegexException
 	 */
 	private void initialize() throws RegexException {
+		//
+		// ### 算法容器中装载解析组件是有一定顺序的 ###
+		//
+		//   组件调用原理：
+		//       每个组件有自己的正则表达式匹配字符串
+		//       （可选）有自己的过滤方法，如字符串中的转义过滤
+		//
+		//   解析时，分别按序调用解析组件，若组件解析失败，则调用下一组件
+		//   若某一组件解析成功，即返回匹配结果
+		//   若全部解析失败，则调用出错处理（默认为前进一字符）
+		//
 		m_algCollections.attach(new WhitespaceTokenizer());// 空白字符解析组件
 		m_algCollections.attach(new CommentTokenizer());// 注释解析组件
-		m_algCollections.attach(new NumberTokenizer());// 数字解析组件
-		m_algCollections.attach(new OperatorTokenizer());// 操作符解析组件
-		m_algCollections.attach(new KeywordTokenizer());// 关键字解析组件
 		m_algCollections.attach(new StringTokenizer());// 字符串解析组件
 		m_algCollections.attach(new CharacterTokenizer());// 字符解析组件
 		m_algCollections.attach(new IdentifierTokenizer());// 标识符解析组件
+		m_algCollections.attach(new KeywordTokenizer());// 关键字解析组件
+		m_algCollections.attach(new NumberTokenizer());// 数字解析组件
+		m_algCollections.attach(new OperatorTokenizer());// 操作符解析组件
 	}
 }

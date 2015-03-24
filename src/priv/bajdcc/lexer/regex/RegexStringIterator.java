@@ -13,7 +13,7 @@ import priv.bajdcc.lexer.utility.Position;
  * @author bajdcc
  *
  */
-public abstract class RegexStringIterator implements IRegexStringIterator {
+public class RegexStringIterator implements IRegexStringIterator {
 	/**
 	 * ´æ´¢×Ö·û´®
 	 */

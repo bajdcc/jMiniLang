@@ -71,44 +71,28 @@ public abstract class TokenAlgorithm implements ITokenAlgorithm,
 		return false;
 	}
 
-	/*
-	 * （非 Javadoc）
-	 * 
-	 * @see priv.bajdcc.lexer.regex.IRegexStringAttribute#getGreedMode()
-	 */
 	@Override
 	public boolean getGreedMode() {
 		return false;// 默认为非贪婪模式
 	}
 
-	/*
-	 * （非 Javadoc）
-	 * 
-	 * @see priv.bajdcc.lexer.algorithm.ITokenAlgorithm#getRegexStringFilter()
-	 */
 	@Override
 	public IRegexStringFilter getRegexStringFilter() {
 		return m_Filter;
 	}
 
-	/*
-	 * （非 Javadoc）
-	 * 
-	 * @see priv.bajdcc.lexer.algorithm.ITokenAlgorithm#getMetaHash()
-	 */
 	@Override
 	public HashMap<Character, MetaType> getMetaHash() {
 		return m_MetaMap;
 	}
 
-	/*
-	 * （非 Javadoc）
-	 * 
-	 * @see
-	 * priv.bajdcc.lexer.regex.IRegexStringResult#setResult(java.lang.String)
-	 */
 	@Override
 	public void setResult(String result) {
 		m_strMatch = result;
+	}
+
+	@Override
+	public String getResult() {
+		return m_strMatch;
 	}
 }
