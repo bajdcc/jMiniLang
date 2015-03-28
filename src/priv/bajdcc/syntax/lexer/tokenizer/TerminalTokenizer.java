@@ -1,25 +1,26 @@
-package priv.bajdcc.lexer.algorithm.impl;
+package priv.bajdcc.syntax.lexer.tokenizer;
 
 import priv.bajdcc.lexer.algorithm.TokenAlgorithm;
-import priv.bajdcc.lexer.algorithm.filter.CharacterFilter;
+import priv.bajdcc.lexer.algorithm.filter.StringFilter;
 import priv.bajdcc.lexer.error.RegexException;
+import priv.bajdcc.lexer.token.MetaType;
 import priv.bajdcc.lexer.token.Token;
 import priv.bajdcc.lexer.token.TokenType;
 
 /**
- * 字符解析
+ * 终结符解析
  * 
  * @author bajdcc
  *
  */
-public class CharacterTokenizer extends TokenAlgorithm {
+public class TerminalTokenizer extends TokenAlgorithm {
 
-	public CharacterTokenizer() throws RegexException {
-		super(getRegexString(), new CharacterFilter());
+	public TerminalTokenizer() throws RegexException {
+		super(getRegexString(), new StringFilter(MetaType.TERMINAL));
 	}
 
 	public static String getRegexString() {
-		return "\'.\'";
+		return "`.*`";
 	}
 
 	/* （非 Javadoc）
@@ -27,7 +28,7 @@ public class CharacterTokenizer extends TokenAlgorithm {
 	 */
 	@Override
 	public Token getToken(String string, Token token) {
-		token.m_kToken = TokenType.CHARACTER;
+		token.m_kToken = TokenType.STRING;
 		token.m_Object = string;
 		return token;
 	}

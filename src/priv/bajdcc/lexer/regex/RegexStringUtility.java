@@ -46,8 +46,6 @@ public class RegexStringUtility {
 			ch = fromDigit(8, 3, error);
 		} else if (ch == 'u') {
 			ch = fromDigit(16, 4, error);
-		} else {
-			m_Iterator.err(RegexError.ESCAPE);
 		}
 		return ch;
 	}

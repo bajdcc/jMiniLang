@@ -5,7 +5,7 @@ import java.util.Stack;
 import priv.bajdcc.lexer.error.RegexException;
 import priv.bajdcc.lexer.error.RegexException.RegexError;
 import priv.bajdcc.lexer.token.MetaType;
-import priv.bajdcc.lexer.utility.Position;
+import priv.bajdcc.utility.Position;
 
 /**
  * 字符串迭代器，提供字节流解析功能
@@ -39,6 +39,10 @@ public class RegexStringIterator implements IRegexStringIterator {
 	 */
 	protected RegexStringIteratorData m_Data = new RegexStringIteratorData();
 
+	public RegexStringIterator() {
+
+	}
+	
 	public RegexStringIterator(String strContext) {
 		m_strContext = strContext;
 	}

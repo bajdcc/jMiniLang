@@ -176,11 +176,15 @@ public class Regex extends RegexStringIterator {
 		int lastFinalStatus = -1;
 		/* 上次经过的终态位置 */
 		int lastIndex = -1;
+		/* 是否为贪婪模式 */
+		boolean greed = attr.getGreedMode();
 		/* 存放匹配字符串 */
 		StringBuilder sb = new StringBuilder();
+		/* 是否允许通过终态结束识别 */
+		boolean allowFinal = false;
 		for (;;) {
 			if (m_FinalStatus.contains(status)) {// 经过终态
-				if (attr.getGreedMode()) {// 贪婪模式
+				if (greed) {// 贪婪模式
 					if (lastFinalStatus == -1) {
 						iterator.snapshot();// 保存位置
 					} else {
@@ -188,7 +192,7 @@ public class Regex extends RegexStringIterator {
 					}
 					lastFinalStatus = status;// 记录上次状态
 					lastIndex = sb.length();
-				} else {// 非贪婪模式，则匹配完成
+				} else if (!allowFinal) {// 非贪婪模式，则匹配完成
 					iterator.discard();// 匹配成功，丢弃位置
 					attr.setResult(sb.toString());
 					return true;
@@ -201,6 +205,7 @@ public class Regex extends RegexStringIterator {
 				RegexStringIteratorData data = m_Filter.filter(iterator);// 过滤
 				local = data.m_chCurrent;
 				skipStore = data.m_kMeta == MetaType.NULL;
+				allowFinal = data.m_kMeta == MetaType.MUST_SAVE;// 强制跳过终态
 			} else {
 				if (!iterator.available()) {
 					local = 0;
@@ -261,7 +266,7 @@ public class Regex extends RegexStringIterator {
 				if (sequence.m_arrComponents.isEmpty())// 在此之前没有存储表达式 (|...)
 				{
 					err(RegexError.INCOMPLETE);
-				} else {
+				} else{
 					if (branch == null) {// 分支为空，则建立分支
 						branch = new Constructure(true);
 						branch.m_arrComponents.add(sequence);// 用新建的分支包含并替代当前序列
@@ -269,6 +274,7 @@ public class Regex extends RegexStringIterator {
 					}
 					sequence = new Constructure(false);// 新建一个序列
 					branch.m_arrComponents.add(sequence);
+					continue;
 				}
 				break;
 			case LPARAN:// '('

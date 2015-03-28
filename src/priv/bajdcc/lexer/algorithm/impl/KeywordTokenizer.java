@@ -29,7 +29,8 @@ public class KeywordTokenizer extends TokenAlgorithm {
 	public static String getRegexString() {
 		StringBuilder sb = new StringBuilder();
 		for (KeywordType keyword : KeywordType.values()) {// ¹Ø¼ü×Ö
-			sb.append(keyword.getName() + "|");
+			sb.append(keyword.getName());
+			sb.append('|');
 		}
 		sb.deleteCharAt(sb.length() - 1);
 		return sb.toString();

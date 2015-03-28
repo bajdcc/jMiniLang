@@ -3,6 +3,7 @@ package priv.bajdcc.lexer.algorithm.impl;
 import priv.bajdcc.lexer.algorithm.TokenAlgorithm;
 import priv.bajdcc.lexer.algorithm.filter.StringFilter;
 import priv.bajdcc.lexer.error.RegexException;
+import priv.bajdcc.lexer.token.MetaType;
 import priv.bajdcc.lexer.token.Token;
 import priv.bajdcc.lexer.token.TokenType;
 
@@ -15,11 +16,11 @@ import priv.bajdcc.lexer.token.TokenType;
 public class StringTokenizer extends TokenAlgorithm {
 
 	public StringTokenizer() throws RegexException {
-		super(getRegexString(), new StringFilter());
+		super(getRegexString(), new StringFilter(MetaType.DOUBLE_QUOTE));
 	}
 
 	public static String getRegexString() {
-		return "\"[^\"]*\"";
+		return "\".*\"";
 	}
 
 	/* £¨·Ç Javadoc£©

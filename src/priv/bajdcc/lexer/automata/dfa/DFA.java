@@ -16,7 +16,7 @@ import priv.bajdcc.lexer.automata.nfa.NFA;
 import priv.bajdcc.lexer.automata.nfa.NFAEdge;
 import priv.bajdcc.lexer.automata.nfa.NFAStatus;
 import priv.bajdcc.lexer.regex.IRegexComponent;
-import priv.bajdcc.lexer.utility.ObjectFactory;
+import priv.bajdcc.utility.ObjectFactory;
 
 /**
  * 确定性自动机（DFA）

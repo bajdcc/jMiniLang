@@ -6,19 +6,24 @@ import priv.bajdcc.lexer.token.Token;
 import priv.bajdcc.lexer.token.TokenType;
 
 /**
- * ×¢ÊÍ½âÎö
+ * ºêÓï¾ä½âÎö
  * 
  * @author bajdcc
  *
  */
-public class CommentTokenizer extends TokenAlgorithm {
+public class MacroTokenizer extends TokenAlgorithm {
 
-	public CommentTokenizer() throws RegexException {
+	public MacroTokenizer() throws RegexException {
 		super(getRegexString(), null);
 	}
 
 	public static String getRegexString() {
-		return "((//[^\\r\\n]*[\\r\\n]{1,2})|(/\\*.*\\*/))";
+		return "#(([^\\r\\n])*)([\\r\\n]{1,2})";
+	}
+
+	@Override
+	public boolean getGreedMode() {
+		return true;
 	}
 
 	/*
@@ -30,7 +35,7 @@ public class CommentTokenizer extends TokenAlgorithm {
 	 */
 	@Override
 	public Token getToken(String string, Token token) {
-		token.m_kToken = TokenType.COMMENT;
+		token.m_kToken = TokenType.MACRO;
 		token.m_Object = string.trim();
 		return token;
 	}

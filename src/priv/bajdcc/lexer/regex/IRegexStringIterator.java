@@ -3,7 +3,7 @@ package priv.bajdcc.lexer.regex;
 import priv.bajdcc.lexer.error.RegexException;
 import priv.bajdcc.lexer.error.RegexException.RegexError;
 import priv.bajdcc.lexer.token.MetaType;
-import priv.bajdcc.lexer.utility.Position;
+import priv.bajdcc.utility.Position;
 
 /**
  * ×Ö·û´®µü´úÆ÷½Ó¿Ú

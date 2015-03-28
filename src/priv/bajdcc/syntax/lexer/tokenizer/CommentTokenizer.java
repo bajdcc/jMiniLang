@@ -1,7 +1,9 @@
-package priv.bajdcc.lexer.algorithm.impl;
+package priv.bajdcc.syntax.lexer.tokenizer;
 
 import priv.bajdcc.lexer.algorithm.TokenAlgorithm;
+import priv.bajdcc.lexer.algorithm.filter.StringPairFilter;
 import priv.bajdcc.lexer.error.RegexException;
+import priv.bajdcc.lexer.token.MetaType;
 import priv.bajdcc.lexer.token.Token;
 import priv.bajdcc.lexer.token.TokenType;
 
@@ -14,11 +16,11 @@ import priv.bajdcc.lexer.token.TokenType;
 public class CommentTokenizer extends TokenAlgorithm {
 
 	public CommentTokenizer() throws RegexException {
-		super(getRegexString(), null);
+		super(getRegexString(), new StringPairFilter(MetaType.LT, MetaType.GT));
 	}
 
 	public static String getRegexString() {
-		return "((//[^\\r\\n]*[\\r\\n]{1,2})|(/\\*.*\\*/))";
+		return "<.*>";
 	}
 
 	/*

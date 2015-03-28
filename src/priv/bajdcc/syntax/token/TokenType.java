@@ -1,4 +1,4 @@
-package priv.bajdcc.lexer.token;
+package priv.bajdcc.syntax.token;
 
 /**
  * 单词类型
@@ -6,9 +6,8 @@ package priv.bajdcc.lexer.token;
  * @author bajdcc
  */
 public enum TokenType {
-	KEYWORD("关键字"), ID("标识符"), WHITESPACE("空白字符"), CHARACTER("字符"), STRING(
-			"字符串"), INTEGER("整数"), REAL("实数"), EOF("全文末尾"), COMMENT("注释"), OPERATOR(
-			"操作符"), MACRO("宏"), ERROR("错误");
+	TERMINAL("终结符"), NONTERMINAL("非终结符"), EOF("全文末尾"), COMMENT("注释"), OPERATOR(
+			"操作符"), WHITSPACE("空白字符"), HANDLER("错误处理器"), ERROR("错误");
 
 	private String name;
 

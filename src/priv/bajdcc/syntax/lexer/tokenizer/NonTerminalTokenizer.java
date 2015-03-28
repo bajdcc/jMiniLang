@@ -1,4 +1,4 @@
-package priv.bajdcc.lexer.algorithm.impl;
+package priv.bajdcc.syntax.lexer.tokenizer;
 
 import priv.bajdcc.lexer.algorithm.TokenAlgorithm;
 import priv.bajdcc.lexer.error.RegexException;
@@ -6,19 +6,24 @@ import priv.bajdcc.lexer.token.Token;
 import priv.bajdcc.lexer.token.TokenType;
 
 /**
- * 注释解析
+ * 非终结符解析
  * 
  * @author bajdcc
  *
  */
-public class CommentTokenizer extends TokenAlgorithm {
+public class NonTerminalTokenizer extends TokenAlgorithm {
 
-	public CommentTokenizer() throws RegexException {
+	public NonTerminalTokenizer() throws RegexException {
 		super(getRegexString(), null);
 	}
 
-	public static String getRegexString() {
-		return "((//[^\\r\\n]*[\\r\\n]{1,2})|(/\\*.*\\*/))";
+	public static String getRegexString() {		
+		return "(\\a|_)\\w*";
+	}
+
+	@Override
+	public boolean getGreedMode() {
+		return true;
 	}
 
 	/*
@@ -30,8 +35,8 @@ public class CommentTokenizer extends TokenAlgorithm {
 	 */
 	@Override
 	public Token getToken(String string, Token token) {
-		token.m_kToken = TokenType.COMMENT;
-		token.m_Object = string.trim();
+		token.m_kToken = TokenType.ID;
+		token.m_Object = string;
 		return token;
 	}
 }

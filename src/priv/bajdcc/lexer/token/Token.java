@@ -1,6 +1,6 @@
 package priv.bajdcc.lexer.token;
 
-import priv.bajdcc.lexer.utility.Position;
+import priv.bajdcc.utility.Position;
 
 /**
  * µ¥´Ê

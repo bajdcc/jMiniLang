@@ -10,13 +10,28 @@ import priv.bajdcc.lexer.regex.RegexStringUtility;
 import priv.bajdcc.lexer.token.MetaType;
 
 /**
- * 字符类型过滤
+ * 字符串类型过滤（首尾字符不同）
  * 
  * @author bajdcc
  *
  */
-public class CharacterFilter implements IRegexStringFilter,
+public class StringPairFilter implements IRegexStringFilter,
 		IRegexStringFilterMeta {
+
+	/**
+	 * 字符串首的终结符
+	 */
+	private MetaType m_kMetaBegin = MetaType.NULL;
+
+	/**
+	 * 字符串尾的终结符
+	 */
+	private MetaType m_kMetaEnd = MetaType.NULL;
+
+	public StringPairFilter(MetaType begin, MetaType end) {
+		m_kMetaBegin = begin;
+		m_kMetaEnd = end;
+	}
 
 	@Override
 	public RegexStringIteratorData filter(IRegexStringIterator iterator) {
@@ -30,7 +45,7 @@ public class CharacterFilter implements IRegexStringFilter,
 				data.m_kMeta = iterator.meta();
 				data.m_chCurrent = iterator.current();
 				iterator.next();
-				if (data.m_kMeta == MetaType.SINGLE_QUOTE) {// 过滤单引号
+				if (data.m_kMeta == m_kMetaBegin || data.m_kMeta == m_kMetaEnd) {// 过滤终结符
 					data.m_kMeta = MetaType.NULL;
 				} else if (data.m_kMeta == MetaType.ESCAPE) {// 处理转义
 					data.m_chCurrent = iterator.current();
@@ -41,8 +56,7 @@ public class CharacterFilter implements IRegexStringFilter,
 				}
 			}
 		} catch (RegexException e) {
-			System.err.println(e.getPosition() + " : "
-					+ e.getMessage());
+			System.err.println(e.getPosition() + " : " + e.getMessage());
 			data.m_kMeta = MetaType.ERROR;
 			data.m_chCurrent = MetaType.ERROR.getChar();
 		}
@@ -56,6 +70,6 @@ public class CharacterFilter implements IRegexStringFilter,
 
 	@Override
 	public MetaType[] getMetaTypes() {
-		return new MetaType[] { MetaType.SINGLE_QUOTE, MetaType.ESCAPE };
+		return new MetaType[] { m_kMetaBegin, m_kMetaEnd, MetaType.ESCAPE };
 	}
 }

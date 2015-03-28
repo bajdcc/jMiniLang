@@ -1,4 +1,4 @@
-package priv.bajdcc.lexer.utility;
+package priv.bajdcc.utility;
 
 import org.vibur.objectpool.PoolObjectFactory;
 

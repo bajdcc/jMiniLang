@@ -16,7 +16,7 @@ import priv.bajdcc.lexer.regex.Constructure;
 import priv.bajdcc.lexer.regex.IRegexComponent;
 import priv.bajdcc.lexer.regex.IRegexComponentVisitor;
 import priv.bajdcc.lexer.regex.Repetition;
-import priv.bajdcc.lexer.utility.ObjectFactory;
+import priv.bajdcc.utility.ObjectFactory;
 
 /**
  * NFA构成算法（AST->NFA）
@@ -30,7 +30,7 @@ public class NFA implements IRegexComponentVisitor {
 	 * 是否为调试模式（打印信息）
 	 */
 	protected boolean m_bDebug = false;
-	
+
 	/**
 	 * 边对象池
 	 */
@@ -213,6 +213,9 @@ public class NFA implements IRegexComponentVisitor {
 	@Override
 	public void visitEnd(Repetition node) {
 		leaveChildren();
+		// #### 注意 ####
+		// 由于正则表达式的语法树结构使然，循环语句的子结点必定只有一个，
+		// 为字符集、并联或串联。
 		/* 构造子图副本 */
 		ArrayList<ENFA> subENFAList = new ArrayList<ENFA>();
 		ENFA enfa = new ENFA();
@@ -246,14 +249,14 @@ public class NFA implements IRegexComponentVisitor {
 			}
 		} else {// 无限循环
 			NFAStatus tailBegin, tailEnd;
-			if (enfa.m_End == null) {
+			if (enfa.m_End == null) {// 循环最低次数为0，即未构造起始部分，故需构造
 				tailBegin = enfa.m_Begin = m_StatusPool.take();
 				tailEnd = enfa.m_End = m_StatusPool.take();
-			} else {
+			} else {// 起始部分已构造完毕，故起始端无需再次构造
 				tailBegin = enfa.m_End;
 				tailEnd = enfa.m_End = m_StatusPool.take();
 			}
-			/* 构造无限循环的结束部分 */
+			/* 构造无限循环的结束部分，连接起始端与循环端的双向e边 */
 			connect(tailBegin, subENFAList.get(node.m_iLowerBound).m_Begin);
 			connect(subENFAList.get(node.m_iLowerBound).m_End, tailBegin);
 			connect(tailBegin, tailEnd);
@@ -292,7 +295,7 @@ public class NFA implements IRegexComponentVisitor {
 	 * 进入结点
 	 */
 	private void enter() {
-		if (m_iLevel == 0) {// 刚进入该结点时，访问其子结点
+		if (m_iLevel == 0) {// 首次访问AST时
 			enterChildren();
 		}
 		m_iLevel++;
@@ -303,7 +306,7 @@ public class NFA implements IRegexComponentVisitor {
 	 */
 	private void leave() {
 		m_iLevel--;
-		if (m_iLevel == 0) {// 刚进入该结点时，访问其子结点
+		if (m_iLevel == 0) {// 离开整个AST时，存储结果
 			leaveChildren();
 			store();
 		}
@@ -321,15 +324,17 @@ public class NFA implements IRegexComponentVisitor {
 	 * 离开子结点
 	 */
 	private void leaveChildren() {
-		m_childNFA = m_stkNFA.pop();
+		m_childNFA = m_stkNFA.pop();// 获得当前结点的子结点
 	}
 
 	/**
 	 * 存储结果
 	 */
 	private void store() {
-		ENFA enfa = m_childNFA.get(0);
-		enfa.m_End.m_Data.m_bFinal = true;
+		// #### 注意 ####
+		// 本程序由regex构造的AST形成的NFA有明确且唯一的初态和终态
+		ENFA enfa = m_childNFA.get(0);// 此时位于顶层，故顶层首个ENFA为根ENFA
+		enfa.m_End.m_Data.m_bFinal = true;// 根ENFA的初态为begin，终态为end
 		m_mainNFA = enfa;
 	}
 
@@ -360,13 +365,13 @@ public class NFA implements IRegexComponentVisitor {
 				newEdge.m_Data = edge.m_Data;
 			}
 		}
-		/* 找到始态和终态 */
+		/* 新建ENFA，连接初态和终态 */
 		ENFA result = new ENFA();
 		result.m_Begin = dstStatusList.get(srcStatusList.indexOf(enfa.m_Begin));
 		result.m_End = dstStatusList.get(srcStatusList.indexOf(enfa.m_End));
 		return result;
 	}
-	
+
 	/**
 	 * 获取字符映射表
 	 */

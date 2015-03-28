@@ -10,7 +10,8 @@ public enum MetaType {
 			'?'), LSQUARE('['), RSQUARE(']'), BAR('|'), ESCAPE('\\'), DASH('-'), LBRACE(
 			'{'), RBRACE('}'), COMMA(','), DOT('.'), NEW_LINE('\n'), CARRIAGE_RETURN(
 			'\r'), BACKSPACE('\b'), DOUBLE_QUOTE('\"'), SINGLE_QUOTE('\''), END(
-			'\0'), ERROR('\0'), NULL('\0');
+			'\0'), ERROR('\0'), NULL('\0'), MUST_SAVE('\0'), TERMINAL('`'), LT(
+			'<'), GT('>');
 
 	private char ch;
 

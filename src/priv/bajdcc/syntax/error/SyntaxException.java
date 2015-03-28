@@ -1,33 +1,26 @@
-package priv.bajdcc.lexer.error;
+package priv.bajdcc.syntax.error;
 
 import priv.bajdcc.utility.Position;
 
 /**
- * 正则表达式生成过程中的异常
+ * 文法生成过程中的异常
  * 
  * @author bajdcc
  *
  */
 @SuppressWarnings("serial")
-public class RegexException extends Exception {
+public class SyntaxException extends Exception {
 
 	/**
 	 * 正则表达式解析过程中的错误
 	 */
-	public enum RegexError {
-		NULL("正则表达式为空"),
-		CTYPE("非法字符"),
-		ESCAPE("非法的转义字符"),
-		BRACK("中括号不匹配"),
-		PAREN("小括号不匹配"),
-		BRACE("大括号不匹配"),
-		RANGE("范围不正确"),
-		SYNTAX("语法错误"),
-		INCOMPLETE("正则表达式不完整");
+	public enum SyntaxError {
+		NULL("推导式为空"), UNDECLARED("无法识别的符号"), SYNTAX("语法错误"), INCOMPLETE(
+				"推导式不完整");
 
 		private String message;
 
-		RegexError(String message) {
+		SyntaxError(String message) {
 			this.message = message;
 		}
 
@@ -40,33 +33,48 @@ public class RegexException extends Exception {
 		}
 	};
 
-	public RegexException(RegexError error, Position pos) {
+	public SyntaxException(SyntaxError error, Position pos, Object obj) {
 		super(error.getMessage());
 		m_Position = pos;
 		m_kError = error;
+		if (obj != null) {
+			m_strInfo = obj.toString();
+		}
 	}
 
 	/**
 	 * 位置
 	 */
 	private Position m_Position = new Position();
-	
+
 	/**
 	 * @return 错误位置
 	 */
 	public Position getPosition() {
 		return m_Position;
 	}
-	
+
 	/**
 	 * 错误类型
 	 */
-	private RegexError m_kError = RegexError.NULL;
+	private SyntaxError m_kError = SyntaxError.NULL;
 
 	/**
 	 * @return 错误类型
 	 */
-	public RegexError getErrorCode() {
+	public SyntaxError getErrorCode() {
 		return m_kError;
+	}
+
+	/**
+	 * 错误信息
+	 */
+	private String m_strInfo = "";
+
+	/**
+	 * @return 错误信息
+	 */
+	public String getInfo() {
+		return m_strInfo;
 	}
 }

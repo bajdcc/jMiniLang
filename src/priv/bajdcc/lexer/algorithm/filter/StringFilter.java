@@ -17,6 +17,15 @@ import priv.bajdcc.lexer.token.MetaType;
  */
 public class StringFilter implements IRegexStringFilter, IRegexStringFilterMeta {
 
+	/**
+	 * 字符串首尾的终结符
+	 */
+	private MetaType m_kMeta = MetaType.NULL;
+	
+	public StringFilter(MetaType meta) {
+		m_kMeta = meta;
+	}
+
 	@Override
 	public RegexStringIteratorData filter(IRegexStringIterator iterator) {
 		RegexStringUtility utility = iterator.utility();// 获取解析组件
@@ -29,12 +38,12 @@ public class StringFilter implements IRegexStringFilter, IRegexStringFilterMeta 
 				data.m_kMeta = iterator.meta();
 				data.m_chCurrent = iterator.current();
 				iterator.next();
-				if (data.m_kMeta == MetaType.DOUBLE_QUOTE) {// 过滤双引号
+				if (data.m_kMeta == m_kMeta) {// 过滤终结符
 					data.m_kMeta = MetaType.NULL;
 				} else if (data.m_kMeta == MetaType.ESCAPE) {// 处理转义
-					data.m_kMeta = MetaType.CHARACTER;
 					data.m_chCurrent = iterator.current();
 					iterator.next();
+					data.m_kMeta = MetaType.MUST_SAVE;
 					data.m_chCurrent = utility.fromEscape(data.m_chCurrent,
 							RegexError.ESCAPE);
 				}
@@ -55,6 +64,6 @@ public class StringFilter implements IRegexStringFilter, IRegexStringFilterMeta 
 
 	@Override
 	public MetaType[] getMetaTypes() {
-		return new MetaType[] { MetaType.DOUBLE_QUOTE, MetaType.ESCAPE };
+		return new MetaType[] { m_kMeta, MetaType.ESCAPE };
 	}
 }

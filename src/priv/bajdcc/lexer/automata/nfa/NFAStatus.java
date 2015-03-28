@@ -1,6 +1,7 @@
 package priv.bajdcc.lexer.automata.nfa;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import priv.bajdcc.lexer.automata.BreadthFirstSearch;
 
@@ -34,14 +35,17 @@ public class NFAStatus {
 	 */
 	public void visit(BreadthFirstSearch<NFAEdge, NFAStatus> bfs) {
 		ArrayList<NFAStatus> stack = bfs.m_Path;
+		HashSet<NFAStatus> set = new HashSet<NFAStatus>();
 		stack.clear();
+		set.add(this);
 		stack.add(this);
 		for (int i = 0; i < stack.size(); i++) {// 遍历每个状态
 			NFAStatus status = stack.get(i);
 			bfs.visitBegin(status);
 			for (NFAEdge edge : status.m_OutEdges) {// 遍历状态的出边
-				if (!stack.contains(edge.m_End) && bfs.testEdge(edge)) {// 边未被访问，且边类型符合要求
+				if (!set.contains(edge.m_End) && bfs.testEdge(edge)) {// 边未被访问，且边类型符合要求
 					stack.add(edge.m_End);
+					set.add(edge.m_End);
 				}
 			}
 			bfs.visitEnd(status);

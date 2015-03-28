@@ -1,6 +1,7 @@
 package priv.bajdcc.lexer.automata.dfa;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import priv.bajdcc.lexer.automata.BreadthFirstSearch;
 
@@ -14,12 +15,12 @@ public class DFAStatus {
 	/**
 	 * 出边集合
 	 */
-	public ArrayList<DFAEdge> m_OutEdges = new ArrayList<DFAEdge>();
+	public HashSet<DFAEdge> m_OutEdges = new HashSet<DFAEdge>();
 
 	/**
 	 * 入边集合
 	 */
-	public ArrayList<DFAEdge> m_InEdges = new ArrayList<DFAEdge>();
+	public HashSet<DFAEdge> m_InEdges = new HashSet<DFAEdge>();
 
 	/**
 	 * 数据
@@ -34,14 +35,17 @@ public class DFAStatus {
 	 */
 	public void visit(BreadthFirstSearch<DFAEdge, DFAStatus> bfs) {
 		ArrayList<DFAStatus> stack = bfs.m_Path;
+		HashSet<DFAStatus> set = new HashSet<DFAStatus>();
 		stack.clear();
+		set.add(this);
 		stack.add(this);
 		for (int i = 0; i < stack.size(); i++) {// 遍历每个状态
 			DFAStatus status = stack.get(i);
 			bfs.visitBegin(status);
 			for (DFAEdge edge : status.m_OutEdges) {// 遍历状态的出边
-				if (!stack.contains(edge.m_End) && bfs.testEdge(edge)) {// 边未被访问，且边类型符合要求
+				if (!set.contains(edge.m_End) && bfs.testEdge(edge)) {// 边未被访问，且边类型符合要求
 					stack.add(edge.m_End);
+					set.add(edge.m_End);
 				}
 			}
 			bfs.visitEnd(status);
