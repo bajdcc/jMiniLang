@@ -40,4 +40,9 @@ public class RuleExp implements ISyntaxComponent {
 			visitor.visitEnd(this);
 		}
 	}
+	
+	@Override
+	public String toString() {
+		return m_iID + "£º " + m_strName;
+	}
 }

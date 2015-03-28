@@ -1,6 +1,6 @@
 package priv.bajdcc.syntax;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 
 import priv.bajdcc.syntax.exp.RuleExp;
 import priv.bajdcc.syntax.exp.TokenExp;
@@ -20,12 +20,12 @@ public class RuleItem {
 	/**
 	 * First集合（终结符）
 	 */
-	public ArrayList<TokenExp> m_arrFirstSetTokens = new ArrayList<TokenExp>();
+	public HashSet<TokenExp> m_arrFirstSetTokens = new HashSet<TokenExp>();
 
 	/**
 	 * First集合（非终结符）
 	 */
-	public ArrayList<RuleExp> m_arrFirstSetRules = new ArrayList<RuleExp>();
+	public HashSet<RuleExp> m_arrFirstSetRules = new HashSet<RuleExp>();
 
 	/**
 	 * 父结点指针

@@ -1,4 +1,4 @@
-package priv.bajdcc.syntax.exp.stringify;
+package priv.bajdcc.syntax.stringify;
 
 import java.util.ArrayList;
 import java.util.Stack;

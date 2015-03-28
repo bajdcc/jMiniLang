@@ -1,6 +1,7 @@
 package priv.bajdcc.syntax;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.HashMap;
 
 import priv.bajdcc.lexer.error.RegexException;
@@ -14,14 +15,20 @@ import priv.bajdcc.syntax.exp.PropertyExp;
 import priv.bajdcc.syntax.exp.RuleExp;
 import priv.bajdcc.syntax.exp.SequenceExp;
 import priv.bajdcc.syntax.exp.TokenExp;
-import priv.bajdcc.syntax.exp.stringify.SyntaxToString;
 import priv.bajdcc.syntax.lexer.SyntaxLexer;
+import priv.bajdcc.syntax.solver.FirstsetSolver;
+import priv.bajdcc.syntax.stringify.SyntaxToString;
 import priv.bajdcc.syntax.token.OperatorType;
 import priv.bajdcc.syntax.token.Token;
 import priv.bajdcc.syntax.token.TokenType;
+import priv.bajdcc.utility.BitVector2;
+import priv.bajdcc.utility.Position;
 
 /**
  * 文法构造器
+ * 
+ * 语法示例： Z -> A | B | `abc` | ( A | `c`<terminal comment text> | C<comment> |
+ * C{Error handler name})
  *
  * @author bajdcc
  */
@@ -55,6 +62,11 @@ public class Syntax {
 	 * 属性表
 	 */
 	private HashMap<String, PropertyExp> m_mapProperties = new HashMap<String, PropertyExp>();
+
+	/**
+	 * 文法起始符号
+	 */
+	private String m_strBeginRuleName = "";
 
 	/**
 	 * 面向文法的词法分析器
@@ -101,7 +113,7 @@ public class Syntax {
 	/**
 	 * 添加非终结符
 	 * 
-	 * @param token
+	 * @param name
 	 *            非终结符名称
 	 */
 	public void addNonTerminal(String name) {
@@ -146,6 +158,19 @@ public class Syntax {
 	private void err(SyntaxError error) throws SyntaxException {
 		throw new SyntaxException(error, m_SyntaxLexer.position(),
 				m_Token.m_Object);
+	}
+
+	/**
+	 * 抛出异常
+	 * 
+	 * @param error
+	 *            错误类型
+	 * @param obj
+	 *            错误信息
+	 * @throws SyntaxException
+	 */
+	private void err(SyntaxError error, Object obj) throws SyntaxException {
+		throw new SyntaxException(error, new Position(), obj);
 	}
 
 	/**
@@ -370,19 +395,251 @@ public class Syntax {
 		return result;
 	}
 
-	@Override
-	public String toString() {
+	/**
+	 * 初始化
+	 * 
+	 * @param startSymbol
+	 *            开始符号
+	 * @throws SyntaxException
+	 */
+	public void initialize(String startSymbol) throws SyntaxException {
+		m_strBeginRuleName = startSymbol;
+		semanticAnalysis();
+	}
+
+	/**
+	 * 进行语义分析
+	 * 
+	 * @throws SyntaxException
+	 */
+	private void semanticAnalysis() throws SyntaxException {
+		/* 非终结符数量 */
+		int size = m_arrNonTerminals.size();
+		/* 计算规则的First集合 */
+		for (RuleExp exp : m_arrNonTerminals) {
+			for (RuleItem item : exp.m_Rule.m_arrRules) {
+				FirstsetSolver solver = new FirstsetSolver();
+				item.m_Expression.visit(solver);// 计算规则的First集合
+				if (!solver.solve(item)) {// 若串长度可能为零，即产生空串
+					err(SyntaxError.EPSILON,
+							getSingleString(exp.m_strName, item.m_Expression));
+				}
+			}
+		}
+		/* 建立连通矩阵 */
+		BitVector2 firstsetDependency = new BitVector2(size, size);// First集依赖矩阵
+		firstsetDependency.clear();
+		/* 计算非终结符First集合包含关系的布尔连通矩阵 */
+		{
+			int i = 0;
+			for (RuleExp exp : m_arrNonTerminals) {
+				for (RuleItem item : exp.m_Rule.m_arrRules) {
+					for (RuleExp rule : item.m_arrFirstSetRules) {
+						firstsetDependency.set(i, rule.m_iID);
+					}
+				}
+				i++;
+			}
+		}
+		/* 计算间接左递归 */
+		{
+			/* 标记并清除直接左递归 */
+			for (int i = 0; i < size; i++) {
+				if (firstsetDependency.test(i, i)) {
+					m_arrNonTerminals.get(i).m_Rule.m_iRecursiveLevel = 1;// 直接左递归
+					firstsetDependency.set(i, i);
+				}
+			}
+			/* 获得拷贝 */
+			BitVector2 a = (BitVector2) firstsetDependency.clone();
+			BitVector2 b = (BitVector2) firstsetDependency.clone();
+			BitVector2 r = new BitVector2(size, size);
+			/* 检查是否出现环 */
+			for (int level = 2; level < size; level++) {// ***
+														// Warshell算法：求有向图的传递闭包
+														// ***
+				/* 进行布尔连通矩阵乘法，即r=aXb */
+				for (int i = 0; i < size; i++) {
+					for (int j = 0; j < size; j++) {
+						r.clear(i, j);
+						for (int k = 0; k < size; k++) {
+							boolean value = r.test(i, j)
+									|| (a.test(i, k) && b.test(k, j));
+							r.set(i, j, value);
+						}
+					}
+				}
+				/* 检查当前结果是否出现环 */
+				{
+					int i = 0;
+					for (RuleExp exp : m_arrNonTerminals) {
+						if (r.test(i, i)) {
+							if (exp.m_Rule.m_iRecursiveLevel < 2) {
+								exp.m_Rule.m_iRecursiveLevel = level;
+							}
+						}
+						i++;
+					}
+				}
+				/* 保存结果 */
+				a = (BitVector2) r.clone();
+			}
+			/* 检查是否存在环并报告错误 */
+			for (RuleExp exp : m_arrNonTerminals) {
+				if (exp.m_Rule.m_iRecursiveLevel > 1) {
+					err(SyntaxError.INDIRECT_RECURSION, exp.m_strName
+							+ " level:" + exp.m_Rule.m_iRecursiveLevel);
+				}
+			}
+		}
+		/* 计算完整的First集合 */
+		{
+			/* 建立处理标记表 */
+			BitSet processed = new BitSet(size);
+			processed.clear();
+			for (int i = 0; i < size; i++) {
+				/* 找出一条无最左依赖的规则 */
+				int nodependencyRule = -1;// 最左依赖的规则索引
+				for (int j = 0; j < size; j++) {
+					if (!processed.get(j)) {
+						boolean empty = true;
+						for (int k = 0; k < size; k++) {
+							if (firstsetDependency.test(j, k)) {
+								empty = false;
+								break;
+							}
+						}
+						if (empty) {// 找到
+							nodependencyRule = j;
+							break;
+						}
+					}
+				}
+				/* 计算该规则的终结符First集合 */
+				{
+					Rule rule = m_arrNonTerminals.get(nodependencyRule).m_Rule;
+					/* 计算规则的终结符First集合 */
+					for (RuleItem item : rule.m_arrRules) {
+						for (RuleExp exp : item.m_arrFirstSetRules) {
+							item.m_arrFirstSetTokens
+									.addAll(exp.m_Rule.m_arrTokens);
+						}
+					}
+					/* 计算非终结符的终结符First集合 */
+					for (RuleItem item : rule.m_arrRules) {
+						rule.m_arrTokens.addAll(item.m_arrFirstSetTokens);
+					}
+					/* 修正左递归规则的终结符First集合 */
+					for (RuleItem item : rule.m_arrRules) {
+						if (item.m_arrFirstSetRules.contains(m_arrNonTerminals
+								.get(nodependencyRule))) {
+							item.m_arrFirstSetTokens.addAll(rule.m_arrTokens);
+						}
+					}
+				}
+				/* 清除该规则 */
+				processed.set(nodependencyRule);
+				for (int j = 0; j < size; j++) {
+					firstsetDependency.clear(j, nodependencyRule);
+				}
+			}
+		}
+		/* 搜索不能产生字符串的规则 */
+		for (RuleExp exp : m_arrNonTerminals) {
+			for (RuleItem item : exp.m_Rule.m_arrRules) {
+				if (item.m_arrFirstSetTokens.isEmpty()) {
+					err(SyntaxError.FAILED,
+							getSingleString(exp.m_strName, item.m_Expression));
+				}
+			}
+		}
+	}
+
+	/**
+	 * 获得单一产生式描述
+	 * 
+	 * @param name
+	 *            非终结符名称
+	 * @param exp
+	 *            表达式树
+	 * @return 原产生式描述
+	 */
+	public String getSingleString(String name, ISyntaxComponent exp) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(name);
+		sb.append(" -> ");
+		SyntaxToString alg = new SyntaxToString();
+		exp.visit(alg);
+		sb.append(alg.toString());
+		return sb.toString();
+	}
+
+	/**
+	 * 获得段落式描述
+	 */
+	public String getParagraphString() {
+		StringBuffer sb = new StringBuffer();
+		/* 起始符号 */
+		sb.append("#### 起始符号 ####");
+		sb.append(System.getProperty("line.separator"));
+		sb.append(m_strBeginRuleName);
+		sb.append(System.getProperty("line.separator"));
+		/* 终结符 */
+		sb.append("#### 终结符 ####");
+		sb.append(System.getProperty("line.separator"));
+		for (TokenExp exp : m_arrTerminals) {
+			sb.append(exp.toString());
+			sb.append(System.getProperty("line.separator"));
+		}
+		/* 非终结符 */
+		sb.append("#### 非终结符 ####");
+		sb.append(System.getProperty("line.separator"));
+		for (RuleExp exp : m_arrNonTerminals) {
+			sb.append(exp.toString());
+			sb.append(System.getProperty("line.separator"));
+		}
+		/* 推导规则 */
+		sb.append("#### 文法产生式 ####");
+		sb.append(System.getProperty("line.separator"));
+		for (RuleExp exp : m_arrNonTerminals) {
+			for (RuleItem item : exp.m_Rule.m_arrRules) {
+				/* 规则正文 */
+				sb.append(getSingleString(exp.m_strName, item.m_Expression));
+				sb.append(System.getProperty("line.separator"));
+				/* First集合 */
+				sb.append("\t--== 终结符First集合 ==--");
+				sb.append(System.getProperty("line.separator"));
+				for (TokenExp token : item.m_arrFirstSetTokens) {
+					sb.append("\t\t" + token.m_strName);
+					sb.append(System.getProperty("line.separator"));
+				}
+				sb.append("\t--== 非终结符First集合 ==--");
+				sb.append(System.getProperty("line.separator"));
+				for (RuleExp rule : item.m_arrFirstSetRules) {
+					sb.append("\t\t" + rule.m_strName);
+					sb.append(System.getProperty("line.separator"));
+				}
+			}
+		}
+		return sb.toString();
+	}
+
+	/**
+	 * 获得原推导式描述
+	 */
+	public String getOriginalString() {
 		StringBuffer sb = new StringBuffer();
 		for (RuleExp exp : m_arrNonTerminals) {
 			for (RuleItem item : exp.m_Rule.m_arrRules) {
-				sb.append(exp.m_strName);
-				sb.append(" -> ");
-				SyntaxToString alg = new SyntaxToString();
-				item.m_Expression.visit(alg);
-				sb.append(alg.toString());
+				sb.append(getSingleString(exp.m_strName, item.m_Expression));
 				sb.append(System.getProperty("line.separator"));
 			}
 		}
 		return sb.toString();
+	}
+
+	@Override
+	public String toString() {
+		return getParagraphString();
 	}
 }
