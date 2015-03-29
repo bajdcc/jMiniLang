@@ -1,17 +1,17 @@
-package priv.bajdcc.lexer.automata;
+package priv.bajdcc.syntax.automata.nga;
 
 /**
- * 状态自动机边类型
+ * 非确定性文法自动机边类型
  * 
  * @author bajdcc
  *
  */
-public enum EdgeType {
-	EPSILON("Epsilon边"), CHARSET("字符区间");
+public enum NGAEdgeType {
+	EPSILON("Epsilon边"), TOKEN("终结符"), RULE("非终结符");
 
 	private String name;
 
-	EdgeType(String name) {
+	NGAEdgeType(String name) {
 		this.name = name;
 	}
 

@@ -40,6 +40,15 @@ public class SyntaxToString implements ISyntaxComponentVisitor {
 	 */
 	private boolean m_bFront = true;
 
+	public SyntaxToString() {
+
+	}
+
+	public SyntaxToString(ISyntaxComponent exp, boolean front) {
+		m_FocusedExp = exp;
+		m_bFront = front;
+	}
+
 	/**
 	 * 开始遍历子结点
 	 */

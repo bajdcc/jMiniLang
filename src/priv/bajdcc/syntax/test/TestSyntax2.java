@@ -7,28 +7,22 @@ import priv.bajdcc.syntax.Syntax;
 import priv.bajdcc.syntax.error.SyntaxException;
 
 @SuppressWarnings("unused")
-public class TestSyntax {
+public class TestSyntax2 {
 
 	public static void main(String[] args) {
-		//System.out.println("Z -> `a`<,> | B | [`a` `b` Z B]");
 		try {
 			//Scanner scanner = new Scanner(System.in);
 			Syntax syntax = new Syntax();
-			syntax.addTerminal("PLUS", "+");
-			syntax.addTerminal("MINUS", "-");
-			syntax.addTerminal("TIMES", "*");
-			syntax.addTerminal("DIVIDE", "/");
-			syntax.addTerminal("LPA", "(");
-			syntax.addTerminal("RPA", ")");
-			syntax.addTerminal("SYMBOL", "i");
-			syntax.addNonTerminal("E");
-			syntax.addNonTerminal("T");
-			syntax.addNonTerminal("F");
+			syntax.addTerminal("a", "a");
+			syntax.addTerminal("b", "b");
+			syntax.addNonTerminal("Z");
+			syntax.addNonTerminal("S");
+			syntax.addNonTerminal("B");
 			syntax.addErrorHandler("sample", null);
-			syntax.infer("E -> T `PLUS`<+> E | T `MINUS`<-> E | T");
-			syntax.infer("T -> F `TIMES`<*> T | F `DIVIDE`</> T | F");
-			syntax.infer("F -> `LPA`<(> E `RPA`<)>  | `SYMBOL`<i>");
-			syntax.initialize("E");
+			syntax.infer("Z -> S");
+			syntax.infer("S -> B B");
+			syntax.infer("B -> `a` B | `b`");
+			syntax.initialize("Z");
 			System.out.println(syntax.toString());
 			System.out.println(syntax.getNGAString());
 			//scanner.close();

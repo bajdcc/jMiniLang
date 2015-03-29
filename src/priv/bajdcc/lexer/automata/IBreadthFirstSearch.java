@@ -1,5 +1,7 @@
 package priv.bajdcc.lexer.automata;
 
+import priv.bajdcc.utility.VisitBag;
+
 /**
  * 
  * BFS宽度优先遍历接口
@@ -25,7 +27,7 @@ public interface IBreadthFirstSearch<Edge, Status> {
 	 * @param status
 	 *            状态
 	 */
-	public void visitBegin(Status status);
+	public void visitBegin(Status status, VisitBag bag);
 
 	/**
 	 * 遍历结束

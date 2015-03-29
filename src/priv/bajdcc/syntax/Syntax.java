@@ -5,6 +5,7 @@ import java.util.BitSet;
 import java.util.HashMap;
 
 import priv.bajdcc.lexer.error.RegexException;
+import priv.bajdcc.syntax.automata.npa.NPA;
 import priv.bajdcc.syntax.error.IErrorHandler;
 import priv.bajdcc.syntax.error.SyntaxException;
 import priv.bajdcc.syntax.error.SyntaxException.SyntaxError;
@@ -82,6 +83,11 @@ public class Syntax {
 	 * 当前解析的文法规则
 	 */
 	private RuleExp m_Rule = null;
+
+	/**
+	 * 非确定性下推自动机
+	 */
+	private NPA m_NPA = null;
 
 	public Syntax() throws RegexException {
 		this(true);
@@ -404,7 +410,20 @@ public class Syntax {
 	 */
 	public void initialize(String startSymbol) throws SyntaxException {
 		m_strBeginRuleName = startSymbol;
+		checkStartSymbol();
 		semanticAnalysis();
+		generateNGA();
+	}
+
+	/**
+	 * 检测起始符号合法性
+	 * 
+	 * @throws SyntaxException
+	 */
+	private void checkStartSymbol() throws SyntaxException {
+		if (!m_mapNonTerminals.containsKey(m_strBeginRuleName)) {
+			err(SyntaxError.UNDECLARED);
+		}
 	}
 
 	/**
@@ -556,6 +575,37 @@ public class Syntax {
 	}
 
 	/**
+	 * 生成非确定性文法自动机
+	 */
+	private void generateNGA() {
+		m_NPA = new NPA(m_arrNonTerminals);
+	}
+
+	/**
+	 * 获得单一产生式描述
+	 * 
+	 * @param name
+	 *            非终结符名称
+	 * @param exp
+	 *            表达式树
+	 * @param focused
+	 *            焦点
+	 * @param front
+	 *            前向
+	 * @return 原产生式描述
+	 */
+	public static String getSingleString(String name, ISyntaxComponent exp,
+			ISyntaxComponent focused, boolean front) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(name);
+		sb.append(" -> ");
+		SyntaxToString alg = new SyntaxToString(focused, front);
+		exp.visit(alg);
+		sb.append(alg.toString());
+		return sb.toString();
+	}
+
+	/**
 	 * 获得单一产生式描述
 	 * 
 	 * @param name
@@ -564,7 +614,7 @@ public class Syntax {
 	 *            表达式树
 	 * @return 原产生式描述
 	 */
-	public String getSingleString(String name, ISyntaxComponent exp) {
+	public static String getSingleString(String name, ISyntaxComponent exp) {
 		StringBuffer sb = new StringBuffer();
 		sb.append(name);
 		sb.append(" -> ");
@@ -636,6 +686,13 @@ public class Syntax {
 			}
 		}
 		return sb.toString();
+	}
+
+	/**
+	 * 获得非确定性文法自动机描述
+	 */
+	public String getNGAString() {
+		return m_NPA.getNGAString();
 	}
 
 	@Override

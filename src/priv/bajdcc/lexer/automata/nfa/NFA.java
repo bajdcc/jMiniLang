@@ -391,7 +391,7 @@ public class NFA implements IRegexComponentVisitor {
 	protected static ArrayList<NFAStatus> getNFAStatusClosure(
 			BreadthFirstSearch<NFAEdge, NFAStatus> bfs, NFAStatus status) {
 		status.visit(bfs);
-		return bfs.m_Path;
+		return bfs.m_arrStatus;
 	}
 
 	/**

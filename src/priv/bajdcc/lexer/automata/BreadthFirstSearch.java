@@ -2,6 +2,8 @@ package priv.bajdcc.lexer.automata;
 
 import java.util.ArrayList;
 
+import priv.bajdcc.utility.VisitBag;
+
 /**
  * 宽度优先搜索
  * 
@@ -15,7 +17,7 @@ public class BreadthFirstSearch<Edge, Status> implements
 	/**
 	 * 存放状态的集合
 	 */
-	public ArrayList<Status> m_Path = new ArrayList<Status>();
+	public ArrayList<Status> m_arrStatus = new ArrayList<Status>();
 
 	@Override
 	public boolean testEdge(Edge edge) {
@@ -23,7 +25,7 @@ public class BreadthFirstSearch<Edge, Status> implements
 	}
 
 	@Override
-	public void visitBegin(Status status) {
+	public void visitBegin(Status status, VisitBag bag) {
 
 	}
 
@@ -31,5 +33,4 @@ public class BreadthFirstSearch<Edge, Status> implements
 	public void visitEnd(Status status) {
 
 	}
-
 }

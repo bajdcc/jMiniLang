@@ -146,7 +146,7 @@ public class DFA extends NFA {
 	protected static ArrayList<DFAStatus> getDFAStatusClosure(
 			BreadthFirstSearch<DFAEdge, DFAStatus> bfs, DFAStatus status) {
 		status.visit(bfs);
-		return bfs.m_Path;
+		return bfs.m_arrStatus;
 	}
 
 	/**
