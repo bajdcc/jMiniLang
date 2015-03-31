@@ -17,7 +17,7 @@ import priv.bajdcc.syntax.token.Token;
 import priv.bajdcc.syntax.token.TokenType;
 
 /**
- * ½âÎöÎÄ·¨µÄ´Ê·¨·ÖÎöÆ÷
+ * è§£ææ–‡æ³•çš„è¯æ³•åˆ†æå™¨
  * 
  * @author bajdcc
  */
@@ -25,18 +25,18 @@ public class SyntaxLexer extends RegexStringIterator implements
 		IRegexStringFilterHost {
 
 	/**
-	 * Ëã·¨¼¯ºÏ£¨ÕıÔò±í´ïÊ½Æ¥Åä£©
+	 * ç®—æ³•é›†åˆï¼ˆæ­£åˆ™è¡¨è¾¾å¼åŒ¹é…ï¼‰
 	 */
 	private TokenAlgorithmCollection m_algCollections = new TokenAlgorithmCollection(
 			this, this);
 
 	/**
-	 * ×Ö·û×ª»»Ëã·¨
+	 * å­—ç¬¦è½¬æ¢ç®—æ³•
 	 */
 	private ITokenAlgorithm m_TokenAlg = null;
 
 	/**
-	 * ¶ªÆúµÄÀàĞÍ¼¯ºÏ
+	 * ä¸¢å¼ƒçš„ç±»å‹é›†åˆ
 	 */
 	private HashSet<TokenType> m_setDiscardToken = new HashSet<TokenType>();
 
@@ -45,13 +45,13 @@ public class SyntaxLexer extends RegexStringIterator implements
 	}
 
 	/**
-	 * ÉèÖÃÒª·ÖÎöµÄÄÚÈİ
+	 * è®¾ç½®è¦åˆ†æçš„å†…å®¹
 	 * 
 	 * @param context
-	 *            ÎÄ·¨ÍÆµ¼Ê½
+	 *            æ–‡æ³•æ¨å¯¼å¼
 	 */
 	public void setContext(String context) {
-		/* ³õÊ¼»¯ */
+		/* åˆå§‹åŒ– */
 		m_strContext = context;
 		m_Position.m_iColumn = 0;
 		m_Position.m_iLine = 0;
@@ -63,23 +63,23 @@ public class SyntaxLexer extends RegexStringIterator implements
 	}
 
 	/**
-	 * »ñÈ¡Ò»¸öµ¥´Ê
+	 * è·å–ä¸€ä¸ªå•è¯
 	 * 
-	 * @return µ¥´Ê
+	 * @return å•è¯
 	 */
 	public Token scan() {
 		Token token = Token.transfer(m_algCollections.scan());
-		if (m_setDiscardToken.contains(token.m_kToken)) {// ĞèÒª¶ªÆú
+		if (m_setDiscardToken.contains(token.m_kToken)) {// éœ€è¦ä¸¢å¼ƒ
 			return null;
 		}
 		return token;
 	}
 
 	/**
-	 * ÉèÖÃ¶ªÆú·ûºÅ
+	 * è®¾ç½®ä¸¢å¼ƒç¬¦å·
 	 * 
 	 * @param type
-	 *            Òª¶ªÆúµÄ·ûºÅÀàĞÍ£¨²»½¨Òé¶ªÆúEOF£¬ÒòÎªĞèÒªÓÃÀ´ÅĞ¶Ï½áÊø£©
+	 *            è¦ä¸¢å¼ƒçš„ç¬¦å·ç±»å‹ï¼ˆä¸å»ºè®®ä¸¢å¼ƒEOFï¼Œå› ä¸ºéœ€è¦ç”¨æ¥åˆ¤æ–­ç»“æŸï¼‰
 	 */
 	public void discard(TokenType type) {
 		m_setDiscardToken.add(type);
@@ -99,26 +99,26 @@ public class SyntaxLexer extends RegexStringIterator implements
 	}
 
 	/**
-	 * ³õÊ¼»¯£¨Ìí¼Ó×é¼ş£©
+	 * åˆå§‹åŒ–ï¼ˆæ·»åŠ ç»„ä»¶ï¼‰
 	 * 
 	 * @throws RegexException
 	 */
 	private void initialize() throws RegexException {
 		//
-		// ### Ëã·¨ÈİÆ÷ÖĞ×°ÔØ½âÎö×é¼şÊÇÓĞÒ»¶¨Ë³ĞòµÄ ###
+		// ### ç®—æ³•å®¹å™¨ä¸­è£…è½½è§£æç»„ä»¶æ˜¯æœ‰ä¸€å®šé¡ºåºçš„ ###
 		//
-		// ×é¼şµ÷ÓÃÔ­Àí£º
-		// Ã¿¸ö×é¼şÓĞ×Ô¼ºµÄÕıÔò±í´ïÊ½Æ¥Åä×Ö·û´®
-		// £¨¿ÉÑ¡£©ÓĞ×Ô¼ºµÄ¹ıÂË·½·¨£¬Èç×Ö·û´®ÖĞµÄ×ªÒå¹ıÂË
+		// ç»„ä»¶è°ƒç”¨åŸç†ï¼š
+		// æ¯ä¸ªç»„ä»¶æœ‰è‡ªå·±çš„æ­£åˆ™è¡¨è¾¾å¼åŒ¹é…å­—ç¬¦ä¸²
+		// ï¼ˆå¯é€‰ï¼‰æœ‰è‡ªå·±çš„è¿‡æ»¤æ–¹æ³•ï¼Œå¦‚å­—ç¬¦ä¸²ä¸­çš„è½¬ä¹‰è¿‡æ»¤
 		//
-		// ½âÎöÊ±£¬·Ö±ğ°´Ğòµ÷ÓÃ½âÎö×é¼ş£¬Èô×é¼ş½âÎöÊ§°Ü£¬Ôòµ÷ÓÃÏÂÒ»×é¼ş
-		// ÈôÄ³Ò»×é¼ş½âÎö³É¹¦£¬¼´·µ»ØÆ¥Åä½á¹û
-		// ÈôÈ«²¿½âÎöÊ§°Ü£¬Ôòµ÷ÓÃ³ö´í´¦Àí£¨Ä¬ÈÏÎªÇ°½øÒ»×Ö·û£©
+		// è§£ææ—¶ï¼Œåˆ†åˆ«æŒ‰åºè°ƒç”¨è§£æç»„ä»¶ï¼Œè‹¥ç»„ä»¶è§£æå¤±è´¥ï¼Œåˆ™è°ƒç”¨ä¸‹ä¸€ç»„ä»¶
+		// è‹¥æŸä¸€ç»„ä»¶è§£ææˆåŠŸï¼Œå³è¿”å›åŒ¹é…ç»“æœ
+		// è‹¥å…¨éƒ¨è§£æå¤±è´¥ï¼Œåˆ™è°ƒç”¨å‡ºé”™å¤„ç†ï¼ˆé»˜è®¤ä¸ºå‰è¿›ä¸€å­—ç¬¦ï¼‰
 		//
-		m_algCollections.attach(new WhitespaceTokenizer());// ¿Õ°××Ö·û½âÎö×é¼ş
-		m_algCollections.attach(new CommentTokenizer());// ×¢ÊÍ½âÎö×é¼ş
-		m_algCollections.attach(new TerminalTokenizer());// ÖÕ½á·û½âÎö×é¼ş
-		m_algCollections.attach(new NonTerminalTokenizer());// ·ÇÖÕ½á·û½âÎö×é¼ş
-		m_algCollections.attach(new OperatorTokenizer());// ²Ù×÷·û½âÎö×é¼ş
+		m_algCollections.attach(new WhitespaceTokenizer());// ç©ºç™½å­—ç¬¦è§£æç»„ä»¶
+		m_algCollections.attach(new CommentTokenizer());// æ³¨é‡Šè§£æç»„ä»¶
+		m_algCollections.attach(new TerminalTokenizer());// ç»ˆç»“ç¬¦è§£æç»„ä»¶
+		m_algCollections.attach(new NonTerminalTokenizer());// éç»ˆç»“ç¬¦è§£æç»„ä»¶
+		m_algCollections.attach(new OperatorTokenizer());// æ“ä½œç¬¦è§£æç»„ä»¶
 	}
 }

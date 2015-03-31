@@ -5,19 +5,19 @@ import java.util.ArrayList;
 import priv.bajdcc.lexer.token.MetaType;
 
 /**
- * ×Ö·û¼¯
+ * å­—ç¬¦é›†
  * 
  * @author bajdcc
  */
 public class Charset implements IRegexComponent {
 
 	/**
-	 * °üº¬µÄ·¶Î§£¨Õı·¶Î§£©
+	 * åŒ…å«çš„èŒƒå›´ï¼ˆæ­£èŒƒå›´ï¼‰
 	 */
 	public ArrayList<CharacterRange> m_arrPositiveBounds = new ArrayList<CharacterRange>();
 
 	/**
-	 * ÊÇ·ñÈ¡·´
+	 * æ˜¯å¦å–å
 	 */
 	public boolean m_bReverse = false;
 
@@ -28,12 +28,12 @@ public class Charset implements IRegexComponent {
 	}
 
 	/**
-	 * Ìí¼Ó·¶Î§
+	 * æ·»åŠ èŒƒå›´
 	 * 
 	 * @param begin
-	 *            ÉÏÏŞ
+	 *            ä¸Šé™
 	 * @param end
-	 *            ÏÂÏŞ
+	 *            ä¸‹é™
 	 */
 	public boolean addRange(char begin, char end) {
 		if (begin > end) {
@@ -48,19 +48,19 @@ public class Charset implements IRegexComponent {
 	}
 
 	/**
-	 * Ìí¼Ó×Ö·û
+	 * æ·»åŠ å­—ç¬¦
 	 * 
 	 * @param ch
-	 *            ×Ö·û
+	 *            å­—ç¬¦
 	 */
 	public boolean addChar(char ch) {
 		return addRange(ch, ch);
 	}
 	
 	/**
-	 * µ±Ç°×Ö·û¼¯ÊÇ·ñ°üº¬Ö¸¶¨×Ö·û
-	 * @param ch ×Ö·û
-	 * @return ²éÕÒ½á¹û
+	 * å½“å‰å­—ç¬¦é›†æ˜¯å¦åŒ…å«æŒ‡å®šå­—ç¬¦
+	 * @param ch å­—ç¬¦
+	 * @return æŸ¥æ‰¾ç»“æœ
 	 */
 	public boolean include(char ch) {
 		for (CharacterRange range : m_arrPositiveBounds) {

@@ -1,29 +1,29 @@
 package priv.bajdcc.utility;
 
 /**
- * Óï¾ä´íÎó²ÎÊı°ü
+ * è¯­å¥é”™è¯¯å‚æ•°åŒ…
  *
  * @author bajdcc
  */
 public class SyntaxErrorBag {
 
 	/**
-	 * ÈôÎª¼ÙÔò×´Ì¬»ú²»½øĞĞ×´Ì¬×ª»»
+	 * è‹¥ä¸ºå‡åˆ™çŠ¶æ€æœºä¸è¿›è¡ŒçŠ¶æ€è½¬æ¢
 	 */
 	public boolean m_bPass = false;
 
 	/**
-	 * ÈôÎª¼ÙÔò×´Ì¬»ú²»Ìø¹ıµ±Ç°¼ÇºÅ
+	 * è‹¥ä¸ºå‡åˆ™çŠ¶æ€æœºä¸è·³è¿‡å½“å‰è®°å·
 	 */
 	public boolean m_bRead = false;
 
 	/**
-	 * ÈôÎª¼ÙÔò×´Ì¬»ú²»½áÊø·ÖÎö
+	 * è‹¥ä¸ºå‡åˆ™çŠ¶æ€æœºä¸ç»“æŸåˆ†æ
 	 */
 	public boolean m_bHalt = false;
 
 	/**
-	 * ÈôÎªÕæÔò²»´¦Àí±¾´ÎÏûÏ¢
+	 * è‹¥ä¸ºçœŸåˆ™ä¸å¤„ç†æœ¬æ¬¡æ¶ˆæ¯
 	 */
 	public boolean m_bGiveUp = false;
 }

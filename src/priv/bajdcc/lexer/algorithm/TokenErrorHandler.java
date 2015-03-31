@@ -4,7 +4,7 @@ import priv.bajdcc.lexer.error.IErrorHandler;
 import priv.bajdcc.lexer.regex.IRegexStringIterator;
 
 /**
- * ´íÎó´¦ÀíÆ÷»ùÀà
+ * é”™è¯¯å¤„ç†å™¨åŸºç±»
  * 
  * @author bajdcc
  *
@@ -12,7 +12,7 @@ import priv.bajdcc.lexer.regex.IRegexStringIterator;
 public abstract class TokenErrorHandler implements IErrorHandler {
 	
 	/**
-	 * µü´úÆ÷½Ó¿Ú
+	 * è¿­ä»£å™¨æ¥å£
 	 */
 	protected IRegexStringIterator m_Iterator = null;
 

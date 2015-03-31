@@ -3,24 +3,24 @@ package priv.bajdcc.syntax.token;
 import priv.bajdcc.utility.Position;
 
 /**
- * 单词
+ * 鍗曡瘝
  * 
  * @author bajdcc
  */
 public class Token {
 
 	/**
-	 * 单词类型
+	 * 鍗曡瘝绫诲瀷
 	 */
 	public TokenType m_kToken = TokenType.ERROR;
 
 	/**
-	 * 数据
+	 * 鏁版嵁
 	 */
 	public Object m_Object = null;
 
 	/**
-	 * 位置
+	 * 浣嶇疆
 	 */
 	public Position m_Position = new Position();
 

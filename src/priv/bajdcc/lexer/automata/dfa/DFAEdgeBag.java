@@ -6,18 +6,18 @@ import java.util.HashSet;
 import priv.bajdcc.lexer.automata.nfa.NFAStatus;
 
 /**
- * DFA±ß¸¨ÖúÊı¾İ½á¹¹
+ * DFAè¾¹è¾…åŠ©æ•°æ®ç»“æ„
  * @author bajdcc
  *
  */
 public class DFAEdgeBag extends DFAEdgeData{
 	/**
-	 * NFA×´Ì¬¼¯ºÏ
+	 * NFAçŠ¶æ€é›†åˆ
 	 */
 	public HashSet<NFAStatus> m_NFAStatus = new HashSet<NFAStatus>();
 	
 	/**
-	 * »ñµÃ×´Ì¬±àºÅÃèÊö£¨¶ººÅ·Ö¸ô£©
+	 * è·å¾—çŠ¶æ€ç¼–å·æè¿°ï¼ˆé€—å·åˆ†éš”ï¼‰
 	 */
 	public String getStatusString(ArrayList<NFAStatus> nfaStatusList) {
 		StringBuilder sb = new StringBuilder();

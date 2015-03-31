@@ -9,7 +9,7 @@ import priv.bajdcc.lexer.token.Token;
 import priv.bajdcc.lexer.token.TokenType;
 
 /**
- * ¹Ø¼ü×Ö½âÎö
+ * å…³é”®å­—è§£æ
  * 
  * @author bajdcc
  *
@@ -17,7 +17,7 @@ import priv.bajdcc.lexer.token.TokenType;
 public class KeywordTokenizer extends TokenAlgorithm {
 
 	/**
-	 * ¹Ø¼ü×Ö¹şÏ£±í
+	 * å…³é”®å­—å“ˆå¸Œè¡¨
 	 */
 	private HashMap<String, KeywordType> m_HashKeyword = new HashMap<String, KeywordType>();
 
@@ -28,7 +28,7 @@ public class KeywordTokenizer extends TokenAlgorithm {
 
 	public static String getRegexString() {
 		StringBuilder sb = new StringBuilder();
-		for (KeywordType keyword : KeywordType.values()) {// ¹Ø¼ü×Ö
+		for (KeywordType keyword : KeywordType.values()) {// å…³é”®å­—
 			sb.append(keyword.getName());
 			sb.append('|');
 		}
@@ -42,16 +42,16 @@ public class KeywordTokenizer extends TokenAlgorithm {
 	}
 
 	/**
-	 * ³õÊ¼»¯¹Ø¼ü×Ö¹şÏ£±í
+	 * åˆå§‹åŒ–å…³é”®å­—å“ˆå¸Œè¡¨
 	 */
 	private void initializeHashMap() {
-		for (KeywordType keyword : KeywordType.values()) {// ¹Ø¼ü×Ö
+		for (KeywordType keyword : KeywordType.values()) {// å…³é”®å­—
 			m_HashKeyword.put(keyword.getName(), keyword);
 		}
 	}
 
 	/*
-	 * £¨·Ç Javadoc£©
+	 * ï¼ˆé Javadocï¼‰
 	 * 
 	 * @see
 	 * priv.bajdcc.lexer.algorithm.ITokenAlgorithm#getToken(java.lang.String,

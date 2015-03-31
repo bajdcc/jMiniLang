@@ -5,17 +5,17 @@ import java.util.ArrayList;
 import priv.bajdcc.utility.VisitBag;
 
 /**
- * ¿í¶ÈÓÅÏÈËÑË÷
+ * å®½åº¦ä¼˜å…ˆæœç´¢
  * 
  * @author bajdcc
  * @param T
- *            ×´Ì¬ÀàĞÍ
+ *            çŠ¶æ€ç±»å‹
  */
 public class BreadthFirstSearch<Edge, Status> implements
 		IBreadthFirstSearch<Edge, Status> {
 
 	/**
-	 * ´æ·Å×´Ì¬µÄ¼¯ºÏ
+	 * å­˜æ”¾çŠ¶æ€çš„é›†åˆ
 	 */
 	public ArrayList<Status> m_arrStatus = new ArrayList<Status>();
 

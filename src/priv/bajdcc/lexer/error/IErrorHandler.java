@@ -1,14 +1,14 @@
 package priv.bajdcc.lexer.error;
 
 /**
- * ´íÎó´¦ÀíÆ÷½Ó¿Ú
+ * é”™è¯¯å¤„ç†å™¨æ¥å£
  * 
  * @author bajdcc
  */
 public interface IErrorHandler {
 	
 	/**
-	 * ´¦Àí´íÎó
+	 * å¤„ç†é”™è¯¯
 	 */
 	public void handleError();
 }

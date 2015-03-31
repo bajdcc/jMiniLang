@@ -7,32 +7,32 @@ import priv.bajdcc.lexer.automata.BreadthFirstSearch;
 import priv.bajdcc.utility.VisitBag;
 
 /**
- * DFA×´Ì¬
+ * DFAçŠ¶æ€
  * 
  * @author bajdcc
  *
  */
 public class DFAStatus {
 	/**
-	 * ³ö±ß¼¯ºÏ
+	 * å‡ºè¾¹é›†åˆ
 	 */
 	public HashSet<DFAEdge> m_OutEdges = new HashSet<DFAEdge>();
 
 	/**
-	 * Èë±ß¼¯ºÏ
+	 * å…¥è¾¹é›†åˆ
 	 */
 	public HashSet<DFAEdge> m_InEdges = new HashSet<DFAEdge>();
 
 	/**
-	 * Êı¾İ
+	 * æ•°æ®
 	 */
 	public DFAStatusData m_Data = new DFAStatusData();
 
 	/**
-	 * ÓÃÓÚ±éÀú°üÀ¨¸Ã×´Ì¬ÔÚÄÚµÄËùÓĞ×´Ì¬£¨Á¬Í¨£©£¬½á¹û´æ·ÅÔÚPATHÖĞ
+	 * ç”¨äºéå†åŒ…æ‹¬è¯¥çŠ¶æ€åœ¨å†…çš„æ‰€æœ‰çŠ¶æ€ï¼ˆè¿é€šï¼‰ï¼Œç»“æœå­˜æ”¾åœ¨PATHä¸­
 	 * 
 	 * @param bfs
-	 *            ±éÀúËã·¨
+	 *            éå†ç®—æ³•
 	 */
 	public void visit(BreadthFirstSearch<DFAEdge, DFAStatus> bfs) {
 		ArrayList<DFAStatus> stack = bfs.m_arrStatus;
@@ -40,13 +40,13 @@ public class DFAStatus {
 		stack.clear();
 		set.add(this);
 		stack.add(this);
-		for (int i = 0; i < stack.size(); i++) {// ±éÀúÃ¿¸ö×´Ì¬
+		for (int i = 0; i < stack.size(); i++) {// éå†æ¯ä¸ªçŠ¶æ€
 			DFAStatus status = stack.get(i);
 			VisitBag bag = new VisitBag();
 			bfs.visitBegin(status, bag);
 			if (bag.m_bVisitChildren) {
-				for (DFAEdge edge : status.m_OutEdges) {// ±éÀú×´Ì¬µÄ³ö±ß
-					if (!set.contains(edge.m_End) && bfs.testEdge(edge)) {// ±ßÎ´±»·ÃÎÊ£¬ÇÒ±ßÀàĞÍ·ûºÏÒªÇó
+				for (DFAEdge edge : status.m_OutEdges) {// éå†çŠ¶æ€çš„å‡ºè¾¹
+					if (!set.contains(edge.m_End) && bfs.testEdge(edge)) {// è¾¹æœªè¢«è®¿é—®ï¼Œä¸”è¾¹ç±»å‹ç¬¦åˆè¦æ±‚
 						stack.add(edge.m_End);
 						set.add(edge.m_End);
 					}

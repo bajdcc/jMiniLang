@@ -5,24 +5,24 @@ import priv.bajdcc.syntax.ISyntaxComponentVisitor;
 import priv.bajdcc.utility.VisitBag;
 
 /**
- * ÎÄ·¨¹æÔò£¨ÖÕ½á·û£©
+ * æ–‡æ³•è§„åˆ™ï¼ˆç»ˆç»“ç¬¦ï¼‰
  *
  * @author bajdcc
  */
 public class TokenExp implements ISyntaxComponent {
 
 	/**
-	 * ÖÕ½á·ûID
+	 * ç»ˆç»“ç¬¦ID
 	 */
 	public int m_iID = -1;
 
 	/**
-	 * ÖÕ½á·ûÃû³Æ
+	 * ç»ˆç»“ç¬¦åç§°
 	 */
 	public String m_strName = null;
 
 	/**
-	 * ÖÕ½á·û¶ÔÓ¦µÄÕıÔò±í´ïÊ½
+	 * ç»ˆç»“ç¬¦å¯¹åº”çš„æ­£åˆ™è¡¨è¾¾å¼
 	 */
 	public String m_strRegex = null;
 

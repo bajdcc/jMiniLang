@@ -1,19 +1,19 @@
 package priv.bajdcc.utility;
 
 /**
- * Î»ÖÃ
+ * ä½ç½®
  * 
  * @author bajdcc
  *
  */
 public class Position {
 	/**
-	 * ÁĞºÅ
+	 * åˆ—å·
 	 */
 	public int m_iColumn = 0;
 
 	/**
-	 * ĞĞºÅ
+	 * è¡Œå·
 	 */
 	public int m_iLine = 0;
 

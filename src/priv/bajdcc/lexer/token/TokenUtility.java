@@ -1,40 +1,40 @@
 package priv.bajdcc.lexer.token;
 
 /**
- * µ¥´ÊÌØÐÔ
+ * å•è¯ç‰¹æ€§
  * 
  * @author bajdcc
  */
 public class TokenUtility {
 
 	/**
-	 * ÊÇ·ñÎªASCIIÓ¢ÎÄ×ÖÄ¸
+	 * æ˜¯å¦ä¸ºASCIIè‹±æ–‡å­—æ¯
 	 * 
 	 * @param ch
-	 *            ×Ö·û
-	 * @return ÊÇ·ñÎªASCIIÓ¢ÎÄ×ÖÄ¸
+	 *            å­—ç¬¦
+	 * @return æ˜¯å¦ä¸ºASCIIè‹±æ–‡å­—æ¯
 	 */
 	public static boolean isLetter(char ch) {
 		return isUpperLetter(ch) || isLowerLetter(ch);
 	}
 
 	/**
-	 * ÊÇ·ñÎªASCII´óÐ´Ó¢ÎÄ×ÖÄ¸
+	 * æ˜¯å¦ä¸ºASCIIå¤§å†™è‹±æ–‡å­—æ¯
 	 * 
 	 * @param ch
-	 *            ×Ö·û
-	 * @return ÊÇ·ñÎªASCII´óÐ´Ó¢ÎÄ×ÖÄ¸
+	 *            å­—ç¬¦
+	 * @return æ˜¯å¦ä¸ºASCIIå¤§å†™è‹±æ–‡å­—æ¯
 	 */
 	public static boolean isUpperLetter(char ch) {
 		return ch >= 'A' && ch <= 'Z';
 	}
 
 	/**
-	 * ÊÇ·ñÎªASCIIÐ¡Ð´Ó¢ÎÄ×ÖÄ¸
+	 * æ˜¯å¦ä¸ºASCIIå°å†™è‹±æ–‡å­—æ¯
 	 * 
 	 * @param ch
-	 *            ×Ö·û
-	 * @return ÊÇ·ñÎªASCIIÐ¡Ð´Ó¢ÎÄ×ÖÄ¸
+	 *            å­—ç¬¦
+	 * @return æ˜¯å¦ä¸ºASCIIå°å†™è‹±æ–‡å­—æ¯
 	 */
 	public static boolean isLowerLetter(char ch) {
 		return ch >= 'a' && ch <= 'z';

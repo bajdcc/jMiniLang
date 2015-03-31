@@ -1,7 +1,7 @@
 package priv.bajdcc.lexer.regex;
 
 /**
- * Æ¥ÅäĞÅÏ¢
+ * åŒ¹é…ä¿¡æ¯
  * 
  * @author bajdcc
  *
@@ -9,24 +9,24 @@ package priv.bajdcc.lexer.regex;
 public interface IRegexStringAttribute {
 
 	/**
-	 * ÉèÖÃÆ¥Åä½á¹û
+	 * è®¾ç½®åŒ¹é…ç»“æœ
 	 * 
 	 * @param result
-	 *            Æ¥Åä½á¹û
+	 *            åŒ¹é…ç»“æœ
 	 */
 	public void setResult(String result);
 
 	/**
-	 * ·µ»ØÆ¥Åä½á¹û
+	 * è¿”å›åŒ¹é…ç»“æœ
 	 * 
-	 * @return Æ¥Åä½á¹û
+	 * @return åŒ¹é…ç»“æœ
 	 */
 	public String getResult();
 
 	/**
-	 * ·µ»ØÌ°À·Ä£Ê½
+	 * è¿”å›è´ªå©ªæ¨¡å¼
 	 * 
-	 * @return ÊÇ·ñÎªÌ°À·Ä£Ê½
+	 * @return æ˜¯å¦ä¸ºè´ªå©ªæ¨¡å¼
 	 */
 	public boolean getGreedMode();
 }

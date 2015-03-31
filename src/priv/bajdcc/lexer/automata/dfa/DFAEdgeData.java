@@ -6,14 +6,14 @@ import priv.bajdcc.lexer.automata.nfa.NFAEdge;
 import priv.bajdcc.lexer.automata.nfa.NFAEdgeData;
 
 /**
- * DFA±ßÊı¾İ
+ * DFAè¾¹æ•°æ®
  * 
  * @author bajdcc
  *
  */
 public class DFAEdgeData extends NFAEdgeData {
 	/**
-	 * NFA±ß¼¯ºÏ
+	 * NFAè¾¹é›†åˆ
 	 */
 	public ArrayList<NFAEdge> m_NFAEdges = new ArrayList<NFAEdge>();
 }

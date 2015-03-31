@@ -6,39 +6,39 @@ import priv.bajdcc.syntax.exp.RuleExp;
 import priv.bajdcc.syntax.exp.TokenExp;
 
 /**
- * ÎÄ·¨¹æÔò²¿¼ş£¨ÎÄ·¨ÍÆµ¼Ê½£©
+ * æ–‡æ³•è§„åˆ™éƒ¨ä»¶ï¼ˆæ–‡æ³•æ¨å¯¼å¼ï¼‰
  *
  * @author bajdcc
  */
 public class RuleItem {
 
 	/**
-	 * ¹æÔò±í´ïÊ½
+	 * è§„åˆ™è¡¨è¾¾å¼
 	 */
 	public ISyntaxComponent m_Expression = null;
 
 	/**
-	 * First¼¯ºÏ£¨ÖÕ½á·û£©
+	 * Firsté›†åˆï¼ˆç»ˆç»“ç¬¦ï¼‰
 	 */
 	public HashSet<TokenExp> m_arrFirstSetTokens = new HashSet<TokenExp>();
 
 	/**
-	 * First¼¯ºÏ£¨·ÇÖÕ½á·û£©
+	 * Firsté›†åˆï¼ˆéç»ˆç»“ç¬¦ï¼‰
 	 */
 	public HashSet<RuleExp> m_arrFirstSetRules = new HashSet<RuleExp>();
 
 	/**
-	 * ¸¸½áµãÖ¸Õë
+	 * çˆ¶ç»“ç‚¹æŒ‡é’ˆ
 	 */
 	public Rule m_Parent = null;
 
 	/**
-	 * ÊÇ·ñÓĞĞ§
+	 * æ˜¯å¦æœ‰æ•ˆ
 	 */
 	public boolean m_bEnable = true;
 
 	public RuleItem(ISyntaxComponent exp, Rule parent) {
-		this.m_Expression = exp;
-		this.m_Parent = parent;
+		m_Expression = exp;
+		m_Parent = parent;
 	}
 }

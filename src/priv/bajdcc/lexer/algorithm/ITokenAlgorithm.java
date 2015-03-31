@@ -8,41 +8,41 @@ import priv.bajdcc.lexer.token.MetaType;
 import priv.bajdcc.lexer.token.Token;
 
 /**
- * ¼ì²â/¶ÁÈ¡µ¥´ÊµÄËã·¨½Ó¿Ú
+ * æ£€æµ‹/è¯»å–å•è¯çš„ç®—æ³•æ¥å£
  * 
  * @author bajdcc
  */
 public interface ITokenAlgorithm {
 
 	/**
-	 * µ±Ç°Ëã·¨ÊÇ·ñ½ÓÊÜÏàÓ¦Visitor¶ÔÏó£¨¼´ÊÇ·ñÆ¥Åä£©
+	 * å½“å‰ç®—æ³•æ˜¯å¦æ¥å—ç›¸åº”Visitorå¯¹è±¡ï¼ˆå³æ˜¯å¦åŒ¹é…ï¼‰
 	 * 
 	 * @param iterator
-	 *            ×Ö·û´®µü´ú¶ÔÏó
+	 *            å­—ç¬¦ä¸²è¿­ä»£å¯¹è±¡
 	 * @param token
-	 *            ·µ»ØµÄµ¥´Ê£¨¿ÉÄÜ³ö´í£¬»òÕßÎªEOL¡¢EOF£©
-	 * @return Ëã·¨Æ¥Åä½á¹û
+	 *            è¿”å›çš„å•è¯ï¼ˆå¯èƒ½å‡ºé”™ï¼Œæˆ–è€…ä¸ºEOLã€EOFï¼‰
+	 * @return ç®—æ³•åŒ¹é…ç»“æœ
 	 */
 	boolean accept(IRegexStringIterator iterator, Token token);
 
 	/**
-	 * ·µ»Ø×Ö·û´®¹ıÂË×é¼ş
+	 * è¿”å›å­—ç¬¦ä¸²è¿‡æ»¤ç»„ä»¶
 	 */
 	public abstract IRegexStringFilter getRegexStringFilter();
 
 	/**
-	 * ·µ»Ø×Ö·ûÀàĞÍ¹şÏ£Ó³Éä±í
+	 * è¿”å›å­—ç¬¦ç±»å‹å“ˆå¸Œæ˜ å°„è¡¨
 	 */
 	public abstract HashMap<Character, MetaType> getMetaHash();
 
 	/**
-	 * ·µ»ØÕıÔò±í´ïÊ½×Ö·û´®
+	 * è¿”å›æ­£åˆ™è¡¨è¾¾å¼å­—ç¬¦ä¸²
 	 * 
 	 * @param string
-	 *            Æ¥ÅäµÄ×Ö·û´®
+	 *            åŒ¹é…çš„å­—ç¬¦ä¸²
 	 * @param token
-	 *            ÊäÈëµÄµ¥´Ê
-	 * @return Êä³öµÄµ¥´Ê
+	 *            è¾“å…¥çš„å•è¯
+	 * @return è¾“å‡ºçš„å•è¯
 	 */
 	public abstract Token getToken(String string, Token token);
 }

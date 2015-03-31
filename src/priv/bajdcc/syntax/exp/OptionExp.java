@@ -5,14 +5,14 @@ import priv.bajdcc.syntax.ISyntaxComponentVisitor;
 import priv.bajdcc.utility.VisitBag;
 
 /**
- * 文法规则（可选）
+ * 鏂囨硶瑙勫垯锛堝彲閫夛級
  *
  * @author bajdcc
  */
 public class OptionExp implements ISyntaxComponent {
 
 	/**
-	 * 子表达式
+	 * 瀛愯〃杈惧紡
 	 */
 	public ISyntaxComponent m_Expression = null;
 

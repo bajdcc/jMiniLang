@@ -26,9 +26,9 @@ import priv.bajdcc.utility.BitVector2;
 import priv.bajdcc.utility.Position;
 
 /**
- * ÎÄ·¨¹¹ÔìÆ÷
+ * æ–‡æ³•æ„é€ å™¨
  * 
- * Óï·¨Ê¾Àı£º Z -> A | B | `abc` | ( A | `c`<terminal comment text> | C<comment> |
+ * è¯­æ³•ç¤ºä¾‹ï¼š Z -> A | B | `abc` | ( A | `c`<terminal comment text> | C<comment> |
  * C{Error handler name})
  *
  * @author bajdcc
@@ -36,56 +36,56 @@ import priv.bajdcc.utility.Position;
 public class Syntax {
 
 	/**
-	 * ÖÕ½á·û±í
+	 * ç»ˆç»“ç¬¦è¡¨
 	 */
 	private ArrayList<TokenExp> m_arrTerminals = new ArrayList<TokenExp>();
 
 	/**
-	 * ÖÕ½á·û±í
+	 * ç»ˆç»“ç¬¦è¡¨
 	 */
 	private HashMap<String, TokenExp> m_mapTerminals = new HashMap<String, TokenExp>();
 
 	/**
-	 * ·ÇÖÕ½á·û±í
+	 * éç»ˆç»“ç¬¦è¡¨
 	 */
 	private ArrayList<RuleExp> m_arrNonTerminals = new ArrayList<RuleExp>();
 
 	/**
-	 * ·ÇÖÕ½á·û±í
+	 * éç»ˆç»“ç¬¦è¡¨
 	 */
 	private HashMap<String, RuleExp> m_mapNonTerminals = new HashMap<String, RuleExp>();
 
 	/**
-	 * ÊôĞÔ±í
+	 * å±æ€§è¡¨
 	 */
 	private ArrayList<PropertyExp> m_arrProperties = new ArrayList<PropertyExp>();
 	/**
-	 * ÊôĞÔ±í
+	 * å±æ€§è¡¨
 	 */
 	private HashMap<String, PropertyExp> m_mapProperties = new HashMap<String, PropertyExp>();
 
 	/**
-	 * ÎÄ·¨ÆğÊ¼·ûºÅ
+	 * æ–‡æ³•èµ·å§‹ç¬¦å·
 	 */
 	private String m_strBeginRuleName = "";
 
 	/**
-	 * ÃæÏòÎÄ·¨µÄ´Ê·¨·ÖÎöÆ÷
+	 * é¢å‘æ–‡æ³•çš„è¯æ³•åˆ†æå™¨
 	 */
 	private SyntaxLexer m_SyntaxLexer = new SyntaxLexer();
 
 	/**
-	 * µ±Ç°×Ö·û
+	 * å½“å‰å­—ç¬¦
 	 */
 	private Token m_Token = null;
 
 	/**
-	 * µ±Ç°½âÎöµÄÎÄ·¨¹æÔò
+	 * å½“å‰è§£æçš„æ–‡æ³•è§„åˆ™
 	 */
 	private RuleExp m_Rule = null;
 
 	/**
-	 * ·ÇÈ·¶¨ĞÔÏÂÍÆ×Ô¶¯»ú
+	 * éç¡®å®šæ€§ä¸‹æ¨è‡ªåŠ¨æœº
 	 */
 	private NPA m_NPA = null;
 
@@ -102,12 +102,12 @@ public class Syntax {
 	}
 
 	/**
-	 * Ìí¼ÓÖÕ½á·û
+	 * æ·»åŠ ç»ˆç»“ç¬¦
 	 * 
 	 * @param name
-	 *            ÖÕ½á·ûÃû³Æ
+	 *            ç»ˆç»“ç¬¦åç§°
 	 * @param regex
-	 *            ÖÕ½á·û¶ÔÓ¦µÄÕıÔò±í´ïÊ½
+	 *            ç»ˆç»“ç¬¦å¯¹åº”çš„æ­£åˆ™è¡¨è¾¾å¼
 	 */
 	public void addTerminal(String name, String regex) {
 		TokenExp exp = new TokenExp(m_arrTerminals.size(), name, regex);
@@ -117,10 +117,10 @@ public class Syntax {
 	}
 
 	/**
-	 * Ìí¼Ó·ÇÖÕ½á·û
+	 * æ·»åŠ éç»ˆç»“ç¬¦
 	 * 
 	 * @param name
-	 *            ·ÇÖÕ½á·ûÃû³Æ
+	 *            éç»ˆç»“ç¬¦åç§°
 	 */
 	public void addNonTerminal(String name) {
 		RuleExp exp = new RuleExp(m_arrNonTerminals.size(), name);
@@ -130,12 +130,12 @@ public class Syntax {
 	}
 
 	/**
-	 * Ìí¼Ó´íÎó´¦ÀíÆ÷
+	 * æ·»åŠ é”™è¯¯å¤„ç†å™¨
 	 * 
 	 * @param name
-	 *            ´¦ÀíÆ÷Ãû
+	 *            å¤„ç†å™¨å
 	 * @param handler
-	 *            ´¦Àí½Ó¿Ú
+	 *            å¤„ç†æ¥å£
 	 */
 	public void addErrorHandler(String name, IErrorHandler handler) {
 		PropertyExp exp = new PropertyExp(m_mapProperties.size(), handler);
@@ -146,7 +146,7 @@ public class Syntax {
 
 	/**
 	 * @param inferString
-	 *            ÎÄ·¨ÍÆµ¼Ê½
+	 *            æ–‡æ³•æ¨å¯¼å¼
 	 * @throws SyntaxException
 	 */
 	public void infer(String inferString) throws SyntaxException {
@@ -155,10 +155,10 @@ public class Syntax {
 	}
 
 	/**
-	 * Å×³öÒì³£
+	 * æŠ›å‡ºå¼‚å¸¸
 	 * 
 	 * @param error
-	 *            ´íÎóÀàĞÍ
+	 *            é”™è¯¯ç±»å‹
 	 * @throws SyntaxException
 	 */
 	private void err(SyntaxError error) throws SyntaxException {
@@ -167,12 +167,12 @@ public class Syntax {
 	}
 
 	/**
-	 * Å×³öÒì³£
+	 * æŠ›å‡ºå¼‚å¸¸
 	 * 
 	 * @param error
-	 *            ´íÎóÀàĞÍ
+	 *            é”™è¯¯ç±»å‹
 	 * @param obj
-	 *            ´íÎóĞÅÏ¢
+	 *            é”™è¯¯ä¿¡æ¯
 	 * @throws SyntaxException
 	 */
 	private void err(SyntaxError error, Object obj) throws SyntaxException {
@@ -180,12 +180,12 @@ public class Syntax {
 	}
 
 	/**
-	 * Æ¥Åä·ûºÅ
+	 * åŒ¹é…ç¬¦å·
 	 * 
 	 * @param type
-	 *            Æ¥ÅäÀàĞÍ
+	 *            åŒ¹é…ç±»å‹
 	 * @param error
-	 *            ´íÎóÀàĞÍ
+	 *            é”™è¯¯ç±»å‹
 	 * @throws SyntaxException
 	 */
 	private void expect(TokenType type, SyntaxError error)
@@ -198,12 +198,12 @@ public class Syntax {
 	}
 
 	/**
-	 * ÕıÈ·Æ¥Åäµ±Ç°×Ö·û
+	 * æ­£ç¡®åŒ¹é…å½“å‰å­—ç¬¦
 	 * 
 	 * @param type
-	 *            Æ¥ÅäÀàĞÍ
+	 *            åŒ¹é…ç±»å‹
 	 * @param error
-	 *            Æ¥ÅäÊ§°ÜÊ±Å×³öµÄÒì³£
+	 *            åŒ¹é…å¤±è´¥æ—¶æŠ›å‡ºçš„å¼‚å¸¸
 	 * @throws SyntaxException
 	 */
 	private void match(TokenType type, SyntaxError error)
@@ -214,7 +214,7 @@ public class Syntax {
 	}
 
 	/**
-	 * Æ¥Åä·ÇÖÕ½á·û
+	 * åŒ¹é…éç»ˆç»“ç¬¦
 	 * 
 	 * @throws SyntaxException
 	 */
@@ -227,7 +227,7 @@ public class Syntax {
 	}
 
 	/**
-	 * Æ¥ÅäÖÕ½á·û
+	 * åŒ¹é…ç»ˆç»“ç¬¦
 	 * 
 	 * @throws SyntaxException
 	 */
@@ -240,7 +240,7 @@ public class Syntax {
 	}
 
 	/**
-	 * Æ¥ÅäÊôĞÔ±í
+	 * åŒ¹é…å±æ€§è¡¨
 	 * 
 	 * @throws SyntaxException
 	 */
@@ -253,7 +253,7 @@ public class Syntax {
 	}
 
 	/**
-	 * È¡ÏÂÒ»¸öµ¥´Ê
+	 * å–ä¸‹ä¸€ä¸ªå•è¯
 	 */
 	private Token next() {
 		m_Token = m_SyntaxLexer.scan();
@@ -261,108 +261,108 @@ public class Syntax {
 	}
 
 	/**
-	 * ±àÒëÍÆµ¼Ê½£¨½«ÎÄ±¾±í´ïÊ½×ª»»³ÉÎÄ·¨Ê÷£©
+	 * ç¼–è¯‘æ¨å¯¼å¼ï¼ˆå°†æ–‡æœ¬è¡¨è¾¾å¼è½¬æ¢æˆæ–‡æ³•æ ‘ï¼‰
 	 * 
 	 * @throws SyntaxException
 	 */
 	private void compile() throws SyntaxException {
-		/* ´¦Àí×ó¶Ë·ÇÖÕ½á·û */
+		/* å¤„ç†å·¦ç«¯éç»ˆç»“ç¬¦ */
 		doHead();
-		/* ´¦ÀíÓÒ¶Ë±í´ïÊ½ */
+		/* å¤„ç†å³ç«¯è¡¨è¾¾å¼ */
 		doTail();
 	}
 
 	/**
-	 * ´¦Àí×ó¶Ë·ÇÖÕ½á·û
+	 * å¤„ç†å·¦ç«¯éç»ˆç»“ç¬¦
 	 * 
 	 * @throws SyntaxException
 	 */
 	private void doHead() throws SyntaxException {
-		/* Æ¥ÅäÍÆµ¼Ê½×ó¶ËµÄ·ÇÖÕ½á·û */
+		/* åŒ¹é…æ¨å¯¼å¼å·¦ç«¯çš„éç»ˆç»“ç¬¦ */
 		next();
 		matchNonTerminal();
-		/* Éè¶¨±¾´ÎĞèÒªÍÆµ¼µÄ·ÇÖÕ½á·û */
+		/* è®¾å®šæœ¬æ¬¡éœ€è¦æ¨å¯¼çš„éç»ˆç»“ç¬¦ */
 		m_Rule = m_mapNonTerminals.get(m_Token.m_Object.toString());
-		/* Æ¥ÅäÍÆµ¼·ûºÅ"->" */
+		/* åŒ¹é…æ¨å¯¼ç¬¦å·"->" */
 		next();
 		expect(TokenType.OPERATOR, SyntaxError.SYNTAX);
 	}
 
 	/**
-	 * ´¦ÀíÓÒ¶Ë±í´ïÊ½
+	 * å¤„ç†å³ç«¯è¡¨è¾¾å¼
 	 * 
 	 * @throws SyntaxException
 	 */
 	private void doTail() throws SyntaxException {
-		/* »ñµÃ·ÖÎöºóµÄ±í´ïÊ½¸ù½áµã */
+		/* è·å¾—åˆ†æåçš„è¡¨è¾¾å¼æ ¹ç»“ç‚¹ */
 		ISyntaxComponent exp = doAnalysis(TokenType.EOF, null);
-		/* ½«¸ù½áµãÌí¼Ó½ø¶ÔÓ¦¹æÔò */
+		/* å°†æ ¹ç»“ç‚¹æ·»åŠ è¿›å¯¹åº”è§„åˆ™ */
 		m_Rule.m_Rule.m_arrRules.add(new RuleItem(exp, m_Rule.m_Rule));
 	}
 
 	/**
-	 * ·ÖÎö±í´ïÊ½
+	 * åˆ†æè¡¨è¾¾å¼
 	 * 
 	 * @param type
-	 *            ½áÊøÀàĞÍ
+	 *            ç»“æŸç±»å‹
 	 * @param obj
-	 *            ½áÊøÊı¾İ
-	 * @return ±í´ïÊ½Ê÷¸ù½áµã
+	 *            ç»“æŸæ•°æ®
+	 * @return è¡¨è¾¾å¼æ ‘æ ¹ç»“ç‚¹
 	 * @throws SyntaxException
 	 */
 	private ISyntaxComponent doAnalysis(TokenType type, Object obj)
 			throws SyntaxException {
 
-		/* ĞÂ½¨ĞòÁĞÓÃÓÚ´æ·Å½á¹û */
+		/* æ–°å»ºåºåˆ—ç”¨äºå­˜æ”¾ç»“æœ */
 		SequenceExp sequence = new SequenceExp();
-		/* ¿ÉÄÜ»áÊ¹ÓÃµÄ·ÖÖ§ */
+		/* å¯èƒ½ä¼šä½¿ç”¨çš„åˆ†æ”¯ */
 		BranchExp branch = null;
-		/* Ìí¼Ó×Ó½áµã½Ó¿Ú */
+		/* æ·»åŠ å­ç»“ç‚¹æ¥å£ */
 		IExpCollction collection = sequence;
-		/* ±í´ïÊ½Í¨ÓÃ½Ó¿Ú */
+		/* è¡¨è¾¾å¼é€šç”¨æ¥å£ */
 		ISyntaxComponent result = sequence;
 
 		for (;;) {
 			if ((m_Token.m_kToken == type && (m_Token.m_Object == null || m_Token.m_Object
-					.equals(obj)))) {// ½áÊø×Ö·û
-				if (m_SyntaxLexer.index() == 0) {// ±í´ïÊ½Îª¿Õ
+					.equals(obj)))) {// ç»“æŸå­—ç¬¦
+				if (m_SyntaxLexer.index() == 0) {// è¡¨è¾¾å¼ä¸ºç©º
 					err(SyntaxError.NULL);
-				} else if (collection.isEmpty()) {// ²¿¼şÎª¿Õ
+				} else if (collection.isEmpty()) {// éƒ¨ä»¶ä¸ºç©º
 					err(SyntaxError.INCOMPLETE);
 				} else {
 					next();
-					break;// Õı³£ÖÕÖ¹
+					break;// æ­£å¸¸ç»ˆæ­¢
 				}
 			} else if (m_Token.m_kToken == TokenType.EOF) {
 				err(SyntaxError.INCOMPLETE);
 			}
-			ISyntaxComponent exp = null;// µ±Ç°´ı¸³ÖµµÄ±í´ïÊ½
+			ISyntaxComponent exp = null;// å½“å‰å¾…èµ‹å€¼çš„è¡¨è¾¾å¼
 			switch (m_Token.m_kToken) {
 			case OPERATOR:
 				OperatorType op = (OperatorType) m_Token.m_Object;
 				next();
 				switch (op) {
 				case ALTERNATIVE:
-					if (collection.isEmpty())// ÔÚ´ËÖ®Ç°Ã»ÓĞ´æ´¢±í´ïÊ½ (|...)
+					if (collection.isEmpty())// åœ¨æ­¤ä¹‹å‰æ²¡æœ‰å­˜å‚¨è¡¨è¾¾å¼ (|...)
 					{
 						err(SyntaxError.INCOMPLETE);
 					} else {
-						if (branch == null) {// ·ÖÖ§Îª¿Õ£¬Ôò½¨Á¢·ÖÖ§
+						if (branch == null) {// åˆ†æ”¯ä¸ºç©ºï¼Œåˆ™å»ºç«‹åˆ†æ”¯
 							branch = new BranchExp();
-							branch.add(sequence);// ÓÃĞÂ½¨µÄ·ÖÖ§°üº¬²¢Ìæ´úµ±Ç°ĞòÁĞ
+							branch.add(sequence);// ç”¨æ–°å»ºçš„åˆ†æ”¯åŒ…å«å¹¶æ›¿ä»£å½“å‰åºåˆ—
 							result = branch;
 						}
-						sequence = new SequenceExp();// ĞÂ½¨Ò»¸öĞòÁĞ
+						sequence = new SequenceExp();// æ–°å»ºä¸€ä¸ªåºåˆ—
 						branch.add(sequence);
 						continue;
 					}
 					break;
 				case LPARAN:// '('
-					exp = doAnalysis(TokenType.OPERATOR, OperatorType.RPARAN);// µİ¹é·ÖÎö
+					exp = doAnalysis(TokenType.OPERATOR, OperatorType.RPARAN);// é€’å½’åˆ†æ
 					break;
 				case LSQUARE:// '['
-					exp = doAnalysis(TokenType.OPERATOR, OperatorType.RSQUARE);// µİ¹é·ÖÎö
-					OptionExp option = new OptionExp();// °ü×°
+					exp = doAnalysis(TokenType.OPERATOR, OperatorType.RSQUARE);// é€’å½’åˆ†æ
+					OptionExp option = new OptionExp();// åŒ…è£…
 					option.m_Expression = exp;
 					exp = option;
 					break;
@@ -402,10 +402,10 @@ public class Syntax {
 	}
 
 	/**
-	 * ³õÊ¼»¯
+	 * åˆå§‹åŒ–
 	 * 
 	 * @param startSymbol
-	 *            ¿ªÊ¼·ûºÅ
+	 *            å¼€å§‹ç¬¦å·
 	 * @throws SyntaxException
 	 */
 	public void initialize(String startSymbol) throws SyntaxException {
@@ -416,7 +416,7 @@ public class Syntax {
 	}
 
 	/**
-	 * ¼ì²âÆğÊ¼·ûºÅºÏ·¨ĞÔ
+	 * æ£€æµ‹èµ·å§‹ç¬¦å·åˆæ³•æ€§
 	 * 
 	 * @throws SyntaxException
 	 */
@@ -427,28 +427,28 @@ public class Syntax {
 	}
 
 	/**
-	 * ½øĞĞÓïÒå·ÖÎö
+	 * è¿›è¡Œè¯­ä¹‰åˆ†æ
 	 * 
 	 * @throws SyntaxException
 	 */
 	private void semanticAnalysis() throws SyntaxException {
-		/* ·ÇÖÕ½á·ûÊıÁ¿ */
+		/* éç»ˆç»“ç¬¦æ•°é‡ */
 		int size = m_arrNonTerminals.size();
-		/* ¼ÆËã¹æÔòµÄFirst¼¯ºÏ */
+		/* è®¡ç®—è§„åˆ™çš„Firsté›†åˆ */
 		for (RuleExp exp : m_arrNonTerminals) {
 			for (RuleItem item : exp.m_Rule.m_arrRules) {
 				FirstsetSolver solver = new FirstsetSolver();
-				item.m_Expression.visit(solver);// ¼ÆËã¹æÔòµÄFirst¼¯ºÏ
-				if (!solver.solve(item)) {// Èô´®³¤¶È¿ÉÄÜÎªÁã£¬¼´²úÉú¿Õ´®
+				item.m_Expression.visit(solver);// è®¡ç®—è§„åˆ™çš„Firsté›†åˆ
+				if (!solver.solve(item)) {// è‹¥ä¸²é•¿åº¦å¯èƒ½ä¸ºé›¶ï¼Œå³äº§ç”Ÿç©ºä¸²
 					err(SyntaxError.EPSILON,
 							getSingleString(exp.m_strName, item.m_Expression));
 				}
 			}
 		}
-		/* ½¨Á¢Á¬Í¨¾ØÕó */
-		BitVector2 firstsetDependency = new BitVector2(size, size);// First¼¯ÒÀÀµ¾ØÕó
+		/* å»ºç«‹è¿é€šçŸ©é˜µ */
+		BitVector2 firstsetDependency = new BitVector2(size, size);// Firsté›†ä¾èµ–çŸ©é˜µ
 		firstsetDependency.clear();
-		/* ¼ÆËã·ÇÖÕ½á·ûFirst¼¯ºÏ°üº¬¹ØÏµµÄ²¼¶ûÁ¬Í¨¾ØÕó */
+		/* è®¡ç®—éç»ˆç»“ç¬¦Firsté›†åˆåŒ…å«å…³ç³»çš„å¸ƒå°”è¿é€šçŸ©é˜µ */
 		{
 			int i = 0;
 			for (RuleExp exp : m_arrNonTerminals) {
@@ -460,24 +460,24 @@ public class Syntax {
 				i++;
 			}
 		}
-		/* ¼ÆËã¼ä½Ó×óµİ¹é */
+		/* è®¡ç®—é—´æ¥å·¦é€’å½’ */
 		{
-			/* ±ê¼Ç²¢Çå³ıÖ±½Ó×óµİ¹é */
+			/* æ ‡è®°å¹¶æ¸…é™¤ç›´æ¥å·¦é€’å½’ */
 			for (int i = 0; i < size; i++) {
 				if (firstsetDependency.test(i, i)) {
-					m_arrNonTerminals.get(i).m_Rule.m_iRecursiveLevel = 1;// Ö±½Ó×óµİ¹é
+					m_arrNonTerminals.get(i).m_Rule.m_iRecursiveLevel = 1;// ç›´æ¥å·¦é€’å½’
 					firstsetDependency.set(i, i);
 				}
 			}
-			/* »ñµÃ¿½±´ */
+			/* è·å¾—æ‹·è´ */
 			BitVector2 a = (BitVector2) firstsetDependency.clone();
 			BitVector2 b = (BitVector2) firstsetDependency.clone();
 			BitVector2 r = new BitVector2(size, size);
-			/* ¼ì²éÊÇ·ñ³öÏÖ»· */
+			/* æ£€æŸ¥æ˜¯å¦å‡ºç°ç¯ */
 			for (int level = 2; level < size; level++) {// ***
-														// WarshellËã·¨£ºÇóÓĞÏòÍ¼µÄ´«µİ±Õ°ü
+														// Warshellç®—æ³•ï¼šæ±‚æœ‰å‘å›¾çš„ä¼ é€’é—­åŒ…
 														// ***
-				/* ½øĞĞ²¼¶ûÁ¬Í¨¾ØÕó³Ë·¨£¬¼´r=aXb */
+				/* è¿›è¡Œå¸ƒå°”è¿é€šçŸ©é˜µä¹˜æ³•ï¼Œå³r=aXb */
 				for (int i = 0; i < size; i++) {
 					for (int j = 0; j < size; j++) {
 						r.clear(i, j);
@@ -488,7 +488,7 @@ public class Syntax {
 						}
 					}
 				}
-				/* ¼ì²éµ±Ç°½á¹ûÊÇ·ñ³öÏÖ»· */
+				/* æ£€æŸ¥å½“å‰ç»“æœæ˜¯å¦å‡ºç°ç¯ */
 				{
 					int i = 0;
 					for (RuleExp exp : m_arrNonTerminals) {
@@ -500,10 +500,10 @@ public class Syntax {
 						i++;
 					}
 				}
-				/* ±£´æ½á¹û */
+				/* ä¿å­˜ç»“æœ */
 				a = (BitVector2) r.clone();
 			}
-			/* ¼ì²éÊÇ·ñ´æÔÚ»·²¢±¨¸æ´íÎó */
+			/* æ£€æŸ¥æ˜¯å¦å­˜åœ¨ç¯å¹¶æŠ¥å‘Šé”™è¯¯ */
 			for (RuleExp exp : m_arrNonTerminals) {
 				if (exp.m_Rule.m_iRecursiveLevel > 1) {
 					err(SyntaxError.INDIRECT_RECURSION, exp.m_strName
@@ -511,14 +511,14 @@ public class Syntax {
 				}
 			}
 		}
-		/* ¼ÆËãÍêÕûµÄFirst¼¯ºÏ */
+		/* è®¡ç®—å®Œæ•´çš„Firsté›†åˆ */
 		{
-			/* ½¨Á¢´¦Àí±ê¼Ç±í */
+			/* å»ºç«‹å¤„ç†æ ‡è®°è¡¨ */
 			BitSet processed = new BitSet(size);
 			processed.clear();
 			for (int i = 0; i < size; i++) {
-				/* ÕÒ³öÒ»ÌõÎŞ×î×óÒÀÀµµÄ¹æÔò */
-				int nodependencyRule = -1;// ×î×óÒÀÀµµÄ¹æÔòË÷Òı
+				/* æ‰¾å‡ºä¸€æ¡æ— æœ€å·¦ä¾èµ–çš„è§„åˆ™ */
+				int nodependencyRule = -1;// æœ€å·¦ä¾èµ–çš„è§„åˆ™ç´¢å¼•
 				for (int j = 0; j < size; j++) {
 					if (!processed.get(j)) {
 						boolean empty = true;
@@ -528,27 +528,27 @@ public class Syntax {
 								break;
 							}
 						}
-						if (empty) {// ÕÒµ½
+						if (empty) {// æ‰¾åˆ°
 							nodependencyRule = j;
 							break;
 						}
 					}
 				}
-				/* ¼ÆËã¸Ã¹æÔòµÄÖÕ½á·ûFirst¼¯ºÏ */
+				/* è®¡ç®—è¯¥è§„åˆ™çš„ç»ˆç»“ç¬¦Firsté›†åˆ */
 				{
 					Rule rule = m_arrNonTerminals.get(nodependencyRule).m_Rule;
-					/* ¼ÆËã¹æÔòµÄÖÕ½á·ûFirst¼¯ºÏ */
+					/* è®¡ç®—è§„åˆ™çš„ç»ˆç»“ç¬¦Firsté›†åˆ */
 					for (RuleItem item : rule.m_arrRules) {
 						for (RuleExp exp : item.m_arrFirstSetRules) {
 							item.m_arrFirstSetTokens
 									.addAll(exp.m_Rule.m_arrTokens);
 						}
 					}
-					/* ¼ÆËã·ÇÖÕ½á·ûµÄÖÕ½á·ûFirst¼¯ºÏ */
+					/* è®¡ç®—éç»ˆç»“ç¬¦çš„ç»ˆç»“ç¬¦Firsté›†åˆ */
 					for (RuleItem item : rule.m_arrRules) {
 						rule.m_arrTokens.addAll(item.m_arrFirstSetTokens);
 					}
-					/* ĞŞÕı×óµİ¹é¹æÔòµÄÖÕ½á·ûFirst¼¯ºÏ */
+					/* ä¿®æ­£å·¦é€’å½’è§„åˆ™çš„ç»ˆç»“ç¬¦Firsté›†åˆ */
 					for (RuleItem item : rule.m_arrRules) {
 						if (item.m_arrFirstSetRules.contains(m_arrNonTerminals
 								.get(nodependencyRule))) {
@@ -556,14 +556,14 @@ public class Syntax {
 						}
 					}
 				}
-				/* Çå³ı¸Ã¹æÔò */
+				/* æ¸…é™¤è¯¥è§„åˆ™ */
 				processed.set(nodependencyRule);
 				for (int j = 0; j < size; j++) {
 					firstsetDependency.clear(j, nodependencyRule);
 				}
 			}
 		}
-		/* ËÑË÷²»ÄÜ²úÉú×Ö·û´®µÄ¹æÔò */
+		/* æœç´¢ä¸èƒ½äº§ç”Ÿå­—ç¬¦ä¸²çš„è§„åˆ™ */
 		for (RuleExp exp : m_arrNonTerminals) {
 			for (RuleItem item : exp.m_Rule.m_arrRules) {
 				if (item.m_arrFirstSetTokens.isEmpty()) {
@@ -575,24 +575,25 @@ public class Syntax {
 	}
 
 	/**
-	 * Éú³É·ÇÈ·¶¨ĞÔÎÄ·¨×Ô¶¯»ú
+	 * ç”Ÿæˆéç¡®å®šæ€§ä¸‹æ¨è‡ªåŠ¨æœº
 	 */
 	private void generateNGA() {
-		m_NPA = new NPA(m_arrNonTerminals);
+		m_NPA = new NPA(m_arrNonTerminals, m_arrTerminals,
+				m_mapNonTerminals.get(m_strBeginRuleName).m_Rule);
 	}
 
 	/**
-	 * »ñµÃµ¥Ò»²úÉúÊ½ÃèÊö
+	 * è·å¾—å•ä¸€äº§ç”Ÿå¼æè¿°
 	 * 
 	 * @param name
-	 *            ·ÇÖÕ½á·ûÃû³Æ
+	 *            éç»ˆç»“ç¬¦åç§°
 	 * @param exp
-	 *            ±í´ïÊ½Ê÷
+	 *            è¡¨è¾¾å¼æ ‘
 	 * @param focused
-	 *            ½¹µã
+	 *            ç„¦ç‚¹
 	 * @param front
-	 *            Ç°Ïò
-	 * @return Ô­²úÉúÊ½ÃèÊö
+	 *            å‰å‘
+	 * @return åŸäº§ç”Ÿå¼æè¿°
 	 */
 	public static String getSingleString(String name, ISyntaxComponent exp,
 			ISyntaxComponent focused, boolean front) {
@@ -606,13 +607,13 @@ public class Syntax {
 	}
 
 	/**
-	 * »ñµÃµ¥Ò»²úÉúÊ½ÃèÊö
+	 * è·å¾—å•ä¸€äº§ç”Ÿå¼æè¿°
 	 * 
 	 * @param name
-	 *            ·ÇÖÕ½á·ûÃû³Æ
+	 *            éç»ˆç»“ç¬¦åç§°
 	 * @param exp
-	 *            ±í´ïÊ½Ê÷
-	 * @return Ô­²úÉúÊ½ÃèÊö
+	 *            è¡¨è¾¾å¼æ ‘
+	 * @return åŸäº§ç”Ÿå¼æè¿°
 	 */
 	public static String getSingleString(String name, ISyntaxComponent exp) {
 		StringBuffer sb = new StringBuffer();
@@ -625,45 +626,45 @@ public class Syntax {
 	}
 
 	/**
-	 * »ñµÃ¶ÎÂäÊ½ÃèÊö
+	 * è·å¾—æ®µè½å¼æè¿°
 	 */
 	public String getParagraphString() {
 		StringBuffer sb = new StringBuffer();
-		/* ÆğÊ¼·ûºÅ */
-		sb.append("#### ÆğÊ¼·ûºÅ ####");
+		/* èµ·å§‹ç¬¦å· */
+		sb.append("#### èµ·å§‹ç¬¦å· ####");
 		sb.append(System.getProperty("line.separator"));
 		sb.append(m_strBeginRuleName);
 		sb.append(System.getProperty("line.separator"));
-		/* ÖÕ½á·û */
-		sb.append("#### ÖÕ½á·û ####");
+		/* ç»ˆç»“ç¬¦ */
+		sb.append("#### ç»ˆç»“ç¬¦ ####");
 		sb.append(System.getProperty("line.separator"));
 		for (TokenExp exp : m_arrTerminals) {
 			sb.append(exp.toString());
 			sb.append(System.getProperty("line.separator"));
 		}
-		/* ·ÇÖÕ½á·û */
-		sb.append("#### ·ÇÖÕ½á·û ####");
+		/* éç»ˆç»“ç¬¦ */
+		sb.append("#### éç»ˆç»“ç¬¦ ####");
 		sb.append(System.getProperty("line.separator"));
 		for (RuleExp exp : m_arrNonTerminals) {
 			sb.append(exp.toString());
 			sb.append(System.getProperty("line.separator"));
 		}
-		/* ÍÆµ¼¹æÔò */
-		sb.append("#### ÎÄ·¨²úÉúÊ½ ####");
+		/* æ¨å¯¼è§„åˆ™ */
+		sb.append("#### æ–‡æ³•äº§ç”Ÿå¼ ####");
 		sb.append(System.getProperty("line.separator"));
 		for (RuleExp exp : m_arrNonTerminals) {
 			for (RuleItem item : exp.m_Rule.m_arrRules) {
-				/* ¹æÔòÕıÎÄ */
+				/* è§„åˆ™æ­£æ–‡ */
 				sb.append(getSingleString(exp.m_strName, item.m_Expression));
 				sb.append(System.getProperty("line.separator"));
-				/* First¼¯ºÏ */
-				sb.append("\t--== ÖÕ½á·ûFirst¼¯ºÏ ==--");
+				/* Firsté›†åˆ */
+				sb.append("\t--== ç»ˆç»“ç¬¦Firsté›†åˆ ==--");
 				sb.append(System.getProperty("line.separator"));
 				for (TokenExp token : item.m_arrFirstSetTokens) {
 					sb.append("\t\t" + token.m_strName);
 					sb.append(System.getProperty("line.separator"));
 				}
-				sb.append("\t--== ·ÇÖÕ½á·ûFirst¼¯ºÏ ==--");
+				sb.append("\t--== éç»ˆç»“ç¬¦Firsté›†åˆ ==--");
 				sb.append(System.getProperty("line.separator"));
 				for (RuleExp rule : item.m_arrFirstSetRules) {
 					sb.append("\t\t" + rule.m_strName);
@@ -675,7 +676,7 @@ public class Syntax {
 	}
 
 	/**
-	 * »ñµÃÔ­ÍÆµ¼Ê½ÃèÊö
+	 * è·å¾—åŸæ¨å¯¼å¼æè¿°
 	 */
 	public String getOriginalString() {
 		StringBuffer sb = new StringBuffer();
@@ -689,10 +690,17 @@ public class Syntax {
 	}
 
 	/**
-	 * »ñµÃ·ÇÈ·¶¨ĞÔÎÄ·¨×Ô¶¯»úÃèÊö
+	 * è·å¾—éç¡®å®šæ€§æ–‡æ³•è‡ªåŠ¨æœºæè¿°
 	 */
 	public String getNGAString() {
 		return m_NPA.getNGAString();
+	}
+	
+	/**
+	 * è·å¾—éç¡®å®šæ€§ä¸‹æ¨è‡ªåŠ¨æœºæè¿°
+	 */
+	public String getNPAString() {
+		return m_NPA.getNPAString();
 	}
 
 	@Override

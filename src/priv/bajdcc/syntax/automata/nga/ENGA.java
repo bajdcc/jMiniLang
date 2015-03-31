@@ -8,12 +8,12 @@ package priv.bajdcc.syntax.automata.nga;
  */
 public class ENGA {
 	/**
-	 * ³õÌ¬
+	 * åˆæ€
 	 */
 	public NGAStatus m_Begin;
 
 	/**
-	 * ÖÕÌ¬
+	 * ç»ˆæ€
 	 */
 	public NGAStatus m_End;
 }

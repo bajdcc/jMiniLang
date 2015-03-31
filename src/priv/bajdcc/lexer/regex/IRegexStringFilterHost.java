@@ -3,15 +3,15 @@ package priv.bajdcc.lexer.regex;
 import priv.bajdcc.lexer.algorithm.ITokenAlgorithm;
 
 /**
- * ×Ö·û´®¹ıÂËÖ÷Ìå
+ * å­—ç¬¦ä¸²è¿‡æ»¤ä¸»ä½“
  * 
  * @author bajdcc
  *
  */
 public interface IRegexStringFilterHost {
 	/**
-	 * ÉèÖÃ×Ö·û×ª»»Ëã·¨
-	 * @param alg ×Ö·û×ª»»Ëã·¨
+	 * è®¾ç½®å­—ç¬¦è½¬æ¢ç®—æ³•
+	 * @param alg å­—ç¬¦è½¬æ¢ç®—æ³•
 	 */
 	public void setFilter(ITokenAlgorithm alg);
 }

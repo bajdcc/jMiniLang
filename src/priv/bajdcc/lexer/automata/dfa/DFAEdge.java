@@ -1,24 +1,24 @@
 package priv.bajdcc.lexer.automata.dfa;
 
 /**
- * DFA±ß
+ * DFAè¾¹
  * 
  * @author bajdcc
  *
  */
 public class DFAEdge {
 	/**
-	 * ³õÌ¬
+	 * åˆæ€
 	 */
 	public DFAStatus m_Begin;
 
 	/**
-	 * ÖÕÌ¬
+	 * ç»ˆæ€
 	 */
 	public DFAStatus m_End;
 
 	/**
-	 * Êı¾İ
+	 * æ•°æ®
 	 */
 	public DFAEdgeData m_Data = new DFAEdgeData();
 }

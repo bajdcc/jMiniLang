@@ -12,7 +12,7 @@ import priv.bajdcc.lexer.token.Token;
 import priv.bajdcc.lexer.token.TokenType;
 
 /**
- * µ¥´ÊÊ¶±ğËã·¨
+ * å•è¯è¯†åˆ«ç®—æ³•
  * 
  * @author bajdcc
  *
@@ -25,22 +25,22 @@ public abstract class TokenAlgorithm implements ITokenAlgorithm,
 		IRegexStringAttribute {
 
 	/**
-	 * ÓÃÀ´Æ¥ÅäµÄÕıÔò±í´ïÊ½
+	 * ç”¨æ¥åŒ¹é…çš„æ­£åˆ™è¡¨è¾¾å¼
 	 */
 	protected Regex m_Regex = null;
 
 	/**
-	 * Æ¥Åä½á¹û
+	 * åŒ¹é…ç»“æœ
 	 */
 	protected String m_strMatch = "";
 
 	/**
-	 * ×Ö·û¹ıÂË½Ó¿Ú
+	 * å­—ç¬¦è¿‡æ»¤æ¥å£
 	 */
 	protected IRegexStringFilter m_Filter = null;
 
 	/**
-	 * ×Ö·ûÀàĞÍ¹ş¶Î±í
+	 * å­—ç¬¦ç±»å‹å“ˆæ®µè¡¨
 	 */
 	protected HashMap<Character, MetaType> m_MetaMap = new HashMap<Character, MetaType>();
 
@@ -64,8 +64,8 @@ public abstract class TokenAlgorithm implements ITokenAlgorithm,
 			return true;
 		}
 		token.m_Position = iterator.position();
-		if (m_Regex.match(iterator, this)) {// Æ¥Åä³É¹¦
-			token = getToken(m_strMatch, token);// ×Ô¶¯×ª»»µ¥´Ê
+		if (m_Regex.match(iterator, this)) {// åŒ¹é…æˆåŠŸ
+			token = getToken(m_strMatch, token);// è‡ªåŠ¨è½¬æ¢å•è¯
 			return true;
 		}
 		return false;
@@ -73,7 +73,7 @@ public abstract class TokenAlgorithm implements ITokenAlgorithm,
 
 	@Override
 	public boolean getGreedMode() {
-		return false;// Ä¬ÈÏÎª·ÇÌ°À·Ä£Ê½
+		return false;// é»˜è®¤ä¸ºéè´ªå©ªæ¨¡å¼
 	}
 
 	@Override

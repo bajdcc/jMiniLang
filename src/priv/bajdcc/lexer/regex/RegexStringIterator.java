@@ -8,34 +8,34 @@ import priv.bajdcc.lexer.token.MetaType;
 import priv.bajdcc.utility.Position;
 
 /**
- * ×Ö·û´®µü´úÆ÷£¬Ìá¹©×Ö½ÚÁ÷½âÎö¹¦ÄÜ
+ * å­—ç¬¦ä¸²è¿­ä»£å™¨ï¼Œæä¾›å­—èŠ‚æµè§£æåŠŸèƒ½
  * 
  * @author bajdcc
  *
  */
 public class RegexStringIterator implements IRegexStringIterator {
 	/**
-	 * ´æ´¢×Ö·û´®
+	 * å­˜å‚¨å­—ç¬¦ä¸²
 	 */
 	protected String m_strContext;
 
 	/**
-	 * ÓÃÓÚ»Ö¸´µÄÎ»ÖÃ¶ÑÕ»
+	 * ç”¨äºæ¢å¤çš„ä½ç½®å †æ ˆ
 	 */
 	public Stack<Integer> m_stkIndex = new Stack<Integer>();
 
 	/**
-	 * Î»ÖÃ
+	 * ä½ç½®
 	 */
 	protected Position m_Position = new Position();
 
 	/**
-	 * ÓÃÓÚ»Ö¸´ĞĞÁĞÊıµÄ¶ÑÕ»
+	 * ç”¨äºæ¢å¤è¡Œåˆ—æ•°çš„å †æ ˆ
 	 */
 	public Stack<Position> m_stkPosition = new Stack<Position>();
 
 	/**
-	 * µ±Ç°µÄ·ÖÎöĞÅÏ¢
+	 * å½“å‰çš„åˆ†æä¿¡æ¯
 	 */
 	protected RegexStringIteratorData m_Data = new RegexStringIteratorData();
 
@@ -48,7 +48,7 @@ public class RegexStringIterator implements IRegexStringIterator {
 	}
 
 	/**
-	 * ×Ö·û½âÎö×é¼ş
+	 * å­—ç¬¦è§£æç»„ä»¶
 	 */
 	protected RegexStringUtility m_Utility = new RegexStringUtility(this);
 
@@ -87,7 +87,7 @@ public class RegexStringIterator implements IRegexStringIterator {
 	}
 
 	/**
-	 * ·ÖÎö×Ö·ûÀàĞÍ
+	 * åˆ†æå­—ç¬¦ç±»å‹
 	 */
 	protected void transform() {
 		m_Data.m_kMeta = MetaType.CHARACTER;

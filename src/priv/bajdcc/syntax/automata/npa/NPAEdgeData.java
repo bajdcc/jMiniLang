@@ -1,58 +1,58 @@
 package priv.bajdcc.syntax.automata.npa;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 
 import priv.bajdcc.syntax.error.IErrorHandler;
 
 /**
- * ·ÇÈ·¶¨ĞÔÏÂÍÆ×Ô¶¯»ú±ßÊı¾İ
+ * éç¡®å®šæ€§ä¸‹æ¨è‡ªåŠ¨æœºè¾¹æ•°æ®
  * 
  * @author bajdcc
  *
  */
 public class NPAEdgeData {
 	/**
-	 * ±ßÀàĞÍ
+	 * è¾¹ç±»å‹
 	 */
 	public NPAEdgeType m_Action = NPAEdgeType.MOVE;
 
 	/**
-	 * Ö¸Áî
+	 * æŒ‡ä»¤
 	 */
-	public NPAInstruction m_Inst = NPAInstruction.PASS;
-	
+	public NPAInstruction m_Inst = NPAInstruction.ACCEPT;
+
 	/**
-	 * Ö¸Áî²ÎÊı
+	 * æŒ‡ä»¤å‚æ•°
 	 */
 	public int m_iIndex = -1;
-	
+
 	/**
-	 * ´¦ÀíĞòºÅ
+	 * å¤„ç†åºå·
 	 */
 	public int m_iHandler = -1;
-	
+
 	/**
-	 * ×´Ì¬²ÎÊı
+	 * çŠ¶æ€å‚æ•°
 	 */
 	public NPAStatus m_Status = null;
-	
+
 	/**
-	 * ¼ÇºÅ²ÎÊı
+	 * è®°å·å‚æ•°
 	 */
 	public int m_iToken = -1;
-	
+
 	/**
-	 * LookAhead±í
+	 * LookAheadè¡¨
 	 */
-	public ArrayList<Integer> m_arrLookAhead = null;
-	
+	public HashSet<Integer> m_arrLookAhead = null;
+
 	/**
-	 * ´íÎó´¦ÀíÆ÷
+	 * é”™è¯¯å¤„ç†å™¨
 	 */
 	public IErrorHandler m_Handler = null;
-	
+
 	/**
-	 * ³ö´íºóÌø×ªµÄ×´Ì¬
+	 * å‡ºé”™åè·³è½¬çš„çŠ¶æ€
 	 */
 	public NPAStatus m_ErrorJump = null;
 }

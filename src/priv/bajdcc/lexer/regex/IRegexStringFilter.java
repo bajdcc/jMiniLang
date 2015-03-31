@@ -1,7 +1,7 @@
 package priv.bajdcc.lexer.regex;
 
 /**
- * ×Ö·û´®¹ıÂË½Ó¿Ú
+ * å­—ç¬¦ä¸²è¿‡æ»¤æ¥å£
  * 
  * @author bajdcc
  *
@@ -9,13 +9,13 @@ package priv.bajdcc.lexer.regex;
 public interface IRegexStringFilter {
 	
 	/**
-	 * ¹ıÂË
+	 * è¿‡æ»¤
 	 */
 	public RegexStringIteratorData filter(IRegexStringIterator iterator);
 	
 	
 	/**
-	 * ·µ»ØÀàĞÍ¹ıÂË½Ó¿Ú
+	 * è¿”å›ç±»å‹è¿‡æ»¤æ¥å£
 	 */
 	public IRegexStringFilterMeta getFilterMeta();
 }

@@ -1,16 +1,16 @@
 package priv.bajdcc.syntax;
 
 /**
- * ÎÄ·¨²¿¼ş½Ó¿Ú£¨¹æÔò±í´ïÊ½»ùÀà£©
+ * æ–‡æ³•éƒ¨ä»¶æ¥å£ï¼ˆè§„åˆ™è¡¨è¾¾å¼åŸºç±»ï¼‰
  * 
  * @author bajdcc
  */
 public interface ISyntaxComponent {
 	/**
-	 * Éè¶¨±éÀú·½Ê½
+	 * è®¾å®šéå†æ–¹å¼
 	 * 
 	 * @param visitor
-	 *            µİ¹é±éÀúËã·¨
+	 *            é€’å½’éå†ç®—æ³•
 	 */
 	public void visit(ISyntaxComponentVisitor visitor);
 }

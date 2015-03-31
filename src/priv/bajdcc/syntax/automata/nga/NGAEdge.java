@@ -1,14 +1,14 @@
 package priv.bajdcc.syntax.automata.nga;
 
 /**
- * ·ÇÈ·¶¨ĞÔÎÄ·¨×Ô¶¯»ú±ß
+ * éç¡®å®šæ€§æ–‡æ³•è‡ªåŠ¨æœºè¾¹
  * 
  * @author bajdcc
  *
  */
 public class NGAEdge extends ENGA {
 	/**
-	 * Êı¾İ
+	 * æ•°æ®
 	 */
 	public NGAEdgeData m_Data = new NGAEdgeData();
 }

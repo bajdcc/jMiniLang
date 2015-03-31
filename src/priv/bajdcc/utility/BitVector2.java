@@ -3,23 +3,23 @@ package priv.bajdcc.utility;
 import java.util.BitSet;
 
 /**
- * ¶şÖØ²¼¶û¾ØÕó
+ * äºŒé‡å¸ƒå°”çŸ©é˜µ
  *
  * @author bajdcc
  */
 public class BitVector2 {
 	/**
-	 * ÄÚ²¿Ò»ÖØ²¼¶ûÊı×é
+	 * å†…éƒ¨ä¸€é‡å¸ƒå°”æ•°ç»„
 	 */
 	BitSet m_BV = null;
 
 	/**
-	 * ĞĞÊı
+	 * è¡Œæ•°
 	 */
 	int m_nX = 0;
 
 	/**
-	 * ÁĞÊı
+	 * åˆ—æ•°
 	 */
 	int m_nY = 0;
 
@@ -37,65 +37,65 @@ public class BitVector2 {
 	}
 
 	/**
-	 * È«²¿ÖÃÎ»
+	 * å…¨éƒ¨ç½®ä½
 	 */
 	public void set() {
 		m_BV.set(0, m_nX * m_nY - 1);
 	}
 
 	/**
-	 * ÖÃÎ»
+	 * ç½®ä½
 	 * 
 	 * @param x
-	 *            ĞĞ
+	 *            è¡Œ
 	 * @param y
-	 *            ÁĞ
+	 *            åˆ—
 	 */
 	public void set(int x, int y) {
 		m_BV.set(x * m_nX + y);
 	}
 
 	/**
-	 * ÖÃÎ»
+	 * ç½®ä½
 	 * 
 	 * @param x
-	 *            ĞĞ
+	 *            è¡Œ
 	 * @param y
-	 *            ÁĞ
+	 *            åˆ—
 	 * @param value
-	 *            ÉèÖÃµÄÖµ
+	 *            è®¾ç½®çš„å€¼
 	 */
 	public void set(int x, int y, boolean value) {
 		m_BV.set(x * m_nX + y, value);
 	}
 
 	/**
-	 * Î»ÖÃ²âÊÔ
+	 * ä½ç½®æµ‹è¯•
 	 * 
 	 * @param x
-	 *            ĞĞ
+	 *            è¡Œ
 	 * @param y
-	 *            ÁĞ
-	 * @return Î»
+	 *            åˆ—
+	 * @return ä½
 	 */
 	public boolean test(int x, int y) {
 		return m_BV.get(x * m_nX + y);
 	}
 
 	/**
-	 * È«²¿ÇåÁã
+	 * å…¨éƒ¨æ¸…é›¶
 	 */
 	public void clear() {
 		m_BV.clear();
 	}
 
 	/**
-	 * ÇåÁã
+	 * æ¸…é›¶
 	 * 
 	 * @param x
-	 *            ĞĞ
+	 *            è¡Œ
 	 * @param y
-	 *            ÁĞ
+	 *            åˆ—
 	 */
 	public void clear(int x, int y) {
 		m_BV.clear(x * m_nX + y);

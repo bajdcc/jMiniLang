@@ -19,14 +19,14 @@ import priv.bajdcc.lexer.regex.IRegexComponent;
 import priv.bajdcc.utility.ObjectFactory;
 
 /**
- * È·¶¨ĞÔ×Ô¶¯»ú£¨DFA£©
+ * ç¡®å®šæ€§è‡ªåŠ¨æœºï¼ˆDFAï¼‰
  * 
  * @author bajdcc
  *
  */
 public class DFA extends NFA {
 	/**
-	 * ±ß¶ÔÏó³Ø
+	 * è¾¹å¯¹è±¡æ± 
 	 */
 	private PoolService<DFAEdge> m_EdgesPool = new ConcurrentLinkedPool<DFAEdge>(
 			new ObjectFactory<DFAEdge>() {
@@ -36,7 +36,7 @@ public class DFA extends NFA {
 			}, 1024, 10240, false);
 
 	/**
-	 * ×´Ì¬¶ÔÏó³Ø
+	 * çŠ¶æ€å¯¹è±¡æ± 
 	 */
 	private PoolService<DFAStatus> m_StatusPool = new ConcurrentLinkedPool<DFAStatus>(
 			new ObjectFactory<DFAStatus>() {
@@ -46,7 +46,7 @@ public class DFA extends NFA {
 			}, 1024, 10240, false);
 
 	/**
-	 * DFA×´Ì¬¼¯ºÏ
+	 * DFAçŠ¶æ€é›†åˆ
 	 */
 	private DFAStatus m_mainDFA = null;
 
@@ -56,76 +56,76 @@ public class DFA extends NFA {
 	}
 
 	/**
-	 * ×ª»»
+	 * è½¬æ¢
 	 */
 	private void transfer() {
 		deleteEpsilonEdges();
 		if (m_bDebug) {
-			System.out.println("#### Ïû³ıEpsilon±ß ####");
+			System.out.println("#### æ¶ˆé™¤Epsilonè¾¹ ####");
 			System.out.println(getNFAString());
 		}
 		determine();
 		if (m_bDebug) {
-			System.out.println("#### È·¶¨»¯ ####");
+			System.out.println("#### ç¡®å®šåŒ– ####");
 			System.out.println(getDFAString());
-			System.out.println("#### ×´Ì¬×ªÒÆ¾ØÕó ####");
+			System.out.println("#### çŠ¶æ€è½¬ç§»çŸ©é˜µ ####");
 			System.out.println(getDFATableString());
 		}
 		minimization();
 		if (m_bDebug) {
-			System.out.println("#### ×îĞ¡»¯ ####");
+			System.out.println("#### æœ€å°åŒ– ####");
 			System.out.println(getDFAString());
-			System.out.println("#### ×´Ì¬×ªÒÆ¾ØÕó ####");
+			System.out.println("#### çŠ¶æ€è½¬ç§»çŸ©é˜µ ####");
 			System.out.println(getDFATableString());
 		}
 	}
 
 	/**
-	 * Á¬½ÓÁ½¸ö×´Ì¬
+	 * è¿æ¥ä¸¤ä¸ªçŠ¶æ€
 	 * 
 	 * @param begin
-	 *            ³õÌ¬
+	 *            åˆæ€
 	 * @param end
-	 *            ÖÕÌ¬
-	 * @return ĞÂµÄ±ß
+	 *            ç»ˆæ€
+	 * @return æ–°çš„è¾¹
 	 */
 	protected DFAEdge connect(DFAStatus begin, DFAStatus end) {
-		DFAEdge edge = m_EdgesPool.take();// ÉêÇëÒ»ÌõĞÂ±ß
+		DFAEdge edge = m_EdgesPool.take();// ç”³è¯·ä¸€æ¡æ–°è¾¹
 		edge.m_Begin = begin;
 		edge.m_End = end;
-		begin.m_OutEdges.add(edge);// Ìí¼Ó½øÆğÊ¼±ßµÄ³ö±ß
-		end.m_InEdges.add(edge);// Ìí¼Ó½ø½áÊø±ßµÄÈë±ß
+		begin.m_OutEdges.add(edge);// æ·»åŠ è¿›èµ·å§‹è¾¹çš„å‡ºè¾¹
+		end.m_InEdges.add(edge);// æ·»åŠ è¿›ç»“æŸè¾¹çš„å…¥è¾¹
 		return edge;
 	}
 
 	/**
-	 * ¶Ï¿ªÄ³¸ö×´Ì¬ºÍÄ³Ìõ±ß
+	 * æ–­å¼€æŸä¸ªçŠ¶æ€å’ŒæŸæ¡è¾¹
 	 * 
 	 * @param status
-	 *            Ä³×´Ì¬
+	 *            æŸçŠ¶æ€
 	 * @param edge
-	 *            Ä³Ìõ±ß
+	 *            æŸæ¡è¾¹
 	 */
 	protected void disconnect(DFAStatus status, DFAEdge edge) {
 		edge.m_Begin.m_OutEdges.remove(edge);
-		edge.m_End.m_InEdges.remove(edge);// µ±Ç°±ßµÄ½áÊø×´Ì¬µÄÈë±ß¼¯ºÏÈ¥³ıµ±Ç°±ß
+		edge.m_End.m_InEdges.remove(edge);// å½“å‰è¾¹çš„ç»“æŸçŠ¶æ€çš„å…¥è¾¹é›†åˆå»é™¤å½“å‰è¾¹
 		m_EdgesPool.restore(edge);
 	}
 
 	/**
-	 * ¶Ï¿ªÄ³¸ö×´Ì¬ºÍËùÓĞ±ß
+	 * æ–­å¼€æŸä¸ªçŠ¶æ€å’Œæ‰€æœ‰è¾¹
 	 * 
 	 * @param begin
-	 *            Ä³×´Ì¬
+	 *            æŸçŠ¶æ€
 	 */
 	protected void disconnect(DFAStatus status) {
-		/* Çå³ıËùÓĞÈë±ß */
+		/* æ¸…é™¤æ‰€æœ‰å…¥è¾¹ */
 		for (Iterator<DFAEdge> it = status.m_InEdges.iterator(); it.hasNext();) {
 			DFAEdge edge = it.next();
 			it.remove();
 			disconnect(edge.m_Begin, edge);
 		}
-		/* Çå³ıËùÓĞ³ö±ß */
+		/* æ¸…é™¤æ‰€æœ‰å‡ºè¾¹ */
 		for (Iterator<DFAEdge> it = status.m_OutEdges.iterator(); it.hasNext();) {
 			DFAEdge edge = it.next();
 			it.remove();
@@ -135,13 +135,13 @@ public class DFA extends NFA {
 	}
 
 	/**
-	 * »ñÈ¡DFA×´Ì¬±Õ°ü
+	 * è·å–DFAçŠ¶æ€é—­åŒ…
 	 * 
 	 * @param bfs
-	 *            ±éÀúËã·¨
+	 *            éå†ç®—æ³•
 	 * @param status
-	 *            ³õÌ¬
-	 * @return ³õÌ¬±Õ°ü
+	 *            åˆæ€
+	 * @return åˆæ€é—­åŒ…
 	 */
 	protected static ArrayList<DFAStatus> getDFAStatusClosure(
 			BreadthFirstSearch<DFAEdge, DFAStatus> bfs, DFAStatus status) {
@@ -150,7 +150,7 @@ public class DFA extends NFA {
 	}
 
 	/**
-	 * »ñµÃDFA×´Ì¬×ª»»¾ØÕó
+	 * è·å¾—DFAçŠ¶æ€è½¬æ¢çŸ©é˜µ
 	 */
 	public ArrayList<DFAStatus> getDFATable() {
 		return getDFAStatusClosure(
@@ -158,73 +158,73 @@ public class DFA extends NFA {
 	}
 
 	/**
-	 * È¥³ıEpsilon±ß
+	 * å»é™¤Epsilonè¾¹
 	 */
 	private void deleteEpsilonEdges() {
 		ArrayList<NFAStatus> NFAStatusList = getNFAStatusClosure(
-				new BreadthFirstSearch<NFAEdge, NFAStatus>(), m_mainNFA.m_Begin);// »ñÈ¡×´Ì¬±Õ°ü
-		ArrayList<NFAStatus> unaccessiableList = new ArrayList<NFAStatus>();// ²»¿Éµ½´ï×´Ì¬¼¯ºÏ
+				new BreadthFirstSearch<NFAEdge, NFAStatus>(), m_mainNFA.m_Begin);// è·å–çŠ¶æ€é—­åŒ…
+		ArrayList<NFAStatus> unaccessiableList = new ArrayList<NFAStatus>();// ä¸å¯åˆ°è¾¾çŠ¶æ€é›†åˆ
 		for (NFAStatus status : NFAStatusList) {
 			boolean epsilon = true;
 			for (NFAEdge edge : status.m_InEdges) {
-				if (edge.m_Data.m_Action != EdgeType.EPSILON) {// ²»ÊÇEpsilon±ß
-					epsilon = false;// µ±Ç°¿Éµ½´ï
+				if (edge.m_Data.m_Action != EdgeType.EPSILON) {// ä¸æ˜¯Epsilonè¾¹
+					epsilon = false;// å½“å‰å¯åˆ°è¾¾
 					break;
 				}
 			}
 			if (epsilon) {
-				unaccessiableList.add(status);// Èç¹ûËùÓĞÈë±ßÎªEpsilon±ß£¬Ôò²»¿Éµ½´ï
+				unaccessiableList.add(status);// å¦‚æœæ‰€æœ‰å…¥è¾¹ä¸ºEpsilonè¾¹ï¼Œåˆ™ä¸å¯åˆ°è¾¾
 			}
 		}
-		unaccessiableList.remove(m_mainNFA.m_Begin);// ³õÌ¬ÉèÎªÓĞĞ§
+		unaccessiableList.remove(m_mainNFA.m_Begin);// åˆæ€è®¾ä¸ºæœ‰æ•ˆ
 		BreadthFirstSearch<NFAEdge, NFAStatus> epsilonBFS = new BreadthFirstSearch<NFAEdge, NFAStatus>() {
 			@Override
 			public boolean testEdge(NFAEdge edge) {
 				return edge.m_Data.m_Action == EdgeType.EPSILON;
 			}
 		};
-		/* ±éÀúËùÓĞÓĞĞ§×´Ì¬ */
+		/* éå†æ‰€æœ‰æœ‰æ•ˆçŠ¶æ€ */
 		for (NFAStatus status : NFAStatusList) {
-			if (!unaccessiableList.contains(status)) {// ÈôÎªÓĞĞ§×´Ì¬
-				/* »ñÈ¡µ±Ç°×´Ì¬µÄEpsilon±Õ°ü */
+			if (!unaccessiableList.contains(status)) {// è‹¥ä¸ºæœ‰æ•ˆçŠ¶æ€
+				/* è·å–å½“å‰çŠ¶æ€çš„Epsiloné—­åŒ… */
 				ArrayList<NFAStatus> epsilonClosure = getNFAStatusClosure(
 						epsilonBFS, status);
-				/* È¥³ı×ÔÉí×´Ì¬ */
+				/* å»é™¤è‡ªèº«çŠ¶æ€ */
 				epsilonClosure.remove(status);
-				/* ±éÀúEpsilon±Õ°üµÄ×´Ì¬ */
+				/* éå†Epsiloné—­åŒ…çš„çŠ¶æ€ */
 				for (NFAStatus epsilonStatus : epsilonClosure) {
 					if (epsilonStatus.m_Data.m_bFinal) {
-						/* Èç¹û±Õ°üÖĞÓĞÖÕÌ¬£¬Ôòµ±Ç°×´Ì¬ÎªÖÕÌ¬ */
+						/* å¦‚æœé—­åŒ…ä¸­æœ‰ç»ˆæ€ï¼Œåˆ™å½“å‰çŠ¶æ€ä¸ºç»ˆæ€ */
 						status.m_Data.m_bFinal = true;
 					}
-					/* ±éÀú±Õ°üÖĞËùÓĞ±ß */
+					/* éå†é—­åŒ…ä¸­æ‰€æœ‰è¾¹ */
 					for (NFAEdge edge : epsilonStatus.m_OutEdges) {
 						if (edge.m_Data.m_Action != EdgeType.EPSILON) {
-							/* Èç¹ûµ±Ç°±ß²»ÊÇEpsilon±ß£¬¾Í½«±Õ°üÖĞµÄÓĞĞ§±ßÌí¼Óµ½µ±Ç°×´Ì¬ */
+							/* å¦‚æœå½“å‰è¾¹ä¸æ˜¯Epsilonè¾¹ï¼Œå°±å°†é—­åŒ…ä¸­çš„æœ‰æ•ˆè¾¹æ·»åŠ åˆ°å½“å‰çŠ¶æ€ */
 							connect(status, edge.m_End).m_Data = edge.m_Data;
 						}
 					}
 				}
 			}
 		}
-		/* É¾³ıEpsilon±ß */
+		/* åˆ é™¤Epsilonè¾¹ */
 		for (NFAStatus status : NFAStatusList) {
 			for (Iterator<NFAEdge> it = status.m_OutEdges.iterator(); it
 					.hasNext();) {
 				NFAEdge edge = it.next();
 				if (edge.m_Data.m_Action == EdgeType.EPSILON) {
 					it.remove();
-					disconnect(status, edge);// É¾³ıEpsilon±ß
+					disconnect(status, edge);// åˆ é™¤Epsilonè¾¹
 				}
 			}
 		}
-		/* É¾³ıÎŞĞ§×´Ì¬ */
+		/* åˆ é™¤æ— æ•ˆçŠ¶æ€ */
 		for (NFAStatus status : unaccessiableList) {
-			NFAStatusList.remove(status);// É¾³ıÎŞĞ§×´Ì¬
-			disconnect(status);// É¾³ıÓë×´Ì¬ÓĞ¹ØµÄËùÓĞ±ß
+			NFAStatusList.remove(status);// åˆ é™¤æ— æ•ˆçŠ¶æ€
+			disconnect(status);// åˆ é™¤ä¸çŠ¶æ€æœ‰å…³çš„æ‰€æœ‰è¾¹
 		}
 		unaccessiableList.clear();
-		/* É¾³ıÖØ¸´±ß */
+		/* åˆ é™¤é‡å¤è¾¹ */
 		for (NFAStatus status : NFAStatusList) {
 			for (int i = 0; i < status.m_OutEdges.size() - 1; i++) {
 				NFAEdge edge1 = status.m_OutEdges.get(i);
@@ -243,64 +243,64 @@ public class DFA extends NFA {
 	}
 
 	/**
-	 * NFAÈ·¶¨»¯£¬×ªÎªDFA
+	 * NFAç¡®å®šåŒ–ï¼Œè½¬ä¸ºDFA
 	 */
 	private void determine() {
-		/* È¡µÃNFAËùÓĞ×´Ì¬ */
+		/* å–å¾—NFAæ‰€æœ‰çŠ¶æ€ */
 		ArrayList<NFAStatus> NFAStatusList = getNFAStatusClosure(
 				new BreadthFirstSearch<NFAEdge, NFAStatus>(), m_mainNFA.m_Begin);
 		ArrayList<DFAStatus> DFAStatusList = new ArrayList<DFAStatus>();
-		/* ¹şÏ£±íÓÃÀ´½øĞĞDFA×´Ì¬±íµÄ²éÕÒ */
+		/* å“ˆå¸Œè¡¨ç”¨æ¥è¿›è¡ŒDFAçŠ¶æ€è¡¨çš„æŸ¥æ‰¾ */
 		HashMap<String, Integer> DFAStatusListMap = new HashMap<String, Integer>();
 		DFAStatus initStatus = m_StatusPool.take();
-		initStatus.m_Data.m_bFinal = m_mainNFA.m_Begin.m_Data.m_bFinal;// ÊÇ·ñÖÕÌ¬
-		initStatus.m_Data.m_NFAStatus.add(m_mainNFA.m_Begin);// DFA[0]=NFA³õÌ¬¼¯ºÏ
+		initStatus.m_Data.m_bFinal = m_mainNFA.m_Begin.m_Data.m_bFinal;// æ˜¯å¦ç»ˆæ€
+		initStatus.m_Data.m_NFAStatus.add(m_mainNFA.m_Begin);// DFA[0]=NFAåˆæ€é›†åˆ
 		DFAStatusList.add(initStatus);
 		DFAStatusListMap.put(initStatus.m_Data.getStatusString(NFAStatusList),
 				0);
-		/* ¹¹ÔìDFA±í */
+		/* æ„é€ DFAè¡¨ */
 		for (int i = 0; i < DFAStatusList.size(); i++) {
 			DFAStatus dfaStatus = DFAStatusList.get(i);
 			ArrayList<DFAEdgeBag> bags = new ArrayList<DFAEdgeBag>();
-			/* ±éÀúµ±Ç°NFA×´Ì¬¼¯ºÏµÄËùÓĞ±ß */
+			/* éå†å½“å‰NFAçŠ¶æ€é›†åˆçš„æ‰€æœ‰è¾¹ */
 			for (NFAStatus nfaStatus : dfaStatus.m_Data.m_NFAStatus) {
 				for (NFAEdge nfaEdge : nfaStatus.m_OutEdges) {
 					DFAEdgeBag dfaBag = null;
 					for (DFAEdgeBag bag : bags) {
-						/* ¼ì²éÊÇ·ñÔÚ±íÖĞ */
+						/* æ£€æŸ¥æ˜¯å¦åœ¨è¡¨ä¸­ */
 						if (nfaEdge.m_Data.m_Action == bag.m_Action
 								&& nfaEdge.m_Data.m_Param == bag.m_Param) {
 							dfaBag = bag;
 							break;
 						}
 					}
-					/* Èô²»´æÔÚ£¬ÔòĞÂ½¨ */
+					/* è‹¥ä¸å­˜åœ¨ï¼Œåˆ™æ–°å»º */
 					if (dfaBag == null) {
 						dfaBag = new DFAEdgeBag();
 						dfaBag.m_Action = nfaEdge.m_Data.m_Action;
 						dfaBag.m_Param = nfaEdge.m_Data.m_Param;
 						bags.add(dfaBag);
 					}
-					/* Ìí¼Óµ±Ç°±ß */
+					/* æ·»åŠ å½“å‰è¾¹ */
 					dfaBag.m_NFAEdges.add(nfaEdge);
-					/* Ìí¼Óµ±Ç°×´Ì¬ */
+					/* æ·»åŠ å½“å‰çŠ¶æ€ */
 					dfaBag.m_NFAStatus.add(nfaEdge.m_End);
 				}
 			}
-			/* ±éÀúµ±Ç°µÄËùÓĞDFA±ß */
+			/* éå†å½“å‰çš„æ‰€æœ‰DFAè¾¹ */
 			for (DFAEdgeBag bag : bags) {
-				/* ¼ì²âDFAÖ¸ÏòµÄ×´Ì¬ÊÇ·ñ´æÔÚ */
+				/* æ£€æµ‹DFAæŒ‡å‘çš„çŠ¶æ€æ˜¯å¦å­˜åœ¨ */
 				DFAStatus status = null;
-				/* ¹şÏ£×Ö·û´® */
+				/* å“ˆå¸Œå­—ç¬¦ä¸² */
 				String hash = bag.getStatusString(NFAStatusList);
 				if (DFAStatusListMap.containsKey(bag
 						.getStatusString(NFAStatusList))) {
 					status = DFAStatusList.get(DFAStatusListMap.get(hash));
-				} else {// ²»´æÔÚDFA
+				} else {// ä¸å­˜åœ¨DFA
 					status = m_StatusPool.take();
 					status.m_Data.m_NFAStatus = new ArrayList<NFAStatus>(
 							bag.m_NFAStatus);
-					/* ¼ì²éÖÕÌ¬ */
+					/* æ£€æŸ¥ç»ˆæ€ */
 					for (NFAStatus nfaStatus : status.m_Data.m_NFAStatus) {
 						if (nfaStatus.m_Data.m_bFinal) {
 							status.m_Data.m_bFinal = true;
@@ -310,7 +310,7 @@ public class DFA extends NFA {
 					DFAStatusList.add(status);
 					DFAStatusListMap.put(hash, DFAStatusList.size() - 1);
 				}
-				/* ´´½¨DFA±ß */
+				/* åˆ›å»ºDFAè¾¹ */
 				DFAEdge edge = connect(dfaStatus, status);
 				edge.m_Data.m_Action = bag.m_Action;
 				edge.m_Data.m_Param = bag.m_Param;
@@ -321,63 +321,63 @@ public class DFA extends NFA {
 	}
 
 	/**
-	 * DFA×îĞ¡»¯
+	 * DFAæœ€å°åŒ–
 	 */
 	private void minimization() {
-		/* ÊÇ·ñ´æÔÚµÈ¼ÛÀàµÄflag */
+		/* æ˜¯å¦å­˜åœ¨ç­‰ä»·ç±»çš„flag */
 		boolean bExistequivalentClass = true;
 		while (bExistequivalentClass) {
-			/* ÖÕÌ¬¼¯ºÏ */
+			/* ç»ˆæ€é›†åˆ */
 			ArrayList<Integer> finalStatus = new ArrayList<Integer>();
-			/* ·ÇÖÕÌ¬¼¯ºÏ */
+			/* éç»ˆæ€é›†åˆ */
 			ArrayList<Integer> nonFinalStatus = new ArrayList<Integer>();
-			/* DFA×´Ì¬×ªÒÆ±í£¬Ìî³äÖÕÌ¬¼¯ºÏ */
+			/* DFAçŠ¶æ€è½¬ç§»è¡¨ï¼Œå¡«å……ç»ˆæ€é›†åˆ */
 			int[][] transition = buildTransition(finalStatus);
-			/* Ìî³ä·ÇÖÕÌ¬¼¯ºÏºÍ×´Ì¬¼¯ºÏµÄ¹şÏ£±í */
+			/* å¡«å……éç»ˆæ€é›†åˆå’ŒçŠ¶æ€é›†åˆçš„å“ˆå¸Œè¡¨ */
 			for (int i = 0; i < transition.length; i++) {
 				if (!finalStatus.contains(i)) {
-					nonFinalStatus.add(i);// Ìí¼Ó·ÇÖÕÌ¬ĞòºÅ
+					nonFinalStatus.add(i);// æ·»åŠ éç»ˆæ€åºå·
 				}
 			}
-			/* DFA×´Ì¬±í */
+			/* DFAçŠ¶æ€è¡¨ */
 			ArrayList<DFAStatus> statusList = getDFATable();
-			/* ´¦ÀíÖÕÌ¬ */
+			/* å¤„ç†ç»ˆæ€ */
 			bExistequivalentClass = mergeStatus(
 					partition(finalStatus, transition), statusList);
-			/* ´¦Àí·ÇÖÕÌ¬ */
+			/* å¤„ç†éç»ˆæ€ */
 			bExistequivalentClass |= mergeStatus(
 					partition(nonFinalStatus, transition), statusList);
 		}
 	}
 
 	/**
-	 * ×îĞ¡»¯»®·Ö
+	 * æœ€å°åŒ–åˆ’åˆ†
 	 * 
 	 * @param statusList
-	 *            ³õÊ¼»®·Ö
+	 *            åˆå§‹åˆ’åˆ†
 	 * @param transition
-	 *            ×´Ì¬×ªÒÆ±í
-	 * @return »®·Ö
+	 *            çŠ¶æ€è½¬ç§»è¡¨
+	 * @return åˆ’åˆ†
 	 */
 	private ArrayList<ArrayList<Integer>> partition(
 			ArrayList<Integer> statusList, int[][] transition) {
 		if (statusList.size() == 1) {
-			/* ´æ·Å½á¹û */
+			/* å­˜æ”¾ç»“æœ */
 			ArrayList<ArrayList<Integer>> pat = new ArrayList<ArrayList<Integer>>();
 			pat.add(new ArrayList<Integer>(statusList.get(0)));
 			return pat;
 		} else {
-			/* ÓÃÓÚ²éÕÒÏàÍ¬×´Ì¬ */
+			/* ç”¨äºæŸ¥æ‰¾ç›¸åŒçŠ¶æ€ */
 			HashMap<String, ArrayList<Integer>> map = new HashMap<String, ArrayList<Integer>>();
 			for (int status : statusList) {
-				/* »ñµÃ×´Ì¬hash */
+				/* è·å¾—çŠ¶æ€hash */
 				String hash = getStatusLineString(transition[status]);
-				/* ×´Ì¬ÊÇ·ñ³öÏÖ¹ı */
+				/* çŠ¶æ€æ˜¯å¦å‡ºç°è¿‡ */
 				if (map.containsKey(hash)) {
-					/* ×´Ì¬ÖØ¸´£¬¼ÓÈëÉÏ¸öÏàÍ¬×´Ì¬µÄ¼¯ºÏ */
+					/* çŠ¶æ€é‡å¤ï¼ŒåŠ å…¥ä¸Šä¸ªç›¸åŒçŠ¶æ€çš„é›†åˆ */
 					map.get(hash).add(status);
 				} else {
-					/* Ç°´Î³öÏÖ£¬´´½¨Êı×é±£´æËü */
+					/* å‰æ¬¡å‡ºç°ï¼Œåˆ›å»ºæ•°ç»„ä¿å­˜å®ƒ */
 					ArrayList<Integer> set = new ArrayList<Integer>();
 					set.add(status);
 					map.put(hash, set);
@@ -388,45 +388,45 @@ public class DFA extends NFA {
 	}
 
 	/**
-	 * ºÏ²¢ÏàÍ¬×´Ì¬
+	 * åˆå¹¶ç›¸åŒçŠ¶æ€
 	 * 
 	 * @param pat
-	 *            ×´Ì¬»®·Ö
+	 *            çŠ¶æ€åˆ’åˆ†
 	 * @param statusList
-	 *            ×´Ì¬×ªÒÆ±í
+	 *            çŠ¶æ€è½¬ç§»è¡¨
 	 */
 	private boolean mergeStatus(ArrayList<ArrayList<Integer>> pat,
 			ArrayList<DFAStatus> statusList) {
-		/* ±£´æÒª´¦ÀíµÄ¶à×´Ì¬ºÏ²¢µÄ»®·Ö */
+		/* ä¿å­˜è¦å¤„ç†çš„å¤šçŠ¶æ€åˆå¹¶çš„åˆ’åˆ† */
 		ArrayList<ArrayList<Integer>> dealWith = new ArrayList<ArrayList<Integer>>();
 		for (ArrayList<Integer> collection : pat) {
-			if (collection.size() > 1) {// ÓĞ¶à¸ö×´Ì¬
+			if (collection.size() > 1) {// æœ‰å¤šä¸ªçŠ¶æ€
 				dealWith.add(collection);
 			}
 		}
-		/* ÊÇ·ñÒÑ¾­Ã»ÓĞµÈ¼ÛÀà£¬ÈôÃ»ÓĞ£¬¾Í·µ»Øfalse£¬ÕâÑùËã·¨¾Í½áÊø£¨ÊÕÁ² £© */
+		/* æ˜¯å¦å·²ç»æ²¡æœ‰ç­‰ä»·ç±»ï¼Œè‹¥æ²¡æœ‰ï¼Œå°±è¿”å›falseï¼Œè¿™æ ·ç®—æ³•å°±ç»“æŸï¼ˆæ”¶æ•› ï¼‰ */
 		if (dealWith.isEmpty()) {
 			return false;
 		}
-		/* ºÏ²¢Ã¿Ò»·Ö×é */
+		/* åˆå¹¶æ¯ä¸€åˆ†ç»„ */
 		for (ArrayList<Integer> collection : dealWith) {
-			/* Ä¿±ê×´Ì¬Îª¼¯ºÏÖĞµÚÒ»¸ö×´Ì¬£¬ÆäÓà×´Ì¬±»ºÏ²¢ */
+			/* ç›®æ ‡çŠ¶æ€ä¸ºé›†åˆä¸­ç¬¬ä¸€ä¸ªçŠ¶æ€ï¼Œå…¶ä½™çŠ¶æ€è¢«åˆå¹¶ */
 			int dstStatus = collection.get(0);
-			/* Ä¿±ê×´Ì¬ */
+			/* ç›®æ ‡çŠ¶æ€ */
 			DFAStatus status = statusList.get(dstStatus);
 			for (int i = 1; i < collection.size(); i++) {
-				/* ÖØ¸´µÄ×´Ì¬ */
+				/* é‡å¤çš„çŠ¶æ€ */
 				int srcStatus = collection.get(i);
 				DFAStatus dupStatus = statusList.get(srcStatus);
-				/* ±¸·İÖØ¸´×´Ì¬µÄÈë±ß */
+				/* å¤‡ä»½é‡å¤çŠ¶æ€çš„å…¥è¾¹ */
 				ArrayList<DFAEdge> edges = new ArrayList<DFAEdge>(
 						dupStatus.m_InEdges);
-				/* ½«Ö¸ÏòÖØ¸´×´Ì¬µÄ±ß¸ÄÎªÖ¸ÏòÄ¿±ê×´Ì¬µÄ±ß */
+				/* å°†æŒ‡å‘é‡å¤çŠ¶æ€çš„è¾¹æ”¹ä¸ºæŒ‡å‘ç›®æ ‡çŠ¶æ€çš„è¾¹ */
 				for (DFAEdge edge : edges) {
-					/* ¸´ÖÆ±ß */
+					/* å¤åˆ¶è¾¹ */
 					connect(edge.m_Begin, status).m_Data = edge.m_Data;
 				}
-				/* È¥³ıÖØ¸´×´Ì¬ */
+				/* å»é™¤é‡å¤çŠ¶æ€ */
 				disconnect(dupStatus);
 			}
 		}
@@ -434,11 +434,11 @@ public class DFA extends NFA {
 	}
 
 	/**
-	 * »ñÈ¡DFA×´Ì¬×ªÒÆ±íÄ³ĞĞµÄ×Ö·û´®
+	 * è·å–DFAçŠ¶æ€è½¬ç§»è¡¨æŸè¡Œçš„å­—ç¬¦ä¸²
 	 * 
 	 * @param line
-	 *            Ä³ĞĞµÄË÷Òı¾ØÕó
-	 * @return ¹şÏ£×Ö·û´®
+	 *            æŸè¡Œçš„ç´¢å¼•çŸ©é˜µ
+	 * @return å“ˆå¸Œå­—ç¬¦ä¸²
 	 */
 	private String getStatusLineString(int[] line) {
 		StringBuilder sb = new StringBuilder();
@@ -449,26 +449,26 @@ public class DFA extends NFA {
 	}
 
 	/**
-	 * ½¨Á¢×´Ì¬
+	 * å»ºç«‹çŠ¶æ€
 	 * 
 	 * @param finalStatus
-	 * @return ×´Ì¬×ª»»¾ØÕó
+	 * @return çŠ¶æ€è½¬æ¢çŸ©é˜µ
 	 */
 	public int[][] buildTransition(Collection<Integer> finalStatus) {
 		finalStatus.clear();
-		/* DFA×´Ì¬±í */
+		/* DFAçŠ¶æ€è¡¨ */
 		ArrayList<DFAStatus> statusList = getDFATable();
-		/* ½¨Á¢×´Ì¬×ªÒÆ¾ØÕó */
+		/* å»ºç«‹çŠ¶æ€è½¬ç§»çŸ©é˜µ */
 		int[][] transition = new int[statusList.size()][m_Map.getRanges()
 				.size()];
-		/* Ìî³ä×´Ì¬×ªÒÆ±í */
+		/* å¡«å……çŠ¶æ€è½¬ç§»è¡¨ */
 		for (int i = 0; i < statusList.size(); i++) {
 			DFAStatus status = statusList.get(i);
 			if (status.m_Data.m_bFinal) {
-				finalStatus.add(i);// ±ê¼ÇÖÕÌ¬
+				finalStatus.add(i);// æ ‡è®°ç»ˆæ€
 			}
 			for (int j = 0; j < transition[i].length; j++) {
-				transition[i][j] = -1;// ÖÃÎŞĞ§±ê¼Ç-1
+				transition[i][j] = -1;// ç½®æ— æ•ˆæ ‡è®°-1
 			}
 			for (DFAEdge edge : status.m_OutEdges) {
 				if (edge.m_Data.m_Action == EdgeType.CHARSET) {
@@ -481,32 +481,32 @@ public class DFA extends NFA {
 	}
 
 	/**
-	 * Ìá¹©DFAÃèÊö
+	 * æä¾›DFAæè¿°
 	 */
-	private String getDFAString() {
-		/* È¡µÃNFAËùÓĞ×´Ì¬ */
+	public String getDFAString() {
+		/* å–å¾—NFAæ‰€æœ‰çŠ¶æ€ */
 		ArrayList<NFAStatus> NFAStatusList = getNFAStatusClosure(
 				new BreadthFirstSearch<NFAEdge, NFAStatus>(), m_mainNFA.m_Begin);
-		/* È¡µÃDFAËùÓĞ×´Ì¬ */
+		/* å–å¾—DFAæ‰€æœ‰çŠ¶æ€ */
 		ArrayList<DFAStatus> DFAStatusList = getDFAStatusClosure(
 				new BreadthFirstSearch<DFAEdge, DFAStatus>(), m_mainDFA);
 		StringBuilder sb = new StringBuilder();
-		/* Éú³ÉDFAÃèÊö */
+		/* ç”ŸæˆDFAæè¿° */
 		for (int i = 0; i < DFAStatusList.size(); i++) {
 			DFAStatus status = DFAStatusList.get(i);
-			/* ×´Ì¬ */
-			sb.append("×´Ì¬[" + i + "]" + (status.m_Data.m_bFinal ? "[½áÊø]" : "")
+			/* çŠ¶æ€ */
+			sb.append("çŠ¶æ€[" + i + "]" + (status.m_Data.m_bFinal ? "[ç»“æŸ]" : "")
 					+ " => " + status.m_Data.getStatusString(NFAStatusList)
 					+ System.getProperty("line.separator"));
-			/* ±ß */
+			/* è¾¹ */
 			for (DFAEdge edge : status.m_OutEdges) {
-				sb.append("\t±ß => [" + DFAStatusList.indexOf(edge.m_End) + "]"
-						+ System.getProperty("line.separator"));// Ö¸Ïò±ß
-				sb.append("\t\tÀàĞÍ => " + edge.m_Data.m_Action.getName());
-				switch (edge.m_Data.m_Action)// ÀàĞÍ
+				sb.append("\tè¾¹ => [" + DFAStatusList.indexOf(edge.m_End) + "]"
+						+ System.getProperty("line.separator"));// æŒ‡å‘è¾¹
+				sb.append("\t\tç±»å‹ => " + edge.m_Data.m_Action.getName());
+				switch (edge.m_Data.m_Action)// ç±»å‹
 				{
 				case CHARSET:
-					sb.append("\t" + m_Map.getRanges().get(edge.m_Data.m_Param));// Çø¼ä
+					sb.append("\t" + m_Map.getRanges().get(edge.m_Data.m_Param));// åŒºé—´
 					break;
 				case EPSILON:
 					break;
@@ -520,7 +520,7 @@ public class DFA extends NFA {
 	}
 
 	/**
-	 * »ñÈ¡×´Ì¬×ªÒÆ¾ØÕóÃèÊö
+	 * è·å–çŠ¶æ€è½¬ç§»çŸ©é˜µæè¿°
 	 */
 	public String getDFATableString() {
 		int[][] transition = buildTransition(new ArrayList<Integer>());

@@ -6,7 +6,7 @@ import priv.bajdcc.lexer.token.Token;
 import priv.bajdcc.lexer.token.TokenType;
 
 /**
- * Êı×Ö½âÎö
+ * æ•°å­—è§£æ
  * 
  * @author bajdcc
  *
@@ -27,7 +27,7 @@ public class NumberTokenizer extends TokenAlgorithm {
 	}
 
 	/*
-	 * £¨·Ç Javadoc£©
+	 * ï¼ˆé Javadocï¼‰
 	 * 
 	 * @see
 	 * priv.bajdcc.lexer.algorithm.ITokenAlgorithm#getToken(java.lang.String,

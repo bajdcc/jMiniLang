@@ -8,12 +8,12 @@ package priv.bajdcc.lexer.automata.nfa;
  */
 public class ENFA {
 	/**
-	 * ³õÌ¬
+	 * åˆæ€
 	 */
 	public NFAStatus m_Begin;
 
 	/**
-	 * ÖÕÌ¬
+	 * ç»ˆæ€
 	 */
 	public NFAStatus m_End;
 }

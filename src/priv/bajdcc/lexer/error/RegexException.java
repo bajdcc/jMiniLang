@@ -3,7 +3,7 @@ package priv.bajdcc.lexer.error;
 import priv.bajdcc.utility.Position;
 
 /**
- * ÕıÔò±í´ïÊ½Éú³É¹ı³ÌÖĞµÄÒì³£
+ * æ­£åˆ™è¡¨è¾¾å¼ç”Ÿæˆè¿‡ç¨‹ä¸­çš„å¼‚å¸¸
  * 
  * @author bajdcc
  *
@@ -12,18 +12,18 @@ import priv.bajdcc.utility.Position;
 public class RegexException extends Exception {
 
 	/**
-	 * ÕıÔò±í´ïÊ½½âÎö¹ı³ÌÖĞµÄ´íÎó
+	 * æ­£åˆ™è¡¨è¾¾å¼è§£æè¿‡ç¨‹ä¸­çš„é”™è¯¯
 	 */
 	public enum RegexError {
-		NULL("ÕıÔò±í´ïÊ½Îª¿Õ"),
-		CTYPE("·Ç·¨×Ö·û"),
-		ESCAPE("·Ç·¨µÄ×ªÒå×Ö·û"),
-		BRACK("ÖĞÀ¨ºÅ²»Æ¥Åä"),
-		PAREN("Ğ¡À¨ºÅ²»Æ¥Åä"),
-		BRACE("´óÀ¨ºÅ²»Æ¥Åä"),
-		RANGE("·¶Î§²»ÕıÈ·"),
-		SYNTAX("Óï·¨´íÎó"),
-		INCOMPLETE("ÕıÔò±í´ïÊ½²»ÍêÕû");
+		NULL("æ­£åˆ™è¡¨è¾¾å¼ä¸ºç©º"),
+		CTYPE("éæ³•å­—ç¬¦"),
+		ESCAPE("éæ³•çš„è½¬ä¹‰å­—ç¬¦"),
+		BRACK("ä¸­æ‹¬å·ä¸åŒ¹é…"),
+		PAREN("å°æ‹¬å·ä¸åŒ¹é…"),
+		BRACE("å¤§æ‹¬å·ä¸åŒ¹é…"),
+		RANGE("èŒƒå›´ä¸æ­£ç¡®"),
+		SYNTAX("è¯­æ³•é”™è¯¯"),
+		INCOMPLETE("æ­£åˆ™è¡¨è¾¾å¼ä¸å®Œæ•´");
 
 		private String message;
 
@@ -47,24 +47,24 @@ public class RegexException extends Exception {
 	}
 
 	/**
-	 * Î»ÖÃ
+	 * ä½ç½®
 	 */
 	private Position m_Position = new Position();
 	
 	/**
-	 * @return ´íÎóÎ»ÖÃ
+	 * @return é”™è¯¯ä½ç½®
 	 */
 	public Position getPosition() {
 		return m_Position;
 	}
 	
 	/**
-	 * ´íÎóÀàĞÍ
+	 * é”™è¯¯ç±»å‹
 	 */
 	private RegexError m_kError = RegexError.NULL;
 
 	/**
-	 * @return ´íÎóÀàĞÍ
+	 * @return é”™è¯¯ç±»å‹
 	 */
 	public RegexError getErrorCode() {
 		return m_kError;

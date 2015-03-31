@@ -3,19 +3,19 @@ package priv.bajdcc.lexer.automata.nfa;
 import priv.bajdcc.lexer.automata.EdgeType;
 
 /**
- * NFA±ßÊı¾İ
+ * NFAè¾¹æ•°æ®
  * 
  * @author bajdcc
  *
  */
 public class NFAEdgeData {
 	/**
-	 * ±ßÀàĞÍ
+	 * è¾¹ç±»å‹
 	 */
 	public EdgeType m_Action = EdgeType.EPSILON;
 	
 	/**
-	 * Êı¾İ
+	 * æ•°æ®
 	 */
 	public int m_Param = -1;
 }

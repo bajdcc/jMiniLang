@@ -6,29 +6,29 @@ import priv.bajdcc.syntax.exp.RuleExp;
 import priv.bajdcc.syntax.exp.TokenExp;
 
 /**
- * ÎÄ·¨¹æÔò£¨ÎÄ·¨ÍÆµ¼Ê½±í£©
+ * æ–‡æ³•è§„åˆ™ï¼ˆæ–‡æ³•æ¨å¯¼å¼è¡¨ï¼‰
  *
  * @author bajdcc
  */
 public class Rule {
 
 	/**
-	 * ¹æÔò±í´ïÊ½ÁĞ±í
+	 * è§„åˆ™è¡¨è¾¾å¼åˆ—è¡¨
 	 */
 	public ArrayList<RuleItem> m_arrRules = new ArrayList<RuleItem>();
 
 	/**
-	 * ¹æÔòÆğÊ¼·ÇÖÕ½á·û
+	 * è§„åˆ™èµ·å§‹éç»ˆç»“ç¬¦
 	 */
 	public RuleExp m_nonTerminal = null;
 
 	/**
-	 * ×óµİ¹éµÈ¼¶£º0Îª·ñ£¬1ÎªÖ±½Ó£¬´óÓÚ1Îª¼ä½Ó
+	 * å·¦é€’å½’ç­‰çº§ï¼š0ä¸ºå¦ï¼Œ1ä¸ºç›´æ¥ï¼Œå¤§äº1ä¸ºé—´æ¥
 	 */
 	public int m_iRecursiveLevel = 0;
 
 	/**
-	 * ÖÕ½á·ûFirst¼¯ºÏ
+	 * ç»ˆç»“ç¬¦Firsté›†åˆ
 	 */
 	public ArrayList<TokenExp> m_arrTokens = new ArrayList<TokenExp>();
 

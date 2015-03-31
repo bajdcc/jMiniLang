@@ -6,24 +6,24 @@ import priv.bajdcc.syntax.error.IErrorHandler;
 import priv.bajdcc.utility.VisitBag;
 
 /**
- * 文法规则（属性）
+ * 鏂囨硶瑙勫垯锛堝睘鎬э級
  *
  * @author bajdcc
  */
 public class PropertyExp implements ISyntaxComponent {
 
 	/**
-	 * 子表达式
+	 * 瀛愯〃杈惧紡
 	 */
 	public ISyntaxComponent m_Expression = null;
 	
 	/**
-	 * 存储序号
+	 * 瀛樺偍搴忓彿
 	 */
 	public int m_iStorage = -1;
 	
 	/**
-	 * 子表达式
+	 * 瀛愯〃杈惧紡
 	 */
 	public IErrorHandler m_ErrorHandler = null;
 

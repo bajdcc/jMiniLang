@@ -19,7 +19,7 @@ import priv.bajdcc.lexer.regex.Repetition;
 import priv.bajdcc.utility.ObjectFactory;
 
 /**
- * NFA¹¹³ÉËã·¨£¨AST->NFA£©
+ * NFAæ„æˆç®—æ³•ï¼ˆAST->NFAï¼‰
  * 
  * @author bajdcc
  *
@@ -27,12 +27,12 @@ import priv.bajdcc.utility.ObjectFactory;
 public class NFA implements IRegexComponentVisitor {
 
 	/**
-	 * ÊÇ·ñÎªµ÷ÊÔÄ£Ê½£¨´òÓ¡ĞÅÏ¢£©
+	 * æ˜¯å¦ä¸ºè°ƒè¯•æ¨¡å¼ï¼ˆæ‰“å°ä¿¡æ¯ï¼‰
 	 */
 	protected boolean m_bDebug = false;
 
 	/**
-	 * ±ß¶ÔÏó³Ø
+	 * è¾¹å¯¹è±¡æ± 
 	 */
 	private PoolService<NFAEdge> m_EdgesPool = new ConcurrentLinkedPool<NFAEdge>(
 			new ObjectFactory<NFAEdge>() {
@@ -42,7 +42,7 @@ public class NFA implements IRegexComponentVisitor {
 			}, 1024, 10240, false);
 
 	/**
-	 * ×´Ì¬¶ÔÏó³Ø
+	 * çŠ¶æ€å¯¹è±¡æ± 
 	 */
 	private PoolService<NFAStatus> m_StatusPool = new ConcurrentLinkedPool<NFAStatus>(
 			new ObjectFactory<NFAStatus>() {
@@ -52,17 +52,17 @@ public class NFA implements IRegexComponentVisitor {
 			}, 1024, 10240, false);
 
 	/**
-	 * Éî¶È
+	 * æ·±åº¦
 	 */
 	private int m_iLevel = 0;
 
 	/**
-	 * NFAÕ»
+	 * NFAæ ˆ
 	 */
 	private Stack<ArrayList<ENFA>> m_stkNFA = new Stack<ArrayList<ENFA>>();
 
 	/**
-	 * NFA×Ó±í
+	 * NFAå­è¡¨
 	 */
 	private ArrayList<ENFA> m_childNFA = new ArrayList<ENFA>();
 
@@ -72,12 +72,12 @@ public class NFA implements IRegexComponentVisitor {
 	protected ENFA m_mainNFA = null;
 
 	/**
-	 * ±í´ïÊ½Ê÷¸ù½áµã
+	 * è¡¨è¾¾å¼æ ‘æ ¹ç»“ç‚¹
 	 */
 	protected IRegexComponent m_Expression = null;
 
 	/**
-	 * Sigma×´Ì¬¼¯
+	 * SigmaçŠ¶æ€é›†
 	 */
 	protected CharacterMap m_Map = new CharacterMap();
 
@@ -86,7 +86,7 @@ public class NFA implements IRegexComponentVisitor {
 		m_Expression = exp;
 		m_Expression.visit(m_Map);
 		if (m_bDebug) {
-			System.out.println("#### ×´Ì¬¼¯ºÏ ####");
+			System.out.println("#### çŠ¶æ€é›†åˆ ####");
 			System.out.println(getStatusString());
 		}
 		m_Expression.visit(this);
@@ -97,50 +97,50 @@ public class NFA implements IRegexComponentVisitor {
 	}
 
 	/**
-	 * Á¬½ÓÁ½¸ö×´Ì¬
+	 * è¿æ¥ä¸¤ä¸ªçŠ¶æ€
 	 * 
 	 * @param begin
-	 *            ³õÌ¬
+	 *            åˆæ€
 	 * @param end
-	 *            ÖÕÌ¬
-	 * @return ĞÂµÄ±ß
+	 *            ç»ˆæ€
+	 * @return æ–°çš„è¾¹
 	 */
 	protected NFAEdge connect(NFAStatus begin, NFAStatus end) {
-		NFAEdge edge = m_EdgesPool.take();// ÉêÇëÒ»ÌõĞÂ±ß
+		NFAEdge edge = m_EdgesPool.take();// ç”³è¯·ä¸€æ¡æ–°è¾¹
 		edge.m_Begin = begin;
 		edge.m_End = end;
-		begin.m_OutEdges.add(edge);// Ìí¼Ó½øÆğÊ¼±ßµÄ³ö±ß
-		end.m_InEdges.add(edge);// Ìí¼Ó½ø½áÊø±ßµÄÈë±ß
+		begin.m_OutEdges.add(edge);// æ·»åŠ è¿›èµ·å§‹è¾¹çš„å‡ºè¾¹
+		end.m_InEdges.add(edge);// æ·»åŠ è¿›ç»“æŸè¾¹çš„å…¥è¾¹
 		return edge;
 	}
 
 	/**
-	 * ¶Ï¿ªÄ³¸ö×´Ì¬ºÍÄ³Ìõ±ß
+	 * æ–­å¼€æŸä¸ªçŠ¶æ€å’ŒæŸæ¡è¾¹
 	 * 
 	 * @param status
-	 *            Ä³×´Ì¬
+	 *            æŸçŠ¶æ€
 	 * @param edge
-	 *            Ä³Ìõ±ß
+	 *            æŸæ¡è¾¹
 	 */
 	protected void disconnect(NFAStatus status, NFAEdge edge) {
-		edge.m_End.m_InEdges.remove(edge);// µ±Ç°±ßµÄ½áÊø×´Ì¬µÄÈë±ß¼¯ºÏÈ¥³ıµ±Ç°±ß
+		edge.m_End.m_InEdges.remove(edge);// å½“å‰è¾¹çš„ç»“æŸçŠ¶æ€çš„å…¥è¾¹é›†åˆå»é™¤å½“å‰è¾¹
 		m_EdgesPool.restore(edge);
 	}
 
 	/**
-	 * ¶Ï¿ªÄ³¸ö×´Ì¬ºÍËùÓĞ±ß
+	 * æ–­å¼€æŸä¸ªçŠ¶æ€å’Œæ‰€æœ‰è¾¹
 	 * 
 	 * @param begin
-	 *            Ä³×´Ì¬
+	 *            æŸçŠ¶æ€
 	 */
 	protected void disconnect(NFAStatus status) {
-		/* Çå³ıËùÓĞÈë±ß */
+		/* æ¸…é™¤æ‰€æœ‰å…¥è¾¹ */
 		for (Iterator<NFAEdge> it = status.m_InEdges.iterator(); it.hasNext();) {
 			NFAEdge edge = it.next();
 			it.remove();
 			disconnect(edge.m_Begin, edge);
 		}
-		/* Çå³ıËùÓĞ³ö±ß */
+		/* æ¸…é™¤æ‰€æœ‰å‡ºè¾¹ */
 		for (Iterator<NFAEdge> it = status.m_OutEdges.iterator(); it.hasNext();) {
 			NFAEdge edge = it.next();
 			it.remove();
@@ -155,10 +155,10 @@ public class NFA implements IRegexComponentVisitor {
 		ENFA enfa = new ENFA();
 		enfa.m_Begin = m_StatusPool.take();
 		enfa.m_End = m_StatusPool.take();
-		for (CharacterRange range : m_Map.getRanges()) {// ±éÀúËùÓĞ×Ö·ûÇø¼ä
-			if (node.include(range.m_chLowerBound)) {// ÈôÔÚµ±Ç°½áµã·¶Î§ÄÚ£¬ÔòÌí¼Ó±ß
-				NFAEdge edge = connect(enfa.m_Begin, enfa.m_End);// Á¬½ÓÁ½¸ö×´Ì¬
-				edge.m_Data.m_Action = EdgeType.CHARSET;// ×Ö·ûÀàĞÍ
+		for (CharacterRange range : m_Map.getRanges()) {// éå†æ‰€æœ‰å­—ç¬¦åŒºé—´
+			if (node.include(range.m_chLowerBound)) {// è‹¥åœ¨å½“å‰ç»“ç‚¹èŒƒå›´å†…ï¼Œåˆ™æ·»åŠ è¾¹
+				NFAEdge edge = connect(enfa.m_Begin, enfa.m_End);// è¿æ¥ä¸¤ä¸ªçŠ¶æ€
+				edge.m_Data.m_Action = EdgeType.CHARSET;// å­—ç¬¦ç±»å‹
 				edge.m_Data.m_Param = m_Map.find(range.m_chLowerBound);
 			}
 		}
@@ -187,7 +187,7 @@ public class NFA implements IRegexComponentVisitor {
 		leaveChildren();
 		ENFA result = null;
 		if (!node.m_bBranch) {
-			/* ½«µ±Ç°NFAµÄÁ½¶ËÍ¬Ã¿¸ö×Ó½áµãµÄÁ½¶Ë´®Áª */
+			/* å°†å½“å‰NFAçš„ä¸¤ç«¯åŒæ¯ä¸ªå­ç»“ç‚¹çš„ä¸¤ç«¯ä¸²è” */
 			for (ENFA enfa : m_childNFA) {
 				if (result == null) {
 					result = m_childNFA.get(0);
@@ -200,7 +200,7 @@ public class NFA implements IRegexComponentVisitor {
 			result = new ENFA();
 			result.m_Begin = m_StatusPool.take();
 			result.m_End = m_StatusPool.take();
-			/* ½«µ±Ç°NFAµÄÁ½¶ËÍ¬Ã¿¸ö×Ó½áµãµÄÁ½¶Ë²¢Áª */
+			/* å°†å½“å‰NFAçš„ä¸¤ç«¯åŒæ¯ä¸ªå­ç»“ç‚¹çš„ä¸¤ç«¯å¹¶è” */
 			for (ENFA enfa : m_childNFA) {
 				connect(result.m_Begin, enfa.m_Begin);
 				connect(enfa.m_End, result.m_End);
@@ -213,55 +213,55 @@ public class NFA implements IRegexComponentVisitor {
 	@Override
 	public void visitEnd(Repetition node) {
 		leaveChildren();
-		// #### ×¢Òâ ####
-		// ÓÉÓÚÕıÔò±í´ïÊ½µÄÓï·¨Ê÷½á¹¹Ê¹È»£¬Ñ­»·Óï¾äµÄ×Ó½áµã±Ø¶¨Ö»ÓĞÒ»¸ö£¬
-		// Îª×Ö·û¼¯¡¢²¢Áª»ò´®Áª¡£
-		/* ¹¹Ôì×ÓÍ¼¸±±¾ */
+		// #### æ³¨æ„ ####
+		// ç”±äºæ­£åˆ™è¡¨è¾¾å¼çš„è¯­æ³•æ ‘ç»“æ„ä½¿ç„¶ï¼Œå¾ªç¯è¯­å¥çš„å­ç»“ç‚¹å¿…å®šåªæœ‰ä¸€ä¸ªï¼Œ
+		// ä¸ºå­—ç¬¦é›†ã€å¹¶è”æˆ–ä¸²è”ã€‚
+		/* æ„é€ å­å›¾å‰¯æœ¬ */
 		ArrayList<ENFA> subENFAList = new ArrayList<ENFA>();
 		ENFA enfa = new ENFA();
 		enfa.m_Begin = m_childNFA.get(0).m_Begin;
 		enfa.m_End = m_childNFA.get(0).m_End;
 		int count = Integer.max(node.m_iLowerBound, node.m_iUpperBound);
 		subENFAList.add(enfa);
-		/* Ñ­»·¸´ÖÆENFA */
+		/* å¾ªç¯å¤åˆ¶ENFA */
 		for (int i = 1; i <= count; i++) {
 			subENFAList.add(copyENFA(enfa));
 		}
 		enfa = new ENFA();
-		/* ¹¹ÔìÑ­»·ÆğÊ¼²¿·Ö */
+		/* æ„é€ å¾ªç¯èµ·å§‹éƒ¨åˆ† */
 		if (node.m_iLowerBound > 0) {
 			enfa.m_Begin = m_childNFA.get(0).m_Begin;
 			enfa.m_End = m_childNFA.get(0).m_End;
 			for (int i = 1; i < node.m_iLowerBound; i++) {
-				connect(enfa.m_End, subENFAList.get(i).m_Begin);// Á¬½ÓÊ×Î²
+				connect(enfa.m_End, subENFAList.get(i).m_Begin);// è¿æ¥é¦–å°¾
 				enfa.m_End = subENFAList.get(i).m_End;
 			}
 		}
-		if (node.m_iUpperBound != -1) {// ÓĞÏŞÑ­»·£¬¹¹ÔìÑ­»·½áÊø²¿·Ö
+		if (node.m_iUpperBound != -1) {// æœ‰é™å¾ªç¯ï¼Œæ„é€ å¾ªç¯ç»“æŸéƒ¨åˆ†
 			for (int i = node.m_iLowerBound; i < node.m_iUpperBound; i++) {
 				if (enfa.m_End != null) {
-					connect(enfa.m_End, subENFAList.get(i).m_Begin);// Á¬½ÓÊ×Î²
+					connect(enfa.m_End, subENFAList.get(i).m_Begin);// è¿æ¥é¦–å°¾
 				} else {
 					enfa = subENFAList.get(i);
 				}
 				connect(subENFAList.get(i).m_Begin,
 						subENFAList.get(node.m_iUpperBound - 1).m_End);
 			}
-		} else {// ÎŞÏŞÑ­»·
+		} else {// æ— é™å¾ªç¯
 			NFAStatus tailBegin, tailEnd;
-			if (enfa.m_End == null) {// Ñ­»·×îµÍ´ÎÊıÎª0£¬¼´Î´¹¹ÔìÆğÊ¼²¿·Ö£¬¹ÊĞè¹¹Ôì
+			if (enfa.m_End == null) {// å¾ªç¯æœ€ä½æ¬¡æ•°ä¸º0ï¼Œå³æœªæ„é€ èµ·å§‹éƒ¨åˆ†ï¼Œæ•…éœ€æ„é€ 
 				tailBegin = enfa.m_Begin = m_StatusPool.take();
 				tailEnd = enfa.m_End = m_StatusPool.take();
-			} else {// ÆğÊ¼²¿·ÖÒÑ¹¹ÔìÍê±Ï£¬¹ÊÆğÊ¼¶ËÎŞĞèÔÙ´Î¹¹Ôì
+			} else {// èµ·å§‹éƒ¨åˆ†å·²æ„é€ å®Œæ¯•ï¼Œæ•…èµ·å§‹ç«¯æ— éœ€å†æ¬¡æ„é€ 
 				tailBegin = enfa.m_End;
 				tailEnd = enfa.m_End = m_StatusPool.take();
 			}
-			/* ¹¹ÔìÎŞÏŞÑ­»·µÄ½áÊø²¿·Ö£¬Á¬½ÓÆğÊ¼¶ËÓëÑ­»·¶ËµÄË«Ïòe±ß */
+			/* æ„é€ æ— é™å¾ªç¯çš„ç»“æŸéƒ¨åˆ†ï¼Œè¿æ¥èµ·å§‹ç«¯ä¸å¾ªç¯ç«¯çš„åŒå‘eè¾¹ */
 			connect(tailBegin, subENFAList.get(node.m_iLowerBound).m_Begin);
 			connect(subENFAList.get(node.m_iLowerBound).m_End, tailBegin);
 			connect(tailBegin, tailEnd);
 		}
-		/* ¹¹ÔìÑ­»·µÄÍ·Î²²¿·Ö */
+		/* æ„é€ å¾ªç¯çš„å¤´å°¾éƒ¨åˆ† */
 		NFAStatus begin = m_StatusPool.take();
 		NFAStatus end = m_StatusPool.take();
 		connect(begin, enfa.m_Begin);
@@ -273,16 +273,16 @@ public class NFA implements IRegexComponentVisitor {
 	}
 
 	/**
-	 * ·µ»ØÕ»¶¥NFA
+	 * è¿”å›æ ˆé¡¶NFA
 	 * 
-	 * @return µ±Ç°Õ»¶¥NFA
+	 * @return å½“å‰æ ˆé¡¶NFA
 	 */
 	private ArrayList<ENFA> currentNFA() {
 		return m_stkNFA.peek();
 	}
 
 	/**
-	 * ´æ´¢NFA
+	 * å­˜å‚¨NFA
 	 * 
 	 * @param enfa
 	 *            ENFA
@@ -292,71 +292,71 @@ public class NFA implements IRegexComponentVisitor {
 	}
 
 	/**
-	 * ½øÈë½áµã
+	 * è¿›å…¥ç»“ç‚¹
 	 */
 	private void enter() {
-		if (m_iLevel == 0) {// Ê×´Î·ÃÎÊASTÊ±
+		if (m_iLevel == 0) {// é¦–æ¬¡è®¿é—®ASTæ—¶
 			enterChildren();
 		}
 		m_iLevel++;
 	}
 
 	/**
-	 * Àë¿ª½áµã
+	 * ç¦»å¼€ç»“ç‚¹
 	 */
 	private void leave() {
 		m_iLevel--;
-		if (m_iLevel == 0) {// Àë¿ªÕû¸öASTÊ±£¬´æ´¢½á¹û
+		if (m_iLevel == 0) {// ç¦»å¼€æ•´ä¸ªASTæ—¶ï¼Œå­˜å‚¨ç»“æœ
 			leaveChildren();
 			store();
 		}
 	}
 
 	/**
-	 * ½øÈë×Ó½áµã
+	 * è¿›å…¥å­ç»“ç‚¹
 	 */
 	private void enterChildren() {
-		m_stkNFA.push(new ArrayList<ENFA>());// ĞÂ½¨ENFA±í
+		m_stkNFA.push(new ArrayList<ENFA>());// æ–°å»ºENFAè¡¨
 		m_childNFA = null;
 	}
 
 	/**
-	 * Àë¿ª×Ó½áµã
+	 * ç¦»å¼€å­ç»“ç‚¹
 	 */
 	private void leaveChildren() {
-		m_childNFA = m_stkNFA.pop();// »ñµÃµ±Ç°½áµãµÄ×Ó½áµã
+		m_childNFA = m_stkNFA.pop();// è·å¾—å½“å‰ç»“ç‚¹çš„å­ç»“ç‚¹
 	}
 
 	/**
-	 * ´æ´¢½á¹û
+	 * å­˜å‚¨ç»“æœ
 	 */
 	private void store() {
-		// #### ×¢Òâ ####
-		// ±¾³ÌĞòÓÉregex¹¹ÔìµÄASTĞÎ³ÉµÄNFAÓĞÃ÷È·ÇÒÎ¨Ò»µÄ³õÌ¬ºÍÖÕÌ¬
-		ENFA enfa = m_childNFA.get(0);// ´ËÊ±Î»ÓÚ¶¥²ã£¬¹Ê¶¥²ãÊ×¸öENFAÎª¸ùENFA
-		enfa.m_End.m_Data.m_bFinal = true;// ¸ùENFAµÄ³õÌ¬Îªbegin£¬ÖÕÌ¬Îªend
+		// #### æ³¨æ„ ####
+		// æœ¬ç¨‹åºç”±regexæ„é€ çš„ASTå½¢æˆçš„NFAæœ‰æ˜ç¡®ä¸”å”¯ä¸€çš„åˆæ€å’Œç»ˆæ€
+		ENFA enfa = m_childNFA.get(0);// æ­¤æ—¶ä½äºé¡¶å±‚ï¼Œæ•…é¡¶å±‚é¦–ä¸ªENFAä¸ºæ ¹ENFA
+		enfa.m_End.m_Data.m_bFinal = true;// æ ¹ENFAçš„åˆæ€ä¸ºbeginï¼Œç»ˆæ€ä¸ºend
 		m_mainNFA = enfa;
 	}
 
 	/**
-	 * ¸´ÖÆENFA
+	 * å¤åˆ¶ENFA
 	 * 
 	 * @param enfa
 	 *            ENFA
-	 * @return ¸±±¾
+	 * @return å‰¯æœ¬
 	 */
 	private ENFA copyENFA(ENFA enfa) {
-		ArrayList<NFAStatus> srcStatusList = new ArrayList<NFAStatus>();// ³õÌ¬±í
-		ArrayList<NFAStatus> dstStatusList = new ArrayList<NFAStatus>();// ÖÕÌ¬±í
+		ArrayList<NFAStatus> srcStatusList = new ArrayList<NFAStatus>();// åˆæ€è¡¨
+		ArrayList<NFAStatus> dstStatusList = new ArrayList<NFAStatus>();// ç»ˆæ€è¡¨
 		srcStatusList.addAll(getNFAStatusClosure(
-				new BreadthFirstSearch<NFAEdge, NFAStatus>(), enfa.m_Begin)); // »ñÈ¡×´Ì¬±Õ°ü
-		/* ¸´ÖÆ×´Ì¬ */
+				new BreadthFirstSearch<NFAEdge, NFAStatus>(), enfa.m_Begin)); // è·å–çŠ¶æ€é—­åŒ…
+		/* å¤åˆ¶çŠ¶æ€ */
 		for (NFAStatus status : srcStatusList) {
 			NFAStatus newStatus = m_StatusPool.take();
 			newStatus.m_Data = status.m_Data;
 			dstStatusList.add(newStatus);
 		}
-		/* ¸´ÖÆ±ß */
+		/* å¤åˆ¶è¾¹ */
 		for (int i = 0; i < srcStatusList.size(); i++) {
 			NFAStatus status = srcStatusList.get(i);
 			for (NFAEdge edge : status.m_OutEdges) {
@@ -365,7 +365,7 @@ public class NFA implements IRegexComponentVisitor {
 				newEdge.m_Data = edge.m_Data;
 			}
 		}
-		/* ĞÂ½¨ENFA£¬Á¬½Ó³õÌ¬ºÍÖÕÌ¬ */
+		/* æ–°å»ºENFAï¼Œè¿æ¥åˆæ€å’Œç»ˆæ€ */
 		ENFA result = new ENFA();
 		result.m_Begin = dstStatusList.get(srcStatusList.indexOf(enfa.m_Begin));
 		result.m_End = dstStatusList.get(srcStatusList.indexOf(enfa.m_End));
@@ -373,20 +373,20 @@ public class NFA implements IRegexComponentVisitor {
 	}
 
 	/**
-	 * »ñÈ¡×Ö·ûÓ³Éä±í
+	 * è·å–å­—ç¬¦æ˜ å°„è¡¨
 	 */
 	public CharacterMap getCharacterMap() {
 		return m_Map;
 	}
 
 	/**
-	 * »ñÈ¡NFA×´Ì¬±Õ°ü
+	 * è·å–NFAçŠ¶æ€é—­åŒ…
 	 * 
 	 * @param bfs
-	 *            ±éÀúËã·¨
+	 *            éå†ç®—æ³•
 	 * @param status
-	 *            ³õÌ¬
-	 * @return ³õÌ¬±Õ°ü
+	 *            åˆæ€
+	 * @return åˆæ€é—­åŒ…
 	 */
 	protected static ArrayList<NFAStatus> getNFAStatusClosure(
 			BreadthFirstSearch<NFAEdge, NFAStatus> bfs, NFAStatus status) {
@@ -395,34 +395,34 @@ public class NFA implements IRegexComponentVisitor {
 	}
 
 	/**
-	 * ×Ö·ûÇø¼äÃèÊö
+	 * å­—ç¬¦åŒºé—´æè¿°
 	 */
 	public String getStatusString() {
 		return m_Map.toString();
 	}
 
 	/**
-	 * NFAÃèÊö
+	 * NFAæè¿°
 	 */
 	public String getNFAString() {
 		StringBuilder sb = new StringBuilder();
 		ArrayList<NFAStatus> statusList = getNFAStatusClosure(
-				new BreadthFirstSearch<NFAEdge, NFAStatus>(), m_mainNFA.m_Begin);// »ñÈ¡×´Ì¬±Õ°ü
-		/* Éú³ÉNFAÃèÊö */
+				new BreadthFirstSearch<NFAEdge, NFAStatus>(), m_mainNFA.m_Begin);// è·å–çŠ¶æ€é—­åŒ…
+		/* ç”ŸæˆNFAæè¿° */
 		for (int i = 0; i < statusList.size(); i++) {
 			NFAStatus status = statusList.get(i);
-			/* ×´Ì¬ */
-			sb.append("×´Ì¬[" + i + "]" + (status.m_Data.m_bFinal ? "[½áÊø]" : "")
+			/* çŠ¶æ€ */
+			sb.append("çŠ¶æ€[" + i + "]" + (status.m_Data.m_bFinal ? "[ç»“æŸ]" : "")
 					+ System.getProperty("line.separator"));
-			/* ±ß */
+			/* è¾¹ */
 			for (NFAEdge edge : status.m_OutEdges) {
-				sb.append("\t±ß => [" + statusList.indexOf(edge.m_End) + "]"
-						+ System.getProperty("line.separator"));// Ö¸Ïò±ß
-				sb.append("\t\tÀàĞÍ => " + edge.m_Data.m_Action.getName());
-				switch (edge.m_Data.m_Action)// ÀàĞÍ
+				sb.append("\tè¾¹ => [" + statusList.indexOf(edge.m_End) + "]"
+						+ System.getProperty("line.separator"));// æŒ‡å‘è¾¹
+				sb.append("\t\tç±»å‹ => " + edge.m_Data.m_Action.getName());
+				switch (edge.m_Data.m_Action)// ç±»å‹
 				{
 				case CHARSET:
-					sb.append("\t" + m_Map.getRanges().get(edge.m_Data.m_Param));// Çø¼ä
+					sb.append("\t" + m_Map.getRanges().get(edge.m_Data.m_Param));// åŒºé—´
 					break;
 				case EPSILON:
 					break;

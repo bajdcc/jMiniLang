@@ -3,7 +3,7 @@ package priv.bajdcc.lexer.algorithm;
 import priv.bajdcc.lexer.regex.IRegexStringIterator;
 
 /**
- * ÏòÇ°½øÒ»²½µÄ´íÎó´¦ÀíÆ÷
+ * å‘å‰è¿›ä¸€æ­¥çš„é”™è¯¯å¤„ç†å™¨
  * 
  * @author bajdcc
  *

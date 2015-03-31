@@ -13,33 +13,33 @@ import priv.bajdcc.syntax.exp.TokenExp;
 import priv.bajdcc.utility.VisitBag;
 
 /**
- * Çó½âÒ»¸ö²úÉúÊ½µÄFirst¼¯ºÏ
+ * æ±‚è§£ä¸€ä¸ªäº§ç”Ÿå¼çš„Firsté›†åˆ
  *
  * @author bajdcc
  */
 public class FirstsetSolver implements ISyntaxComponentVisitor {
 
 	/**
-	 * ÖÕ½á·û±í
+	 * ç»ˆç»“ç¬¦è¡¨
 	 */
 	private HashSet<TokenExp> m_setTokens = new HashSet<TokenExp>();
 
 	/**
-	 * ·ÇÖÕ½á·û±í
+	 * éç»ˆç»“ç¬¦è¡¨
 	 */
 	private HashSet<RuleExp> m_setRules = new HashSet<RuleExp>();
 
 	/**
-	 * ²úÉúÊ½ÍÆµ¼µÄ´®³¤¶ÈÊÇ·ñ¿ÉÄÜÎªÁã
+	 * äº§ç”Ÿå¼æ¨å¯¼çš„ä¸²é•¿åº¦æ˜¯å¦å¯èƒ½ä¸ºé›¶
 	 */
 	private boolean m_bZero = true;
 
 	/**
-	 * Çó½â
+	 * æ±‚è§£
 	 * 
 	 * @param target
-	 *            Ä¿±ê²úÉúÊ½¶ÔÏó
-	 * @return ²úÉúÊ½ÊÇ·ñºÏ·¨
+	 *            ç›®æ ‡äº§ç”Ÿå¼å¯¹è±¡
+	 * @return äº§ç”Ÿå¼æ˜¯å¦åˆæ³•
 	 */
 	public boolean solve(RuleItem target) {
 		if (m_bZero) {

@@ -6,7 +6,7 @@ import priv.bajdcc.lexer.token.Token;
 import priv.bajdcc.lexer.token.TokenType;
 
 /**
- * ¿Õ°××Ö·û½âÎö
+ * ç©ºç™½å­—ç¬¦è§£æ
  * 
  * @author bajdcc
  *
@@ -27,7 +27,7 @@ public class WhitespaceTokenizer extends TokenAlgorithm {
 	}
 
 	/*
-	 * £¨·Ç Javadoc£©
+	 * ï¼ˆé Javadocï¼‰
 	 * 
 	 * @see
 	 * priv.bajdcc.lexer.algorithm.ITokenAlgorithm#getToken(java.lang.String,

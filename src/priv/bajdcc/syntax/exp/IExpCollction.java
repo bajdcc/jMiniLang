@@ -3,21 +3,21 @@ package priv.bajdcc.syntax.exp;
 import priv.bajdcc.syntax.ISyntaxComponent;
 
 /**
- * 可以添加孩子结点的表达式接口
+ * 鍙互娣诲姞瀛╁瓙缁撶偣鐨勮〃杈惧紡鎺ュ彛
  *
  * @author bajdcc
  */
 public interface IExpCollction {
 	/**
-	 * 添加孩子结点
+	 * 娣诲姞瀛╁瓙缁撶偣
 	 * 
 	 * @param exp
-	 *            子表达式
+	 *            瀛愯〃杈惧紡
 	 */
 	public void add(ISyntaxComponent exp);
 	
 	/**
-	 * 集合是否为空
+	 * 闆嗗悎鏄惁涓虹┖
 	 */
 	public boolean isEmpty();
 }

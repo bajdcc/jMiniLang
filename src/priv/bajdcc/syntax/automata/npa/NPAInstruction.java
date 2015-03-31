@@ -1,13 +1,14 @@
 package priv.bajdcc.syntax.automata.npa;
 
 /**
- * ·ÇÈ·¶¨ÐÔÏÂÍÆ×Ô¶¯»úÖ¸Áî
+ * éžç¡®å®šæ€§ä¸‹æŽ¨è‡ªåŠ¨æœºæŒ‡ä»¤
  *
  * @author bajdcc
  */
 public enum NPAInstruction {
-	PASS("Í¨¹ý"), READ("¶ÁÈë"), SHIFT("ÒÆ½ø"), TRANSLATE("·­Òë"), LEFT_RECURSION("×óµÝ¹é"), TRANSLATE_DISCARD(
-			"¶ªÆú·­Òë"), LEFT_RECURSION_DISCARD("¶ªÆú×óµÝ¹é"), TRANSLATE_FINISH("·­Òë½áÊø");
+	ACCEPT("æŽ¥å—"), READ("è¯»å…¥"), SHIFT("ç§»è¿›"), TRANSLATE("ç¿»è¯‘"), LEFT_RECURSION(
+			"å·¦é€’å½’"), TRANSLATE_DISCARD("ä¸¢å¼ƒç¿»è¯‘"), LEFT_RECURSION_DISCARD("ä¸¢å¼ƒå·¦é€’å½’"), TRANSLATE_FINISH(
+			"ç¿»è¯‘ç»“æŸ");
 
 	private String name;
 

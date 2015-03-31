@@ -1,13 +1,13 @@
 package priv.bajdcc.syntax.token;
 
 /**
- * µ¥´ÊÀàÐÍ
+ * å•è¯ç±»åž‹
  * 
  * @author bajdcc
  */
 public enum TokenType {
-	TERMINAL("ÖÕ½á·û"), NONTERMINAL("·ÇÖÕ½á·û"), EOF("È«ÎÄÄ©Î²"), COMMENT("×¢ÊÍ"), OPERATOR(
-			"²Ù×÷·û"), WHITSPACE("¿Õ°××Ö·û"), HANDLER("´íÎó´¦ÀíÆ÷"), ERROR("´íÎó");
+	TERMINAL("ç»ˆç»“ç¬¦"), NONTERMINAL("éžç»ˆç»“ç¬¦"), EOF("å…¨æ–‡æœ«å°¾"), COMMENT("æ³¨é‡Š"), OPERATOR(
+			"æ“ä½œç¬¦"), WHITSPACE("ç©ºç™½å­—ç¬¦"), HANDLER("é”™è¯¯å¤„ç†å™¨"), ERROR("é”™è¯¯");
 
 	private String name;
 

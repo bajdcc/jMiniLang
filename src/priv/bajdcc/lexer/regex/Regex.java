@@ -11,21 +11,21 @@ import priv.bajdcc.lexer.error.RegexException;
 import priv.bajdcc.lexer.error.RegexException.RegexError;
 
 /**
- * ## ÕıÔò±í´ïÊ½·ÖÎö¹¤¾ß ##<br/>
- * ÓÃÓÚÉú³ÉÓï·¨Ê÷<br/>
- * Óï·¨Í¬Ò»°ãµÄÕıÔò±í´ïÊ½£¬Ö»ÓĞÌ°À·Ä£Ê½£¬Ã»ÓĞÇ°/ºóÏòÆ¥Åä£¬ Ã»ÓĞ²¶»ñ¹¦ÄÜ£¬½öÓÃÓÚÆ¥Åä¡£
+ * ## æ­£åˆ™è¡¨è¾¾å¼åˆ†æå·¥å…· ##<br/>
+ * ç”¨äºç”Ÿæˆè¯­æ³•æ ‘<br/>
+ * è¯­æ³•åŒä¸€èˆ¬çš„æ­£åˆ™è¡¨è¾¾å¼ï¼Œåªæœ‰è´ªå©ªæ¨¡å¼ï¼Œæ²¡æœ‰å‰/åå‘åŒ¹é…ï¼Œ æ²¡æœ‰æ•è·åŠŸèƒ½ï¼Œä»…ç”¨äºåŒ¹é…ã€‚
  * 
  * @author bajdcc
  */
 public class Regex extends RegexStringIterator {
 
 	/**
-	 * ÊÇ·ñÎªµ÷ÊÔÄ£Ê½£¨´òÓ¡ĞÅÏ¢£©
+	 * æ˜¯å¦ä¸ºè°ƒè¯•æ¨¡å¼ï¼ˆæ‰“å°ä¿¡æ¯ï¼‰
 	 */
 	private boolean m_bDebug = false;
 
 	/**
-	 * ±í´ïÊ½Ê÷¸ù½áµã
+	 * è¡¨è¾¾å¼æ ‘æ ¹ç»“ç‚¹
 	 */
 	private IRegexComponent m_Expression = null;
 
@@ -35,22 +35,22 @@ public class Regex extends RegexStringIterator {
 	private DFA m_DFA = null;
 
 	/**
-	 * DFA×´Ì¬×ª»»±í
+	 * DFAçŠ¶æ€è½¬æ¢è¡¨
 	 */
 	private int[][] m_Transition = null;
 
 	/**
-	 * ÖÕÌ¬±í
+	 * ç»ˆæ€è¡¨
 	 */
 	private HashSet<Integer> m_FinalStatus = new HashSet<Integer>();
 
 	/**
-	 * ×Ö·ûÇø¼ä±í
+	 * å­—ç¬¦åŒºé—´è¡¨
 	 */
 	private CharacterMap m_Map = null;
 
 	/**
-	 * ×Ö·û´®¹ıÂË½Ó¿Ú
+	 * å­—ç¬¦ä¸²è¿‡æ»¤æ¥å£
 	 */
 	private IRegexStringFilter m_Filter = null;
 
@@ -83,7 +83,7 @@ public class Regex extends RegexStringIterator {
 	}
 
 	/**
-	 * ## ±àÒë±í´ïÊ½ ##<br/>
+	 * ## ç¼–è¯‘è¡¨è¾¾å¼ ##<br/>
 	 * 
 	 * @throws RegexException
 	 */
@@ -92,7 +92,7 @@ public class Regex extends RegexStringIterator {
 		/* String->AST */
 		m_Expression = analysis(MetaType.END.getChar(), MetaType.END);
 		if (m_bDebug) {
-			System.out.println("#### ÕıÔò±í´ïÊ½Óï·¨Ê÷ ####");
+			System.out.println("#### æ­£åˆ™è¡¨è¾¾å¼è¯­æ³•æ ‘ ####");
 			System.out.println(toString());
 		}
 		/* AST->ENFA->NFA->DFA */
@@ -102,32 +102,32 @@ public class Regex extends RegexStringIterator {
 	}
 
 	/**
-	 * ½¨Á¢DFA×´Ì¬×ª»»±í
+	 * å»ºç«‹DFAçŠ¶æ€è½¬æ¢è¡¨
 	 */
 	private void buildTransition() {
-		/* ×Ö·ûÇø¼äÓ³Éä±í */
+		/* å­—ç¬¦åŒºé—´æ˜ å°„è¡¨ */
 		m_Map = m_DFA.getCharacterMap();
-		/* DFA×´Ì¬×ªÒÆ±í */
+		/* DFAçŠ¶æ€è½¬ç§»è¡¨ */
 		m_Transition = m_DFA.buildTransition(m_FinalStatus);
 	}
 
 	/**
-	 * Æ¥Åä£¨Ä¬ÈÏÎªÌ°À·Æ¥Åä£©
+	 * åŒ¹é…ï¼ˆé»˜è®¤ä¸ºè´ªå©ªåŒ¹é…ï¼‰
 	 * 
 	 * @param string
-	 *            ±»Æ¥ÅäµÄ×Ö·û´®
-	 * @return Æ¥Åä½á¹û£¨Èô²»³É¹¦Ôò·µ»Ø¿Õ£©
+	 *            è¢«åŒ¹é…çš„å­—ç¬¦ä¸²
+	 * @return åŒ¹é…ç»“æœï¼ˆè‹¥ä¸æˆåŠŸåˆ™è¿”å›ç©ºï¼‰
 	 */
 	public String match(String string) {
 		return match(string, true);
 	}
 
 	/**
-	 * Æ¥Åä
+	 * åŒ¹é…
 	 * 
 	 * @param string
-	 *            ±»Æ¥ÅäµÄ×Ö·û´®
-	 * @return Æ¥Åä½á¹û£¨Èô²»³É¹¦Ôò·µ»Ø¿Õ£©
+	 *            è¢«åŒ¹é…çš„å­—ç¬¦ä¸²
+	 * @return åŒ¹é…ç»“æœï¼ˆè‹¥ä¸æˆåŠŸåˆ™è¿”å›ç©ºï¼‰
 	 */
 	public String match(String string, boolean greed) {
 		String matchString = null;
@@ -156,56 +156,56 @@ public class Regex extends RegexStringIterator {
 	}
 
 	/**
-	 * Æ¥ÅäËã·¨£¨DFA×´Ì¬±í£©
+	 * åŒ¹é…ç®—æ³•ï¼ˆDFAçŠ¶æ€è¡¨ï¼‰
 	 * 
 	 * @param iterator
-	 *            ×Ö·û´®±éÀú½Ó¿Ú
+	 *            å­—ç¬¦ä¸²éå†æ¥å£
 	 * @param attr
-	 *            Êä³öµÄÆ¥Åä×Ö·û´®
-	 * @return ÊÇ·ñÆ¥Åä³É¹¦
+	 *            è¾“å‡ºçš„åŒ¹é…å­—ç¬¦ä¸²
+	 * @return æ˜¯å¦åŒ¹é…æˆåŠŸ
 	 */
 	public boolean match(IRegexStringIterator iterator,
 			IRegexStringAttribute attr) {
-		/* Ê¹ÓÃÈ«¾Ö×Ö·ûÓ³Éä±í */
+		/* ä½¿ç”¨å…¨å±€å­—ç¬¦æ˜ å°„è¡¨ */
 		int[] charMap = m_Map.getStatus();
-		/* ±£´æµ±Ç°Î»ÖÃ */
+		/* ä¿å­˜å½“å‰ä½ç½® */
 		iterator.snapshot();
-		/* µ±Ç°×´Ì¬ */
+		/* å½“å‰çŠ¶æ€ */
 		int status = 0;
-		/* ÉÏ´Î¾­¹ıµÄÖÕÌ¬ */
+		/* ä¸Šæ¬¡ç»è¿‡çš„ç»ˆæ€ */
 		int lastFinalStatus = -1;
-		/* ÉÏ´Î¾­¹ıµÄÖÕÌ¬Î»ÖÃ */
+		/* ä¸Šæ¬¡ç»è¿‡çš„ç»ˆæ€ä½ç½® */
 		int lastIndex = -1;
-		/* ÊÇ·ñÎªÌ°À·Ä£Ê½ */
+		/* æ˜¯å¦ä¸ºè´ªå©ªæ¨¡å¼ */
 		boolean greed = attr.getGreedMode();
-		/* ´æ·ÅÆ¥Åä×Ö·û´® */
+		/* å­˜æ”¾åŒ¹é…å­—ç¬¦ä¸² */
 		StringBuilder sb = new StringBuilder();
-		/* ÊÇ·ñÔÊĞíÍ¨¹ıÖÕÌ¬½áÊøÊ¶±ğ */
+		/* æ˜¯å¦å…è®¸é€šè¿‡ç»ˆæ€ç»“æŸè¯†åˆ« */
 		boolean allowFinal = false;
 		for (;;) {
-			if (m_FinalStatus.contains(status)) {// ¾­¹ıÖÕÌ¬
-				if (greed) {// Ì°À·Ä£Ê½
+			if (m_FinalStatus.contains(status)) {// ç»è¿‡ç»ˆæ€
+				if (greed) {// è´ªå©ªæ¨¡å¼
 					if (lastFinalStatus == -1) {
-						iterator.snapshot();// ±£´æÎ»ÖÃ
+						iterator.snapshot();// ä¿å­˜ä½ç½®
 					} else {
-						iterator.cover();// ¸²¸ÇÎ»ÖÃ
+						iterator.cover();// è¦†ç›–ä½ç½®
 					}
-					lastFinalStatus = status;// ¼ÇÂ¼ÉÏ´Î×´Ì¬
+					lastFinalStatus = status;// è®°å½•ä¸Šæ¬¡çŠ¶æ€
 					lastIndex = sb.length();
-				} else if (!allowFinal) {// ·ÇÌ°À·Ä£Ê½£¬ÔòÆ¥ÅäÍê³É
-					iterator.discard();// Æ¥Åä³É¹¦£¬¶ªÆúÎ»ÖÃ
+				} else if (!allowFinal) {// éè´ªå©ªæ¨¡å¼ï¼Œåˆ™åŒ¹é…å®Œæˆ
+					iterator.discard();// åŒ¹é…æˆåŠŸï¼Œä¸¢å¼ƒä½ç½®
 					attr.setResult(sb.toString());
 					return true;
 				}
 			}
 			char local = 0;
-			boolean skipStore = false;// È¡Ïû´æ´¢µ±Ç°×Ö·û
-			/* »ñµÃµ±Ç°×Ö·û */
+			boolean skipStore = false;// å–æ¶ˆå­˜å‚¨å½“å‰å­—ç¬¦
+			/* è·å¾—å½“å‰å­—ç¬¦ */
 			if (m_Filter != null) {
-				RegexStringIteratorData data = m_Filter.filter(iterator);// ¹ıÂË
+				RegexStringIteratorData data = m_Filter.filter(iterator);// è¿‡æ»¤
 				local = data.m_chCurrent;
 				skipStore = data.m_kMeta == MetaType.NULL;
-				allowFinal = data.m_kMeta == MetaType.MUST_SAVE;// Ç¿ÖÆÌø¹ıÖÕÌ¬
+				allowFinal = data.m_kMeta == MetaType.MUST_SAVE;// å¼ºåˆ¶è·³è¿‡ç»ˆæ€
 			} else {
 				if (!iterator.available()) {
 					local = 0;
@@ -214,65 +214,65 @@ public class Regex extends RegexStringIterator {
 					iterator.next();
 				}
 			}
-			/* ´æ´¢×Ö·û */
+			/* å­˜å‚¨å­—ç¬¦ */
 			if (!skipStore) {
 				sb.append(local);
 			}
-			/* »ñµÃ×Ö·ûÇø¼äË÷Òı */
+			/* è·å¾—å­—ç¬¦åŒºé—´ç´¢å¼• */
 			int charClass = charMap[local];
-			/* ×´Ì¬×ªÒÆ */
+			/* çŠ¶æ€è½¬ç§» */
 			int refer = -1;
-			if (charClass != -1) {// Çø¼äÓĞĞ§£¬³¢ÊÔ×ªÒÆ
+			if (charClass != -1) {// åŒºé—´æœ‰æ•ˆï¼Œå°è¯•è½¬ç§»
 				refer = m_Transition[status][charClass];
 			}
-			if (refer == -1) {// Ê§°Ü
+			if (refer == -1) {// å¤±è´¥
 				iterator.restore();
-				if (lastFinalStatus == -1) {// Æ¥ÅäÊ§°Ü
+				if (lastFinalStatus == -1) {// åŒ¹é…å¤±è´¥
 					return false;
-				} else {// Ê¹ÓÃÉÏ´Î¾­¹ıµÄÖÕÌ¬Æ¥Åä½á¹û
-					iterator.discard();// Æ¥Åä³É¹¦£¬¶ªÆúÎ»ÖÃ
+				} else {// ä½¿ç”¨ä¸Šæ¬¡ç»è¿‡çš„ç»ˆæ€åŒ¹é…ç»“æœ
+					iterator.discard();// åŒ¹é…æˆåŠŸï¼Œä¸¢å¼ƒä½ç½®
 					attr.setResult(sb.substring(0, lastIndex));
 					return true;
 				}
 			} else {
-				status = refer;// ¸üĞÂ×´Ì¬
+				status = refer;// æ›´æ–°çŠ¶æ€
 			}
 		}
 	}
 
 	private IRegexComponent analysis(char terminal, MetaType meta)
 			throws RegexException {
-		Constructure sequence = new Constructure(false);// ½¨Á¢ĞòÁĞÒÔ´æ´¢±í´ïÊ½
-		Constructure branch = null;// ½¨Á¢·ÖÖ§ÒÔ´æ´¢'|'ĞÍ±í´ïÊ½£¬ÊÇ·ñÊÇ·ÖÖ§ÓĞ´ıÔ¤²â
+		Constructure sequence = new Constructure(false);// å»ºç«‹åºåˆ—ä»¥å­˜å‚¨è¡¨è¾¾å¼
+		Constructure branch = null;// å»ºç«‹åˆ†æ”¯ä»¥å­˜å‚¨'|'å‹è¡¨è¾¾å¼ï¼Œæ˜¯å¦æ˜¯åˆ†æ”¯æœ‰å¾…é¢„æµ‹
 		Constructure result = sequence;
 
 		for (;;) {
-			if ((m_Data.m_kMeta == meta && m_Data.m_chCurrent == terminal)) {// ½áÊø×Ö·û
-				if (m_Data.m_iIndex == 0) {// ±í´ïÊ½Îª¿Õ
+			if ((m_Data.m_kMeta == meta && m_Data.m_chCurrent == terminal)) {// ç»“æŸå­—ç¬¦
+				if (m_Data.m_iIndex == 0) {// è¡¨è¾¾å¼ä¸ºç©º
 					err(RegexError.NULL);
-				} else if (sequence.m_arrComponents.isEmpty()) {// ²¿¼şÎª¿Õ
+				} else if (sequence.m_arrComponents.isEmpty()) {// éƒ¨ä»¶ä¸ºç©º
 					err(RegexError.INCOMPLETE);
 				} else {
 					next();
-					break;// Õı³£ÖÕÖ¹
+					break;// æ­£å¸¸ç»ˆæ­¢
 				}
 			} else if (m_Data.m_kMeta == MetaType.END) {
 				err(RegexError.INCOMPLETE);
 			}
-			IRegexComponent expression = null;// µ±Ç°´ı¸³ÖµµÄ±í´ïÊ½
+			IRegexComponent expression = null;// å½“å‰å¾…èµ‹å€¼çš„è¡¨è¾¾å¼
 			switch (m_Data.m_kMeta) {
 			case BAR:// '|'
 				next();
-				if (sequence.m_arrComponents.isEmpty())// ÔÚ´ËÖ®Ç°Ã»ÓĞ´æ´¢±í´ïÊ½ (|...)
+				if (sequence.m_arrComponents.isEmpty())// åœ¨æ­¤ä¹‹å‰æ²¡æœ‰å­˜å‚¨è¡¨è¾¾å¼ (|...)
 				{
 					err(RegexError.INCOMPLETE);
 				} else{
-					if (branch == null) {// ·ÖÖ§Îª¿Õ£¬Ôò½¨Á¢·ÖÖ§
+					if (branch == null) {// åˆ†æ”¯ä¸ºç©ºï¼Œåˆ™å»ºç«‹åˆ†æ”¯
 						branch = new Constructure(true);
-						branch.m_arrComponents.add(sequence);// ÓÃĞÂ½¨µÄ·ÖÖ§°üº¬²¢Ìæ´úµ±Ç°ĞòÁĞ
+						branch.m_arrComponents.add(sequence);// ç”¨æ–°å»ºçš„åˆ†æ”¯åŒ…å«å¹¶æ›¿ä»£å½“å‰åºåˆ—
 						result = branch;
 					}
-					sequence = new Constructure(false);// ĞÂ½¨Ò»¸öĞòÁĞ
+					sequence = new Constructure(false);// æ–°å»ºä¸€ä¸ªåºåˆ—
 					branch.m_arrComponents.add(sequence);
 					continue;
 				}
@@ -280,19 +280,19 @@ public class Regex extends RegexStringIterator {
 			case LPARAN:// '('
 				next();
 				expression = analysis(MetaType.RPARAN.getChar(),
-						MetaType.RPARAN);// µİ¹é·ÖÎö
+						MetaType.RPARAN);// é€’å½’åˆ†æ
 				break;
 			default:
 				break;
 			}
 
-			if (expression == null) {// µ±Ç°²»ÊÇ±í´ïÊ½£¬Ôò×÷Îª×Ö·û
-				Charset charset = new Charset();// µ±Ç°´ı·ÖÎöµÄ×Ö·û¼¯
+			if (expression == null) {// å½“å‰ä¸æ˜¯è¡¨è¾¾å¼ï¼Œåˆ™ä½œä¸ºå­—ç¬¦
+				Charset charset = new Charset();// å½“å‰å¾…åˆ†æçš„å­—ç¬¦é›†
 				expression = charset;
 				switch (m_Data.m_kMeta) {
 				case ESCAPE:// '\\'
 					next();
-					escape(charset, true);// ´¦Àí×ªÒå
+					escape(charset, true);// å¤„ç†è½¬ä¹‰
 					break;
 				case DOT:// '.'
 					m_Data.m_kMeta = MetaType.CHARACTER;
@@ -313,7 +313,7 @@ public class Regex extends RegexStringIterator {
 				}
 			}
 
-			Repetition rep = null;// Ñ­»·
+			Repetition rep = null;// å¾ªç¯
 			switch (m_Data.m_kMeta) {
 			case QUERY:// '?'
 				next();
@@ -346,38 +346,38 @@ public class Regex extends RegexStringIterator {
 	}
 
 	/**
-	 * ´¦Àí×ªÒå×Ö·û
+	 * å¤„ç†è½¬ä¹‰å­—ç¬¦
 	 * 
 	 * @param charset
-	 *            ×Ö·û¼¯
+	 *            å­—ç¬¦é›†
 	 * @param extend
-	 *            ÊÇ·ñÖ§³ÖÀ©Õ¹Èç\d \wµÈ
+	 *            æ˜¯å¦æ”¯æŒæ‰©å±•å¦‚\d \wç­‰
 	 * @throws RegexException
 	 */
 	private void escape(Charset charset, boolean extend) throws RegexException {
 		char ch = m_Data.m_chCurrent;
-		if (m_Data.m_kMeta == MetaType.CHARACTER) {// ×Ö·û
+		if (m_Data.m_kMeta == MetaType.CHARACTER) {// å­—ç¬¦
 			next();
 			if (extend) {
 				if (TokenUtility.isUpperLetter(ch) || ch == '.') {
-					charset.m_bReverse = true;// ´óĞ´ÔòÈ¡·´
+					charset.m_bReverse = true;// å¤§å†™åˆ™å–å
 				}
 				char cl = Character.toLowerCase(ch);
 				switch (cl) {
-				case 'd':// Êı×Ö
+				case 'd':// æ•°å­—
 					charset.addRange('0', '9');
 					return;
-				case 'a':// ×ÖÄ¸
+				case 'a':// å­—æ¯
 					charset.addRange('a', 'z');
 					charset.addRange('A', 'Z');
 					return;
-				case 'w':// ±êÊ¶·û
+				case 'w':// æ ‡è¯†ç¬¦
 					charset.addRange('a', 'z');
 					charset.addRange('A', 'Z');
 					charset.addRange('0', '9');
 					charset.addChar('_');
 					return;
-				case 's':// ¿Õ°××Ö·û
+				case 's':// ç©ºç™½å­—ç¬¦
 					charset.addChar('\r');
 					charset.addChar('\n');
 					charset.addChar('\t');
@@ -389,7 +389,7 @@ public class Regex extends RegexStringIterator {
 					break;
 				}
 			}
-			if (TokenUtility.isLetter(ch)) {// Èç¹ûÎª×ÖÄ¸
+			if (TokenUtility.isLetter(ch)) {// å¦‚æœä¸ºå­—æ¯
 				ch = m_Utility.fromEscape(ch, RegexError.ESCAPE);
 				if (!charset.addChar(ch)) {
 					err(RegexError.RANGE);
@@ -397,7 +397,7 @@ public class Regex extends RegexStringIterator {
 			}
 		} else if (m_Data.m_kMeta == MetaType.END) {
 			err(RegexError.INCOMPLETE);
-		} else {// ¹¦ÄÜ×Ö·ûÔò×ªÒå
+		} else {// åŠŸèƒ½å­—ç¬¦åˆ™è½¬ä¹‰
 			next();
 			if (!charset.addChar(ch)) {
 				err(RegexError.RANGE);
@@ -406,14 +406,14 @@ public class Regex extends RegexStringIterator {
 	}
 
 	/**
-	 * ´¦Àí×Ö·û¼¯ºÏ
+	 * å¤„ç†å­—ç¬¦é›†åˆ
 	 * 
 	 * @param charset
-	 *            ×Ö·û¼¯
+	 *            å­—ç¬¦é›†
 	 * @throws RegexException
 	 */
 	private void range(Charset charset) throws RegexException {
-		if (m_Data.m_kMeta == MetaType.CARET) {// '^'È¡·´
+		if (m_Data.m_kMeta == MetaType.CARET) {// '^'å–å
 			next();
 			charset.m_bReverse = true;
 		}
@@ -450,10 +450,10 @@ public class Regex extends RegexStringIterator {
 	}
 
 	/**
-	 * ´¦Àí×Ö·û
+	 * å¤„ç†å­—ç¬¦
 	 * 
 	 * @param charset
-	 *            ×Ö·û¼¯
+	 *            å­—ç¬¦é›†
 	 * @throws RegexException
 	 */
 	private void character(Charset charset) throws RegexException {
@@ -469,22 +469,22 @@ public class Regex extends RegexStringIterator {
 	}
 
 	/**
-	 * ´¦ÀíÁ¿´Ê
+	 * å¤„ç†é‡è¯
 	 * 
 	 * @throws RegexException
 	 */
 	private void quantity(Repetition rep) throws RegexException {
 		int lower, upper;
-		lower = upper = digit();// Ñ­»·ÏÂ½ç
+		lower = upper = digit();// å¾ªç¯ä¸‹ç•Œ
 		if (lower == -1) {
 			err(RegexError.BRACE);
 		}
 		if (m_Data.m_kMeta == MetaType.COMMA) {// ','
 			next();
 			if (m_Data.m_kMeta == MetaType.RBRACE) {// '}'
-				upper = -1;// ÉÏ½çÎªÎŞÇî´ó
+				upper = -1;// ä¸Šç•Œä¸ºæ— ç©·å¤§
 			} else {
-				upper = digit();// µÃµ½Ñ­»·ÉÏ½ç
+				upper = digit();// å¾—åˆ°å¾ªç¯ä¸Šç•Œ
 				if (upper == -1) {
 					err(RegexError.BRACE);
 				}
@@ -499,9 +499,9 @@ public class Regex extends RegexStringIterator {
 	}
 
 	/**
-	 * Ê®½øÖÆÊı×Ö×ª»»
+	 * åè¿›åˆ¶æ•°å­—è½¬æ¢
 	 * 
-	 * @return Êı×Ö
+	 * @return æ•°å­—
 	 */
 	private int digit() {
 		int index = m_Data.m_iIndex;
@@ -519,30 +519,44 @@ public class Regex extends RegexStringIterator {
 	@Override
 	protected void transform() {
 		if (g_mapMeta.containsKey(m_Data.m_chCurrent)) {
-			m_Data.m_kMeta = g_mapMeta.get(m_Data.m_chCurrent);// ¹¦ÄÜ×Ö·û
+			m_Data.m_kMeta = g_mapMeta.get(m_Data.m_chCurrent);// åŠŸèƒ½å­—ç¬¦
 		} else {
-			m_Data.m_kMeta = MetaType.CHARACTER;// Ò»°ã×Ö·û
+			m_Data.m_kMeta = MetaType.CHARACTER;// ä¸€èˆ¬å­—ç¬¦
 		}
 	}
 
 	@Override
 	public String toString() {
-		RegexToString alg = new RegexToString();// ±í´ïÊ½Ê÷ĞòÁĞ»¯Ëã·¨³õÊ¼»¯
-		m_Expression.visit(alg);// ±éÀúÊ÷
+		RegexToString alg = new RegexToString();// è¡¨è¾¾å¼æ ‘åºåˆ—åŒ–ç®—æ³•åˆå§‹åŒ–
+		m_Expression.visit(alg);// éå†æ ‘
 		return alg.toString();
 	}
 
 	/**
-	 * »ñÈ¡×Ö·ûÇø¼äÃèÊö
+	 * è·å–å­—ç¬¦åŒºé—´æè¿°
 	 */
 	public String getStatusString() {
 		return m_DFA.getStatusString();
 	}
 
 	/**
-	 * »ñÈ¡NFAÃèÊö
+	 * è·å–NFAæè¿°
 	 */
 	public String getNFAString() {
 		return m_DFA.getNFAString();
+	}
+	
+	/**
+	 * è·å–DFAæè¿°
+	 */
+	public String getDFAString() {
+		return m_DFA.getDFAString();
+	}
+
+	/**
+	 * è·å–DFATableæè¿°
+	 */
+	public String getDFATableString() {
+		return m_DFA.getDFATableString();
 	}
 }

@@ -1,7 +1,7 @@
 package priv.bajdcc.lexer.token;
 
 /**
- * ¹Ø¼ü´Ê
+ * å…³é”®è¯
  * 
  * @author bajdcc
  */

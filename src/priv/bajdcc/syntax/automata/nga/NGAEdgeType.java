@@ -1,13 +1,13 @@
 package priv.bajdcc.syntax.automata.nga;
 
 /**
- * ·ÇÈ·¶¨ĞÔÎÄ·¨×Ô¶¯»ú±ßÀàĞÍ
+ * éç¡®å®šæ€§æ–‡æ³•è‡ªåŠ¨æœºè¾¹ç±»å‹
  * 
  * @author bajdcc
  *
  */
 public enum NGAEdgeType {
-	EPSILON("Epsilon±ß"), TOKEN("ÖÕ½á·û"), RULE("·ÇÖÕ½á·û");
+	EPSILON("Epsilonè¾¹"), TOKEN("ç»ˆç»“ç¬¦"), RULE("éç»ˆç»“ç¬¦");
 
 	private String name;
 

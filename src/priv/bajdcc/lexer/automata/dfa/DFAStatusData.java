@@ -7,19 +7,19 @@ import priv.bajdcc.lexer.automata.nfa.NFAStatus;
 import priv.bajdcc.lexer.automata.nfa.NFAStatusData;
 
 /**
- * DFA×´Ì¬Êı¾İ
+ * DFAçŠ¶æ€æ•°æ®
  * 
  * @author bajdcc
  *
  */
 public class DFAStatusData extends NFAStatusData {
 	/**
-	 * NFA×´Ì¬¼¯ºÏ
+	 * NFAçŠ¶æ€é›†åˆ
 	 */
 	public ArrayList<NFAStatus> m_NFAStatus = new ArrayList<NFAStatus>();
 
 	/**
-	 * »ñµÃ×´Ì¬±àºÅÃèÊö£¨¶ººÅ·Ö¸ô£©
+	 * è·å¾—çŠ¶æ€ç¼–å·æè¿°ï¼ˆé€—å·åˆ†éš”ï¼‰
 	 */
 	public String getStatusString(ArrayList<NFAStatus> nfaStatusList) {
 		if (m_NFAStatus.isEmpty()) {

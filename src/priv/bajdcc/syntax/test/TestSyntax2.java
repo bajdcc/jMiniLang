@@ -25,6 +25,7 @@ public class TestSyntax2 {
 			syntax.initialize("Z");
 			System.out.println(syntax.toString());
 			System.out.println(syntax.getNGAString());
+			System.out.println(syntax.getNPAString());
 			//scanner.close();
 		} catch (RegexException e) {
 			System.err.println(e.getPosition() + "," + e.getMessage());

@@ -1,19 +1,19 @@
 package priv.bajdcc.syntax.automata.npa;
 
 /**
- * ·ÇÈ·¶¨ĞÔÏÂÍÆ×Ô¶¯»ú×´Ì¬Êı¾İ
+ * éç¡®å®šæ€§ä¸‹æ¨è‡ªåŠ¨æœºçŠ¶æ€æ•°æ®
  * 
  * @author bajdcc
  *
  */
 public class NPAStatusData {
 	/**
-	 * ±êÇ©
+	 * æ ‡ç­¾
 	 */
 	public String m_strLabel = "";
 
 	/**
-	 * ×´Ì¬ËùÊô¹æÔòµÄË÷Òı
+	 * çŠ¶æ€æ‰€å±è§„åˆ™çš„ç´¢å¼•
 	 */
 	public int m_iRuleItem = -1;
 }

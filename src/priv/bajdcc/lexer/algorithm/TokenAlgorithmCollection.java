@@ -9,28 +9,28 @@ import priv.bajdcc.lexer.token.Token;
 import priv.bajdcc.lexer.token.TokenType;
 
 /**
- * 用于抽取单词的算法集合（包含数字、字符串等）
+ * 鐢ㄤ簬鎶藉彇鍗曡瘝鐨勭畻娉曢泦鍚堬紙鍖呭惈鏁板瓧銆佸瓧绗︿覆绛夛級
  * 
  * @author bajdcc
  */
 public class TokenAlgorithmCollection {
 	/**
-	 * 算法集合
+	 * 绠楁硶闆嗗悎
 	 */
 	private ArrayList<ITokenAlgorithm> m_arrAlgorithms = new ArrayList<ITokenAlgorithm>();
 
 	/**
-	 * 字符串迭代器
+	 * 瀛楃涓茶凯浠ｅ櫒
 	 */
 	private IRegexStringIterator m_Iterator = null;
 
 	/**
-	 * 字符转换主体
+	 * 瀛楃杞崲涓讳綋
 	 */
 	private IRegexStringFilterHost m_FilterHost = null;
 	
 	/**
-	 * 错误处理
+	 * 閿欒澶勭悊
 	 */
 	private IErrorHandler m_Handler = null;
 

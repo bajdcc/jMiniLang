@@ -1,19 +1,19 @@
 package priv.bajdcc.utility;
 
 /**
- * ±éÀúÊı¾İ°ü
+ * éå†æ•°æ®åŒ…
  *
  * @author bajdcc
  */
 public class VisitBag {
 	
 	/**
-	 * ÊÇ·ñÔÊĞí·ÃÎÊ×Ó½áµã
+	 * æ˜¯å¦å…è®¸è®¿é—®å­ç»“ç‚¹
 	 */
 	public boolean m_bVisitChildren = true;
 	
 	/**
-	 * ÊÇ·ñÔÊĞíµ÷ÓÃVisitEnd·½·¨
+	 * æ˜¯å¦å…è®¸è°ƒç”¨VisitEndæ–¹æ³•
 	 */
 	public boolean m_bVisitEnd = true;
 }

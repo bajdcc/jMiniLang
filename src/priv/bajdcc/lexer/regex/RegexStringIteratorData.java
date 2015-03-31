@@ -3,21 +3,21 @@ package priv.bajdcc.lexer.regex;
 import priv.bajdcc.lexer.token.MetaType;
 
 /**
- * ·ÖÎöÊ±Ê¹ÓÃµÄÊı¾İ
+ * åˆ†ææ—¶ä½¿ç”¨çš„æ•°æ®
  */
 public class RegexStringIteratorData {
 	/**
-	 * µ±Ç°´¦ÀíµÄÎ»ÖÃ
+	 * å½“å‰å¤„ç†çš„ä½ç½®
 	 */
 	public int m_iIndex = 0;
 
 	/**
-	 * ×Ö·û
+	 * å­—ç¬¦
 	 */
 	public char m_chCurrent = 0;
 
 	/**
-	 * ×Ö·ûÀàĞÍ
+	 * å­—ç¬¦ç±»å‹
 	 */
 	public MetaType m_kMeta = MetaType.END;
 

@@ -9,7 +9,7 @@ import priv.bajdcc.syntax.exp.TokenExp;
 import priv.bajdcc.utility.VisitBag;
 
 /**
- * »ùÓÚÎÄ·¨×é¼şµÄ·ÃÎÊ½Ó¿Ú£¨VisitorÄ£Ê½£©
+ * åŸºäºæ–‡æ³•ç»„ä»¶çš„è®¿é—®æ¥å£ï¼ˆVisitoræ¨¡å¼ï¼‰
  * 
  * @author bajdcc
  */

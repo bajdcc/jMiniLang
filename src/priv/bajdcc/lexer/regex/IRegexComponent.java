@@ -1,16 +1,16 @@
 package priv.bajdcc.lexer.regex;
 
 /**
- * ÕıÔò±í´ïÊ½²¿¼ş½Ó¿Ú£¨¸¸Àà£©
+ * æ­£åˆ™è¡¨è¾¾å¼éƒ¨ä»¶æ¥å£ï¼ˆçˆ¶ç±»ï¼‰
  * 
  * @author bajdcc
  */
 public interface IRegexComponent {
 	/**
-	 * Éè¶¨À©Õ¹×ÔÉí½áµãµÄ·½Ê½
+	 * è®¾å®šæ‰©å±•è‡ªèº«ç»“ç‚¹çš„æ–¹å¼
 	 * 
 	 * @param visitor
-	 *            µİ¹é±éÀúËã·¨
+	 *            é€’å½’éå†ç®—æ³•
 	 */
 	public void visit(IRegexComponentVisitor visitor);
 }

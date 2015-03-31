@@ -24,9 +24,9 @@ import priv.bajdcc.utility.VisitBag;
 
 /**
  * <p>
- * <strong>·ÇÈ·¶¨ĞÔÎÄ·¨×Ô¶¯»ú</strong>£¨<b>NGA</b>£©¹¹³ÉËã·¨£¨<b>AST->NGA</b>£©
+ * <strong>éç¡®å®šæ€§æ–‡æ³•è‡ªåŠ¨æœº</strong>ï¼ˆ<b>NGA</b>ï¼‰æ„æˆç®—æ³•ï¼ˆ<b>AST->NGA</b>ï¼‰
  * </p>
- * <i>¹¦ÄÜ£º½øĞĞLRÏîÄ¿¼¯µÄ¼ÆËã</i>
+ * <i>åŠŸèƒ½ï¼šè¿›è¡ŒLRé¡¹ç›®é›†çš„è®¡ç®—</i>
  * 
  * @author bajdcc
  *
@@ -34,17 +34,22 @@ import priv.bajdcc.utility.VisitBag;
 public class NGA implements ISyntaxComponentVisitor {
 
 	/**
-	 * ·ÇÖÕ½á·û¼¯ºÏ
+	 * éç»ˆç»“ç¬¦é›†åˆ
 	 */
 	protected ArrayList<RuleExp> m_arrNonTerminals = null;
+	
+	/**
+	 * ç»ˆç»“ç¬¦é›†åˆ
+	 */
+	protected ArrayList<TokenExp> m_arrTerminals = null;
 
 	/**
-	 * ·ÇÖÕ½á·û¼¯ºÏ
+	 * è§„åˆ™åˆ°æ–‡æ³•è‡ªåŠ¨æœºçŠ¶æ€çš„æ˜ å°„
 	 */
 	protected HashMap<RuleItem, NGAStatus> m_mapNGA = new HashMap<RuleItem, NGAStatus>();
 
 	/**
-	 * ±ß¶ÔÏó³Ø
+	 * è¾¹å¯¹è±¡æ± 
 	 */
 	private PoolService<NGAEdge> m_EdgesPool = new ConcurrentLinkedPool<NGAEdge>(
 			new ObjectFactory<NGAEdge>() {
@@ -54,7 +59,7 @@ public class NGA implements ISyntaxComponentVisitor {
 			}, 1024, 10240, false);
 
 	/**
-	 * ×´Ì¬¶ÔÏó³Ø
+	 * çŠ¶æ€å¯¹è±¡æ± 
 	 */
 	private PoolService<NGAStatus> m_StatusPool = new ConcurrentLinkedPool<NGAStatus>(
 			new ObjectFactory<NGAStatus>() {
@@ -64,60 +69,61 @@ public class NGA implements ISyntaxComponentVisitor {
 			}, 1024, 10240, false);
 
 	/**
-	 * ±£´æ½á¹ûµÄÊı¾İ°ü
+	 * ä¿å­˜ç»“æœçš„æ•°æ®åŒ…
 	 */
 	private NGABag m_Bag = null;
 
-	public NGA(ArrayList<RuleExp> nonterminals) {
+	public NGA(ArrayList<RuleExp> nonterminals, ArrayList<TokenExp> terminals) {
 		m_arrNonTerminals = nonterminals;
+		m_arrTerminals = terminals;
 		generateNGAMap();
 	}
 
 	/**
-	 * Á¬½ÓÁ½¸ö×´Ì¬
+	 * è¿æ¥ä¸¤ä¸ªçŠ¶æ€
 	 * 
 	 * @param begin
-	 *            ³õÌ¬
+	 *            åˆæ€
 	 * @param end
-	 *            ÖÕÌ¬
-	 * @return ĞÂµÄ±ß
+	 *            ç»ˆæ€
+	 * @return æ–°çš„è¾¹
 	 */
 	protected NGAEdge connect(NGAStatus begin, NGAStatus end) {
-		NGAEdge edge = m_EdgesPool.take();// ÉêÇëÒ»ÌõĞÂ±ß
+		NGAEdge edge = m_EdgesPool.take();// ç”³è¯·ä¸€æ¡æ–°è¾¹
 		edge.m_Begin = begin;
 		edge.m_End = end;
-		begin.m_OutEdges.add(edge);// Ìí¼Ó½øÆğÊ¼±ßµÄ³ö±ß
-		end.m_InEdges.add(edge);// Ìí¼Ó½ø½áÊø±ßµÄÈë±ß
+		begin.m_OutEdges.add(edge);// æ·»åŠ è¿›èµ·å§‹è¾¹çš„å‡ºè¾¹
+		end.m_InEdges.add(edge);// æ·»åŠ è¿›ç»“æŸè¾¹çš„å…¥è¾¹
 		return edge;
 	}
 
 	/**
-	 * ¶Ï¿ªÄ³¸ö×´Ì¬ºÍÄ³Ìõ±ß
+	 * æ–­å¼€æŸä¸ªçŠ¶æ€å’ŒæŸæ¡è¾¹
 	 * 
 	 * @param status
-	 *            Ä³×´Ì¬
+	 *            æŸçŠ¶æ€
 	 * @param edge
-	 *            Ä³Ìõ±ß
+	 *            æŸæ¡è¾¹
 	 */
 	protected void disconnect(NGAStatus status, NGAEdge edge) {
-		edge.m_End.m_InEdges.remove(edge);// µ±Ç°±ßµÄ½áÊø×´Ì¬µÄÈë±ß¼¯ºÏÈ¥³ıµ±Ç°±ß
+		edge.m_End.m_InEdges.remove(edge);// å½“å‰è¾¹çš„ç»“æŸçŠ¶æ€çš„å…¥è¾¹é›†åˆå»é™¤å½“å‰è¾¹
 		m_EdgesPool.restore(edge);
 	}
 
 	/**
-	 * ¶Ï¿ªÄ³¸ö×´Ì¬ºÍËùÓĞ±ß
+	 * æ–­å¼€æŸä¸ªçŠ¶æ€å’Œæ‰€æœ‰è¾¹
 	 * 
 	 * @param begin
-	 *            Ä³×´Ì¬
+	 *            æŸçŠ¶æ€
 	 */
 	protected void disconnect(NGAStatus status) {
-		/* Çå³ıËùÓĞÈë±ß */
+		/* æ¸…é™¤æ‰€æœ‰å…¥è¾¹ */
 		for (Iterator<NGAEdge> it = status.m_InEdges.iterator(); it.hasNext();) {
 			NGAEdge edge = it.next();
 			it.remove();
 			disconnect(edge.m_Begin, edge);
 		}
-		/* Çå³ıËùÓĞ³ö±ß */
+		/* æ¸…é™¤æ‰€æœ‰å‡ºè¾¹ */
 		for (Iterator<NGAEdge> it = status.m_OutEdges.iterator(); it.hasNext();) {
 			NGAEdge edge = it.next();
 			it.remove();
@@ -127,21 +133,21 @@ public class NGA implements ISyntaxComponentVisitor {
 	}
 
 	/**
-	 * ²úÉúNGAÓ³Éä±í
+	 * äº§ç”ŸNGAæ˜ å°„è¡¨
 	 */
 	private void generateNGAMap() {
 		for (RuleExp exp : m_arrNonTerminals) {
 			int i = 0;
 			for (RuleItem item : exp.m_Rule.m_arrRules) {
-				/* ±í´ïÊ½×ª»»³ÉNGA */
+				/* è¡¨è¾¾å¼è½¬æ¢æˆNGA */
 				m_Bag = new NGABag();
 				m_Bag.m_Expression = item.m_Expression;
 				m_Bag.m_strPrefix = exp.m_strName + "[" + i + "]";
 				m_Bag.m_Expression.visit(this);
 				ENGA enga = m_Bag.m_outputNGA;
-				/* NGAÈ¥Epsilon±ß */
+				/* NGAå»Epsilonè¾¹ */
 				NGAStatus status = deleteEpsilon(enga);
-				/* ±£´æ */
+				/* ä¿å­˜ */
 				m_mapNGA.put(item, status);
 				i++;
 			}
@@ -149,34 +155,34 @@ public class NGA implements ISyntaxComponentVisitor {
 	}
 
 	/**
-	 * NGAÈ¥Epsilon±ß£¨ÓëDFAÈ¥E±ßËã·¨ÏàËÆ£©
+	 * NGAå»Epsilonè¾¹ï¼ˆä¸DFAå»Eè¾¹ç®—æ³•ç›¸ä¼¼ï¼‰
 	 * 
 	 * @param enga
 	 *            ENGA
-	 * @return NGA×´Ì¬
+	 * @return NGAçŠ¶æ€
 	 */
 	private NGAStatus deleteEpsilon(ENGA enga) {
-		/* »ñÈ¡×´Ì¬±Õ°ü */
+		/* è·å–çŠ¶æ€é—­åŒ… */
 		ArrayList<NGAStatus> NGAStatusList = getNGAStatusClosure(
 				new BreadthFirstSearch<NGAEdge, NGAStatus>(), enga.m_Begin);
-		/* ¿Éµ½´ï×´Ì¬¼¯ºÏ */
+		/* å¯åˆ°è¾¾çŠ¶æ€é›†åˆ */
 		ArrayList<NGAStatus> availableStatus = new ArrayList<NGAStatus>();
-		/* ¿Éµ½´ï±êÇ©¼¯ºÏ */
+		/* å¯åˆ°è¾¾æ ‡ç­¾é›†åˆ */
 		ArrayList<String> availableLabels = new ArrayList<String>();
-		/* ¿Éµ½´ï±êÇ©¼¯¹şÏ£±í£¨ÓÃÓÚ²éÕÒ£© */
+		/* å¯åˆ°è¾¾æ ‡ç­¾é›†å“ˆå¸Œè¡¨ï¼ˆç”¨äºæŸ¥æ‰¾ï¼‰ */
 		HashSet<String> availableLabelsSet = new HashSet<String>();
-		/* ËÑË÷ËùÓĞÓĞĞ§×´Ì¬ */
+		/* æœç´¢æ‰€æœ‰æœ‰æ•ˆçŠ¶æ€ */
 		availableStatus.add(NGAStatusList.get(0));
 		availableLabels.add(NGAStatusList.get(0).m_Data.m_strLabel);
 		availableLabelsSet.add(NGAStatusList.get(0).m_Data.m_strLabel);
 		for (NGAStatus status : NGAStatusList) {
-			if (status == NGAStatusList.get(0)) {// ÅÅ³ıµÚÒ»¸ö
+			if (status == NGAStatusList.get(0)) {// æ’é™¤ç¬¬ä¸€ä¸ª
 				continue;
 			}
 			boolean available = false;
 			for (NGAEdge edge : status.m_InEdges) {
-				if (edge.m_Data.m_Action != NGAEdgeType.EPSILON) {// ²»ÊÇEpsilon±ß
-					available = true;// µ±Ç°¿Éµ½´ï
+				if (edge.m_Data.m_Action != NGAEdgeType.EPSILON) {// ä¸æ˜¯Epsilonè¾¹
+					available = true;// å½“å‰å¯åˆ°è¾¾
 					break;
 				}
 			}
@@ -193,43 +199,43 @@ public class NGA implements ISyntaxComponentVisitor {
 				return edge.m_Data.m_Action == NGAEdgeType.EPSILON;
 			}
 		};
-		/* ±éÀúËùÓĞÓĞĞ§×´Ì¬ */
+		/* éå†æ‰€æœ‰æœ‰æ•ˆçŠ¶æ€ */
 		for (NGAStatus status : availableStatus) {
-			/* »ñÈ¡µ±Ç°×´Ì¬µÄEpsilon±Õ°ü */
+			/* è·å–å½“å‰çŠ¶æ€çš„Epsiloné—­åŒ… */
 			ArrayList<NGAStatus> epsilonClosure = getNGAStatusClosure(
 					epsilonBFS, status);
-			/* È¥³ı×ÔÉí×´Ì¬ */
+			/* å»é™¤è‡ªèº«çŠ¶æ€ */
 			epsilonClosure.remove(status);
-			/* ±éÀúEpsilon±Õ°üµÄ×´Ì¬ */
+			/* éå†Epsiloné—­åŒ…çš„çŠ¶æ€ */
 			for (NGAStatus epsilonStatus : epsilonClosure) {
 				if (epsilonStatus.m_Data.m_bFinal) {
-					/* Èç¹û±Õ°üÖĞÓĞÖÕÌ¬£¬Ôòµ±Ç°×´Ì¬ÎªÖÕÌ¬ */
+					/* å¦‚æœé—­åŒ…ä¸­æœ‰ç»ˆæ€ï¼Œåˆ™å½“å‰çŠ¶æ€ä¸ºç»ˆæ€ */
 					status.m_Data.m_bFinal = true;
 				}
-				/* ±éÀú±Õ°üÖĞËùÓĞ±ß */
+				/* éå†é—­åŒ…ä¸­æ‰€æœ‰è¾¹ */
 				for (NGAEdge edge : epsilonStatus.m_OutEdges) {
 					if (edge.m_Data.m_Action != NGAEdgeType.EPSILON) {
-						/* »ñµÃË÷Òı */
+						/* è·å¾—ç´¢å¼• */
 						int idx = availableLabels
 								.indexOf(edge.m_End.m_Data.m_strLabel);
-						/* Èç¹ûµ±Ç°±ß²»ÊÇEpsilon±ß£¬¾Í½«±Õ°üÖĞµÄÓĞĞ§±ßÌí¼Óµ½µ±Ç°×´Ì¬ */
+						/* å¦‚æœå½“å‰è¾¹ä¸æ˜¯Epsilonè¾¹ï¼Œå°±å°†é—­åŒ…ä¸­çš„æœ‰æ•ˆè¾¹æ·»åŠ åˆ°å½“å‰çŠ¶æ€ */
 						connect(status, availableStatus.get(idx)).m_Data = edge.m_Data;
 					}
 				}
 			}
 		}
-		/* É¾³ıEpsilon±ß */
+		/* åˆ é™¤Epsilonè¾¹ */
 		for (NGAStatus status : NGAStatusList) {
 			for (Iterator<NGAEdge> it = status.m_OutEdges.iterator(); it
 					.hasNext();) {
 				NGAEdge edge = it.next();
 				if (edge.m_Data.m_Action == NGAEdgeType.EPSILON) {
 					it.remove();
-					disconnect(status, edge);// É¾³ıEpsilon±ß
+					disconnect(status, edge);// åˆ é™¤Epsilonè¾¹
 				}
 			}
 		}
-		/* É¾³ıÎŞĞ§×´Ì¬ */
+		/* åˆ é™¤æ— æ•ˆçŠ¶æ€ */
 		ArrayList<NGAStatus> unaccessiableStatus = new ArrayList<NGAStatus>();
 		for (NGAStatus status : NGAStatusList) {
 			if (!availableStatus.contains(status)) {
@@ -237,20 +243,20 @@ public class NGA implements ISyntaxComponentVisitor {
 			}
 		}
 		for (NGAStatus status : unaccessiableStatus) {
-			NGAStatusList.remove(status);// É¾³ıÎŞĞ§×´Ì¬
-			disconnect(status);// É¾³ıÓë×´Ì¬ÓĞ¹ØµÄËùÓĞ±ß
+			NGAStatusList.remove(status);// åˆ é™¤æ— æ•ˆçŠ¶æ€
+			disconnect(status);// åˆ é™¤ä¸çŠ¶æ€æœ‰å…³çš„æ‰€æœ‰è¾¹
 		}
 		return enga.m_Begin;
 	}
 
 	/**
-	 * »ñÈ¡NGA×´Ì¬±Õ°ü
+	 * è·å–NGAçŠ¶æ€é—­åŒ…
 	 * 
 	 * @param bfs
-	 *            ±éÀúËã·¨
+	 *            éå†ç®—æ³•
 	 * @param status
-	 *            ³õÌ¬
-	 * @return ³õÌ¬±Õ°ü
+	 *            åˆæ€
+	 * @return åˆæ€é—­åŒ…
 	 */
 	protected static ArrayList<NGAStatus> getNGAStatusClosure(
 			BreadthFirstSearch<NGAEdge, NGAStatus> bfs, NGAStatus status) {
@@ -259,7 +265,7 @@ public class NGA implements ISyntaxComponentVisitor {
 	}
 
 	/**
-	 * ¿ªÊ¼±éÀú×Ó½áµã
+	 * å¼€å§‹éå†å­ç»“ç‚¹
 	 */
 	private void beginChilren() {
 		m_Bag.m_childNGA = null;
@@ -267,14 +273,14 @@ public class NGA implements ISyntaxComponentVisitor {
 	}
 
 	/**
-	 * ½áÊø±éÀú×Ó½áµã
+	 * ç»“æŸéå†å­ç»“ç‚¹
 	 */
 	private void endChilren() {
 		m_Bag.m_childNGA = m_Bag.m_stkNGA.pop();
 	}
 
 	/**
-	 * ±£´æ½á¹û
+	 * ä¿å­˜ç»“æœ
 	 * 
 	 * @param enpa
 	 *            EpsilonNGA
@@ -320,9 +326,9 @@ public class NGA implements ISyntaxComponentVisitor {
 
 	@Override
 	public void visitEnd(TokenExp node) {
-		/* ĞÂ½¨ENGA */
+		/* æ–°å»ºENGA */
 		ENGA enga = createENGA(node);
-		/* Á¬½ÓENGA±ß²¢±£´æµ±Ç°½áµã */
+		/* è¿æ¥ENGAè¾¹å¹¶ä¿å­˜å½“å‰ç»“ç‚¹ */
 		NGAEdge edge = connect(enga.m_Begin, enga.m_End);
 		edge.m_Data.m_Action = NGAEdgeType.TOKEN;
 		edge.m_Data.m_Token = node;
@@ -331,9 +337,9 @@ public class NGA implements ISyntaxComponentVisitor {
 
 	@Override
 	public void visitEnd(RuleExp node) {
-		/* ĞÂ½¨ENGA */
+		/* æ–°å»ºENGA */
 		ENGA enga = createENGA(node);
-		/* Á¬½ÓENGA±ß²¢±£´æµ±Ç°½áµã */
+		/* è¿æ¥ENGAè¾¹å¹¶ä¿å­˜å½“å‰ç»“ç‚¹ */
 		NGAEdge edge = connect(enga.m_Begin, enga.m_End);
 		edge.m_Data.m_Action = NGAEdgeType.RULE;
 		edge.m_Data.m_Rule = node;
@@ -343,11 +349,11 @@ public class NGA implements ISyntaxComponentVisitor {
 	@Override
 	public void visitEnd(SequenceExp node) {
 		endChilren();
-		/* ´®Áª */
+		/* ä¸²è” */
 		ENGA enga = null;
 		for (ENGA child : m_Bag.m_childNGA) {
 			if (enga != null) {
-				connect(enga.m_End, child.m_Begin);// Ê×Î²ÏàÁ¬
+				connect(enga.m_End, child.m_Begin);// é¦–å°¾ç›¸è¿
 				enga.m_End = child.m_End;
 			} else {
 				enga = m_Bag.m_childNGA.get(0);
@@ -359,14 +365,14 @@ public class NGA implements ISyntaxComponentVisitor {
 	@Override
 	public void visitEnd(BranchExp node) {
 		endChilren();
-		/* ĞÂ½¨ENGA */
+		/* æ–°å»ºENGA */
 		ENGA enga = createENGA(node);
-		/* ²¢Áª */
+		/* å¹¶è” */
 		for (ENGA child : m_Bag.m_childNGA) {
-			/* ¸´ÖÆ±êÇ© */
+			/* å¤åˆ¶æ ‡ç­¾ */
 			child.m_Begin.m_Data.m_strLabel = enga.m_Begin.m_Data.m_strLabel;
 			child.m_End.m_Data.m_strLabel = enga.m_End.m_Data.m_strLabel;
-			/* Á¬½ÓÊ×Î² */
+			/* è¿æ¥é¦–å°¾ */
 			connect(enga.m_Begin, child.m_Begin);
 			connect(child.m_Begin, enga.m_End);
 		}
@@ -376,13 +382,13 @@ public class NGA implements ISyntaxComponentVisitor {
 	@Override
 	public void visitEnd(OptionExp node) {
 		endChilren();
-		/* »ñµÃÎ¨Ò»µÄÒ»¸ö×Ó½áµã */
+		/* è·å¾—å”¯ä¸€çš„ä¸€ä¸ªå­ç»“ç‚¹ */
 		ENGA enga = m_Bag.m_childNGA.get(0);
 		enga.m_Begin.m_Data.m_strLabel = Syntax.getSingleString(
 				m_Bag.m_strPrefix, m_Bag.m_Expression, node, true);
 		enga.m_End.m_Data.m_strLabel = Syntax.getSingleString(
 				m_Bag.m_strPrefix, m_Bag.m_Expression, node, false);
-		/* Ìí¼Ó¿ÉÑ¡±ß£¬¼´Epsilon±ß */
+		/* æ·»åŠ å¯é€‰è¾¹ï¼Œå³Epsilonè¾¹ */
 		connect(enga.m_Begin, enga.m_End);
 		store(enga);
 	}
@@ -390,13 +396,13 @@ public class NGA implements ISyntaxComponentVisitor {
 	@Override
 	public void visitEnd(PropertyExp node) {
 		endChilren();
-		/* »ñµÃÎ¨Ò»µÄÒ»¸ö×Ó½áµã */
+		/* è·å¾—å”¯ä¸€çš„ä¸€ä¸ªå­ç»“ç‚¹ */
 		ENGA enga = m_Bag.m_childNGA.get(0);
 		enga.m_Begin.m_Data.m_strLabel = Syntax.getSingleString(
 				m_Bag.m_strPrefix, m_Bag.m_Expression, node, true);
 		enga.m_End.m_Data.m_strLabel = Syntax.getSingleString(
 				m_Bag.m_strPrefix, m_Bag.m_Expression, node, false);
-		/* »ñµÃ¸Ã½áµãµÄ±ß */
+		/* è·å¾—è¯¥ç»“ç‚¹çš„è¾¹ */
 		NGAEdge edge = enga.m_Begin.m_OutEdges.get(0);
 		edge.m_Data.m_iStorage = node.m_iStorage;
 		edge.m_Data.m_Handler = node.m_ErrorHandler;
@@ -404,11 +410,11 @@ public class NGA implements ISyntaxComponentVisitor {
 	}
 
 	/**
-	 * ĞÂ½¨ENGA
+	 * æ–°å»ºENGA
 	 * 
 	 * @param node
-	 *            ½áµã
-	 * @return ENGA±ß
+	 *            ç»“ç‚¹
+	 * @return ENGAè¾¹
 	 */
 	private ENGA createENGA(ISyntaxComponent node) {
 		ENGA enga = new ENGA();
@@ -422,7 +428,7 @@ public class NGA implements ISyntaxComponentVisitor {
 	}
 
 	/**
-	 * ·ÇÈ·¶¨ĞÔÎÄ·¨×Ô¶¯»úÃèÊö
+	 * éç¡®å®šæ€§æ–‡æ³•è‡ªåŠ¨æœºæè¿°
 	 */
 	public String getNGAString() {
 		StringBuffer sb = new StringBuffer();
@@ -434,13 +440,13 @@ public class NGA implements ISyntaxComponentVisitor {
 	}
 
 	/**
-	 * ·ÇÈ·¶¨ĞÔÎÄ·¨×Ô¶¯»úÃèÊö
+	 * éç¡®å®šæ€§æ–‡æ³•è‡ªåŠ¨æœºæè¿°
 	 * 
 	 * @param status
-	 *            NGA×´Ì¬
+	 *            NGAçŠ¶æ€
 	 * @param prefix
-	 *            Ç°×º
-	 * @return ÃèÊö
+	 *            å‰ç¼€
+	 * @return æè¿°
 	 */
 	public String getNGAString(NGAStatus status, String prefix) {
 		NGAToString alg = new NGAToString(prefix);

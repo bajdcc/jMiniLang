@@ -6,33 +6,33 @@ import java.util.Stack;
 import priv.bajdcc.syntax.ISyntaxComponent;
 
 /**
- * ·ÇÈ·¶¨ĞÔÎÄ·¨×Ô¶¯»ú½á¹û°ü
+ * éç¡®å®šæ€§æ–‡æ³•è‡ªåŠ¨æœºç»“æœåŒ…
  *
  * @author bajdcc
  */
 public class NGABag {
 	/**
-	 * NGAÕ»
+	 * NGAæ ˆ
 	 */
 	public Stack<ArrayList<ENGA>> m_stkNGA = new Stack<ArrayList<ENGA>>();
 
 	/**
-	 * NGA×Ó±í
+	 * NGAå­è¡¨
 	 */
 	public ArrayList<ENGA> m_childNGA = new ArrayList<ENGA>();
 
 	/**
-	 * ´æ´¢½á¹ûµÄENGA
+	 * å­˜å‚¨ç»“æœçš„ENGA
 	 */
 	public ENGA m_outputNGA = null;
 
 	/**
-	 * ±ê¼ÇÇ°×º
+	 * æ ‡è®°å‰ç¼€
 	 */
 	public String m_strPrefix = "";
 
 	/**
-	 * ±ê¼ÇÇ°×º
+	 * æ ‡è®°å‰ç¼€
 	 */
 	public ISyntaxComponent m_Expression = null;
 }

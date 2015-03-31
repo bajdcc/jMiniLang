@@ -3,11 +3,11 @@ package priv.bajdcc.utility;
 import org.vibur.objectpool.PoolObjectFactory;
 
 /**
- * ¶ÔÏó³Ø
+ * å¯¹è±¡æ± 
  * 
  * @author bajdcc
  * @param T
- *            ¶ÔÏóÀàĞÍ
+ *            å¯¹è±¡ç±»å‹
  */
 public abstract class ObjectFactory<T> implements PoolObjectFactory<T> {
 

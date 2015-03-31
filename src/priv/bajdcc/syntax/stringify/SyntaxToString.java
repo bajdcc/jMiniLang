@@ -16,27 +16,27 @@ import priv.bajdcc.utility.VisitBag;
 public class SyntaxToString implements ISyntaxComponentVisitor {
 
 	/**
-	 * ÎÄ·¨ÍÆµ¼Ê½ÃèÊö
+	 * æ–‡æ³•æ¨å¯¼å¼æè¿°
 	 */
 	private StringBuilder m_Context = new StringBuilder();
 
 	/**
-	 * ´æ·Å½á¹ûµÄÕ»
+	 * å­˜æ”¾ç»“æœçš„æ ˆ
 	 */
 	private Stack<ArrayList<String>> m_stkStringList = new Stack<ArrayList<String>>();
 
 	/**
-	 * µ±Ç°ÃèÊö±í
+	 * å½“å‰æè¿°è¡¨
 	 */
 	private ArrayList<String> m_arrData = new ArrayList<String>();
 
 	/**
-	 * ½¹µã
+	 * ç„¦ç‚¹
 	 */
 	private ISyntaxComponent m_FocusedExp = null;
 
 	/**
-	 * LRÏîÄ¿·ûºÅ'*'
+	 * LRé¡¹ç›®ç¬¦å·'*'ï¼Œæ˜¯å¦ç§»è¿›å½“å‰ç¬¦å·
 	 */
 	private boolean m_bFront = true;
 
@@ -50,7 +50,7 @@ public class SyntaxToString implements ISyntaxComponentVisitor {
 	}
 
 	/**
-	 * ¿ªÊ¼±éÀú×Ó½áµã
+	 * å¼€å§‹éå†å­ç»“ç‚¹
 	 */
 	private void beginChilren() {
 		m_arrData = null;
@@ -58,23 +58,23 @@ public class SyntaxToString implements ISyntaxComponentVisitor {
 	}
 
 	/**
-	 * ½áÊø±éÀú×Ó½áµã
+	 * ç»“æŸéå†å­ç»“ç‚¹
 	 */
 	private void endChilren() {
 		m_arrData = m_stkStringList.pop();
 	}
 
 	/**
-	 * ±£´æ½á¹û
+	 * ä¿å­˜ç»“æœ
 	 * 
 	 * @param exp
-	 *            µ±Ç°±í´ïÊ½½áµã
+	 *            å½“å‰è¡¨è¾¾å¼ç»“ç‚¹
 	 * @param string
-	 *            ÃèÊö
+	 *            æè¿°
 	 */
 	private void store(ISyntaxComponent exp, String string) {
 		if (m_FocusedExp == exp) {
-			/* Ìí¼ÓLRÏîÄ¿¼¯·ûºÅ */
+			/* æ·»åŠ LRé¡¹ç›®é›†ç¬¦å· */
 			if (m_bFront) {
 				string = "*" + string;
 			} else {

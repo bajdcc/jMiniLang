@@ -6,7 +6,7 @@ import priv.bajdcc.lexer.token.MetaType;
 import priv.bajdcc.utility.Position;
 
 /**
- * ×Ö·û´®µü´úÆ÷½Ó¿Ú
+ * å­—ç¬¦ä¸²è¿­ä»£å™¨æ¥å£
  * 
  * @author bajdcc
  *
@@ -14,91 +14,91 @@ import priv.bajdcc.utility.Position;
 public interface IRegexStringIterator {
 
 	/**
-	 * Å×³ö´íÎó
+	 * æŠ›å‡ºé”™è¯¯
 	 * 
 	 * @param error
-	 *            ´íÎóÀàĞÍ
+	 *            é”™è¯¯ç±»å‹
 	 * @throws RegexException
 	 */
 	public abstract void err(RegexError error) throws RegexException;
 
 	/**
-	 * ´¦ÀíÏÂÒ»¸ö×Ö·û
+	 * å¤„ç†ä¸‹ä¸€ä¸ªå­—ç¬¦
 	 */
 	public abstract void next();
 
 	/**
-	 * ·­Òëµ±Ç°×Ö·û
+	 * ç¿»è¯‘å½“å‰å­—ç¬¦
 	 */
 	public abstract void translate();
 
 	/**
-	 * ÅĞ¶Ïµ±Ç°Î»ÖÃ²»ÊÇÄ©Î²
+	 * åˆ¤æ–­å½“å‰ä½ç½®ä¸æ˜¯æœ«å°¾
 	 * 
 	 */
 	public abstract boolean available();
 
 	/**
-	 * Ç°½øÒ»¸ö×Ö·û£¨look forward£©
+	 * å‰è¿›ä¸€ä¸ªå­—ç¬¦ï¼ˆlook forwardï¼‰
 	 * 
 	 */
 	public abstract void advance();
 
 	/**
-	 * »ñµÃµ±Ç°×Ö·û
+	 * è·å¾—å½“å‰å­—ç¬¦
 	 * 
 	 */
 	public abstract char current();
 
 	/**
-	 * »ñµÃ×Ö·ûÀàĞÍ
+	 * è·å¾—å­—ç¬¦ç±»å‹
 	 */
 	public abstract MetaType meta();
 
 	/**
-	 * »ñµÃµ±Ç°Î»ÖÃ
+	 * è·å¾—å½“å‰ä½ç½®
 	 */
 	public abstract int index();
 
 	/**
-	 * »ñµÃµ±Ç°Î»ÖÃ
+	 * è·å¾—å½“å‰ä½ç½®
 	 */
 	public abstract Position position();
 
 	/**
-	 * È·ÈÏµ±Ç°×Ö·û
+	 * ç¡®è®¤å½“å‰å­—ç¬¦
 	 * 
 	 * @param meta
-	 *            ÀàĞÍ
+	 *            ç±»å‹
 	 * @param error
-	 *            Å×³öµÄ´íÎó
+	 *            æŠ›å‡ºçš„é”™è¯¯
 	 * @throws RegexException
 	 */
 	public abstract void expect(MetaType meta, RegexError error)
 			throws RegexException;
 
 	/**
-	 * ±£´æµ±Ç°Î»ÖÃ
+	 * ä¿å­˜å½“å‰ä½ç½®
 	 */
 	public abstract void snapshot();
 
 	/**
-	 * ¸²¸Çµ±Ç°Î»ÖÃ
+	 * è¦†ç›–å½“å‰ä½ç½®
 	 */
 	public abstract void cover();
 
 	/**
-	 * »Ö¸´ÖÁÉÏ´ÎÎ»ÖÃ
+	 * æ¢å¤è‡³ä¸Šæ¬¡ä½ç½®
 	 */
 	public abstract void restore();
 
 	/**
-	 * ¶ªÆúÉÏ´ÎÎ»ÖÃ
+	 * ä¸¢å¼ƒä¸Šæ¬¡ä½ç½®
 	 */
 	public abstract void discard();
 
 	/**
-	 * »ñµÃ½âÎö×é¼ş
+	 * è·å¾—è§£æç»„ä»¶
 	 */
 	public abstract RegexStringUtility utility();
 }

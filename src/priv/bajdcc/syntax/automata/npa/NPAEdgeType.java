@@ -2,7 +2,7 @@ package priv.bajdcc.syntax.automata.npa;
 
 /**
  * <p>
- * ·ÇÈ·¶¨ĞÔÏÂÍÆ×Ô¶¯»ú±ßÀàĞÍ
+ * éç¡®å®šæ€§ä¸‹æ¨è‡ªåŠ¨æœºè¾¹ç±»å‹
  * </p>
  * Move ------------ (Start,Epsilon,[Token]) ----> (End,Epsilon)<br/>
  * Shift ----------- (Start,Epsilon,Epsilon) ----> (End,Start)<br/>
@@ -14,7 +14,7 @@ package priv.bajdcc.syntax.automata.npa;
  *
  */
 public enum NPAEdgeType {
-	MOVE("×ªÒÆ"), SHIFT("ÒÆ½ø"), REDUCE("¹æÔ¼"), LEFT_RECURSION("×óµİ¹é"), FINISH("½áÊø");
+	MOVE("ç­‰å¾…è§„çº¦"), SHIFT("ç§»è¿›"), REDUCE("è§„çº¦"), LEFT_RECURSION("å·¦é€’å½’"), FINISH("ç»“æŸ");
 
 	private String name;
 

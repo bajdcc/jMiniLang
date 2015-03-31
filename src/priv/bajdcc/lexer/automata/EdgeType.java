@@ -1,13 +1,13 @@
 package priv.bajdcc.lexer.automata;
 
 /**
- * ×´Ì¬×Ô¶¯»ú±ßÀàĞÍ
+ * çŠ¶æ€è‡ªåŠ¨æœºè¾¹ç±»å‹
  * 
  * @author bajdcc
  *
  */
 public enum EdgeType {
-	EPSILON("Epsilon±ß"), CHARSET("×Ö·ûÇø¼ä");
+	EPSILON("Epsilonè¾¹"), CHARSET("å­—ç¬¦åŒºé—´");
 
 	private String name;
 

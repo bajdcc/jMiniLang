@@ -1,34 +1,34 @@
 package priv.bajdcc.syntax;
 
 /**
- * ¼ÇºÅ¿ØÖÆÆ÷
+ * è®°å·æ§åˆ¶å™¨
  *
  * @author bajdcc
  */
 public interface ISyntaxToken {
 
 	/**
-	 * ·µ»Ø¼ÇºÅÀàĞÍ
+	 * è¿”å›è®°å·ç±»å‹
 	 */
 	public int getTokenID();
 
 	/**
-	 * ¿ØÖÆÆ÷ÊÇ·ñÓĞĞ§
+	 * æ§åˆ¶å™¨æ˜¯å¦æœ‰æ•ˆ
 	 */
 	public boolean available();
 
 	/**
-	 * ÏòÇ°
+	 * å‘å‰
 	 */
 	public void previous();
 
 	/**
-	 * Ïòºó
+	 * å‘å
 	 */
 	public void next();
 
 	/**
-	 * ·µ»Ø¼ÇºÅËù´¦Î»ÖÃ
+	 * è¿”å›è®°å·æ‰€å¤„ä½ç½®
 	 */
 	public int getPosition();
 }

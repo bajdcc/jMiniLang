@@ -1,19 +1,19 @@
 package priv.bajdcc.syntax.automata.nga;
 
 /**
- * ·ÇÈ·¶¨ĞÔÎÄ·¨×Ô¶¯»ú×´Ì¬Êı¾İ
+ * éç¡®å®šæ€§æ–‡æ³•è‡ªåŠ¨æœºçŠ¶æ€æ•°æ®
  * 
  * @author bajdcc
  *
  */
 public class NGAStatusData {
 	/**
-	 * ±êÇ©
+	 * æ ‡ç­¾
 	 */
 	public String m_strLabel = "";
 
 	/**
-	 * ÊÇ·ñÎªÖÕÌ¬
+	 * æ˜¯å¦ä¸ºç»ˆæ€
 	 */
 	public boolean m_bFinal = false;
 }

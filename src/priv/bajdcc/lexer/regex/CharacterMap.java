@@ -3,7 +3,7 @@ package priv.bajdcc.lexer.regex;
 import java.util.ArrayList;
 
 /**
- * ×Ö·û¼¯ºÏ£¬½«×Ö·û·¶Î§°´×´Ì¬·Ö×é£¨Sigma¼¯ºÏ£©
+ * å­—ç¬¦é›†åˆï¼Œå°†å­—ç¬¦èŒƒå›´æŒ‰çŠ¶æ€åˆ†ç»„ï¼ˆSigmaé›†åˆï¼‰
  * 
  * @see CharacterRange
  * @author bajdcc
@@ -12,45 +12,45 @@ import java.util.ArrayList;
 public class CharacterMap implements IRegexComponentVisitor {
 
 	/**
-	 * Unicode×Ö·ûµÄ·¶Î§0-65535
+	 * Unicodeå­—ç¬¦çš„èŒƒå›´0-65535
 	 */
 	private static final int g_iUnicodeMapSize = 0x10000;
 
 	/**
-	 * ±éÀúµÄ½áµãµÄÉî¶È
+	 * éå†çš„ç»“ç‚¹çš„æ·±åº¦
 	 */
 	private int m_iLevel = 0;
 
 	/**
-	 * ÖØĞÂ·Ö×éºóµÄ·¶Î§¼¯ºÏ
+	 * é‡æ–°åˆ†ç»„åçš„èŒƒå›´é›†åˆ
 	 */
 	private ArrayList<CharacterRange> m_arrRanges = new ArrayList<CharacterRange>();
 
 	/**
-	 * ·µ»ØÖØ¹¹£¨¹æ·¶»¯£©µÄ×Ö·ûÇø¼ä¼¯ºÏ
+	 * è¿”å›é‡æ„ï¼ˆè§„èŒƒåŒ–ï¼‰çš„å­—ç¬¦åŒºé—´é›†åˆ
 	 * 
-	 * @return ÖØ¹¹µÄ×Ö·ûÇø¼ä¼¯ºÏ
+	 * @return é‡æ„çš„å­—ç¬¦åŒºé—´é›†åˆ
 	 */
 	public ArrayList<CharacterRange> getRanges() {
 		return m_arrRanges;
 	}
 
 	/**
-	 * ÃæÏò×Ö·û£¨Unicode£©µÄ×´Ì¬Ó³Éä±í£¬´óĞ¡65536
+	 * é¢å‘å­—ç¬¦ï¼ˆUnicodeï¼‰çš„çŠ¶æ€æ˜ å°„è¡¨ï¼Œå¤§å°65536
 	 */
 	private int[] m_arrStatus = new int[g_iUnicodeMapSize];
 
 	/**
-	 * ·µ»ØUnicode×Ö·ûÓ³Éä±í
+	 * è¿”å›Unicodeå­—ç¬¦æ˜ å°„è¡¨
 	 * 
-	 * @return ×Ö·ûÓ³Éä±í
+	 * @return å­—ç¬¦æ˜ å°„è¡¨
 	 */
 	public int[] getStatus() {
 		return m_arrStatus;
 	}
 
 	/**
-	 * ÅÅĞò·½·¨
+	 * æ’åºæ–¹æ³•
 	 */
 	private CharacterRangeComparator m_Comparator = new CharacterRangeComparator();
 
@@ -58,9 +58,9 @@ public class CharacterMap implements IRegexComponentVisitor {
 	public void visitBegin(Charset node) {
 		increaseLevel();
 		if (node.m_bReverse) {
-			preceedReverse(node);// ´¦ÀíÈ¡·´¼¯ºÏ
+			preceedReverse(node);// å¤„ç†å–åé›†åˆ
 		}
-		addRanges(node);// ½«×´Ì¬¼¯ºÏ·Ö½âÖØ¹¹
+		addRanges(node);// å°†çŠ¶æ€é›†åˆåˆ†è§£é‡æ„
 	}
 
 	@Override
@@ -89,11 +89,11 @@ public class CharacterMap implements IRegexComponentVisitor {
 	}
 
 	/**
-	 * ²éÕÒÖ¸¶¨×Ö·ûËùÔÚµÄÇø¼ä·¶Î§ĞòºÅ
+	 * æŸ¥æ‰¾æŒ‡å®šå­—ç¬¦æ‰€åœ¨çš„åŒºé—´èŒƒå›´åºå·
 	 * 
 	 * @param ch
-	 *            ×Ö·û
-	 * @return ĞòºÅ£¬-1´ú±í²»´æÔÚ
+	 *            å­—ç¬¦
+	 * @return åºå·ï¼Œ-1ä»£è¡¨ä¸å­˜åœ¨
 	 */
 	public int find(char ch) {
 		for (int i = 0; i < m_arrRanges.size(); i++) {
@@ -106,21 +106,21 @@ public class CharacterMap implements IRegexComponentVisitor {
 	}
 
 	/**
-	 * »¯¼ò¡¢ÏûÈ¥×Ö·û¼¯ÖĞµÄÈ¡·´ÊôĞÔ
+	 * åŒ–ç®€ã€æ¶ˆå»å­—ç¬¦é›†ä¸­çš„å–åå±æ€§
 	 * 
 	 * @param charset
-	 *            ×Ö·û¼¯
+	 *            å­—ç¬¦é›†
 	 */
 	private void preceedReverse(Charset charset) {
 		charset.m_bReverse = false;
-		charset.m_arrPositiveBounds.sort(m_Comparator);// ¶Ô¼¯ºÏÅÅĞò
+		charset.m_arrPositiveBounds.sort(m_Comparator);// å¯¹é›†åˆæ’åº
 		ArrayList<CharacterRange> ranges = new ArrayList<CharacterRange>();
 		CharacterRange oldRange = new CharacterRange();
 		for (CharacterRange range : charset.m_arrPositiveBounds) {
-			if (range.m_chLowerBound > oldRange.m_chUpperBound + 1) {// µ±Ç°ÏÂ½ç´óÓÚÖ®Ç°ÉÏ½ç£¬¹ÊÌí¼Ó
+			if (range.m_chLowerBound > oldRange.m_chUpperBound + 1) {// å½“å‰ä¸‹ç•Œå¤§äºä¹‹å‰ä¸Šç•Œï¼Œæ•…æ·»åŠ 
 				CharacterRange midRange = new CharacterRange(
 						(char) (oldRange.m_chUpperBound + 1),
-						(char) (range.m_chLowerBound - 1));// Ìí¼Ó·¶Î§£¬´ÓÖ®Ç°ÉÏ½çµ½µ±Ç°ÏÂ½ç
+						(char) (range.m_chLowerBound - 1));// æ·»åŠ èŒƒå›´ï¼Œä»ä¹‹å‰ä¸Šç•Œåˆ°å½“å‰ä¸‹ç•Œ
 				ranges.add(midRange);
 				oldRange = range;
 			}
@@ -129,50 +129,50 @@ public class CharacterMap implements IRegexComponentVisitor {
 			CharacterRange midRange = new CharacterRange(
 					(char) (oldRange.m_chLowerBound + 1),
 					(char) (g_iUnicodeMapSize - 1));
-			ranges.add(midRange);// Ìí¼Ó×îºóµÄ·¶Î§
+			ranges.add(midRange);// æ·»åŠ æœ€åçš„èŒƒå›´
 		}
 		charset.m_arrPositiveBounds = ranges;
-		charset.m_arrPositiveBounds.sort(m_Comparator);// ¶Ô¼¯ºÏÅÅĞò
+		charset.m_arrPositiveBounds.sort(m_Comparator);// å¯¹é›†åˆæ’åº
 	}
 
 	/**
-	 * Éî¶È¼ÓÒ»
+	 * æ·±åº¦åŠ ä¸€
 	 */
 	private void increaseLevel() {
 		m_iLevel++;
 	}
 
 	/**
-	 * Éî¶È¼õÒ»
+	 * æ·±åº¦å‡ä¸€
 	 */
 	private void decreaseLevel() {
 		m_iLevel--;
-		if (m_iLevel == 0) {// ±éÀúµ½¸ù½áµã
+		if (m_iLevel == 0) {// éå†åˆ°æ ¹ç»“ç‚¹
 			putStatus();
 		}
 	}
 
 	/**
-	 * Ìí¼ÓËùÓĞ×´Ì¬
+	 * æ·»åŠ æ‰€æœ‰çŠ¶æ€
 	 */
 	private void putStatus() {
 		for (int i = 0; i < g_iUnicodeMapSize; i++) {
-			m_arrStatus[i] = -1;// ËùÓĞÔªËØÖÃÎªÎŞĞ§×´Ì¬-1
+			m_arrStatus[i] = -1;// æ‰€æœ‰å…ƒç´ ç½®ä¸ºæ— æ•ˆçŠ¶æ€-1
 		}
 		for (int i = 0; i < m_arrRanges.size(); i++) {
 			int lower = m_arrRanges.get(i).m_chLowerBound;
 			int upper = m_arrRanges.get(i).m_chUpperBound;
 			for (int j = lower; j <= upper; j++) {
-				m_arrStatus[j] = i;// ½«·¶Î§iÖĞ°üÀ¨µÄËùÓĞÔªËØÖÃÎªi
+				m_arrStatus[j] = i;// å°†èŒƒå›´iä¸­åŒ…æ‹¬çš„æ‰€æœ‰å…ƒç´ ç½®ä¸ºi
 			}
 		}
 	}
 
 	/**
-	 * ´¦ÀíĞÂÌí¼ÓµÄ×Ö·û·¶Î§£¬±ØÒªÊ±½«Æä·Ö½â£¬Ê¹µÃÔªËØ¼äÏà»¥¶ÀÁ¢
+	 * å¤„ç†æ–°æ·»åŠ çš„å­—ç¬¦èŒƒå›´ï¼Œå¿…è¦æ—¶å°†å…¶åˆ†è§£ï¼Œä½¿å¾—å…ƒç´ é—´ç›¸äº’ç‹¬ç«‹
 	 * 
 	 * @param CharacterRange
-	 *            ×Ö·ûÇø¼ä
+	 *            å­—ç¬¦åŒºé—´
 	 */
 	private void addRange(CharacterRange newRange) {
 
@@ -180,20 +180,20 @@ public class CharacterMap implements IRegexComponentVisitor {
 			m_arrRanges.sort(m_Comparator);
 			CharacterRange oldRange = m_arrRanges.get(i);
 			/*
-			 * ·ÀÖ¹ĞÂÔöÇø¼ä[New]ÓëÖ®Ç°Çø¼ä[Old]²úÉú½»¼¯£¬ÈôÓĞ£¬Ôò½«¼¯ºÏ·ÖÁÑ
+			 * é˜²æ­¢æ–°å¢åŒºé—´[New]ä¸ä¹‹å‰åŒºé—´[Old]äº§ç”Ÿäº¤é›†ï¼Œè‹¥æœ‰ï¼Œåˆ™å°†é›†åˆåˆ†è£‚
 			 */
 			if (oldRange.m_chLowerBound < newRange.m_chLowerBound) {
 				if (oldRange.m_chUpperBound < newRange.m_chLowerBound) {
 
 					// [####Old####]_______________
 					// ______________[#####New####]
-					// [Old]±È[New]Ğ¡£¬Ã»ÓĞ½»¼¯
+					// [Old]æ¯”[New]å°ï¼Œæ²¡æœ‰äº¤é›†
 
 				} else if (oldRange.m_chUpperBound < newRange.m_chUpperBound) {
 
 					// [######Old######]__________
 					// ______________[#####New####]
-					// [Old]Óë[New]ÓĞ½»¼¯[New.Lower,Old.Upper]
+					// [Old]ä¸[New]æœ‰äº¤é›†[New.Lower,Old.Upper]
 					// [Old]=[Old.Lower,New.Lower-1]
 					// [Mid]=[New.Lower,Old.Upper]
 					// [New]=[Old.Upper+1,New.Upper]
@@ -210,7 +210,7 @@ public class CharacterMap implements IRegexComponentVisitor {
 
 					// [###########Old############]
 					// ______________[#####New####]
-					// [Old]Óë[New]ÓĞ½»¼¯[New]
+					// [Old]ä¸[New]æœ‰äº¤é›†[New]
 					// [Old]=[Old.Lower,New.Lower-1]
 					// [New]=[New]
 
@@ -223,7 +223,7 @@ public class CharacterMap implements IRegexComponentVisitor {
 
 					// [#############Old##############]
 					// ______________[#####New####]____
-					// [Old]Óë[New]ÓĞ½»¼¯[New]
+					// [Old]ä¸[New]æœ‰äº¤é›†[New]
 					// [Left]=[Old.Lower,New.Lower-1]
 					// [Mid]=[New]
 					// [Right]=[New.Upper+1]
@@ -242,7 +242,7 @@ public class CharacterMap implements IRegexComponentVisitor {
 
 					// [#######Old#######]
 					// [##########New##########]
-					// [Old]Óë[New]ÓĞ½»¼¯[Old]
+					// [Old]ä¸[New]æœ‰äº¤é›†[Old]
 
 					newRange.m_chLowerBound = (char) (oldRange.m_chUpperBound + 1);
 				} else if (oldRange.m_chUpperBound == newRange.m_chUpperBound) {
@@ -256,7 +256,7 @@ public class CharacterMap implements IRegexComponentVisitor {
 
 					// [##########Old##########]
 					// [#######New#######]
-					// [Old]Óë[New]ÓĞ½»¼¯[New]
+					// [Old]ä¸[New]æœ‰äº¤é›†[New]
 					// [Old]=[New.Upper+1,Old.Upper]
 					// [New]=[New]
 
@@ -271,7 +271,7 @@ public class CharacterMap implements IRegexComponentVisitor {
 
 					// ___[#######Old#######]___
 					// [##########New##########]
-					// [Old]Óë[New]ÓĞ½»¼¯[Old]
+					// [Old]ä¸[New]æœ‰äº¤é›†[Old]
 					// [Left]=[New.Lower,Old.Lower-1]
 					// [New]=[Old.Upper+1,New.Upper]
 
@@ -283,7 +283,7 @@ public class CharacterMap implements IRegexComponentVisitor {
 
 					// ______[#######Old#######]
 					// [##########New##########]
-					// [Old]Óë[New]ÓĞ½»¼¯[Old]
+					// [Old]ä¸[New]æœ‰äº¤é›†[Old]
 					// [Old]=[Old]
 					// [New]=[New.Lower,Old.Lower-1]
 
@@ -294,7 +294,7 @@ public class CharacterMap implements IRegexComponentVisitor {
 
 					// ______[##########Old##########]
 					// [##########New##########]______
-					// [Old]Óë[New]ÓĞ½»¼¯[Old.Lower,New.Upper]
+					// [Old]ä¸[New]æœ‰äº¤é›†[Old.Lower,New.Upper]
 					// [Old]=[New.Upper+1,Old.Upper]
 					// [Mid]=[Old.Lower,New.Upper]
 					// [New]=[New.Lower,Old.Lower-1]
@@ -314,10 +314,10 @@ public class CharacterMap implements IRegexComponentVisitor {
 	}
 
 	/**
-	 * ´¦ÀíĞÂÌí¼ÓµÄ×Ö·û·¶Î§£¬±ØÒªÊ±½«Æä·Ö½â£¬Ê¹µÃÔªËØ¼äÏà»¥¶ÀÁ¢
+	 * å¤„ç†æ–°æ·»åŠ çš„å­—ç¬¦èŒƒå›´ï¼Œå¿…è¦æ—¶å°†å…¶åˆ†è§£ï¼Œä½¿å¾—å…ƒç´ é—´ç›¸äº’ç‹¬ç«‹
 	 * 
 	 * @param charset
-	 *            ×Ö·û¼¯
+	 *            å­—ç¬¦é›†
 	 */
 	private void addRanges(Charset charset) {
 		for (CharacterRange range : charset.m_arrPositiveBounds) {

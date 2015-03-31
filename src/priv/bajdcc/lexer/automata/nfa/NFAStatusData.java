@@ -1,14 +1,14 @@
 package priv.bajdcc.lexer.automata.nfa;
 
 /**
- * NFA×´Ì¬Êı¾İ
+ * NFAçŠ¶æ€æ•°æ®
  * 
  * @author bajdcc
  *
  */
 public class NFAStatusData {
 	/**
-	 * ÊÇ·ñÎªÖÕÌ¬
+	 * æ˜¯å¦ä¸ºç»ˆæ€
 	 */
 	public boolean m_bFinal;
 }

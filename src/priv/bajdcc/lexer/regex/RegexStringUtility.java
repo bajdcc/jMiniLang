@@ -5,7 +5,7 @@ import priv.bajdcc.lexer.error.RegexException.RegexError;
 
 /**
  * 
- * 解析组件集合
+ * 瑙ｆ瀽缁勪欢闆嗗悎
  * 
  * @author bajdcc
  *
@@ -13,7 +13,7 @@ import priv.bajdcc.lexer.error.RegexException.RegexError;
 public class RegexStringUtility {
 
 	/**
-	 * 迭代接口
+	 * 杩唬鎺ュ彛
 	 */
 	private IRegexStringIterator m_Iterator = null;
 
@@ -22,11 +22,11 @@ public class RegexStringUtility {
 	}
 
 	/**
-	 * 处理转义字符
+	 * 澶勭悊杞箟瀛楃
 	 * 
 	 * @param ch
-	 *            字符
-	 * @return 处理后的字符
+	 *            瀛楃
+	 * @return 澶勭悊鍚庣殑瀛楃
 	 * @throws RegexException 
 	 */
 	public char fromEscape(char ch, RegexError error) throws RegexException {
@@ -51,13 +51,13 @@ public class RegexStringUtility {
 	}
 
 	/**
-	 * 处理数字
+	 * 澶勭悊鏁板瓧
 	 * 
 	 * @param base
-	 *            基数
+	 *            鍩烘暟
 	 * @param count
-	 *            长度
-	 * @return 处理后的字符
+	 *            闀垮害
+	 * @return 澶勭悊鍚庣殑瀛楃
 	 * @throws RegexException
 	 */
 	public char fromDigit(int base, int count, RegexError error)

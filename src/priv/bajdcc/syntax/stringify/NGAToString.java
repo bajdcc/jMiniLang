@@ -6,22 +6,22 @@ import priv.bajdcc.syntax.automata.nga.NGAStatus;
 import priv.bajdcc.utility.VisitBag;
 
 /**
- * NGAĞòÁĞ»¯£¨¿í¶ÈÓÅÏÈËÑË÷£©
+ * NGAåºåˆ—åŒ–ï¼ˆå®½åº¦ä¼˜å…ˆæœç´¢ï¼‰
  * 
  * @author bajdcc
  * @param T
- *            ×´Ì¬ÀàĞÍ
+ *            çŠ¶æ€ç±»å‹
  */
 public class NGAToString extends
 		BreadthFirstSearch<NGAEdge, NGAStatus> {
 
 	/**
-	 * ÃèÊö
+	 * æè¿°
 	 */
 	private StringBuilder m_Context = new StringBuilder();
 
 	/**
-	 * Ç°×º
+	 * å‰ç¼€
 	 */
 	private String m_Prefix = "";
 
@@ -35,26 +35,26 @@ public class NGAToString extends
 
 	@Override
 	public void visitBegin(NGAStatus status, VisitBag bag) {
-		/* ÈôÊ×´Î·ÃÎÊ½ÚµãÔòÏÈ¹¹Ôì×´Ì¬±í */
+		/* è‹¥é¦–æ¬¡è®¿é—®èŠ‚ç‚¹åˆ™å…ˆæ„é€ çŠ¶æ€è¡¨ */
 		if (m_arrStatus.isEmpty()) {
 			BreadthFirstSearch<NGAEdge, NGAStatus> bfs = new BreadthFirstSearch<NGAEdge, NGAStatus>();
 			status.visit(bfs);
 			m_arrStatus = bfs.m_arrStatus;
 		}
-		/* Êä³ö×´Ì¬±êÇ© */
+		/* è¾“å‡ºçŠ¶æ€æ ‡ç­¾ */
 		appendLine();
 		appendPrefix();
-		m_Context.append("--== ×´Ì¬[" + m_arrStatus.indexOf(status) + "]"
-				+ (status.m_Data.m_bFinal ? "[½áÊø]" : "") + " ==--");
+		m_Context.append("--== çŠ¶æ€[" + m_arrStatus.indexOf(status) + "]"
+				+ (status.m_Data.m_bFinal ? "[ç»“æŸ]" : "") + " ==--");
 		appendLine();
 		appendPrefix();
-		m_Context.append("±êÇ©£º " + status.m_Data.m_strLabel);
+		m_Context.append("æ ‡ç­¾ï¼š " + status.m_Data.m_strLabel);
 		appendLine();
-		/* Êä³ö±ß */
+		/* è¾“å‡ºè¾¹ */
 		for (NGAEdge edge : status.m_OutEdges) {
 			appendPrefix();
-			m_Context.append("\tµ½´ï " + m_arrStatus.indexOf(edge.m_End)
-					+ "  £º  ");
+			m_Context.append("\tåˆ°è¾¾ " + m_arrStatus.indexOf(edge.m_End)
+					+ "  ï¼š  ");
 			m_Context.append(edge.m_Data.m_Action.getName());
 			switch (edge.m_Data.m_Action) {
 			case EPSILON:
@@ -73,14 +73,14 @@ public class NGAToString extends
 	}
 
 	/**
-	 * Ìí¼ÓÇ°×º
+	 * æ·»åŠ å‰ç¼€
 	 */
 	private void appendPrefix() {
 		m_Context.append(m_Prefix);
 	}
 
 	/**
-	 * Ìí¼ÓĞĞ
+	 * æ·»åŠ è¡Œ
 	 */
 	private void appendLine() {
 		m_Context.append(System.getProperty("line.separator"));

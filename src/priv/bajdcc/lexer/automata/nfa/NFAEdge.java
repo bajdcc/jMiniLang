@@ -1,14 +1,14 @@
 package priv.bajdcc.lexer.automata.nfa;
 
 /**
- * NFA±ß
+ * NFAè¾¹
  * 
  * @author bajdcc
  *
  */
 public class NFAEdge extends ENFA {
 	/**
-	 * Êı¾İ
+	 * æ•°æ®
 	 */
 	public NFAEdgeData m_Data = new NFAEdgeData();
 }

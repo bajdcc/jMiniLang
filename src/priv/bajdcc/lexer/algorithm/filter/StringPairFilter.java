@@ -10,7 +10,7 @@ import priv.bajdcc.lexer.regex.RegexStringUtility;
 import priv.bajdcc.lexer.token.MetaType;
 
 /**
- * ×Ö·û´®ÀàĞÍ¹ıÂË£¨Ê×Î²×Ö·û²»Í¬£©
+ * å­—ç¬¦ä¸²ç±»å‹è¿‡æ»¤ï¼ˆé¦–å°¾å­—ç¬¦ä¸åŒï¼‰
  * 
  * @author bajdcc
  *
@@ -19,12 +19,12 @@ public class StringPairFilter implements IRegexStringFilter,
 		IRegexStringFilterMeta {
 
 	/**
-	 * ×Ö·û´®Ê×µÄÖÕ½á·û
+	 * å­—ç¬¦ä¸²é¦–çš„ç»ˆç»“ç¬¦
 	 */
 	private MetaType m_kMetaBegin = MetaType.NULL;
 
 	/**
-	 * ×Ö·û´®Î²µÄÖÕ½á·û
+	 * å­—ç¬¦ä¸²å°¾çš„ç»ˆç»“ç¬¦
 	 */
 	private MetaType m_kMetaEnd = MetaType.NULL;
 
@@ -35,7 +35,7 @@ public class StringPairFilter implements IRegexStringFilter,
 
 	@Override
 	public RegexStringIteratorData filter(IRegexStringIterator iterator) {
-		RegexStringUtility utility = iterator.utility();// »ñÈ¡½âÎö×é¼ş
+		RegexStringUtility utility = iterator.utility();// è·å–è§£æç»„ä»¶
 		RegexStringIteratorData data = new RegexStringIteratorData();
 		try {
 			if (!iterator.available()) {
@@ -45,9 +45,9 @@ public class StringPairFilter implements IRegexStringFilter,
 				data.m_kMeta = iterator.meta();
 				data.m_chCurrent = iterator.current();
 				iterator.next();
-				if (data.m_kMeta == m_kMetaBegin || data.m_kMeta == m_kMetaEnd) {// ¹ıÂËÖÕ½á·û
+				if (data.m_kMeta == m_kMetaBegin || data.m_kMeta == m_kMetaEnd) {// è¿‡æ»¤ç»ˆç»“ç¬¦
 					data.m_kMeta = MetaType.NULL;
-				} else if (data.m_kMeta == MetaType.ESCAPE) {// ´¦Àí×ªÒå
+				} else if (data.m_kMeta == MetaType.ESCAPE) {// å¤„ç†è½¬ä¹‰
 					data.m_chCurrent = iterator.current();
 					iterator.next();
 					data.m_kMeta = MetaType.MUST_SAVE;

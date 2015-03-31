@@ -3,7 +3,7 @@ package priv.bajdcc.syntax.error;
 import priv.bajdcc.utility.Position;
 
 /**
- * ÎÄ·¨Éú³É¹ı³ÌÖĞµÄÒì³£
+ * æ–‡æ³•ç”Ÿæˆè¿‡ç¨‹ä¸­çš„å¼‚å¸¸
  * 
  * @author bajdcc
  *
@@ -12,12 +12,12 @@ import priv.bajdcc.utility.Position;
 public class SyntaxException extends Exception {
 
 	/**
-	 * ÎÄ·¨ÍÆµ¼Ê½½âÎö¹ı³ÌÖĞµÄ´íÎó
+	 * æ–‡æ³•æ¨å¯¼å¼è§£æè¿‡ç¨‹ä¸­çš„é”™è¯¯
 	 */
 	public enum SyntaxError {
-		NULL("ÍÆµ¼Ê½Îª¿Õ"), UNDECLARED("ÎŞ·¨Ê¶±ğµÄ·ûºÅ"), SYNTAX("Óï·¨´íÎó"), INCOMPLETE(
-				"ÍÆµ¼Ê½²»ÍêÕû"), EPSILON("¿ÉÄÜ²úÉú¿Õ´®"), INDIRECT_RECURSION("´æÔÚ¼ä½Ó×óµİ¹é"), FAILED(
-				"²»ÄÜ²úÉú×Ö·û´®");
+		NULL("æ¨å¯¼å¼ä¸ºç©º"), UNDECLARED("æ— æ³•è¯†åˆ«çš„ç¬¦å·"), SYNTAX("è¯­æ³•é”™è¯¯"), INCOMPLETE(
+				"æ¨å¯¼å¼ä¸å®Œæ•´"), EPSILON("å¯èƒ½äº§ç”Ÿç©ºä¸²"), INDIRECT_RECURSION("å­˜åœ¨é—´æ¥å·¦é€’å½’"), FAILED(
+				"ä¸èƒ½äº§ç”Ÿå­—ç¬¦ä¸²");
 
 		private String message;
 
@@ -44,36 +44,36 @@ public class SyntaxException extends Exception {
 	}
 
 	/**
-	 * Î»ÖÃ
+	 * ä½ç½®
 	 */
 	private Position m_Position = new Position();
 
 	/**
-	 * @return ´íÎóÎ»ÖÃ
+	 * @return é”™è¯¯ä½ç½®
 	 */
 	public Position getPosition() {
 		return m_Position;
 	}
 
 	/**
-	 * ´íÎóÀàĞÍ
+	 * é”™è¯¯ç±»å‹
 	 */
 	private SyntaxError m_kError = SyntaxError.NULL;
 
 	/**
-	 * @return ´íÎóÀàĞÍ
+	 * @return é”™è¯¯ç±»å‹
 	 */
 	public SyntaxError getErrorCode() {
 		return m_kError;
 	}
 
 	/**
-	 * ´íÎóĞÅÏ¢
+	 * é”™è¯¯ä¿¡æ¯
 	 */
 	private String m_strInfo = "";
 
 	/**
-	 * @return ´íÎóĞÅÏ¢
+	 * @return é”™è¯¯ä¿¡æ¯
 	 */
 	public String getInfo() {
 		return m_strInfo;

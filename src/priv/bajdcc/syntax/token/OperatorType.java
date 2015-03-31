@@ -1,7 +1,7 @@
 package priv.bajdcc.syntax.token;
 
 /**
- * ²Ù×÷·û
+ * æ“ä½œç¬¦
  * 
  * @author bajdcc
  */

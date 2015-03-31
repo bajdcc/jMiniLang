@@ -10,7 +10,7 @@ import priv.bajdcc.lexer.token.TokenType;
 import priv.bajdcc.syntax.token.OperatorType;
 
 /**
- * ²Ù×÷·û½âÎö
+ * æ“ä½œç¬¦è§£æ
  * 
  * @author bajdcc
  *
@@ -18,7 +18,7 @@ import priv.bajdcc.syntax.token.OperatorType;
 public class OperatorTokenizer extends TokenAlgorithm {
 
 	/**
-	 * ¹Ø¼ü×Ö¹şÏ£±í
+	 * å…³é”®å­—å“ˆå¸Œè¡¨
 	 */
 	private HashMap<String, OperatorType> m_HashOperator = new HashMap<String, OperatorType>();
 
@@ -45,16 +45,16 @@ public class OperatorTokenizer extends TokenAlgorithm {
 	}
 
 	/**
-	 * ³õÊ¼»¯¹Ø¼ü×Ö¹şÏ£±í
+	 * åˆå§‹åŒ–å…³é”®å­—å“ˆå¸Œè¡¨
 	 */
 	private void initializeHashMap() {
-		for (OperatorType operator : OperatorType.values()) {// ¹Ø¼ü×Ö
+		for (OperatorType operator : OperatorType.values()) {// å…³é”®å­—
 			m_HashOperator.put(operator.getName(), operator);
 		}
 	}
 
 	/*
-	 * £¨·Ç Javadoc£©
+	 * ï¼ˆé Javadocï¼‰
 	 * 
 	 * @see
 	 * priv.bajdcc.lexer.algorithm.ITokenAlgorithm#getToken(java.lang.String,

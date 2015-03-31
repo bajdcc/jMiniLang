@@ -14,7 +14,7 @@ public class Main {
 	public static void main(String[] args) {
 		String filename = "E:/vmm.cpp";
 		try {
-			// ¶ÁÎÄ¼ş
+			// è¯»æ–‡ä»¶
 			BufferedReader br = new BufferedReader(new FileReader(filename));
 			String line = "";
 			StringBuffer sb = new StringBuffer();
@@ -23,7 +23,7 @@ public class Main {
 			}
 			br.close();
 			String context = sb.toString();
-			// ´Ê·¨·ÖÎö
+			// è¯æ³•åˆ†æ
 			Lexer lexer = new Lexer(context);
 			lexer.discard(TokenType.COMMENT);
 			lexer.discard(TokenType.WHITESPACE);

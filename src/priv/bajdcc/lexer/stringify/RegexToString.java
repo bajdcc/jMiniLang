@@ -8,17 +8,17 @@ import priv.bajdcc.lexer.regex.Repetition;
 public class RegexToString implements IRegexComponentVisitor {
 
 	/**
-	 * 正则表达式的树型表达
+	 * 姝ｅ垯琛ㄨ揪寮忕殑鏍戝瀷琛ㄨ揪
 	 */
 	private StringBuilder m_Context = new StringBuilder();
 
 	/**
-	 * 前缀
+	 * 鍓嶇紑
 	 */
 	private StringBuilder m_Prefix = new StringBuilder();
 
 	/**
-	 * 前缀缩进
+	 * 鍓嶇紑缂╄繘
 	 */
 	private void appendPrefix() {
 		m_Prefix.append('\t');
@@ -26,7 +26,7 @@ public class RegexToString implements IRegexComponentVisitor {
 	}
 
 	/**
-	 * 取消前缀缩进
+	 * 鍙栨秷鍓嶇紑缂╄繘
 	 */
 	private void reducePrefix() {
 		m_Prefix.deleteCharAt(0);
@@ -35,20 +35,20 @@ public class RegexToString implements IRegexComponentVisitor {
 
 	@Override
 	public void visitBegin(Charset node) {
-		m_Context.append(m_Prefix + "字符");
-		m_Context.append((node.m_bReverse ? "[取反]" : "") + "\t" + node);
+		m_Context.append(m_Prefix + "瀛楃");
+		m_Context.append((node.m_bReverse ? "[鍙栧弽]" : "") + "\t" + node);
 		m_Context.append(System.getProperty("line.separator"));
 	}
 
 	@Override
 	public void visitBegin(Constructure node) {
-		m_Context.append(m_Prefix + (node.m_bBranch ? "分支" : "序列"));
+		m_Context.append(m_Prefix + (node.m_bBranch ? "鍒嗘敮" : "搴忓垪"));
 		appendPrefix();
 	}
 
 	@Override
 	public void visitBegin(Repetition node) {
-		m_Context.append(m_Prefix.toString() + "循环{" + node.m_iLowerBound + ","
+		m_Context.append(m_Prefix.toString() + "寰幆{" + node.m_iLowerBound + ","
 				+ node.m_iUpperBound + "}");
 		appendPrefix();
 	}

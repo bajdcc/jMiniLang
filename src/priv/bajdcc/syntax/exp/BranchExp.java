@@ -7,14 +7,14 @@ import priv.bajdcc.syntax.ISyntaxComponentVisitor;
 import priv.bajdcc.utility.VisitBag;
 
 /**
- * ÎÄ·¨¹æÔò£¨·ÖÖ§£©
+ * æ–‡æ³•è§„åˆ™ï¼ˆåˆ†æ”¯ï¼‰
  *
  * @author bajdcc
  */
 public class BranchExp implements ISyntaxComponent, IExpCollction {
 
 	/**
-	 * ×Ó±í´ïÊ½±í
+	 * å­è¡¨è¾¾å¼è¡¨
 	 */
 	public ArrayList<ISyntaxComponent> m_arrExpressions = new ArrayList<ISyntaxComponent>();
 

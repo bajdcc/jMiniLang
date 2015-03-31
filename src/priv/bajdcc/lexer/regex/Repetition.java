@@ -1,23 +1,23 @@
 package priv.bajdcc.lexer.regex;
 
 /**
- * Ñ­»·¹¦ÄÜ
+ * å¾ªç¯åŠŸèƒ½
  * 
  * @author bajdcc
  */
 public class Repetition implements IRegexComponent {
 	/**
-	 * Ñ­»·²¿¼ş±í´ïÊ½
+	 * å¾ªç¯éƒ¨ä»¶è¡¨è¾¾å¼
 	 */
 	public IRegexComponent m_Component = null;
 	
 	/**
-	 * Ñ­»·´ÎÊıÏÂÏŞ
+	 * å¾ªç¯æ¬¡æ•°ä¸‹é™
 	 */
 	public int m_iLowerBound = 0;
 	
 	/**
-	 * Ñ­»·´ÎÊıÉÏÏŞ
+	 * å¾ªç¯æ¬¡æ•°ä¸Šé™
 	 */
 	public int m_iUpperBound = 0;
 

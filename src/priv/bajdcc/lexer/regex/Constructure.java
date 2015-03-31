@@ -3,18 +3,18 @@ package priv.bajdcc.lexer.regex;
 import java.util.ArrayList;
 
 /**
- * Ë³Ğò½á¹¹»ò·ÖÖ§½á¹¹
+ * é¡ºåºç»“æ„æˆ–åˆ†æ”¯ç»“æ„
  * 
  * @author bajdcc
  */
 public class Constructure implements IRegexComponent {
 	/**
-	 * ÈôÊÇÔòÎª·ÖÖ§£¬·ñÔòÎªË³Ğò
+	 * è‹¥æ˜¯åˆ™ä¸ºåˆ†æ”¯ï¼Œå¦åˆ™ä¸ºé¡ºåº
 	 */
 	public boolean m_bBranch = false;
 
 	/**
-	 * º¢×Ó½áµã
+	 * å­©å­ç»“ç‚¹
 	 */
 	public ArrayList<IRegexComponent> m_arrComponents = new ArrayList<IRegexComponent>();
 

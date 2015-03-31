@@ -4,36 +4,36 @@ import priv.bajdcc.utility.VisitBag;
 
 /**
  * 
- * BFS¿í¶ÈÓÅÏÈ±éÀú½Ó¿Ú
+ * BFSå®½åº¦ä¼˜å…ˆéå†æ¥å£
  * 
  * @param <Edge>
- *            ±ßÀàĞÍ
+ *            è¾¹ç±»å‹
  * @param <Status>
- *            ×´Ì¬ÀàĞÍ
+ *            çŠ¶æ€ç±»å‹
  * @author bajdcc
  *
  */
 public interface IBreadthFirstSearch<Edge, Status> {
 	/**
-	 * ±ß²âÊÔ
+	 * è¾¹æµ‹è¯•
 	 * 
-	 * @return ²âÊÔ½á¹û
+	 * @return æµ‹è¯•ç»“æœ
 	 */
 	public boolean testEdge(Edge edge);
 
 	/**
-	 * ±éÀú¿ªÊ¼
+	 * éå†å¼€å§‹
 	 * 
 	 * @param status
-	 *            ×´Ì¬
+	 *            çŠ¶æ€
 	 */
 	public void visitBegin(Status status, VisitBag bag);
 
 	/**
-	 * ±éÀú½áÊø
+	 * éå†ç»“æŸ
 	 * 
 	 * @param status
-	 *            ×´Ì¬
+	 *            çŠ¶æ€
 	 */
 	public void visitEnd(Status status);
 }

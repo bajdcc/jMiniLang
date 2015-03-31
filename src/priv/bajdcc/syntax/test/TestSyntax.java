@@ -31,6 +31,7 @@ public class TestSyntax {
 			syntax.initialize("E");
 			System.out.println(syntax.toString());
 			System.out.println(syntax.getNGAString());
+			System.out.println(syntax.getNPAString());
 			//scanner.close();
 		} catch (RegexException e) {
 			System.err.println(e.getPosition() + "," + e.getMessage());

@@ -10,7 +10,7 @@ import priv.bajdcc.lexer.regex.RegexStringUtility;
 import priv.bajdcc.lexer.token.MetaType;
 
 /**
- * ×Ö·ûÀàĞÍ¹ıÂË
+ * å­—ç¬¦ç±»å‹è¿‡æ»¤
  * 
  * @author bajdcc
  *
@@ -20,7 +20,7 @@ public class CharacterFilter implements IRegexStringFilter,
 
 	@Override
 	public RegexStringIteratorData filter(IRegexStringIterator iterator) {
-		RegexStringUtility utility = iterator.utility();// »ñÈ¡½âÎö×é¼ş
+		RegexStringUtility utility = iterator.utility();// è·å–è§£æç»„ä»¶
 		RegexStringIteratorData data = new RegexStringIteratorData();
 		try {
 			if (!iterator.available()) {
@@ -30,9 +30,9 @@ public class CharacterFilter implements IRegexStringFilter,
 				data.m_kMeta = iterator.meta();
 				data.m_chCurrent = iterator.current();
 				iterator.next();
-				if (data.m_kMeta == MetaType.SINGLE_QUOTE) {// ¹ıÂËµ¥ÒıºÅ
+				if (data.m_kMeta == MetaType.SINGLE_QUOTE) {// è¿‡æ»¤å•å¼•å·
 					data.m_kMeta = MetaType.NULL;
-				} else if (data.m_kMeta == MetaType.ESCAPE) {// ´¦Àí×ªÒå
+				} else if (data.m_kMeta == MetaType.ESCAPE) {// å¤„ç†è½¬ä¹‰
 					data.m_chCurrent = iterator.current();
 					iterator.next();
 					data.m_kMeta = MetaType.MUST_SAVE;

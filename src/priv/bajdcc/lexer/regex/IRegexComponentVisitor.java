@@ -1,7 +1,7 @@
 package priv.bajdcc.lexer.regex;
 
 /**
- * »ùÓÚÕıÔò±í´ïÊ½×é¼şµÄ·ÃÎÊ½Ó¿Ú£¨VisitorÄ£Ê½£©
+ * åŸºäºæ­£åˆ™è¡¨è¾¾å¼ç»„ä»¶çš„è®¿é—®æ¥å£ï¼ˆVisitoræ¨¡å¼ï¼‰
  * 
  * @author bajdcc
  */

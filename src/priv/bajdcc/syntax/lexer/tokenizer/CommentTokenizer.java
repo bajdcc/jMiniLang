@@ -8,7 +8,7 @@ import priv.bajdcc.lexer.token.Token;
 import priv.bajdcc.lexer.token.TokenType;
 
 /**
- * ×¢ÊÍ½âÎö
+ * æ³¨é‡Šè§£æ
  * 
  * @author bajdcc
  *
@@ -24,7 +24,7 @@ public class CommentTokenizer extends TokenAlgorithm {
 	}
 
 	/*
-	 * £¨·Ç Javadoc£©
+	 * ï¼ˆé Javadocï¼‰
 	 * 
 	 * @see
 	 * priv.bajdcc.lexer.algorithm.ITokenAlgorithm#getToken(java.lang.String,

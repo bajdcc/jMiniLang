@@ -6,24 +6,24 @@ import priv.bajdcc.syntax.Rule;
 import priv.bajdcc.utility.VisitBag;
 
 /**
- * ÎÄ·¨¹æÔò£¨·ÇÖÕ½á·û£©
+ * æ–‡æ³•è§„åˆ™ï¼ˆéç»ˆç»“ç¬¦ï¼‰
  *
  * @author bajdcc
  */
 public class RuleExp implements ISyntaxComponent {
 
 	/**
-	 * ·ÇÖÕ½á·ûID
+	 * éç»ˆç»“ç¬¦ID
 	 */
 	public int m_iID = -1;
 
 	/**
-	 * ·ÇÖÕ½á·ûÃû³Æ
+	 * éç»ˆç»“ç¬¦åç§°
 	 */
 	public String m_strName = null;
 
 	/**
-	 * ¹æÔò
+	 * è§„åˆ™
 	 */
 	public Rule m_Rule = new Rule(this);
 
@@ -43,6 +43,6 @@ public class RuleExp implements ISyntaxComponent {
 	
 	@Override
 	public String toString() {
-		return m_iID + "£º " + m_strName;
+		return m_iID + "ï¼š " + m_strName;
 	}
 }

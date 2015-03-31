@@ -3,19 +3,19 @@ package priv.bajdcc.lexer.regex;
 import java.util.Comparator;
 
 /**
- * 字符范围
+ * 瀛楃鑼冨洿
  * 
  * @author bajdcc
  */
 public class CharacterRange {
 
 	/**
-	 * 下限（包含）
+	 * 涓嬮檺锛堝寘鍚級
 	 */
 	public char m_chLowerBound = 0;
 
 	/**
-	 * 上限（包含）
+	 * 涓婇檺锛堝寘鍚級
 	 */
 	public char m_chUpperBound = 0;
 
@@ -29,9 +29,9 @@ public class CharacterRange {
 	}
 	
 	/**
-	 * 当前区间是否包含字符
-	 * @param ch 字符
-	 * @return 比较结果
+	 * 褰撳墠鍖洪棿鏄惁鍖呭惈瀛楃
+	 * @param ch 瀛楃
+	 * @return 姣旇緝缁撴灉
 	 */
 	public boolean include(char ch) {
 		return ch >= m_chLowerBound && ch <= m_chUpperBound;

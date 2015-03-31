@@ -1,14 +1,14 @@
 package priv.bajdcc.lexer.token;
 
 /**
- * µ¥´ÊÀàÐÍ
+ * å•è¯ç±»åž‹
  * 
  * @author bajdcc
  */
 public enum TokenType {
-	KEYWORD("¹Ø¼ü×Ö"), ID("±êÊ¶·û"), WHITESPACE("¿Õ°××Ö·û"), CHARACTER("×Ö·û"), STRING(
-			"×Ö·û´®"), INTEGER("ÕûÊý"), REAL("ÊµÊý"), EOF("È«ÎÄÄ©Î²"), COMMENT("×¢ÊÍ"), OPERATOR(
-			"²Ù×÷·û"), MACRO("ºê"), ERROR("´íÎó");
+	KEYWORD("å…³é”®å­—"), ID("æ ‡è¯†ç¬¦"), WHITESPACE("ç©ºç™½å­—ç¬¦"), CHARACTER("å­—ç¬¦"), STRING(
+			"å­—ç¬¦ä¸²"), INTEGER("æ•´æ•°"), REAL("å®žæ•°"), EOF("å…¨æ–‡æœ«å°¾"), COMMENT("æ³¨é‡Š"), OPERATOR(
+			"æ“ä½œç¬¦"), MACRO("å®"), ERROR("é”™è¯¯");
 
 	private String name;
 

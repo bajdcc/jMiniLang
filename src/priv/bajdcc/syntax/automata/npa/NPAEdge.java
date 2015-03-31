@@ -1,24 +1,24 @@
 package priv.bajdcc.syntax.automata.npa;
 
 /**
- * ·ÇÈ·¶¨ĞÔÏÂÍÆ×Ô¶¯»ú±ß
+ * éç¡®å®šæ€§ä¸‹æ¨è‡ªåŠ¨æœºè¾¹
  * 
  * @author bajdcc
  *
  */
 public class NPAEdge {
 	/**
-	 * ³õÌ¬
+	 * åˆæ€
 	 */
 	public NPAStatus m_Begin;
 
 	/**
-	 * ÖÕÌ¬
+	 * ç»ˆæ€
 	 */
 	public NPAStatus m_End;
 
 	/**
-	 * Êı¾İ
+	 * æ•°æ®
 	 */
 	public NPAEdgeData m_Data = new NPAEdgeData();
 }

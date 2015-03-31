@@ -5,34 +5,34 @@ import priv.bajdcc.syntax.exp.RuleExp;
 import priv.bajdcc.syntax.exp.TokenExp;
 
 /**
- * ·ÇÈ·¶¨ĞÔÎÄ·¨×Ô¶¯»ú±ßÊı¾İ
+ * éç¡®å®šæ€§æ–‡æ³•è‡ªåŠ¨æœºè¾¹æ•°æ®
  * 
  * @author bajdcc
  *
  */
 public class NGAEdgeData {
 	/**
-	 * ±ßÀàĞÍ
+	 * è¾¹ç±»å‹
 	 */
 	public NGAEdgeType m_Action = NGAEdgeType.EPSILON;
 
 	/**
-	 * ÖÕ½á·ûÊı¾İ
+	 * ç»ˆç»“ç¬¦æ•°æ®
 	 */
 	public TokenExp m_Token = null;
 	
 	/**
-	 * ·ÇÖÕ½á·ûÊı¾İ
+	 * éç»ˆç»“ç¬¦æ•°æ®
 	 */
 	public RuleExp m_Rule = null;
 	
 	/**
-	 * ´æ´¢ĞòºÅ£¨-1ÎªÎŞĞ§£©
+	 * å­˜å‚¨åºå·ï¼ˆ-1ä¸ºæ— æ•ˆï¼‰
 	 */
 	public int m_iStorage = -1;
 	
 	/**
-	 * ´íÎó´¦ÀíÆ÷
+	 * é”™è¯¯å¤„ç†å™¨
 	 */
 	public IErrorHandler m_Handler = null;
 }
