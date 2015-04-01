@@ -37,7 +37,7 @@ public class NGA implements ISyntaxComponentVisitor {
 	 * 非终结符集合
 	 */
 	protected ArrayList<RuleExp> m_arrNonTerminals = null;
-	
+
 	/**
 	 * 终结符集合
 	 */
@@ -350,13 +350,14 @@ public class NGA implements ISyntaxComponentVisitor {
 	public void visitEnd(SequenceExp node) {
 		endChilren();
 		/* 串联 */
-		ENGA enga = null;
+		ENGA enga = new ENGA();
 		for (ENGA child : m_Bag.m_childNGA) {
-			if (enga != null) {
+			if (enga.m_Begin != null) {
 				connect(enga.m_End, child.m_Begin);// 首尾相连
 				enga.m_End = child.m_End;
 			} else {
-				enga = m_Bag.m_childNGA.get(0);
+				enga.m_Begin = m_Bag.m_childNGA.get(0).m_Begin;
+				enga.m_End = m_Bag.m_childNGA.get(0).m_End;
 			}
 		}
 		store(enga);
@@ -374,7 +375,7 @@ public class NGA implements ISyntaxComponentVisitor {
 			child.m_End.m_Data.m_strLabel = enga.m_End.m_Data.m_strLabel;
 			/* 连接首尾 */
 			connect(enga.m_Begin, child.m_Begin);
-			connect(child.m_Begin, enga.m_End);
+			connect(child.m_End, enga.m_End);
 		}
 		store(enga);
 	}
@@ -432,6 +433,8 @@ public class NGA implements ISyntaxComponentVisitor {
 	 */
 	public String getNGAString() {
 		StringBuffer sb = new StringBuffer();
+		sb.append("#### 产生式 ####");
+		sb.append(System.getProperty("line.separator"));
 		for (NGAStatus status : m_mapNGA.values()) {
 			sb.append(getNGAString(status, ""));
 			sb.append(System.getProperty("line.separator"));

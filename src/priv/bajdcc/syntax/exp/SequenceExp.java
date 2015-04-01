@@ -23,7 +23,7 @@ public class SequenceExp implements ISyntaxComponent, IExpCollction {
 		VisitBag bag = new VisitBag();
 		visitor.visitBegin(this, bag);
 		if (bag.m_bVisitChildren) {
-			for (ISyntaxComponent exp : m_arrExpressions){
+			for (ISyntaxComponent exp : m_arrExpressions) {
 				exp.visit(visitor);
 			}
 		}
@@ -36,7 +36,7 @@ public class SequenceExp implements ISyntaxComponent, IExpCollction {
 	public void add(ISyntaxComponent exp) {
 		m_arrExpressions.add(exp);
 	}
-	
+
 	@Override
 	public boolean isEmpty() {
 		return m_arrExpressions.isEmpty();

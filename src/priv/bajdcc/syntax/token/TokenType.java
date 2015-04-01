@@ -6,8 +6,9 @@ package priv.bajdcc.syntax.token;
  * @author bajdcc
  */
 public enum TokenType {
-	TERMINAL("终结符"), NONTERMINAL("非终结符"), EOF("全文末尾"), COMMENT("注释"), OPERATOR(
-			"操作符"), WHITSPACE("空白字符"), HANDLER("错误处理器"), ERROR("错误");
+	TERMINAL("终结符"), NONTERMINAL("非终结符"), STORAGE("存储序号"), EOF("全文末尾"), COMMENT(
+			"注释"), OPERATOR("操作符"), WHITSPACE("空白字符"), HANDLER("错误处理器"), ERROR(
+			"错误");
 
 	private String name;
 

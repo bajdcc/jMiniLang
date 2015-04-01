@@ -20,12 +20,12 @@ public class RuleItem {
 	/**
 	 * First集合（终结符）
 	 */
-	public HashSet<TokenExp> m_arrFirstSetTokens = new HashSet<TokenExp>();
+	public HashSet<TokenExp> m_setFirstSetTokens = new HashSet<TokenExp>();
 
 	/**
 	 * First集合（非终结符）
 	 */
-	public HashSet<RuleExp> m_arrFirstSetRules = new HashSet<RuleExp>();
+	public HashSet<RuleExp> m_setFirstSetRules = new HashSet<RuleExp>();
 
 	/**
 	 * 父结点指针

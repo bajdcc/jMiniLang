@@ -1,6 +1,7 @@
 package priv.bajdcc.lexer.regex;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * 字符集合，将字符范围按状态分组（Sigma集合）
@@ -113,7 +114,7 @@ public class CharacterMap implements IRegexComponentVisitor {
 	 */
 	private void preceedReverse(Charset charset) {
 		charset.m_bReverse = false;
-		charset.m_arrPositiveBounds.sort(m_Comparator);// 对集合排序
+		Collections.sort(charset.m_arrPositiveBounds, m_Comparator);
 		ArrayList<CharacterRange> ranges = new ArrayList<CharacterRange>();
 		CharacterRange oldRange = new CharacterRange();
 		for (CharacterRange range : charset.m_arrPositiveBounds) {
@@ -131,8 +132,8 @@ public class CharacterMap implements IRegexComponentVisitor {
 					(char) (g_iUnicodeMapSize - 1));
 			ranges.add(midRange);// 添加最后的范围
 		}
-		charset.m_arrPositiveBounds = ranges;
-		charset.m_arrPositiveBounds.sort(m_Comparator);// 对集合排序
+		charset.m_arrPositiveBounds = ranges;		
+		Collections.sort(charset.m_arrPositiveBounds, m_Comparator);
 	}
 
 	/**
@@ -171,13 +172,13 @@ public class CharacterMap implements IRegexComponentVisitor {
 	/**
 	 * 处理新添加的字符范围，必要时将其分解，使得元素间相互独立
 	 * 
-	 * @param CharacterRange
+	 * @param newRange
 	 *            字符区间
 	 */
 	private void addRange(CharacterRange newRange) {
 
 		for (int i = 0; i < m_arrRanges.size(); i++) {
-			m_arrRanges.sort(m_Comparator);
+			Collections.sort(m_arrRanges, m_Comparator);
 			CharacterRange oldRange = m_arrRanges.get(i);
 			/*
 			 * 防止新增区间[New]与之前区间[Old]产生交集，若有，则将集合分裂

@@ -45,8 +45,8 @@ public class FirstsetSolver implements ISyntaxComponentVisitor {
 		if (m_bZero) {
 			return false;
 		}
-		target.m_arrFirstSetTokens = new HashSet<TokenExp>(m_setTokens);
-		target.m_arrFirstSetRules = new HashSet<RuleExp>(m_setRules);
+		target.m_setFirstSetTokens = new HashSet<TokenExp>(m_setTokens);
+		target.m_setFirstSetRules = new HashSet<RuleExp>(m_setRules);
 		return true;
 	}
 

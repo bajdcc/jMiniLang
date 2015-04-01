@@ -91,14 +91,13 @@ public class SyntaxToString implements ISyntaxComponentVisitor {
 	@Override
 	public void visitBegin(TokenExp node, VisitBag bag) {
 		bag.m_bVisitEnd = false;
-		store(node, " `" + node.m_strName + "` ");
+		store(node, " `" + node.m_strName + "`");
 	}
 
 	@Override
 	public void visitBegin(RuleExp node, VisitBag bag) {
 		bag.m_bVisitEnd = false;
-		store(node, " " + node.m_strName + " ");
-
+		store(node, " " + node.m_strName);
 	}
 
 	@Override
@@ -165,7 +164,7 @@ public class SyntaxToString implements ISyntaxComponentVisitor {
 	public void visitEnd(PropertyExp node) {
 		endChilren();
 		store(node, m_arrData.get(0)
-				+ (node.m_iStorage == -1 ? "" : " [" + node.m_iStorage + "] "));
+				+ (node.m_iStorage == -1 ? "" : "[" + node.m_iStorage + "] "));
 	}
 
 	@Override

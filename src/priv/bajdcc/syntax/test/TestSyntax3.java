@@ -9,23 +9,22 @@ import priv.bajdcc.syntax.Syntax;
 import priv.bajdcc.syntax.error.SyntaxException;
 
 @SuppressWarnings("unused")
-public class TestSyntax2 {
+public class TestSyntax3 {
 
 	public static void main(String[] args) {
 		try {
 			//Scanner scanner = new Scanner(System.in);
 			Syntax syntax = new Syntax();
 			syntax.addTerminal("a", "a");
-			syntax.addTerminal("b", "b");
-			syntax.addNonTerminal("Z");
+			syntax.addTerminal("c", "c");
+			syntax.addTerminal("d", "d");
 			syntax.addNonTerminal("S");
-			syntax.addNonTerminal("B");
+			syntax.addNonTerminal("A");
 			syntax.addErrorHandler("sample", null);
-			syntax.infer("Z -> S");
-			syntax.infer("S -> B B");
-			syntax.infer("B -> `a` B");
-			syntax.infer("B -> `b`");
-			syntax.initialize("Z");
+			syntax.infer("S -> `c` A `d`");
+			syntax.infer("A -> `a`");
+			syntax.infer("A -> A `a`");
+			syntax.initialize("S");
 			System.out.println(syntax.toString());
 			System.out.println(syntax.getNGAString());
 			System.out.println(syntax.getNPAString());

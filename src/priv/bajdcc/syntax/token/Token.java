@@ -62,6 +62,9 @@ public class Token {
 		case WHITESPACE:
 			tk.m_kToken = TokenType.WHITSPACE;
 			break;
+		case INTEGER:
+			tk.m_kToken = TokenType.STORAGE;
+			break;
 		default:
 			break;
 		}

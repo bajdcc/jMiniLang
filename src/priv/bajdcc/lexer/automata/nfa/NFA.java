@@ -130,7 +130,7 @@ public class NFA implements IRegexComponentVisitor {
 	/**
 	 * 断开某个状态和所有边
 	 * 
-	 * @param begin
+	 * @param status
 	 *            某状态
 	 */
 	protected void disconnect(NFAStatus status) {
@@ -221,7 +221,7 @@ public class NFA implements IRegexComponentVisitor {
 		ENFA enfa = new ENFA();
 		enfa.m_Begin = m_childNFA.get(0).m_Begin;
 		enfa.m_End = m_childNFA.get(0).m_End;
-		int count = Integer.max(node.m_iLowerBound, node.m_iUpperBound);
+		int count = Math.max(node.m_iLowerBound, node.m_iUpperBound);
 		subENFAList.add(enfa);
 		/* 循环复制ENFA */
 		for (int i = 1; i <= count; i++) {

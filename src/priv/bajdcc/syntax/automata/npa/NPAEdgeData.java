@@ -19,7 +19,7 @@ public class NPAEdgeData {
 	/**
 	 * 指令
 	 */
-	public NPAInstruction m_Inst = NPAInstruction.ACCEPT;
+	public NPAInstruction m_Inst = NPAInstruction.PASS;
 
 	/**
 	 * 指令参数

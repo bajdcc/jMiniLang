@@ -28,8 +28,8 @@ import priv.bajdcc.utility.Position;
 /**
  * 文法构造器
  * 
- * 语法示例： Z -> A | B | `abc` | ( A | `c`<terminal comment text> | C<comment> |
- * C{Error handler name})
+ * 语法示例： Z -> A | B[1] | `abc` | ( A[0] | `c`<terminal comment text> |
+ * C[1]<comment> | C[storage id]{Error handler name})
  *
  * @author bajdcc
  */
@@ -56,13 +56,13 @@ public class Syntax {
 	private HashMap<String, RuleExp> m_mapNonTerminals = new HashMap<String, RuleExp>();
 
 	/**
-	 * 属性表
+	 * 错误处理表
 	 */
-	private ArrayList<PropertyExp> m_arrProperties = new ArrayList<PropertyExp>();
+	private ArrayList<IErrorHandler> m_arrHandlers = new ArrayList<IErrorHandler>();
 	/**
-	 * 属性表
+	 * 错误处理表
 	 */
-	private HashMap<String, PropertyExp> m_mapProperties = new HashMap<String, PropertyExp>();
+	private HashMap<String, IErrorHandler> m_mapHandlers = new HashMap<String, IErrorHandler>();
 
 	/**
 	 * 文法起始符号
@@ -138,9 +138,8 @@ public class Syntax {
 	 *            处理接口
 	 */
 	public void addErrorHandler(String name, IErrorHandler handler) {
-		PropertyExp exp = new PropertyExp(m_mapProperties.size(), handler);
-		if (m_mapProperties.put(name, exp) == null) {
-			m_arrProperties.add(exp);
+		if (m_mapHandlers.put(name, handler) == null) {
+			m_arrHandlers.add(handler);
 		}
 	}
 
@@ -240,16 +239,39 @@ public class Syntax {
 	}
 
 	/**
-	 * 匹配属性表
+	 * 匹配错误处理器
 	 * 
 	 * @throws SyntaxException
 	 */
-	private PropertyExp matchProperty() throws SyntaxException {
+	private IErrorHandler matchHandler() throws SyntaxException {
 		match(TokenType.HANDLER, SyntaxError.SYNTAX);
-		if (!m_mapProperties.containsKey(m_Token.m_Object.toString())) {
+		if (!m_mapHandlers.containsKey(m_Token.m_Object.toString())) {
 			err(SyntaxError.UNDECLARED);
 		}
-		return m_mapProperties.get(m_Token.m_Object.toString());
+		return m_mapHandlers.get(m_Token.m_Object.toString());
+	}
+
+	/**
+	 * 匹配存储序号
+	 * 
+	 * @param exp
+	 *            表达式
+	 * @param storage
+	 *            存储序号
+	 * @return 属性对象
+	 * @throws SyntaxException
+	 */
+	private PropertyExp matchStorage(ISyntaxComponent exp, Object storage)
+			throws SyntaxException {
+		PropertyExp property;
+		if (m_Token.m_kToken == TokenType.STORAGE) {
+			property = new PropertyExp((int) storage, null);
+			next();
+		} else {
+			property = new PropertyExp(0, null);
+		}
+		property.m_Expression = exp;
+		return property;
 	}
 
 	/**
@@ -376,17 +398,21 @@ public class Syntax {
 			case TERMINAL:
 				exp = matchTerminal();
 				next();
+				PropertyExp property1 = matchStorage(exp, m_Token.m_Object);
+				exp = property1;
+				if (m_Token.m_kToken == TokenType.HANDLER) {
+					property1.m_ErrorHandler = matchHandler();
+					next();
+				}
 				break;
 			case NONTERMINAL:
-				RuleExp rule = matchNonTerminal();
+				exp = matchNonTerminal();
 				next();
+				PropertyExp property2 = matchStorage(exp, m_Token.m_Object);
+				exp = property2;
 				if (m_Token.m_kToken == TokenType.HANDLER) {
-					PropertyExp property = matchProperty();
-					property.m_Expression = rule;
-					exp = property;
+					property2.m_ErrorHandler = matchHandler();
 					next();
-				} else {
-					exp = rule;
 				}
 				break;
 			default:
@@ -453,7 +479,7 @@ public class Syntax {
 			int i = 0;
 			for (RuleExp exp : m_arrNonTerminals) {
 				for (RuleItem item : exp.m_Rule.m_arrRules) {
-					for (RuleExp rule : item.m_arrFirstSetRules) {
+					for (RuleExp rule : item.m_setFirstSetRules) {
 						firstsetDependency.set(i, rule.m_iID);
 					}
 				}
@@ -466,7 +492,7 @@ public class Syntax {
 			for (int i = 0; i < size; i++) {
 				if (firstsetDependency.test(i, i)) {
 					m_arrNonTerminals.get(i).m_Rule.m_iRecursiveLevel = 1;// 直接左递归
-					firstsetDependency.set(i, i);
+					firstsetDependency.clear(i, i);
 				}
 			}
 			/* 获得拷贝 */
@@ -474,9 +500,7 @@ public class Syntax {
 			BitVector2 b = (BitVector2) firstsetDependency.clone();
 			BitVector2 r = new BitVector2(size, size);
 			/* 检查是否出现环 */
-			for (int level = 2; level < size; level++) {// ***
-														// Warshell算法：求有向图的传递闭包
-														// ***
+			for (int level = 2; level < size; level++) {// Warshell算法：求有向图的传递闭包
 				/* 进行布尔连通矩阵乘法，即r=aXb */
 				for (int i = 0; i < size; i++) {
 					for (int j = 0; j < size; j++) {
@@ -534,25 +558,29 @@ public class Syntax {
 						}
 					}
 				}
+				if (nodependencyRule == -1) {
+					err(SyntaxError.MISS_NODEPENDENCY_RULE,
+							m_arrNonTerminals.get(i).m_strName);
+				}
 				/* 计算该规则的终结符First集合 */
 				{
 					Rule rule = m_arrNonTerminals.get(nodependencyRule).m_Rule;
 					/* 计算规则的终结符First集合 */
 					for (RuleItem item : rule.m_arrRules) {
-						for (RuleExp exp : item.m_arrFirstSetRules) {
-							item.m_arrFirstSetTokens
+						for (RuleExp exp : item.m_setFirstSetRules) {
+							item.m_setFirstSetTokens
 									.addAll(exp.m_Rule.m_arrTokens);
 						}
 					}
 					/* 计算非终结符的终结符First集合 */
 					for (RuleItem item : rule.m_arrRules) {
-						rule.m_arrTokens.addAll(item.m_arrFirstSetTokens);
+						rule.m_arrTokens.addAll(item.m_setFirstSetTokens);
 					}
 					/* 修正左递归规则的终结符First集合 */
 					for (RuleItem item : rule.m_arrRules) {
-						if (item.m_arrFirstSetRules.contains(m_arrNonTerminals
+						if (item.m_setFirstSetRules.contains(m_arrNonTerminals
 								.get(nodependencyRule))) {
-							item.m_arrFirstSetTokens.addAll(rule.m_arrTokens);
+							item.m_setFirstSetTokens.addAll(rule.m_arrTokens);
 						}
 					}
 				}
@@ -566,7 +594,7 @@ public class Syntax {
 		/* 搜索不能产生字符串的规则 */
 		for (RuleExp exp : m_arrNonTerminals) {
 			for (RuleItem item : exp.m_Rule.m_arrRules) {
-				if (item.m_arrFirstSetTokens.isEmpty()) {
+				if (item.m_setFirstSetTokens.isEmpty()) {
 					err(SyntaxError.FAILED,
 							getSingleString(exp.m_strName, item.m_Expression));
 				}
@@ -660,13 +688,13 @@ public class Syntax {
 				/* First集合 */
 				sb.append("\t--== 终结符First集合 ==--");
 				sb.append(System.getProperty("line.separator"));
-				for (TokenExp token : item.m_arrFirstSetTokens) {
+				for (TokenExp token : item.m_setFirstSetTokens) {
 					sb.append("\t\t" + token.m_strName);
 					sb.append(System.getProperty("line.separator"));
 				}
 				sb.append("\t--== 非终结符First集合 ==--");
 				sb.append(System.getProperty("line.separator"));
-				for (RuleExp rule : item.m_arrFirstSetRules) {
+				for (RuleExp rule : item.m_setFirstSetRules) {
 					sb.append("\t\t" + rule.m_strName);
 					sb.append(System.getProperty("line.separator"));
 				}
@@ -695,7 +723,7 @@ public class Syntax {
 	public String getNGAString() {
 		return m_NPA.getNGAString();
 	}
-	
+
 	/**
 	 * 获得非确定性下推自动机描述
 	 */

@@ -1,5 +1,7 @@
 package priv.bajdcc.syntax.stringify;
 
+import java.util.ArrayList;
+
 import priv.bajdcc.lexer.automata.BreadthFirstSearch;
 import priv.bajdcc.syntax.automata.nga.NGAEdge;
 import priv.bajdcc.syntax.automata.nga.NGAStatus;
@@ -24,6 +26,11 @@ public class NGAToString extends
 	 * 前缀
 	 */
 	private String m_Prefix = "";
+	
+	/**
+	 * 存放状态的集合
+	 */
+	private ArrayList<NGAStatus> m_arrNGAStatus = new ArrayList<NGAStatus>();
 
 	public NGAToString() {
 
@@ -36,24 +43,24 @@ public class NGAToString extends
 	@Override
 	public void visitBegin(NGAStatus status, VisitBag bag) {
 		/* 若首次访问节点则先构造状态表 */
-		if (m_arrStatus.isEmpty()) {
+		if (m_arrNGAStatus.isEmpty()) {
 			BreadthFirstSearch<NGAEdge, NGAStatus> bfs = new BreadthFirstSearch<NGAEdge, NGAStatus>();
 			status.visit(bfs);
-			m_arrStatus = bfs.m_arrStatus;
+			m_arrNGAStatus = bfs.m_arrStatus;
 		}
 		/* 输出状态标签 */
 		appendLine();
 		appendPrefix();
-		m_Context.append("--== 状态[" + m_arrStatus.indexOf(status) + "]"
+		m_Context.append("--== 状态[" + m_arrNGAStatus.indexOf(status) + "]"
 				+ (status.m_Data.m_bFinal ? "[结束]" : "") + " ==--");
 		appendLine();
 		appendPrefix();
-		m_Context.append("标签： " + status.m_Data.m_strLabel);
+		m_Context.append("项目： " + status.m_Data.m_strLabel);
 		appendLine();
 		/* 输出边 */
 		for (NGAEdge edge : status.m_OutEdges) {
 			appendPrefix();
-			m_Context.append("\t到达 " + m_arrStatus.indexOf(edge.m_End)
+			m_Context.append("\t到达 " + m_arrNGAStatus.indexOf(edge.m_End)
 					+ "  ：  ");
 			m_Context.append(edge.m_Data.m_Action.getName());
 			switch (edge.m_Data.m_Action) {

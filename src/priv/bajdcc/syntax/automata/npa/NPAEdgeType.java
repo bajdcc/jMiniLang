@@ -14,7 +14,7 @@ package priv.bajdcc.syntax.automata.npa;
  *
  */
 public enum NPAEdgeType {
-	MOVE("等待规约"), SHIFT("移进"), REDUCE("规约"), LEFT_RECURSION("左递归"), FINISH("结束");
+	MOVE("匹配"), SHIFT("移进"), REDUCE("规约"), LEFT_RECURSION("左递归"), FINISH("结束");
 
 	private String name;
 

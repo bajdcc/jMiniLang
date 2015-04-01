@@ -131,6 +131,7 @@ public class Regex extends RegexStringIterator {
 	 */
 	public String match(String string, boolean greed) {
 		String matchString = null;
+		final Boolean isgreed = greed;
 		IRegexStringAttribute attr = new IRegexStringAttribute() {
 			public String result;
 
@@ -146,7 +147,7 @@ public class Regex extends RegexStringIterator {
 
 			@Override
 			public boolean getGreedMode() {
-				return greed;
+				return isgreed;
 			}
 		};
 		if (match(new RegexStringIterator(string), attr)) {
@@ -266,7 +267,7 @@ public class Regex extends RegexStringIterator {
 				if (sequence.m_arrComponents.isEmpty())// 在此之前没有存储表达式 (|...)
 				{
 					err(RegexError.INCOMPLETE);
-				} else{
+				} else {
 					if (branch == null) {// 分支为空，则建立分支
 						branch = new Constructure(true);
 						branch.m_arrComponents.add(sequence);// 用新建的分支包含并替代当前序列
@@ -441,9 +442,11 @@ public class Regex extends RegexStringIterator {
 			} else if (m_Data.m_kMeta == MetaType.ESCAPE) {
 				next();
 				escape(charset, false);
+			} else if (m_Data.m_kMeta == MetaType.END) {
+				err(RegexError.INCOMPLETE);
 			} else {
-				next();
 				charset.addChar(m_Data.m_chCurrent);
+				next();
 			}
 		}
 		next();
@@ -545,7 +548,7 @@ public class Regex extends RegexStringIterator {
 	public String getNFAString() {
 		return m_DFA.getNFAString();
 	}
-	
+
 	/**
 	 * 获取DFA描述
 	 */
