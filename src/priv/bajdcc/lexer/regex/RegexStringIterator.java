@@ -5,6 +5,7 @@ import java.util.Stack;
 import priv.bajdcc.lexer.error.RegexException;
 import priv.bajdcc.lexer.error.RegexException.RegexError;
 import priv.bajdcc.lexer.token.MetaType;
+import priv.bajdcc.lexer.token.Token;
 import priv.bajdcc.utility.Position;
 
 /**
@@ -13,7 +14,8 @@ import priv.bajdcc.utility.Position;
  * @author bajdcc
  *
  */
-public class RegexStringIterator implements IRegexStringIterator {
+public class RegexStringIterator implements IRegexStringIterator, Cloneable {
+
 	/**
 	 * 存储字符串
 	 */
@@ -42,7 +44,7 @@ public class RegexStringIterator implements IRegexStringIterator {
 	public RegexStringIterator() {
 
 	}
-	
+
 	public RegexStringIterator(String strContext) {
 		m_strContext = strContext;
 	}
@@ -68,6 +70,11 @@ public class RegexStringIterator implements IRegexStringIterator {
 			m_Position.m_iColumn = 0;
 			m_Position.m_iLine++;
 		}
+	}
+
+	@Override
+	public Token scan() {
+		return null;
 	}
 
 	@Override
@@ -130,7 +137,8 @@ public class RegexStringIterator implements IRegexStringIterator {
 	@Override
 	public void snapshot() {
 		m_stkIndex.push(m_Data.m_iIndex);
-		m_stkPosition.push(new Position(m_Position.m_iColumn, m_Position.m_iLine));
+		m_stkPosition.push(new Position(m_Position.m_iColumn,
+				m_Position.m_iLine));
 	}
 
 	@Override
@@ -142,7 +150,7 @@ public class RegexStringIterator implements IRegexStringIterator {
 	@Override
 	public void restore() {
 		m_Data.m_iIndex = m_stkIndex.pop();
-		m_Position = m_stkPosition.pop();
+		m_Position = new Position(m_stkPosition.pop());
 	}
 
 	@Override
@@ -154,5 +162,23 @@ public class RegexStringIterator implements IRegexStringIterator {
 	@Override
 	public RegexStringUtility utility() {
 		return m_Utility;
+	}
+
+	@Override
+	public String getRegexDescription() {
+		return m_strContext;
+	}
+
+	@Override
+	public IRegexStringIterator copy() {
+		return null;
+	}
+
+	@Override
+	protected Object clone() throws CloneNotSupportedException {
+		RegexStringIterator o = (RegexStringIterator) super.clone();
+		o.m_Position = (Position) o.m_Position.clone();
+		o.m_Data = (RegexStringIteratorData) o.m_Data.clone();
+		return o;
 	}
 }

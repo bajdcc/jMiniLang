@@ -43,6 +43,11 @@ public class Lexer extends RegexStringIterator implements
 	 */
 	private HashSet<TokenType> m_setDiscardToken = new HashSet<TokenType>();
 
+	/**
+	 * 记录当前的单词
+	 */
+	protected Token m_Token = null;
+
 	public Lexer(String context) throws RegexException {
 		super(context);
 		initialize();
@@ -53,12 +58,34 @@ public class Lexer extends RegexStringIterator implements
 	 * 
 	 * @return 单词
 	 */
-	public Token scan() {
-		Token token = m_algCollections.scan();
-		if (m_setDiscardToken.contains(token.m_kToken)) {// 需要丢弃
+	private Token scanInternal() {
+		m_Token = m_algCollections.scan();
+		if (m_setDiscardToken.contains(m_Token.m_kToken)) {// 需要丢弃
 			return null;
 		}
-		return token;
+		return m_Token;
+	}
+	
+	/**
+	 * 获取一个单词
+	 * 
+	 * @return 单词
+	 */
+	@Override
+	public Token scan() {
+		do {
+			m_Token = scanInternal();
+		} while (m_Token == null);
+		return m_Token;
+	}
+
+	/**
+	 * 返回当前单词
+	 * 
+	 * @return 当前单词
+	 */
+	public Token token() {
+		return m_Token;
 	}
 
 	/**

@@ -5,7 +5,7 @@ import priv.bajdcc.lexer.token.MetaType;
 /**
  * 分析时使用的数据
  */
-public class RegexStringIteratorData {
+public class RegexStringIteratorData implements Cloneable {
 	/**
 	 * 当前处理的位置
 	 */
@@ -29,5 +29,10 @@ public class RegexStringIteratorData {
 		m_iIndex = index;
 		m_chCurrent = current;
 		m_kMeta = meta;
+	}
+	
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		return super.clone();
 	}
 }

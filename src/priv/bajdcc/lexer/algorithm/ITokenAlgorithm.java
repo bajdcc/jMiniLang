@@ -45,4 +45,10 @@ public interface ITokenAlgorithm {
 	 * @return 输出的单词
 	 */
 	public abstract Token getToken(String string, Token token);
+	
+	/**
+	 * 返回正则表达式描述
+	 * @return 正则表达式描述
+	 */
+	public abstract String getRegexDescription();
 }

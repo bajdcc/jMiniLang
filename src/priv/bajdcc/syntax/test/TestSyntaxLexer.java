@@ -17,7 +17,7 @@ public class TestSyntaxLexer {
 			lexer.setContext(str);
 			Token token;
 			for (;;) {
-				token = lexer.scan();
+				token = lexer.nextToken();
 				if (token.m_kToken == TokenType.EOF) {
 					break;
 				}

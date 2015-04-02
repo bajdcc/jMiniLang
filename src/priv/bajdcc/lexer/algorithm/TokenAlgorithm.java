@@ -95,4 +95,9 @@ public abstract class TokenAlgorithm implements ITokenAlgorithm,
 	public String getResult() {
 		return m_strMatch;
 	}
+	
+	@Override
+	public String getRegexDescription() {
+		return m_Regex.getRegexDescription();
+	}
 }

@@ -20,7 +20,7 @@ public class NumberTokenizer extends TokenAlgorithm {
 	}
 
 	public static String getRegexString() {
-		return "-?\\[\\d+\\]";
+		return "-1|\\[\\d+\\]";
 	}
 
 	@Override

@@ -41,12 +41,27 @@ public class TokenAlgorithmCollection {
 		m_Handler = new TokenErrorAdvanceHandler(iterator);
 	}
 
+	/**
+	 * 添加解析组件
+	 * @param alg 解析组件
+	 */
 	public void attach(ITokenAlgorithm alg) {
 		m_arrAlgorithms.add(alg);
 	}
 
+	/**
+	 * 删除解析组件
+	 * @param alg 解析组件
+	 */
 	public void detach(ITokenAlgorithm alg) {
 		m_arrAlgorithms.remove(alg);
+	}
+	
+	/**
+	 * 清空解析组件
+	 */
+	public void clear() {
+		m_arrAlgorithms.clear();
 	}
 
 	public Token scan() {

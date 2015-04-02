@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 import priv.bajdcc.lexer.error.RegexException;
+import priv.bajdcc.lexer.token.TokenType;
 import priv.bajdcc.syntax.Syntax;
 import priv.bajdcc.syntax.error.SyntaxException;
 
@@ -15,9 +16,9 @@ public class TestSyntax3 {
 		try {
 			//Scanner scanner = new Scanner(System.in);
 			Syntax syntax = new Syntax();
-			syntax.addTerminal("a", "a");
-			syntax.addTerminal("c", "c");
-			syntax.addTerminal("d", "d");
+			syntax.addTerminal("a", TokenType.ID, "a");
+			syntax.addTerminal("c", TokenType.ID, "c");
+			syntax.addTerminal("d", TokenType.ID, "d");
 			syntax.addNonTerminal("S");
 			syntax.addNonTerminal("A");
 			syntax.addErrorHandler("sample", null);

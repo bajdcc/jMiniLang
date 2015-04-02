@@ -68,7 +68,7 @@ public class SyntaxLexer extends RegexStringIterator implements
 	 * 
 	 * @return 单词
 	 */
-	public Token scan() {
+	public Token nextToken() {
 		Token token = Token.transfer(m_algCollections.scan());
 		if (m_setDiscardToken.contains(token.m_kToken)) {// 需要丢弃
 			return null;

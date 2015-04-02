@@ -38,31 +38,31 @@ public class Syntax {
 	/**
 	 * 终结符表
 	 */
-	private ArrayList<TokenExp> m_arrTerminals = new ArrayList<TokenExp>();
+	protected ArrayList<TokenExp> m_arrTerminals = new ArrayList<TokenExp>();
 
 	/**
-	 * 终结符表
+	 * 终结符映射
 	 */
-	private HashMap<String, TokenExp> m_mapTerminals = new HashMap<String, TokenExp>();
-
-	/**
-	 * 非终结符表
-	 */
-	private ArrayList<RuleExp> m_arrNonTerminals = new ArrayList<RuleExp>();
+	protected HashMap<String, TokenExp> m_mapTerminals = new HashMap<String, TokenExp>();
 
 	/**
 	 * 非终结符表
 	 */
-	private HashMap<String, RuleExp> m_mapNonTerminals = new HashMap<String, RuleExp>();
+	protected ArrayList<RuleExp> m_arrNonTerminals = new ArrayList<RuleExp>();
+
+	/**
+	 * 非终结符映射
+	 */
+	protected HashMap<String, RuleExp> m_mapNonTerminals = new HashMap<String, RuleExp>();
 
 	/**
 	 * 错误处理表
 	 */
-	private ArrayList<IErrorHandler> m_arrHandlers = new ArrayList<IErrorHandler>();
+	protected ArrayList<IErrorHandler> m_arrHandlers = new ArrayList<IErrorHandler>();
 	/**
-	 * 错误处理表
+	 * 错误处理映射
 	 */
-	private HashMap<String, IErrorHandler> m_mapHandlers = new HashMap<String, IErrorHandler>();
+	protected HashMap<String, IErrorHandler> m_mapHandlers = new HashMap<String, IErrorHandler>();
 
 	/**
 	 * 文法起始符号
@@ -87,7 +87,7 @@ public class Syntax {
 	/**
 	 * 非确定性下推自动机
 	 */
-	private NPA m_NPA = null;
+	protected NPA m_NPA = null;
 
 	public Syntax() throws RegexException {
 		this(true);
@@ -106,11 +106,14 @@ public class Syntax {
 	 * 
 	 * @param name
 	 *            终结符名称
-	 * @param regex
-	 *            终结符对应的正则表达式
+	 * @param type
+	 *            单词类型
+	 * @param obj
+	 *            单词信息
 	 */
-	public void addTerminal(String name, String regex) {
-		TokenExp exp = new TokenExp(m_arrTerminals.size(), name, regex);
+	public void addTerminal(String name,
+			priv.bajdcc.lexer.token.TokenType type, Object obj) {
+		TokenExp exp = new TokenExp(m_arrTerminals.size(), name, type, obj);
 		if (m_mapTerminals.put(name, exp) == null) {
 			m_arrTerminals.add(exp);
 		}
@@ -268,7 +271,7 @@ public class Syntax {
 			property = new PropertyExp((int) storage, null);
 			next();
 		} else {
-			property = new PropertyExp(0, null);
+			property = new PropertyExp(-1, null);
 		}
 		property.m_Expression = exp;
 		return property;
@@ -278,8 +281,10 @@ public class Syntax {
 	 * 取下一个单词
 	 */
 	private Token next() {
-		m_Token = m_SyntaxLexer.scan();
-		return m_Token == null ? next() : m_Token;
+		do {
+			m_Token = m_SyntaxLexer.nextToken();
+		} while (m_Token == null);
+		return m_Token;
 	}
 
 	/**

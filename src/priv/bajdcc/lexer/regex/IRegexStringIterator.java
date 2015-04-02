@@ -3,6 +3,7 @@ package priv.bajdcc.lexer.regex;
 import priv.bajdcc.lexer.error.RegexException;
 import priv.bajdcc.lexer.error.RegexException.RegexError;
 import priv.bajdcc.lexer.token.MetaType;
+import priv.bajdcc.lexer.token.Token;
 import priv.bajdcc.utility.Position;
 
 /**
@@ -26,6 +27,11 @@ public interface IRegexStringIterator {
 	 * 处理下一个字符
 	 */
 	public abstract void next();
+	
+	/**
+	 * 处理下一个字符（会丢弃字符直到获得合法字符）
+	 */
+	public abstract Token scan();
 
 	/**
 	 * 翻译当前字符
@@ -101,4 +107,14 @@ public interface IRegexStringIterator {
 	 * 获得解析组件
 	 */
 	public abstract RegexStringUtility utility();
+	
+	/**
+	 * 获得正则表达式描述
+	 */
+	public abstract String getRegexDescription();
+	
+	/**
+	 * 复制一个对象
+	 */
+	public IRegexStringIterator copy();
 }

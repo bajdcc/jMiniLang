@@ -6,7 +6,7 @@ package priv.bajdcc.utility;
  * @author bajdcc
  *
  */
-public class Position {
+public class Position implements Cloneable {
 	/**
 	 * 列号
 	 */
@@ -19,6 +19,11 @@ public class Position {
 
 	public Position() {
 	}
+	
+	public Position(Position obj) {
+		m_iColumn = obj.m_iColumn;
+		m_iLine = obj.m_iLine;
+	}
 
 	public Position(int col, int line) {
 		m_iColumn = col;
@@ -28,5 +33,10 @@ public class Position {
 	@Override
 	public String toString() {
 		return m_iLine + "," + m_iColumn;
+	}
+
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		return super.clone();
 	}
 }

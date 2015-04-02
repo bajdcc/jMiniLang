@@ -32,11 +32,6 @@ public class RuleItem {
 	 */
 	public Rule m_Parent = null;
 
-	/**
-	 * 是否有效
-	 */
-	public boolean m_bEnable = true;
-
 	public RuleItem(ISyntaxComponent exp, Rule parent) {
 		m_Expression = exp;
 		m_Parent = parent;

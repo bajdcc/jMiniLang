@@ -3,6 +3,8 @@ package priv.bajdcc.syntax.test;
 import java.util.Scanner;
 
 import priv.bajdcc.lexer.error.RegexException;
+import priv.bajdcc.lexer.token.OperatorType;
+import priv.bajdcc.lexer.token.TokenType;
 import priv.bajdcc.syntax.Syntax;
 import priv.bajdcc.syntax.error.SyntaxException;
 
@@ -14,13 +16,13 @@ public class TestSyntax {
 		try {
 			//Scanner scanner = new Scanner(System.in);
 			Syntax syntax = new Syntax();
-			syntax.addTerminal("PLUS", "+");
-			syntax.addTerminal("MINUS", "-");
-			syntax.addTerminal("TIMES", "*");
-			syntax.addTerminal("DIVIDE", "/");
-			syntax.addTerminal("LPA", "(");
-			syntax.addTerminal("RPA", ")");
-			syntax.addTerminal("SYMBOL", "i");
+			syntax.addTerminal("PLUS", TokenType.OPERATOR, OperatorType.PLUS);
+			syntax.addTerminal("MINUS", TokenType.OPERATOR, OperatorType.MINUS);
+			syntax.addTerminal("TIMES", TokenType.OPERATOR, OperatorType.TIMES);
+			syntax.addTerminal("DIVIDE", TokenType.OPERATOR, OperatorType.DIVIDE);
+			syntax.addTerminal("LPA", TokenType.OPERATOR, OperatorType.LPARAN);
+			syntax.addTerminal("RPA", TokenType.OPERATOR, OperatorType.RPARAN);
+			syntax.addTerminal("SYMBOL", TokenType.ID, "i");
 			syntax.addNonTerminal("E");
 			syntax.addNonTerminal("T");
 			syntax.addNonTerminal("F");

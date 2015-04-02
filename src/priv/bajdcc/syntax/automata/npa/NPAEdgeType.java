@@ -8,7 +8,7 @@ package priv.bajdcc.syntax.automata.npa;
  * Shift ----------- (Start,Epsilon,Epsilon) ----> (End,Start)<br/>
  * Reduce ---------- (Start,[Status],Epsilon) ---> (End,Epsilon)<br/>
  * Left Recursion -- (Start,Epsilon,Epsilon) ----> (End,Epsilon)<br/>
- * Finish ---------- (Start,Epsilon,Epsilon) ----> (Epsilon,Epsilon) <br/>
+ * Finish ---------- (Start,Epsilon,Epsilon) ----> (Epsilon,Epsilon)<br/>
  * 
  * @author bajdcc
  *
