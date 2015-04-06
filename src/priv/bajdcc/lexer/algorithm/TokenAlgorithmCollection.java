@@ -13,7 +13,7 @@ import priv.bajdcc.lexer.token.TokenType;
  * 
  * @author bajdcc
  */
-public class TokenAlgorithmCollection {
+public class TokenAlgorithmCollection implements Cloneable {
 	/**
 	 * 算法集合
 	 */
@@ -28,7 +28,7 @@ public class TokenAlgorithmCollection {
 	 * 字符转换主体
 	 */
 	private IRegexStringFilterHost m_FilterHost = null;
-	
+
 	/**
 	 * 错误处理
 	 */
@@ -43,7 +43,9 @@ public class TokenAlgorithmCollection {
 
 	/**
 	 * 添加解析组件
-	 * @param alg 解析组件
+	 * 
+	 * @param alg
+	 *            解析组件
 	 */
 	public void attach(ITokenAlgorithm alg) {
 		m_arrAlgorithms.add(alg);
@@ -51,12 +53,14 @@ public class TokenAlgorithmCollection {
 
 	/**
 	 * 删除解析组件
-	 * @param alg 解析组件
+	 * 
+	 * @param alg
+	 *            解析组件
 	 */
 	public void detach(ITokenAlgorithm alg) {
 		m_arrAlgorithms.remove(alg);
 	}
-	
+
 	/**
 	 * 清空解析组件
 	 */
@@ -79,5 +83,24 @@ public class TokenAlgorithmCollection {
 			m_Handler.handleError();
 		}
 		return token;
+	}
+
+	/**
+	 * 拷贝构造
+	 * 
+	 * @param iter
+	 *            迭代器
+	 * @param filter
+	 *            过滤器
+	 * @return 拷贝
+	 * @throws CloneNotSupportedException
+	 */
+	public TokenAlgorithmCollection copy(IRegexStringIterator iter,
+			IRegexStringFilterHost filter) throws CloneNotSupportedException {
+		TokenAlgorithmCollection o = (TokenAlgorithmCollection) super.clone();
+		o.m_Iterator = iter;
+		o.m_FilterHost = filter;
+		o.m_Handler = new TokenErrorAdvanceHandler(iter);
+		return o;
 	}
 }

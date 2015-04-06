@@ -117,4 +117,9 @@ public interface IRegexStringIterator {
 	 * 复制一个对象
 	 */
 	public IRegexStringIterator copy();
+	
+	/**
+	 * 获取扩展接口
+	 */
+	public IRegexStringIteratorEx ex();
 }

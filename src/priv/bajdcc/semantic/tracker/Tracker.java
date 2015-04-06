@@ -26,7 +26,7 @@ public class Tracker {
 	 */
 	public NPAStatus m_npaStatus = null;
 	/**
-	 * PDA状态核堆栈
+	 * PDA状态堆栈
 	 */
 	public Stack<NPAStatus> m_stkStatus = new Stack<NPAStatus>();
 	

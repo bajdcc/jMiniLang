@@ -78,7 +78,7 @@ public class SyntaxToString implements ISyntaxComponentVisitor {
 			if (m_bFront) {
 				string = "*" + string;
 			} else {
-				string += "*";
+				string += " *";
 			}
 		}
 		if (m_stkStringList.isEmpty()) {

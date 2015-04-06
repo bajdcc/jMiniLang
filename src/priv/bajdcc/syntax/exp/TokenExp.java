@@ -50,7 +50,7 @@ public class TokenExp implements ISyntaxComponent {
 
 	@Override
 	public String toString() {
-		return String.format("%d: `%s`,%s,%s", m_iID, m_strName,
+		return String.format("%d: `%s`，%s，%s", m_iID, m_strName,
 				m_kType.getName(),
 				m_Object == null ? "(null)" : m_Object.toString());
 	}

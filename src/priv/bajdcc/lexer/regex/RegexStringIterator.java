@@ -181,4 +181,9 @@ public class RegexStringIterator implements IRegexStringIterator, Cloneable {
 		o.m_Data = (RegexStringIteratorData) o.m_Data.clone();
 		return o;
 	}
+
+	@Override
+	public IRegexStringIteratorEx ex() {
+		return null;
+	}
 }

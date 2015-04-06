@@ -1,5 +1,6 @@
 package priv.bajdcc.lexer;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 
 import priv.bajdcc.lexer.algorithm.ITokenAlgorithm;
@@ -15,9 +16,11 @@ import priv.bajdcc.lexer.algorithm.impl.StringTokenizer;
 import priv.bajdcc.lexer.algorithm.impl.WhitespaceTokenizer;
 import priv.bajdcc.lexer.error.RegexException;
 import priv.bajdcc.lexer.regex.IRegexStringFilterHost;
+import priv.bajdcc.lexer.regex.IRegexStringIteratorEx;
 import priv.bajdcc.lexer.regex.RegexStringIterator;
 import priv.bajdcc.lexer.token.Token;
 import priv.bajdcc.lexer.token.TokenType;
+import priv.bajdcc.utility.Position;
 
 /**
  * 词法分析器
@@ -25,7 +28,7 @@ import priv.bajdcc.lexer.token.TokenType;
  * @author bajdcc
  */
 public class Lexer extends RegexStringIterator implements
-		IRegexStringFilterHost {
+		IRegexStringFilterHost, IRegexStringIteratorEx, Cloneable {
 
 	/**
 	 * 算法集合（正则表达式匹配）
@@ -48,6 +51,11 @@ public class Lexer extends RegexStringIterator implements
 	 */
 	protected Token m_Token = null;
 
+	/**
+	 * 上次位置
+	 */
+	private Position m_lastPosition = new Position();
+
 	public Lexer(String context) throws RegexException {
 		super(context);
 		initialize();
@@ -65,7 +73,7 @@ public class Lexer extends RegexStringIterator implements
 		}
 		return m_Token;
 	}
-	
+
 	/**
 	 * 获取一个单词
 	 * 
@@ -76,6 +84,7 @@ public class Lexer extends RegexStringIterator implements
 		do {
 			m_Token = scanInternal();
 		} while (m_Token == null);
+		m_lastPosition = m_Token.m_Position;
 		return m_Token;
 	}
 
@@ -84,6 +93,7 @@ public class Lexer extends RegexStringIterator implements
 	 * 
 	 * @return 当前单词
 	 */
+	@Override
 	public Token token() {
 		return m_Token;
 	}
@@ -137,5 +147,37 @@ public class Lexer extends RegexStringIterator implements
 		m_algCollections.attach(new KeywordTokenizer());// 关键字解析组件
 		m_algCollections.attach(new NumberTokenizer());// 数字解析组件
 		m_algCollections.attach(new OperatorTokenizer());// 操作符解析组件
+	}
+
+	@Override
+	public IRegexStringIteratorEx ex() {
+		return this;
+	}
+
+	@Override
+	public boolean isEOF() {
+		return m_Token.m_kToken == TokenType.EOF;
+	}
+
+	@Override
+	public void saveToken() {
+		
+	}
+
+	@Override
+	public Position lastPosition() {
+		return m_lastPosition;
+	}
+
+	@Override
+	protected Object clone() throws CloneNotSupportedException {
+		Lexer o = (Lexer) super.clone();
+		o.m_algCollections = m_algCollections.copy(o, o);
+		return o;
+	}
+
+	@Override
+	public ArrayList<Token> tokenList() {
+		return null;
 	}
 }

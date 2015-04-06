@@ -10,6 +10,7 @@ import priv.bajdcc.lexer.regex.Regex;
 import priv.bajdcc.lexer.token.MetaType;
 import priv.bajdcc.lexer.token.Token;
 import priv.bajdcc.lexer.token.TokenType;
+import priv.bajdcc.utility.Position;
 
 /**
  * 单词识别算法
@@ -63,7 +64,7 @@ public abstract class TokenAlgorithm implements ITokenAlgorithm,
 			token.m_kToken = TokenType.EOF;
 			return true;
 		}
-		token.m_Position = iterator.position();
+		token.m_Position = new Position(iterator.position());
 		if (m_Regex.match(iterator, this)) {// 匹配成功
 			token = getToken(m_strMatch, token);// 自动转换单词
 			return true;

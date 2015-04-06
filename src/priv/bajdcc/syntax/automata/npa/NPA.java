@@ -405,6 +405,15 @@ public class NPA extends NGA {
 		}
 		return NPAStatusList;
 	}
+	
+	/**
+	 * 获得所有推导式
+	 * 
+	 * @return NPA状态表
+	 */
+	public ArrayList<RuleItem> getRuleItems() {
+		return m_arrRuleItems;
+	}
 
 	/**
 	 * 获得NPA描述
