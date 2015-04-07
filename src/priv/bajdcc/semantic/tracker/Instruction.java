@@ -36,7 +36,7 @@ public class Instruction {
 
 	@Override
 	public String toString() {
-		return String.format("指令：%s \t参数：%d 处理：%d", m_Inst.getName(), m_iIndex,
+		return String.format("指令：%5s \t参数：%4d \t处理：%d", m_Inst.getName(), m_iIndex,
 				m_iHandler);
 	}
 }

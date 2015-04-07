@@ -7,6 +7,8 @@ import priv.bajdcc.lexer.regex.IRegexStringIterator;
 import priv.bajdcc.lexer.token.Token;
 import priv.bajdcc.lexer.token.TokenType;
 import priv.bajdcc.semantic.lexer.TokenFactory;
+import priv.bajdcc.semantic.token.ISemanticHandler;
+import priv.bajdcc.semantic.token.ParsingStack;
 import priv.bajdcc.semantic.tracker.ErrorRecord;
 import priv.bajdcc.semantic.tracker.Instruction;
 import priv.bajdcc.semantic.tracker.InstructionRecord;
@@ -55,9 +57,19 @@ public class Semantic extends Syntax implements IErrorHandler {
 	private ArrayList<TrackerError> m_arrErrors = new ArrayList<TrackerError>();
 
 	/**
-	 * 存放单词流
+	 * 单词流
 	 */
 	private ArrayList<Token> m_arrTokens = new ArrayList<Token>();
+
+	/**
+	 * 当前的语义接口
+	 */
+	private ISemanticHandler m_Handler = null;
+
+	/**
+	 * 语义分析结果
+	 */
+	private Object m_Object = null;
 
 	/**
 	 * 设置错误处理器
@@ -79,6 +91,28 @@ public class Semantic extends Syntax implements IErrorHandler {
 	}
 
 	/**
+	 * @param handler
+	 *            语义分析接口
+	 * @param inferString
+	 *            文法推导式
+	 * @throws SyntaxException
+	 */
+	public void infer(ISemanticHandler handler, String inferString)
+			throws SyntaxException {
+		if (handler == null) {
+			throw new NullPointerException("handler");
+		}
+		m_Handler = handler;
+		super.infer(inferString);
+		m_Handler = null;
+	}
+
+	@Override
+	protected void onAddRuleItem(RuleItem item) {
+		item.m_Handler = m_Handler;
+	}
+
+	/**
 	 * 初始化
 	 * 
 	 * @param startSymbol
@@ -88,6 +122,7 @@ public class Semantic extends Syntax implements IErrorHandler {
 	public void initialize(String startSymbol) throws SyntaxException {
 		super.initialize(startSymbol);
 		analysis();
+		run();
 	}
 
 	/**
@@ -122,9 +157,11 @@ public class Semantic extends Syntax implements IErrorHandler {
 		while (trackerResource.m_headTracker != null && !success) {
 			Tracker tracker = trackerResource.m_headTracker;
 			while (tracker != null) {
-				Tracker nextTracker = tracker.m_nextTracker;
+				Tracker nextTracker = tracker.m_nextTracker;				
 				/* 对每一个跟踪器进行计算，构造level记录可用边优先级，可以防止冲突 */
 				/* 匹配=0 移进=0 左递归=1 归约=2 */
+				/* 对终结符则移进，对非终结符则匹配，互不冲突，故两者优先级相同 */
+				/* 左递归属于特殊的归约，区别是归约后不出栈 */
 				int level = 2;
 				/* 筛选边 */
 				aliveEdgeList.clear();
@@ -147,7 +184,7 @@ public class Semantic extends Syntax implements IErrorHandler {
 						}
 						continue;
 					case LEFT_RECURSION:
-						sublevel = 2;
+						sublevel = 1;
 						break;
 					case MOVE:
 						/* 检查Move所需要的记号跟输入是否一致（匹配） */
@@ -168,7 +205,7 @@ public class Semantic extends Syntax implements IErrorHandler {
 						}
 						break;
 					case SHIFT:
-						sublevel = 1;
+						sublevel = 0;
 						break;
 					default:
 						break;
@@ -246,7 +283,7 @@ public class Semantic extends Syntax implements IErrorHandler {
 							newTracker.m_stkStatus.pop();// 栈顶弹出
 							break;
 						case SHIFT:
-							newTracker.m_stkStatus.add(newTracker.m_npaStatus);// 移入新状态
+							newTracker.m_stkStatus.push(newTracker.m_npaStatus);// 移入新状态
 							break;
 						default:
 							break;
@@ -494,11 +531,87 @@ public class Semantic extends Syntax implements IErrorHandler {
 		Token token = tracker.m_iterToken.ex().token();
 		for (TokenExp exp : m_arrTerminals) {
 			if (exp.m_kType == token.m_kToken
-					&& exp.m_Object.equals(token.m_Object)) {
+					&& (exp.m_Object == null || exp.m_Object
+							.equals(token.m_Object))) {
 				return exp.m_iID;
 			}
 		}
 		return -1;
+	}
+
+	/**
+	 * 进行语义处理
+	 */
+	private void run() {
+		/* 单词索引 */
+		int idxToken = 0;
+		/* 规则集合 */
+		ArrayList<RuleItem> items = m_NPA.getRuleItems();
+		/* 数据处理堆栈 */
+		ParsingStack ps = new ParsingStack();
+		/* 遍历所有指令 */
+		for (Instruction inst : m_arrInsts) {
+			/* 语义处理接口 */
+			ISemanticHandler handler = null;
+			/* 处理前 */
+			switch (inst.m_Inst) {
+			case PASS:
+				idxToken++;
+				break;
+			case READ:
+				ps.set(inst.m_iIndex, m_arrTokens.get(idxToken));
+				idxToken++;
+				break;
+			case SHIFT:
+				ps.push();
+				break;
+			case LEFT_RECURSION:
+			case LEFT_RECURSION_DISCARD:
+			case TRANSLATE:
+			case TRANSLATE_DISCARD:
+			case TRANSLATE_FINISH:
+				if (inst.m_iHandler != -1) {
+					handler = items.get(inst.m_iHandler).m_Handler;
+				}
+				break;
+			default:
+				break;
+			}
+			/* 处理时 */
+			if (handler != null) {
+				m_Object = handler.handle(ps, null, null);
+			}
+			/* 处理后 */
+			switch (inst.m_Inst) {
+			case LEFT_RECURSION:
+				ps.pop();// 先pop再push为了让栈层成为current的引用
+				ps.push();
+				ps.set(inst.m_iIndex, m_Object);
+				break;
+			case LEFT_RECURSION_DISCARD:
+				ps.pop();
+				ps.push();
+				break;
+			case PASS:
+				break;
+			case READ:
+				break;
+			case SHIFT:
+				break;
+			case TRANSLATE:
+				ps.pop();
+				ps.set(inst.m_iIndex, m_Object);
+				break;
+			case TRANSLATE_DISCARD:
+				ps.pop();
+				break;
+			case TRANSLATE_FINISH:
+				ps.pop();
+				break;
+			default:
+				break;
+			}
+		}
 	}
 
 	/**
@@ -526,6 +639,20 @@ public class Semantic extends Syntax implements IErrorHandler {
 		sb.append(System.getProperty("line.separator"));
 		for (Token token : m_arrTokens) {
 			sb.append(token.toString());
+			sb.append(System.getProperty("line.separator"));
+		}
+		return sb.toString();
+	}
+
+	/**
+	 * 获取分析结果描述
+	 */
+	public String getObject() {
+		StringBuffer sb = new StringBuffer();
+		sb.append("#### 分析结果 ####");
+		sb.append(System.getProperty("line.separator"));
+		if (m_Object != null) {
+			sb.append(m_Object.toString());
 			sb.append(System.getProperty("line.separator"));
 		}
 		return sb.toString();

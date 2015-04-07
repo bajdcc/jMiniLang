@@ -324,7 +324,19 @@ public class Syntax {
 		/* 获得分析后的表达式根结点 */
 		ISyntaxComponent exp = doAnalysis(TokenType.EOF, null);
 		/* 将根结点添加进对应规则 */
-		m_Rule.m_Rule.m_arrRules.add(new RuleItem(exp, m_Rule.m_Rule));
+		RuleItem item = new RuleItem(exp, m_Rule.m_Rule);
+		onAddRuleItem(item);
+		m_Rule.m_Rule.m_arrRules.add(item);
+	}
+
+	/**
+	 * 创建推导式之后的回调函数
+	 * 
+	 * @param item
+	 *            推导式
+	 */
+	protected void onAddRuleItem(RuleItem item) {
+
 	}
 
 	/**

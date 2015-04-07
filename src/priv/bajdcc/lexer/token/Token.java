@@ -26,7 +26,7 @@ public class Token {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(String.format("%04d,%03d:\t%-10s\t%s", m_Position.m_iLine, m_Position.m_iColumn,
+		sb.append(String.format("%04d,%03d:\t%s\t%s", m_Position.m_iLine, m_Position.m_iColumn,
 				m_kToken.getName(),
 				m_Object == null ? "(null)" : m_Object.toString()));
 		return sb.toString();

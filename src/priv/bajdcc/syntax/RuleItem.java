@@ -2,6 +2,7 @@ package priv.bajdcc.syntax;
 
 import java.util.HashSet;
 
+import priv.bajdcc.semantic.token.ISemanticHandler;
 import priv.bajdcc.syntax.exp.RuleExp;
 import priv.bajdcc.syntax.exp.TokenExp;
 
@@ -16,6 +17,11 @@ public class RuleItem {
 	 * 规则表达式
 	 */
 	public ISyntaxComponent m_Expression = null;
+	
+	/**
+	 * 规则对应的语义分析接口
+	 */
+	public ISemanticHandler m_Handler = null;
 
 	/**
 	 * First集合（终结符）

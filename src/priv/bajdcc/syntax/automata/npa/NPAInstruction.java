@@ -6,9 +6,9 @@ package priv.bajdcc.syntax.automata.npa;
  * @author bajdcc
  */
 public enum NPAInstruction {
-	PASS("通过"), READ("读入"), SHIFT("移进"), TRANSLATE("归约"), LEFT_RECURSION(
-			"左递归"), TRANSLATE_DISCARD("归约"), LEFT_RECURSION_DISCARD("左递归"), TRANSLATE_FINISH(
-			"归约结束");
+	PASS("通过"), READ("读入"), SHIFT("移进"), TRANSLATE("翻译"), LEFT_RECURSION(
+			"左递归"), TRANSLATE_DISCARD("翻译"), LEFT_RECURSION_DISCARD("左递归"), TRANSLATE_FINISH(
+			"翻译结束");
 
 	private String name;
 

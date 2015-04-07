@@ -360,8 +360,7 @@ public class NPA extends NGA {
 	 * @return 状态是否为左递归
 	 */
 	private static boolean isLeftRecursiveEdge(NGAEdge edge, Rule rule) {
-		if (edge.m_Begin.m_InEdges.isEmpty())// 没有入边
-		{
+		if (edge.m_Begin.m_InEdges.isEmpty()) {// 没有入边
 			return edge.m_Data.m_Action == NGAEdgeType.RULE
 					&& edge.m_Data.m_Rule.m_Rule == rule;
 		}
@@ -405,7 +404,7 @@ public class NPA extends NGA {
 		}
 		return NPAStatusList;
 	}
-	
+
 	/**
 	 * 获得所有推导式
 	 * 

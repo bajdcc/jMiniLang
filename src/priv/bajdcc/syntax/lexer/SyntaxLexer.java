@@ -13,6 +13,7 @@ import priv.bajdcc.syntax.lexer.tokenizer.CommentTokenizer;
 import priv.bajdcc.syntax.lexer.tokenizer.NonTerminalTokenizer;
 import priv.bajdcc.syntax.lexer.tokenizer.NumberTokenizer;
 import priv.bajdcc.syntax.lexer.tokenizer.OperatorTokenizer;
+import priv.bajdcc.syntax.lexer.tokenizer.PropertyTokenizer;
 import priv.bajdcc.syntax.lexer.tokenizer.TerminalTokenizer;
 import priv.bajdcc.syntax.token.Token;
 import priv.bajdcc.syntax.token.TokenType;
@@ -118,6 +119,7 @@ public class SyntaxLexer extends RegexStringIterator implements
 		//
 		m_algCollections.attach(new WhitespaceTokenizer());// 空白字符解析组件
 		m_algCollections.attach(new CommentTokenizer());// 注释解析组件
+		m_algCollections.attach(new PropertyTokenizer());// 属性解析组件
 		m_algCollections.attach(new TerminalTokenizer());// 终结符解析组件
 		m_algCollections.attach(new NonTerminalTokenizer());// 非终结符解析组件
 		m_algCollections.attach(new NumberTokenizer());// 存储序号解析组件
