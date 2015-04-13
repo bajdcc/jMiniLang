@@ -1,6 +1,7 @@
 package priv.bajdcc.lexer.algorithm.impl;
 
 import priv.bajdcc.lexer.algorithm.TokenAlgorithm;
+import priv.bajdcc.lexer.algorithm.filter.LineFilter;
 import priv.bajdcc.lexer.error.RegexException;
 import priv.bajdcc.lexer.token.Token;
 import priv.bajdcc.lexer.token.TokenType;
@@ -14,7 +15,7 @@ import priv.bajdcc.lexer.token.TokenType;
 public class MacroTokenizer extends TokenAlgorithm {
 
 	public MacroTokenizer() throws RegexException {
-		super(getRegexString(), null);
+		super(getRegexString(), new LineFilter());
 	}
 
 	public static String getRegexString() {
@@ -35,8 +36,8 @@ public class MacroTokenizer extends TokenAlgorithm {
 	 */
 	@Override
 	public Token getToken(String string, Token token) {
-		token.m_kToken = TokenType.MACRO;
-		token.m_Object = string.trim();
+		token.kToken = TokenType.MACRO;
+		token.object = string.trim();
 		return token;
 	}
 }

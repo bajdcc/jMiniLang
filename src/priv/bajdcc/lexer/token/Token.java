@@ -11,24 +11,24 @@ public class Token {
 	/**
 	 * 单词类型
 	 */
-	public TokenType m_kToken = TokenType.ERROR;
+	public TokenType kToken = TokenType.ERROR;
 
 	/**
 	 * 数据
 	 */
-	public Object m_Object = null;
+	public Object object = null;
 
 	/**
 	 * 位置
 	 */
-	public Position m_Position = new Position();
+	public Position position = new Position();
 
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(String.format("%04d,%03d:\t%s\t%s", m_Position.m_iLine, m_Position.m_iColumn,
-				m_kToken.getName(),
-				m_Object == null ? "(null)" : m_Object.toString()));
+		sb.append(String.format("%04d,%03d:\t%s\t%s", position.iLine, position.iColumn,
+				kToken.getName(),
+				object == null ? "(null)" : object.toString()));
 		return sb.toString();
 	}
 }

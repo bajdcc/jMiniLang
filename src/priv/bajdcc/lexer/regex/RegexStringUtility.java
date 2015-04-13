@@ -15,10 +15,10 @@ public class RegexStringUtility {
 	/**
 	 * 迭代接口
 	 */
-	private IRegexStringIterator m_Iterator = null;
+	private IRegexStringIterator iterator = null;
 
 	public RegexStringUtility(IRegexStringIterator iterator) {
-		m_Iterator = iterator;
+		this.iterator = iterator;
 	}
 
 	/**
@@ -65,14 +65,14 @@ public class RegexStringUtility {
 		int chv, val = 0;
 		try {
 			while (count != 0) {
-				chv = Integer.valueOf(m_Iterator.current() + "", base);
+				chv = Integer.valueOf(iterator.current() + "", base);
 				--count;
 				val *= base;
 				val += chv;
-				m_Iterator.next();
+				iterator.next();
 			}
 		} catch (NumberFormatException e) {
-			m_Iterator.err(error);
+			iterator.err(error);
 		}
 		return (char) val;
 	}

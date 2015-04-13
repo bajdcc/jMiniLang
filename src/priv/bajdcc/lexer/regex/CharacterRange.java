@@ -12,20 +12,20 @@ public class CharacterRange {
 	/**
 	 * 下限（包含）
 	 */
-	public char m_chLowerBound = 0;
+	public char chLowerBound = 0;
 
 	/**
 	 * 上限（包含）
 	 */
-	public char m_chUpperBound = 0;
+	public char chUpperBound = 0;
 
 	public CharacterRange() {
 
 	}
 
 	public CharacterRange(char lower, char upper) {
-		m_chLowerBound = lower;
-		m_chUpperBound = upper;
+		chLowerBound = lower;
+		chUpperBound = upper;
 	}
 	
 	/**
@@ -34,17 +34,17 @@ public class CharacterRange {
 	 * @return 比较结果
 	 */
 	public boolean include(char ch) {
-		return ch >= m_chLowerBound && ch <= m_chUpperBound;
+		return ch >= chLowerBound && ch <= chUpperBound;
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		if (m_chLowerBound == m_chUpperBound) {
-			sb.append(printChar(m_chLowerBound));
+		if (chLowerBound == chUpperBound) {
+			sb.append(printChar(chLowerBound));
 		} else {
-			sb.append(printChar(m_chLowerBound) + "-"
-					+ printChar(m_chUpperBound));
+			sb.append(printChar(chLowerBound) + "-"
+					+ printChar(chUpperBound));
 		}
 		return sb.toString();
 	}
@@ -63,14 +63,14 @@ class CharacterRangeComparator implements Comparator<CharacterRange> {
 
 	@Override
 	public int compare(CharacterRange o1, CharacterRange o2) {
-		if (o1.m_chLowerBound < o2.m_chLowerBound) {
+		if (o1.chLowerBound < o2.chLowerBound) {
 			return -1;
 		}
-		if (o1.m_chLowerBound == o2.m_chLowerBound) {
-			if (o1.m_chUpperBound < o2.m_chUpperBound) {
+		if (o1.chLowerBound == o2.chLowerBound) {
+			if (o1.chUpperBound < o2.chUpperBound) {
 				return -1;
 			}
-			if (o1.m_chUpperBound == o2.m_chUpperBound) {
+			if (o1.chUpperBound == o2.chUpperBound) {
 				return 0;
 			}
 			return 1;

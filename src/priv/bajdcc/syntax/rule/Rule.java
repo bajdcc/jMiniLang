@@ -1,4 +1,4 @@
-package priv.bajdcc.syntax;
+package priv.bajdcc.syntax.rule;
 
 import java.util.ArrayList;
 
@@ -15,24 +15,24 @@ public class Rule {
 	/**
 	 * 规则表达式列表
 	 */
-	public ArrayList<RuleItem> m_arrRules = new ArrayList<RuleItem>();
+	public ArrayList<RuleItem> arrRules = new ArrayList<RuleItem>();
 
 	/**
 	 * 规则起始非终结符
 	 */
-	public RuleExp m_nonTerminal = null;
+	public RuleExp nonTerminal = null;
 
 	/**
 	 * 左递归等级：0为否，1为直接，大于1为间接
 	 */
-	public int m_iRecursiveLevel = 0;
+	public int iRecursiveLevel = 0;
 
 	/**
 	 * 终结符First集合
 	 */
-	public ArrayList<TokenExp> m_arrTokens = new ArrayList<TokenExp>();
+	public ArrayList<TokenExp> arrTokens = new ArrayList<TokenExp>();
 
 	public Rule(RuleExp exp) {
-		m_nonTerminal = exp;
+		nonTerminal = exp;
 	}
 }

@@ -21,16 +21,16 @@ public class StringPairFilter implements IRegexStringFilter,
 	/**
 	 * 字符串首的终结符
 	 */
-	private MetaType m_kMetaBegin = MetaType.NULL;
+	private MetaType kMetaBegin = MetaType.NULL;
 
 	/**
 	 * 字符串尾的终结符
 	 */
-	private MetaType m_kMetaEnd = MetaType.NULL;
+	private MetaType kMetaEnd = MetaType.NULL;
 
 	public StringPairFilter(MetaType begin, MetaType end) {
-		m_kMetaBegin = begin;
-		m_kMetaEnd = end;
+		kMetaBegin = begin;
+		kMetaEnd = end;
 	}
 
 	@Override
@@ -39,26 +39,26 @@ public class StringPairFilter implements IRegexStringFilter,
 		RegexStringIteratorData data = new RegexStringIteratorData();
 		try {
 			if (!iterator.available()) {
-				data.m_kMeta = MetaType.END;
-				data.m_chCurrent = MetaType.END.getChar();
+				data.kMeta = MetaType.END;
+				data.chCurrent = MetaType.END.getChar();
 			} else {
-				data.m_kMeta = iterator.meta();
-				data.m_chCurrent = iterator.current();
+				data.kMeta = iterator.meta();
+				data.chCurrent = iterator.current();
 				iterator.next();
-				if (data.m_kMeta == m_kMetaBegin || data.m_kMeta == m_kMetaEnd) {// 过滤终结符
-					data.m_kMeta = MetaType.NULL;
-				} else if (data.m_kMeta == MetaType.ESCAPE) {// 处理转义
-					data.m_chCurrent = iterator.current();
+				if (data.kMeta == kMetaBegin || data.kMeta == kMetaEnd) {// 过滤终结符
+					data.kMeta = MetaType.NULL;
+				} else if (data.kMeta == MetaType.ESCAPE) {// 处理转义
+					data.chCurrent = iterator.current();
 					iterator.next();
-					data.m_kMeta = MetaType.MUST_SAVE;
-					data.m_chCurrent = utility.fromEscape(data.m_chCurrent,
+					data.kMeta = MetaType.MUST_SAVE;
+					data.chCurrent = utility.fromEscape(data.chCurrent,
 							RegexError.ESCAPE);
 				}
 			}
 		} catch (RegexException e) {
 			System.err.println(e.getPosition() + " : " + e.getMessage());
-			data.m_kMeta = MetaType.ERROR;
-			data.m_chCurrent = MetaType.ERROR.getChar();
+			data.kMeta = MetaType.ERROR;
+			data.chCurrent = MetaType.ERROR.getChar();
 		}
 		return data;
 	}
@@ -70,6 +70,6 @@ public class StringPairFilter implements IRegexStringFilter,
 
 	@Override
 	public MetaType[] getMetaTypes() {
-		return new MetaType[] { m_kMetaBegin, m_kMetaEnd, MetaType.ESCAPE };
+		return new MetaType[] { kMetaBegin, kMetaEnd, MetaType.ESCAPE };
 	}
 }

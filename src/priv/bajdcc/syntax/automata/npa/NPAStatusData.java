@@ -10,10 +10,10 @@ public class NPAStatusData {
 	/**
 	 * 标签
 	 */
-	public String m_strLabel = "";
+	public String label = "";
 
 	/**
 	 * 状态所属规则的索引
 	 */
-	public int m_iRuleItem = -1;
+	public int iRuleItem = -1;
 }

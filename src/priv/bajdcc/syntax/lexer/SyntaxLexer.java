@@ -29,18 +29,18 @@ public class SyntaxLexer extends RegexStringIterator implements
 	/**
 	 * 算法集合（正则表达式匹配）
 	 */
-	private TokenAlgorithmCollection m_algCollections = new TokenAlgorithmCollection(
+	private TokenAlgorithmCollection algorithmCollections = new TokenAlgorithmCollection(
 			this, this);
 
 	/**
 	 * 字符转换算法
 	 */
-	private ITokenAlgorithm m_TokenAlg = null;
+	private ITokenAlgorithm tokenAlgorithm = null;
 
 	/**
 	 * 丢弃的类型集合
 	 */
-	private HashSet<TokenType> m_setDiscardToken = new HashSet<TokenType>();
+	private HashSet<TokenType> setDiscardToken = new HashSet<TokenType>();
 
 	public SyntaxLexer() throws RegexException {
 		initialize();
@@ -54,14 +54,14 @@ public class SyntaxLexer extends RegexStringIterator implements
 	 */
 	public void setContext(String context) {
 		/* 初始化 */
-		m_strContext = context;
-		m_Position.m_iColumn = 0;
-		m_Position.m_iLine = 0;
-		m_Data.m_chCurrent = 0;
-		m_Data.m_iIndex = 0;
-		m_Data.m_kMeta = MetaType.END;
-		m_stkIndex.clear();
-		m_stkPosition.clear();
+		this.context = context;
+		position.iColumn = 0;
+		position.iLine = 0;
+		data.chCurrent = 0;
+		data.iIndex = 0;
+		data.kMeta = MetaType.END;
+		stkIndex.clear();
+		stkPosition.clear();
 	}
 
 	/**
@@ -70,8 +70,8 @@ public class SyntaxLexer extends RegexStringIterator implements
 	 * @return 单词
 	 */
 	public Token nextToken() {
-		Token token = Token.transfer(m_algCollections.scan());
-		if (m_setDiscardToken.contains(token.m_kToken)) {// 需要丢弃
+		Token token = Token.transfer(algorithmCollections.scan());
+		if (setDiscardToken.contains(token.kToken)) {// 需要丢弃
 			return null;
 		}
 		return token;
@@ -84,19 +84,19 @@ public class SyntaxLexer extends RegexStringIterator implements
 	 *            要丢弃的符号类型（不建议丢弃EOF，因为需要用来判断结束）
 	 */
 	public void discard(TokenType type) {
-		m_setDiscardToken.add(type);
+		setDiscardToken.add(type);
 	}
 
 	@Override
 	public void setFilter(ITokenAlgorithm alg) {
-		m_TokenAlg = alg;
+		tokenAlgorithm = alg;
 	}
 
 	@Override
 	protected void transform() {
 		super.transform();
-		if (m_TokenAlg != null) {
-			m_Data.m_kMeta = m_TokenAlg.getMetaHash().get(m_Data.m_chCurrent);
+		if (tokenAlgorithm != null) {
+			data.kMeta = tokenAlgorithm.getMetaHash().get(data.chCurrent);
 		}
 	}
 
@@ -117,12 +117,12 @@ public class SyntaxLexer extends RegexStringIterator implements
 		// 若某一组件解析成功，即返回匹配结果
 		// 若全部解析失败，则调用出错处理（默认为前进一字符）
 		//
-		m_algCollections.attach(new WhitespaceTokenizer());// 空白字符解析组件
-		m_algCollections.attach(new CommentTokenizer());// 注释解析组件
-		m_algCollections.attach(new PropertyTokenizer());// 属性解析组件
-		m_algCollections.attach(new TerminalTokenizer());// 终结符解析组件
-		m_algCollections.attach(new NonTerminalTokenizer());// 非终结符解析组件
-		m_algCollections.attach(new NumberTokenizer());// 存储序号解析组件
-		m_algCollections.attach(new OperatorTokenizer());// 操作符解析组件
+		algorithmCollections.attach(new WhitespaceTokenizer());// 空白字符解析组件
+		algorithmCollections.attach(new CommentTokenizer());// 注释解析组件
+		algorithmCollections.attach(new PropertyTokenizer());// 属性解析组件
+		algorithmCollections.attach(new TerminalTokenizer());// 终结符解析组件
+		algorithmCollections.attach(new NonTerminalTokenizer());// 非终结符解析组件
+		algorithmCollections.attach(new NumberTokenizer());// 存储序号解析组件
+		algorithmCollections.attach(new OperatorTokenizer());// 操作符解析组件
 	}
 }

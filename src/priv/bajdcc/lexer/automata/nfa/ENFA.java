@@ -10,10 +10,10 @@ public class ENFA {
 	/**
 	 * 初态
 	 */
-	public NFAStatus m_Begin;
+	public NFAStatus begin;
 
 	/**
 	 * 终态
 	 */
-	public NFAStatus m_End;
+	public NFAStatus end;
 }

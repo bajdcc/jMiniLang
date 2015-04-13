@@ -27,8 +27,8 @@ public class CharacterTokenizer extends TokenAlgorithm {
 	 */
 	@Override
 	public Token getToken(String string, Token token) {
-		token.m_kToken = TokenType.CHARACTER;
-		token.m_Object = string;
+		token.kToken = TokenType.CHARACTER;
+		token.object = string;
 		return token;
 	}
 }

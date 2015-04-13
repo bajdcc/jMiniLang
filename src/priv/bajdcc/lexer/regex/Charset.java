@@ -14,12 +14,12 @@ public class Charset implements IRegexComponent {
 	/**
 	 * 包含的范围（正范围）
 	 */
-	public ArrayList<CharacterRange> m_arrPositiveBounds = new ArrayList<CharacterRange>();
+	public ArrayList<CharacterRange> arrPositiveBounds = new ArrayList<CharacterRange>();
 
 	/**
 	 * 是否取反
 	 */
-	public boolean m_bReverse = false;
+	public boolean bReverse = false;
 
 	@Override
 	public void visit(IRegexComponentVisitor visitor) {
@@ -39,11 +39,11 @@ public class Charset implements IRegexComponent {
 		if (begin > end) {
 			return false;
 		}
-		for (CharacterRange range : m_arrPositiveBounds) {
-			if (begin <= range.m_chLowerBound && end >= range.m_chUpperBound)
+		for (CharacterRange range : arrPositiveBounds) {
+			if (begin <= range.chLowerBound && end >= range.chUpperBound)
 				return false;
 		}
-		m_arrPositiveBounds.add(new CharacterRange(begin, end));
+		arrPositiveBounds.add(new CharacterRange(begin, end));
 		return true;
 	}
 
@@ -63,7 +63,7 @@ public class Charset implements IRegexComponent {
 	 * @return 查找结果
 	 */
 	public boolean include(char ch) {
-		for (CharacterRange range : m_arrPositiveBounds) {
+		for (CharacterRange range : arrPositiveBounds) {
 			if (range.include(ch)) {
 				return true;
 			}
@@ -75,7 +75,7 @@ public class Charset implements IRegexComponent {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		boolean comma = false;
-		for (CharacterRange range : m_arrPositiveBounds) {
+		for (CharacterRange range : arrPositiveBounds) {
 			if (comma)
 				sb.append(MetaType.COMMA.getChar());
 			sb.append(range);

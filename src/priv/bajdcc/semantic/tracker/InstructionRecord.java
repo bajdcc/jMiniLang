@@ -12,14 +12,14 @@ public class InstructionRecord {
 	/**
 	 * 指令集
 	 */
-	public ArrayList<Instruction> m_arrInsts = new ArrayList<Instruction>();
+	public ArrayList<Instruction> arrInsts = new ArrayList<Instruction>();
 	
 	/**
 	 * 前向指针
 	 */
-	public InstructionRecord m_prevInstRecord = null;
+	public InstructionRecord prev = null;
 	
 	public InstructionRecord(InstructionRecord prev) {
-		m_prevInstRecord = prev;	
+		this.prev = prev;	
 	}
 }

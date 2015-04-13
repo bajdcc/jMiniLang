@@ -15,31 +15,31 @@ public class PropertyExp implements ISyntaxComponent {
 	/**
 	 * 子表达式
 	 */
-	public ISyntaxComponent m_Expression = null;
+	public ISyntaxComponent expression = null;
 	
 	/**
 	 * 存储序号
 	 */
-	public int m_iStorage = -1;
+	public int iStorage = -1;
 	
 	/**
 	 * 子表达式
 	 */
-	public IErrorHandler m_ErrorHandler = null;
+	public IErrorHandler errorHandler = null;
 
 	public PropertyExp(int id, IErrorHandler handler) {
-		m_iStorage = id;
-		m_ErrorHandler = handler;
+		iStorage = id;
+		errorHandler = handler;
 	}
 	
 	@Override
 	public void visit(ISyntaxComponentVisitor visitor) {
 		VisitBag bag = new VisitBag();
 		visitor.visitBegin(this, bag);
-		if (bag.m_bVisitChildren) {
-			m_Expression.visit(visitor);
+		if (bag.bVisitChildren) {
+			expression.visit(visitor);
 		}
-		if (bag.m_bVisitEnd) {
+		if (bag.bVisitEnd) {
 			visitor.visitEnd(this);
 		}
 	}

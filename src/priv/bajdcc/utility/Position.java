@@ -10,29 +10,29 @@ public class Position implements Cloneable {
 	/**
 	 * 列号
 	 */
-	public int m_iColumn = 0;
+	public int iColumn = 0;
 
 	/**
 	 * 行号
 	 */
-	public int m_iLine = 0;
+	public int iLine = 0;
 
 	public Position() {
 	}
 	
 	public Position(Position obj) {
-		m_iColumn = obj.m_iColumn;
-		m_iLine = obj.m_iLine;
+		iColumn = obj.iColumn;
+		iLine = obj.iLine;
 	}
 
 	public Position(int col, int line) {
-		m_iColumn = col;
-		m_iLine = line;
+		iColumn = col;
+		iLine = line;
 	}
 
 	@Override
 	public String toString() {
-		return m_iLine + "," + m_iColumn;
+		return iLine + "," + iColumn;
 	}
 
 	@Override

@@ -38,14 +38,14 @@ public class TestSemantic3 {
 				@Override
 				public Object handle(IIndexedData indexed,
 						ITokenFactory factory, Object obj) {
-					return indexed.get(0).m_Object;
+					return indexed.get(0).object;
 				}
 			};
 			ISemanticHandler handleRec = new ISemanticHandler() {
 				@Override
 				public Object handle(IIndexedData indexed,
 						ITokenFactory factory, Object obj) {
-					int lop = Integer.parseInt(indexed.get(0).m_Object
+					int lop = Integer.parseInt(indexed.get(0).object
 							.toString());					
 					return lop + 1;
 				}
@@ -54,8 +54,8 @@ public class TestSemantic3 {
 			// syntax.infer("T -> F `TIMES`<*> T | F `DIVIDE`</> T | F");
 			// syntax.infer("F -> `LPA`<(> E `RPA`<)>  | `SYMBOL`<i>");
 			semantic.infer(handleCopy, "START -> Z[0]");
-			semantic.infer(handleRec, "Z -> Z[0] `a`[1]");
-			semantic.infer(handleValue, "Z -> `a`[0]");
+			semantic.infer(handleRec, "Z -> Z[0] @a[1]");
+			semantic.infer(handleValue, "Z -> @a[0]");
 			semantic.initialize("START");
 			System.out.println(semantic.toString());
 			System.out.println(semantic.getNGAString());

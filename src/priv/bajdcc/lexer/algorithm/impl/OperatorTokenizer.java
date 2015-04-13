@@ -20,7 +20,7 @@ public class OperatorTokenizer extends TokenAlgorithm {
 	/**
 	 * 关键字哈希表
 	 */
-	private HashMap<String, OperatorType> m_HashOperator = new HashMap<String, OperatorType>();
+	private HashMap<String, OperatorType> hashOperator = new HashMap<String, OperatorType>();
 
 	public OperatorTokenizer() throws RegexException {
 		super(getRegexString(), null);
@@ -28,15 +28,22 @@ public class OperatorTokenizer extends TokenAlgorithm {
 	}
 
 	public static String getRegexString() {
-		String exp = "=|+|-|*|/|%|&|\\||~|!|<|>|(|)|{|}|[|]|,|.|;|:|==|!=|++|--|+=|-=|*=|/=|<=|>=|&&|\\|\\|";
 		MetaType[] metaTypes = new MetaType[] { MetaType.LPARAN,
 				MetaType.RPARAN, MetaType.STAR, MetaType.PLUS,
 				MetaType.LSQUARE, MetaType.RSQUARE, MetaType.LBRACE,
-				MetaType.RBRACE, MetaType.DOT };
-		for (MetaType meta : metaTypes) {
-			exp = exp.replace(meta.getChar() + "", "\\" + meta.getChar());
+				MetaType.RBRACE, MetaType.DOT, MetaType.BAR, MetaType.QUERY };
+		StringBuilder sb = new StringBuilder();
+		for (OperatorType type : OperatorType.values()) {
+			String op = type.getName();
+			for (MetaType meta : metaTypes) {
+				op = op.replace(meta.getChar() + "", "\\" + meta.getChar());
+			}
+			sb.append(op + "|");
 		}
-		return exp;
+		if (sb.length() > 0) {
+			sb.deleteCharAt(sb.length() - 1);
+		}
+		return sb.toString();
 	}
 
 	@Override
@@ -49,7 +56,7 @@ public class OperatorTokenizer extends TokenAlgorithm {
 	 */
 	private void initializeHashMap() {
 		for (OperatorType operator : OperatorType.values()) {// 关键字
-			m_HashOperator.put(operator.getName(), operator);
+			hashOperator.put(operator.getName(), operator);
 		}
 	}
 
@@ -62,8 +69,8 @@ public class OperatorTokenizer extends TokenAlgorithm {
 	 */
 	@Override
 	public Token getToken(String string, Token token) {
-		token.m_kToken = TokenType.OPERATOR;
-		token.m_Object = m_HashOperator.get(string);
+		token.kToken = TokenType.OPERATOR;
+		token.object = hashOperator.get(string);
 		return token;
 	}
 }

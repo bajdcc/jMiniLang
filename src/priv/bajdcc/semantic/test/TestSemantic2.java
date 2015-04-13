@@ -35,13 +35,13 @@ public class TestSemantic2 {
 			// syntax.infer("T -> F `TIMES`<*> T | F `DIVIDE`</> T | F");
 			// syntax.infer("F -> `LPA`<(> E `RPA`<)>  | `SYMBOL`<i>");
 			semantic.infer("S -> E");
-			semantic.infer("E -> E `PLUS`<+> T");
+			semantic.infer("E -> E @PLUS<+> T");
 			semantic.infer("E -> T");
-			semantic.infer("T -> T `TIMES`<*> F");
+			semantic.infer("T -> T @TIMES<*> F");
 			semantic.infer("T -> F");
-			semantic.infer("F -> `v`<v>");
-			semantic.infer("F -> `d`<d>");
-			semantic.infer("F -> `LPA`<(> E `RPA`<)>");
+			semantic.infer("F -> @v<v>");
+			semantic.infer("F -> @d<d>");
+			semantic.infer("F -> @LPA@<(> E @RPA<)>");
 			semantic.initialize("S");
 			System.out.println(semantic.toString());
 			System.out.println(semantic.getNGAString());

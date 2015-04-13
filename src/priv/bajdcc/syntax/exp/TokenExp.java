@@ -15,43 +15,43 @@ public class TokenExp implements ISyntaxComponent {
 	/**
 	 * 终结符ID
 	 */
-	public int m_iID = -1;
+	public int id = -1;
 
 	/**
 	 * 终结符名称
 	 */
-	public String m_strName = null;
+	public String name = null;
 
 	/**
 	 * 终结符对应的正则表达式
 	 */
-	public TokenType m_kType = null;
+	public TokenType kType = null;
 
 	/**
 	 * 终结符对应的正则表达式解析组件（用于语义分析中的单词流解析）
 	 */
-	public Object m_Object = null;
+	public Object object = null;
 
 	public TokenExp(int id, String name, TokenType type, Object obj) {
-		m_iID = id;
-		m_strName = name;
-		m_kType = type;
-		m_Object = obj;
+		this.id = id;
+		this.name = name;
+		kType = type;
+		object = obj;
 	}
 
 	@Override
 	public void visit(ISyntaxComponentVisitor visitor) {
 		VisitBag bag = new VisitBag();
 		visitor.visitBegin(this, bag);
-		if (bag.m_bVisitEnd) {
+		if (bag.bVisitEnd) {
 			visitor.visitEnd(this);
 		}
 	}
 
 	@Override
 	public String toString() {
-		return String.format("%d: `%s`，%s，%s", m_iID, m_strName,
-				m_kType.getName(),
-				m_Object == null ? "(null)" : m_Object.toString());
+		return String.format("%d: `%s`，%s，%s", id, name,
+				kType.getName(),
+				object == null ? "(null)" : object.toString());
 	}
 }

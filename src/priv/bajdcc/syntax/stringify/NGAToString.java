@@ -20,57 +20,57 @@ public class NGAToString extends
 	/**
 	 * 描述
 	 */
-	private StringBuilder m_Context = new StringBuilder();
+	private StringBuilder context = new StringBuilder();
 
 	/**
 	 * 前缀
 	 */
-	private String m_Prefix = "";
+	private String prefix = "";
 	
 	/**
 	 * 存放状态的集合
 	 */
-	private ArrayList<NGAStatus> m_arrNGAStatus = new ArrayList<NGAStatus>();
+	private ArrayList<NGAStatus> arrNGAStatus = new ArrayList<NGAStatus>();
 
 	public NGAToString() {
 
 	}
 
 	public NGAToString(String prefix) {
-		m_Prefix = prefix;
+		this.prefix = prefix;
 	}
 
 	@Override
 	public void visitBegin(NGAStatus status, VisitBag bag) {
 		/* 若首次访问节点则先构造状态表 */
-		if (m_arrNGAStatus.isEmpty()) {
+		if (arrNGAStatus.isEmpty()) {
 			BreadthFirstSearch<NGAEdge, NGAStatus> bfs = new BreadthFirstSearch<NGAEdge, NGAStatus>();
 			status.visit(bfs);
-			m_arrNGAStatus = bfs.m_arrStatus;
+			arrNGAStatus = bfs.arrStatus;
 		}
 		/* 输出状态标签 */
 		appendLine();
 		appendPrefix();
-		m_Context.append("--== 状态[" + m_arrNGAStatus.indexOf(status) + "]"
-				+ (status.m_Data.m_bFinal ? "[结束]" : "") + " ==--");
+		context.append("--== 状态[" + arrNGAStatus.indexOf(status) + "]"
+				+ (status.data.bFinal ? "[结束]" : "") + " ==--");
 		appendLine();
 		appendPrefix();
-		m_Context.append("项目： " + status.m_Data.m_strLabel);
+		context.append("项目： " + status.data.label);
 		appendLine();
 		/* 输出边 */
-		for (NGAEdge edge : status.m_OutEdges) {
+		for (NGAEdge edge : status.outEdges) {
 			appendPrefix();
-			m_Context.append("\t到达 " + m_arrNGAStatus.indexOf(edge.m_End)
+			context.append("\t到达 " + arrNGAStatus.indexOf(edge.end)
 					+ "  ：  ");
-			m_Context.append(edge.m_Data.m_Action.getName());
-			switch (edge.m_Data.m_Action) {
+			context.append(edge.data.kAction.getName());
+			switch (edge.data.kAction) {
 			case EPSILON:
 				break;
 			case RULE:
-				m_Context.append(" = " + edge.m_Data.m_Rule);
+				context.append(" = " + edge.data.rule);
 				break;
 			case TOKEN:
-				m_Context.append(" = " + edge.m_Data.m_Token);
+				context.append(" = " + edge.data.token);
 				break;
 			default:
 				break;
@@ -83,18 +83,18 @@ public class NGAToString extends
 	 * 添加前缀
 	 */
 	private void appendPrefix() {
-		m_Context.append(m_Prefix);
+		context.append(prefix);
 	}
 
 	/**
 	 * 添加行
 	 */
 	private void appendLine() {
-		m_Context.append(System.getProperty("line.separator"));
+		context.append(System.getProperty("line.separator"));
 	}
 
 	@Override
 	public String toString() {
-		return m_Context.toString();
+		return context.toString();
 	}
 }

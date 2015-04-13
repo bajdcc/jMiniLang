@@ -14,14 +14,14 @@ public class DFAEdgeBag extends DFAEdgeData{
 	/**
 	 * NFA状态集合
 	 */
-	public HashSet<NFAStatus> m_NFAStatus = new HashSet<NFAStatus>();
+	public HashSet<NFAStatus> nfaStatus = new HashSet<NFAStatus>();
 	
 	/**
 	 * 获得状态编号描述（逗号分隔）
 	 */
 	public String getStatusString(ArrayList<NFAStatus> nfaStatusList) {
 		StringBuilder sb = new StringBuilder();
-		for (NFAStatus status : m_NFAStatus) {
+		for (NFAStatus status : nfaStatus) {
 			sb.append(nfaStatusList.indexOf(status) + ",");
 		}
 		return sb.toString();

@@ -1,15 +1,16 @@
 package priv.bajdcc.syntax.solver;
 
 import java.util.HashSet;
+
 import priv.bajdcc.syntax.ISyntaxComponent;
 import priv.bajdcc.syntax.ISyntaxComponentVisitor;
-import priv.bajdcc.syntax.RuleItem;
 import priv.bajdcc.syntax.exp.BranchExp;
 import priv.bajdcc.syntax.exp.OptionExp;
 import priv.bajdcc.syntax.exp.PropertyExp;
 import priv.bajdcc.syntax.exp.RuleExp;
 import priv.bajdcc.syntax.exp.SequenceExp;
 import priv.bajdcc.syntax.exp.TokenExp;
+import priv.bajdcc.syntax.rule.RuleItem;
 import priv.bajdcc.utility.VisitBag;
 
 /**
@@ -22,17 +23,17 @@ public class FirstsetSolver implements ISyntaxComponentVisitor {
 	/**
 	 * 终结符表
 	 */
-	private HashSet<TokenExp> m_setTokens = new HashSet<TokenExp>();
+	private HashSet<TokenExp> setTokens = new HashSet<TokenExp>();
 
 	/**
 	 * 非终结符表
 	 */
-	private HashSet<RuleExp> m_setRules = new HashSet<RuleExp>();
+	private HashSet<RuleExp> setRules = new HashSet<RuleExp>();
 
 	/**
 	 * 产生式推导的串长度是否可能为零
 	 */
-	private boolean m_bZero = true;
+	private boolean bZero = true;
 
 	/**
 	 * 求解
@@ -42,77 +43,77 @@ public class FirstsetSolver implements ISyntaxComponentVisitor {
 	 * @return 产生式是否合法
 	 */
 	public boolean solve(RuleItem target) {
-		if (m_bZero) {
+		if (bZero) {
 			return false;
 		}
-		target.m_setFirstSetTokens = new HashSet<TokenExp>(m_setTokens);
-		target.m_setFirstSetRules = new HashSet<RuleExp>(m_setRules);
+		target.setFirstSetTokens = new HashSet<TokenExp>(setTokens);
+		target.setFirstSetRules = new HashSet<RuleExp>(setRules);
 		return true;
 	}
 
 	@Override
 	public void visitBegin(TokenExp node, VisitBag bag) {
-		bag.m_bVisitChildren = false;
-		bag.m_bVisitEnd = false;
-		m_setTokens.add(node);
-		if (m_bZero) {
-			m_bZero = false;
+		bag.bVisitChildren = false;
+		bag.bVisitEnd = false;
+		setTokens.add(node);
+		if (bZero) {
+			bZero = false;
 		}
 	}
 
 	@Override
 	public void visitBegin(RuleExp node, VisitBag bag) {
-		bag.m_bVisitChildren = false;
-		bag.m_bVisitEnd = false;
-		m_setRules.add(node);
-		if (m_bZero) {
-			m_bZero = false;
+		bag.bVisitChildren = false;
+		bag.bVisitEnd = false;
+		setRules.add(node);
+		if (bZero) {
+			bZero = false;
 		}
 	}
 
 	@Override
 	public void visitBegin(SequenceExp node, VisitBag bag) {
-		bag.m_bVisitChildren = false;
-		bag.m_bVisitEnd = false;
+		bag.bVisitChildren = false;
+		bag.bVisitEnd = false;
 		boolean zero = false;
-		for (ISyntaxComponent exp : node.m_arrExpressions) {
+		for (ISyntaxComponent exp : node.arrExpressions) {
 			exp.visit(this);
-			zero = m_bZero;
+			zero = bZero;
 			if (!zero) {
 				break;
 			}
 		}
-		m_bZero = zero;
+		bZero = zero;
 	}
 
 	@Override
 	public void visitBegin(BranchExp node, VisitBag bag) {
-		bag.m_bVisitChildren = false;
-		bag.m_bVisitEnd = false;
+		bag.bVisitChildren = false;
+		bag.bVisitEnd = false;
 		boolean zero = false;
-		for (ISyntaxComponent exp : node.m_arrExpressions) {
+		for (ISyntaxComponent exp : node.arrExpressions) {
 			exp.visit(this);
-			if (m_bZero) {
-				zero = m_bZero;
+			if (bZero) {
+				zero = bZero;
 			}
 		}
-		m_bZero = zero;
+		bZero = zero;
 	}
 
 	@Override
 	public void visitBegin(OptionExp node, VisitBag bag) {
-		bag.m_bVisitChildren = false;
-		bag.m_bVisitEnd = false;
-		node.m_Expression.visit(this);
-		m_bZero = true;
+		bag.bVisitChildren = false;
+		bag.bVisitEnd = false;
+		node.expression.visit(this);
+		bZero = true;
 	}
 
 	@Override
 	public void visitBegin(PropertyExp node, VisitBag bag) {
-		bag.m_bVisitChildren = false;
-		bag.m_bVisitEnd = false;
-		node.m_Expression.visit(this);
-		m_bZero = false;
+		bag.bVisitChildren = false;
+		bag.bVisitEnd = false;
+		node.expression.visit(this);
+		bZero = false;
 	}
 
 	@Override

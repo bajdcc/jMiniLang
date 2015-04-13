@@ -18,7 +18,7 @@ public class TestSyntaxLexer {
 			Token token;
 			for (;;) {
 				token = lexer.nextToken();
-				if (token.m_kToken == TokenType.EOF) {
+				if (token.kToken == TokenType.EOF) {
 					break;
 				}
 				System.out.println(token.toString());

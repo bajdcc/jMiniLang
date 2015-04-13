@@ -16,6 +16,6 @@ public class TokenErrorAdvanceHandler extends TokenErrorHandler {
 
 	@Override
 	public void handleError() {
-		m_Iterator.advance();
+		iterator.advance();
 	}
 }

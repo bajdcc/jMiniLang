@@ -4,11 +4,7 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Stack;
 
-import org.vibur.objectpool.ConcurrentLinkedPool;
-import org.vibur.objectpool.PoolService;
-
 import priv.bajdcc.lexer.token.Token;
-import priv.bajdcc.utility.ObjectFactory;
 
 /**
  * 单词解析栈
@@ -20,22 +16,12 @@ public class ParsingStack implements IIndexedData {
 	/**
 	 * 当前索引表
 	 */
-	private HashMap<Integer, TokenBag> m_mapTokenBag = null;
-
-	/**
-	 * 索引池
-	 */
-	private PoolService<HashMap<Integer, TokenBag>> m_IndexedTokensPool = new ConcurrentLinkedPool<HashMap<Integer, TokenBag>>(
-			new ObjectFactory<HashMap<Integer, TokenBag>>() {
-				public HashMap<Integer, TokenBag> create() {
-					return new HashMap<Integer, TokenBag>();
-				};
-			}, 100, 1000, false);
+	private HashMap<Integer, TokenBag> mapTokenBag = null;
 
 	/**
 	 * 单词包栈
 	 */
-	private Stack<HashMap<Integer, TokenBag>> m_stkMapTokenBags = new Stack<HashMap<Integer, TokenBag>>();
+	private Stack<HashMap<Integer, TokenBag>> stkMapTokenBags = new Stack<HashMap<Integer, TokenBag>>();
 
 	public ParsingStack() {
 		push();
@@ -45,20 +31,20 @@ public class ParsingStack implements IIndexedData {
 	 * 放入一个索引数据，同时置当前为栈顶
 	 */
 	public void push() {
-		m_mapTokenBag = m_IndexedTokensPool.take();
-		m_stkMapTokenBags.push(m_mapTokenBag);
+		mapTokenBag = new HashMap<Integer, TokenBag>();
+		stkMapTokenBags.push(mapTokenBag);
 	}
 
 	/**
 	 * 弹出一个索引数据，同时置当前为栈顶
 	 */
 	public void pop() {
-		if (!m_stkMapTokenBags.isEmpty()) {
-			m_IndexedTokensPool.restore(m_stkMapTokenBags.pop());
-			if (!m_stkMapTokenBags.isEmpty()) {
-				m_mapTokenBag = m_stkMapTokenBags.peek();
+		if (!stkMapTokenBags.isEmpty()) {
+			stkMapTokenBags.pop();
+			if (!stkMapTokenBags.isEmpty()) {
+				mapTokenBag = stkMapTokenBags.peek();
 			} else {
-				m_mapTokenBag = null;
+				mapTokenBag = null;
 			}
 		}
 	}
@@ -72,8 +58,8 @@ public class ParsingStack implements IIndexedData {
 	 *            单词
 	 */
 	public void set(int index, Token token) {
-		if (m_mapTokenBag != null) {
-			m_mapTokenBag.put(index, new TokenBag(token));
+		if (mapTokenBag != null) {
+			mapTokenBag.put(index, new TokenBag(token));
 		}
 	}
 
@@ -86,18 +72,23 @@ public class ParsingStack implements IIndexedData {
 	 *            对象
 	 */
 	public void set(int index, Object obj) {
-		if (m_mapTokenBag != null) {
-			m_mapTokenBag.put(index, new TokenBag(obj));
+		if (mapTokenBag != null) {
+			mapTokenBag.put(index, new TokenBag(obj));
 		}
 	}
 
 	@Override
 	public TokenBag get(int index) {
-		if (m_mapTokenBag == null) {
+		if (mapTokenBag == null) {
 			return null;
 		} else {
-			return m_mapTokenBag.get(index);
+			return mapTokenBag.get(index);
 		}
+	}
+
+	@Override
+	public boolean exist(int index) {
+		return mapTokenBag.containsKey(index);
 	}
 
 	private static void printTokenBag(StringBuilder sb,
@@ -109,10 +100,10 @@ public class ParsingStack implements IIndexedData {
 		} else {
 			for (Entry<Integer, TokenBag> bag : bags.entrySet()) {
 				sb.append("[" + bag.getKey() + ": ");
-				if (bag.getValue().m_Token != null) {
-					sb.append(bag.getValue().m_Token.toString());
+				if (bag.getValue().token != null) {
+					sb.append(bag.getValue().token.toString());
 				} else {
-					sb.append(bag.getValue().m_Object.toString());
+					sb.append(bag.getValue().object.toString());
 				}
 				sb.append("]");
 			}
@@ -125,10 +116,10 @@ public class ParsingStack implements IIndexedData {
 		sb.append("-------- stack begin --------");
 		sb.append(System.getProperty("line.separator"));
 		sb.append("0: ");
-		printTokenBag(sb, m_mapTokenBag);
+		printTokenBag(sb, mapTokenBag);
 		sb.append(System.getProperty("line.separator"));
 		int i = 1;
-		for (HashMap<Integer, TokenBag> hashMap : m_stkMapTokenBags) {
+		for (HashMap<Integer, TokenBag> hashMap : stkMapTokenBags) {
 			sb.append(i + ": ");
 			printTokenBag(sb, hashMap);
 			sb.append(System.getProperty("line.separator"));

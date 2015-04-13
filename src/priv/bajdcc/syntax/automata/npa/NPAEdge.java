@@ -10,15 +10,15 @@ public class NPAEdge {
 	/**
 	 * 初态
 	 */
-	public NPAStatus m_Begin;
+	public NPAStatus begin;
 
 	/**
 	 * 终态
 	 */
-	public NPAStatus m_End;
+	public NPAStatus end;
 
 	/**
 	 * 数据
 	 */
-	public NPAEdgeData m_Data = new NPAEdgeData();
+	public NPAEdgeData data = new NPAEdgeData();
 }

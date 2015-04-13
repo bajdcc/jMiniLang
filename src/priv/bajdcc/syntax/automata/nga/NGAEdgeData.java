@@ -14,25 +14,25 @@ public class NGAEdgeData {
 	/**
 	 * 边类型
 	 */
-	public NGAEdgeType m_Action = NGAEdgeType.EPSILON;
+	public NGAEdgeType kAction = NGAEdgeType.EPSILON;
 
 	/**
 	 * 终结符数据
 	 */
-	public TokenExp m_Token = null;
+	public TokenExp token = null;
 	
 	/**
 	 * 非终结符数据
 	 */
-	public RuleExp m_Rule = null;
+	public RuleExp rule = null;
 	
 	/**
 	 * 存储序号（-1为无效）
 	 */
-	public int m_iStorage = -1;
+	public int iStorage = -1;
 	
 	/**
 	 * 错误处理器
 	 */
-	public IErrorHandler m_Handler = null;
+	public IErrorHandler handler = null;
 }

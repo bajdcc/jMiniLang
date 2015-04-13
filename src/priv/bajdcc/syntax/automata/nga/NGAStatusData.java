@@ -10,10 +10,10 @@ public class NGAStatusData {
 	/**
 	 * 标签
 	 */
-	public String m_strLabel = "";
+	public String label = "";
 
 	/**
 	 * 是否为终态
 	 */
-	public boolean m_bFinal = false;
+	public boolean bFinal = false;
 }

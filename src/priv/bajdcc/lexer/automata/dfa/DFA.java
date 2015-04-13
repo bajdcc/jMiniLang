@@ -6,9 +6,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.ListIterator;
 
-import org.vibur.objectpool.ConcurrentLinkedPool;
-import org.vibur.objectpool.PoolService;
-
 import priv.bajdcc.lexer.automata.BreadthFirstSearch;
 import priv.bajdcc.lexer.automata.EdgeType;
 import priv.bajdcc.lexer.automata.dfa.DFAStatus;
@@ -16,7 +13,6 @@ import priv.bajdcc.lexer.automata.nfa.NFA;
 import priv.bajdcc.lexer.automata.nfa.NFAEdge;
 import priv.bajdcc.lexer.automata.nfa.NFAStatus;
 import priv.bajdcc.lexer.regex.IRegexComponent;
-import priv.bajdcc.utility.ObjectFactory;
 
 /**
  * 确定性自动机（DFA）
@@ -25,30 +21,11 @@ import priv.bajdcc.utility.ObjectFactory;
  *
  */
 public class DFA extends NFA {
-	/**
-	 * 边对象池
-	 */
-	private PoolService<DFAEdge> m_EdgesPool = new ConcurrentLinkedPool<DFAEdge>(
-			new ObjectFactory<DFAEdge>() {
-				public DFAEdge create() {
-					return new DFAEdge();
-				};
-			}, 1024, 10240, false);
-
-	/**
-	 * 状态对象池
-	 */
-	private PoolService<DFAStatus> m_StatusPool = new ConcurrentLinkedPool<DFAStatus>(
-			new ObjectFactory<DFAStatus>() {
-				public DFAStatus create() {
-					return new DFAStatus();
-				};
-			}, 1024, 10240, false);
 
 	/**
 	 * DFA状态集合
 	 */
-	private DFAStatus m_mainDFA = null;
+	private DFAStatus dfa = null;
 
 	public DFA(IRegexComponent exp, boolean debug) {
 		super(exp, debug);
@@ -60,19 +37,19 @@ public class DFA extends NFA {
 	 */
 	private void transfer() {
 		deleteEpsilonEdges();
-		if (m_bDebug) {
+		if (bDebug) {
 			System.out.println("#### 消除Epsilon边 ####");
 			System.out.println(getNFAString());
 		}
 		determine();
-		if (m_bDebug) {
+		if (bDebug) {
 			System.out.println("#### 确定化 ####");
 			System.out.println(getDFAString());
 			System.out.println("#### 状态转移矩阵 ####");
 			System.out.println(getDFATableString());
 		}
 		minimization();
-		if (m_bDebug) {
+		if (bDebug) {
 			System.out.println("#### 最小化 ####");
 			System.out.println(getDFAString());
 			System.out.println("#### 状态转移矩阵 ####");
@@ -90,11 +67,11 @@ public class DFA extends NFA {
 	 * @return 新的边
 	 */
 	protected DFAEdge connect(DFAStatus begin, DFAStatus end) {
-		DFAEdge edge = m_EdgesPool.take();// 申请一条新边
-		edge.m_Begin = begin;
-		edge.m_End = end;
-		begin.m_OutEdges.add(edge);// 添加进起始边的出边
-		end.m_InEdges.add(edge);// 添加进结束边的入边
+		DFAEdge edge = new DFAEdge();// 申请一条新边
+		edge.begin = begin;
+		edge.end = end;
+		begin.outEdges.add(edge);// 添加进起始边的出边
+		end.inEdges.add(edge);// 添加进结束边的入边
 		return edge;
 	}
 
@@ -107,9 +84,8 @@ public class DFA extends NFA {
 	 *            某条边
 	 */
 	protected void disconnect(DFAStatus status, DFAEdge edge) {
-		edge.m_Begin.m_OutEdges.remove(edge);
-		edge.m_End.m_InEdges.remove(edge);// 当前边的结束状态的入边集合去除当前边
-		m_EdgesPool.restore(edge);
+		edge.begin.outEdges.remove(edge);
+		edge.end.inEdges.remove(edge);// 当前边的结束状态的入边集合去除当前边
 	}
 
 	/**
@@ -120,18 +96,17 @@ public class DFA extends NFA {
 	 */
 	protected void disconnect(DFAStatus status) {
 		/* 清除所有入边 */
-		for (Iterator<DFAEdge> it = status.m_InEdges.iterator(); it.hasNext();) {
+		for (Iterator<DFAEdge> it = status.inEdges.iterator(); it.hasNext();) {
 			DFAEdge edge = it.next();
 			it.remove();
-			disconnect(edge.m_Begin, edge);
+			disconnect(edge.begin, edge);
 		}
 		/* 清除所有出边 */
-		for (Iterator<DFAEdge> it = status.m_OutEdges.iterator(); it.hasNext();) {
+		for (Iterator<DFAEdge> it = status.outEdges.iterator(); it.hasNext();) {
 			DFAEdge edge = it.next();
 			it.remove();
 			disconnect(status, edge);
 		}
-		m_StatusPool.restore(status);
 	}
 
 	/**
@@ -146,7 +121,7 @@ public class DFA extends NFA {
 	protected static ArrayList<DFAStatus> getDFAStatusClosure(
 			BreadthFirstSearch<DFAEdge, DFAStatus> bfs, DFAStatus status) {
 		status.visit(bfs);
-		return bfs.m_arrStatus;
+		return bfs.arrStatus;
 	}
 
 	/**
@@ -154,7 +129,7 @@ public class DFA extends NFA {
 	 */
 	public ArrayList<DFAStatus> getDFATable() {
 		return getDFAStatusClosure(
-				new BreadthFirstSearch<DFAEdge, DFAStatus>(), m_mainDFA);
+				new BreadthFirstSearch<DFAEdge, DFAStatus>(), dfa);
 	}
 
 	/**
@@ -162,12 +137,12 @@ public class DFA extends NFA {
 	 */
 	private void deleteEpsilonEdges() {
 		ArrayList<NFAStatus> NFAStatusList = getNFAStatusClosure(
-				new BreadthFirstSearch<NFAEdge, NFAStatus>(), m_mainNFA.m_Begin);// 获取状态闭包
+				new BreadthFirstSearch<NFAEdge, NFAStatus>(), nfa.begin);// 获取状态闭包
 		ArrayList<NFAStatus> unaccessiableList = new ArrayList<NFAStatus>();// 不可到达状态集合
 		for (NFAStatus status : NFAStatusList) {
 			boolean epsilon = true;
-			for (NFAEdge edge : status.m_InEdges) {
-				if (edge.m_Data.m_Action != EdgeType.EPSILON) {// 不是Epsilon边
+			for (NFAEdge edge : status.inEdges) {
+				if (edge.data.kAction != EdgeType.EPSILON) {// 不是Epsilon边
 					epsilon = false;// 当前可到达
 					break;
 				}
@@ -176,11 +151,11 @@ public class DFA extends NFA {
 				unaccessiableList.add(status);// 如果所有入边为Epsilon边，则不可到达
 			}
 		}
-		unaccessiableList.remove(m_mainNFA.m_Begin);// 初态设为有效
+		unaccessiableList.remove(nfa.begin);// 初态设为有效
 		BreadthFirstSearch<NFAEdge, NFAStatus> epsilonBFS = new BreadthFirstSearch<NFAEdge, NFAStatus>() {
 			@Override
 			public boolean testEdge(NFAEdge edge) {
-				return edge.m_Data.m_Action == EdgeType.EPSILON;
+				return edge.data.kAction == EdgeType.EPSILON;
 			}
 		};
 		/* 遍历所有有效状态 */
@@ -193,15 +168,15 @@ public class DFA extends NFA {
 				epsilonClosure.remove(status);
 				/* 遍历Epsilon闭包的状态 */
 				for (NFAStatus epsilonStatus : epsilonClosure) {
-					if (epsilonStatus.m_Data.m_bFinal) {
+					if (epsilonStatus.data.bFinal) {
 						/* 如果闭包中有终态，则当前状态为终态 */
-						status.m_Data.m_bFinal = true;
+						status.data.bFinal = true;
 					}
 					/* 遍历闭包中所有边 */
-					for (NFAEdge edge : epsilonStatus.m_OutEdges) {
-						if (edge.m_Data.m_Action != EdgeType.EPSILON) {
+					for (NFAEdge edge : epsilonStatus.outEdges) {
+						if (edge.data.kAction != EdgeType.EPSILON) {
 							/* 如果当前边不是Epsilon边，就将闭包中的有效边添加到当前状态 */
-							connect(status, edge.m_End).m_Data = edge.m_Data;
+							connect(status, edge.end).data = edge.data;
 						}
 					}
 				}
@@ -209,10 +184,10 @@ public class DFA extends NFA {
 		}
 		/* 删除Epsilon边 */
 		for (NFAStatus status : NFAStatusList) {
-			for (Iterator<NFAEdge> it = status.m_OutEdges.iterator(); it
+			for (Iterator<NFAEdge> it = status.outEdges.iterator(); it
 					.hasNext();) {
 				NFAEdge edge = it.next();
-				if (edge.m_Data.m_Action == EdgeType.EPSILON) {
+				if (edge.data.kAction == EdgeType.EPSILON) {
 					it.remove();
 					disconnect(status, edge);// 删除Epsilon边
 				}
@@ -226,14 +201,14 @@ public class DFA extends NFA {
 		unaccessiableList.clear();
 		/* 删除重复边 */
 		for (NFAStatus status : NFAStatusList) {
-			for (int i = 0; i < status.m_OutEdges.size() - 1; i++) {
-				NFAEdge edge1 = status.m_OutEdges.get(i);
-				for (ListIterator<NFAEdge> it2 = status.m_OutEdges
+			for (int i = 0; i < status.outEdges.size() - 1; i++) {
+				NFAEdge edge1 = status.outEdges.get(i);
+				for (ListIterator<NFAEdge> it2 = status.outEdges
 						.listIterator(i + 1); it2.hasNext();) {
 					NFAEdge edge2 = it2.next();
-					if (edge1.m_End == edge2.m_End
-							&& edge1.m_Data.m_Action == edge2.m_Data.m_Action
-							&& edge1.m_Data.m_Param == edge2.m_Data.m_Param) {
+					if (edge1.end == edge2.end
+							&& edge1.data.kAction == edge2.data.kAction
+							&& edge1.data.param == edge2.data.param) {
 						it2.remove();
 						disconnect(status, edge2);
 					}
@@ -248,28 +223,28 @@ public class DFA extends NFA {
 	private void determine() {
 		/* 取得NFA所有状态 */
 		ArrayList<NFAStatus> NFAStatusList = getNFAStatusClosure(
-				new BreadthFirstSearch<NFAEdge, NFAStatus>(), m_mainNFA.m_Begin);
+				new BreadthFirstSearch<NFAEdge, NFAStatus>(), nfa.begin);
 		ArrayList<DFAStatus> DFAStatusList = new ArrayList<DFAStatus>();
 		/* 哈希表用来进行DFA状态表的查找 */
 		HashMap<String, Integer> DFAStatusListMap = new HashMap<String, Integer>();
-		DFAStatus initStatus = m_StatusPool.take();
-		initStatus.m_Data.m_bFinal = m_mainNFA.m_Begin.m_Data.m_bFinal;// 是否终态
-		initStatus.m_Data.m_NFAStatus.add(m_mainNFA.m_Begin);// DFA[0]=NFA初态集合
+		DFAStatus initStatus = new DFAStatus();
+		initStatus.data.bFinal = nfa.begin.data.bFinal;// 是否终态
+		initStatus.data.nfaStatus.add(nfa.begin);// DFA[0]=NFA初态集合
 		DFAStatusList.add(initStatus);
-		DFAStatusListMap.put(initStatus.m_Data.getStatusString(NFAStatusList),
+		DFAStatusListMap.put(initStatus.data.getStatusString(NFAStatusList),
 				0);
 		/* 构造DFA表 */
 		for (int i = 0; i < DFAStatusList.size(); i++) {
 			DFAStatus dfaStatus = DFAStatusList.get(i);
 			ArrayList<DFAEdgeBag> bags = new ArrayList<DFAEdgeBag>();
 			/* 遍历当前NFA状态集合的所有边 */
-			for (NFAStatus nfaStatus : dfaStatus.m_Data.m_NFAStatus) {
-				for (NFAEdge nfaEdge : nfaStatus.m_OutEdges) {
+			for (NFAStatus nfaStatus : dfaStatus.data.nfaStatus) {
+				for (NFAEdge nfaEdge : nfaStatus.outEdges) {
 					DFAEdgeBag dfaBag = null;
 					for (DFAEdgeBag bag : bags) {
 						/* 检查是否在表中 */
-						if (nfaEdge.m_Data.m_Action == bag.m_Action
-								&& nfaEdge.m_Data.m_Param == bag.m_Param) {
+						if (nfaEdge.data.kAction == bag.kAction
+								&& nfaEdge.data.param == bag.param) {
 							dfaBag = bag;
 							break;
 						}
@@ -277,14 +252,14 @@ public class DFA extends NFA {
 					/* 若不存在，则新建 */
 					if (dfaBag == null) {
 						dfaBag = new DFAEdgeBag();
-						dfaBag.m_Action = nfaEdge.m_Data.m_Action;
-						dfaBag.m_Param = nfaEdge.m_Data.m_Param;
+						dfaBag.kAction = nfaEdge.data.kAction;
+						dfaBag.param = nfaEdge.data.param;
 						bags.add(dfaBag);
 					}
 					/* 添加当前边 */
-					dfaBag.m_NFAEdges.add(nfaEdge);
+					dfaBag.nfaEdges.add(nfaEdge);
 					/* 添加当前状态 */
-					dfaBag.m_NFAStatus.add(nfaEdge.m_End);
+					dfaBag.nfaStatus.add(nfaEdge.end);
 				}
 			}
 			/* 遍历当前的所有DFA边 */
@@ -297,13 +272,13 @@ public class DFA extends NFA {
 						.getStatusString(NFAStatusList))) {
 					status = DFAStatusList.get(DFAStatusListMap.get(hash));
 				} else {// 不存在DFA
-					status = m_StatusPool.take();
-					status.m_Data.m_NFAStatus = new ArrayList<NFAStatus>(
-							bag.m_NFAStatus);
+					status = new DFAStatus();
+					status.data.nfaStatus = new ArrayList<NFAStatus>(
+							bag.nfaStatus);
 					/* 检查终态 */
-					for (NFAStatus nfaStatus : status.m_Data.m_NFAStatus) {
-						if (nfaStatus.m_Data.m_bFinal) {
-							status.m_Data.m_bFinal = true;
+					for (NFAStatus nfaStatus : status.data.nfaStatus) {
+						if (nfaStatus.data.bFinal) {
+							status.data.bFinal = true;
 							break;
 						}
 					}
@@ -312,12 +287,12 @@ public class DFA extends NFA {
 				}
 				/* 创建DFA边 */
 				DFAEdge edge = connect(dfaStatus, status);
-				edge.m_Data.m_Action = bag.m_Action;
-				edge.m_Data.m_Param = bag.m_Param;
-				edge.m_Data.m_NFAEdges = bag.m_NFAEdges;
+				edge.data.kAction = bag.kAction;
+				edge.data.param = bag.param;
+				edge.data.nfaEdges = bag.nfaEdges;
 			}
 		}
-		m_mainDFA = DFAStatusList.get(0);
+		dfa = DFAStatusList.get(0);
 	}
 
 	/**
@@ -420,11 +395,11 @@ public class DFA extends NFA {
 				DFAStatus dupStatus = statusList.get(srcStatus);
 				/* 备份重复状态的入边 */
 				ArrayList<DFAEdge> edges = new ArrayList<DFAEdge>(
-						dupStatus.m_InEdges);
+						dupStatus.inEdges);
 				/* 将指向重复状态的边改为指向目标状态的边 */
 				for (DFAEdge edge : edges) {
 					/* 复制边 */
-					connect(edge.m_Begin, status).m_Data = edge.m_Data;
+					connect(edge.begin, status).data = edge.data;
 				}
 				/* 去除重复状态 */
 				disconnect(dupStatus);
@@ -459,21 +434,21 @@ public class DFA extends NFA {
 		/* DFA状态表 */
 		ArrayList<DFAStatus> statusList = getDFATable();
 		/* 建立状态转移矩阵 */
-		int[][] transition = new int[statusList.size()][m_Map.getRanges()
+		int[][] transition = new int[statusList.size()][chMap.getRanges()
 				.size()];
 		/* 填充状态转移表 */
 		for (int i = 0; i < statusList.size(); i++) {
 			DFAStatus status = statusList.get(i);
-			if (status.m_Data.m_bFinal) {
+			if (status.data.bFinal) {
 				finalStatus.add(i);// 标记终态
 			}
 			for (int j = 0; j < transition[i].length; j++) {
 				transition[i][j] = -1;// 置无效标记-1
 			}
-			for (DFAEdge edge : status.m_OutEdges) {
-				if (edge.m_Data.m_Action == EdgeType.CHARSET) {
-					transition[i][edge.m_Data.m_Param] = statusList
-							.indexOf(edge.m_End);
+			for (DFAEdge edge : status.outEdges) {
+				if (edge.data.kAction == EdgeType.CHARSET) {
+					transition[i][edge.data.param] = statusList
+							.indexOf(edge.end);
 				}
 			}
 		}
@@ -486,27 +461,27 @@ public class DFA extends NFA {
 	public String getDFAString() {
 		/* 取得NFA所有状态 */
 		ArrayList<NFAStatus> NFAStatusList = getNFAStatusClosure(
-				new BreadthFirstSearch<NFAEdge, NFAStatus>(), m_mainNFA.m_Begin);
+				new BreadthFirstSearch<NFAEdge, NFAStatus>(), nfa.begin);
 		/* 取得DFA所有状态 */
 		ArrayList<DFAStatus> DFAStatusList = getDFAStatusClosure(
-				new BreadthFirstSearch<DFAEdge, DFAStatus>(), m_mainDFA);
+				new BreadthFirstSearch<DFAEdge, DFAStatus>(), dfa);
 		StringBuilder sb = new StringBuilder();
 		/* 生成DFA描述 */
 		for (int i = 0; i < DFAStatusList.size(); i++) {
 			DFAStatus status = DFAStatusList.get(i);
 			/* 状态 */
-			sb.append("状态[" + i + "]" + (status.m_Data.m_bFinal ? "[结束]" : "")
-					+ " => " + status.m_Data.getStatusString(NFAStatusList)
+			sb.append("状态[" + i + "]" + (status.data.bFinal ? "[结束]" : "")
+					+ " => " + status.data.getStatusString(NFAStatusList)
 					+ System.getProperty("line.separator"));
 			/* 边 */
-			for (DFAEdge edge : status.m_OutEdges) {
-				sb.append("\t边 => [" + DFAStatusList.indexOf(edge.m_End) + "]"
+			for (DFAEdge edge : status.outEdges) {
+				sb.append("\t边 => [" + DFAStatusList.indexOf(edge.end) + "]"
 						+ System.getProperty("line.separator"));// 指向边
-				sb.append("\t\t类型 => " + edge.m_Data.m_Action.getName());
-				switch (edge.m_Data.m_Action)// 类型
+				sb.append("\t\t类型 => " + edge.data.kAction.getName());
+				switch (edge.data.kAction)// 类型
 				{
 				case CHARSET:
-					sb.append("\t" + m_Map.getRanges().get(edge.m_Data.m_Param));// 区间
+					sb.append("\t" + chMap.getRanges().get(edge.data.param));// 区间
 					break;
 				case EPSILON:
 					break;

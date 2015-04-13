@@ -14,25 +14,25 @@ public class NGABag {
 	/**
 	 * NGA栈
 	 */
-	public Stack<ArrayList<ENGA>> m_stkNGA = new Stack<ArrayList<ENGA>>();
+	public Stack<ArrayList<ENGA>> stkNGA = new Stack<ArrayList<ENGA>>();
 
 	/**
 	 * NGA子表
 	 */
-	public ArrayList<ENGA> m_childNGA = new ArrayList<ENGA>();
+	public ArrayList<ENGA> childNGA = new ArrayList<ENGA>();
 
 	/**
 	 * 存储结果的ENGA
 	 */
-	public ENGA m_outputNGA = null;
+	public ENGA nga = null;
 
 	/**
 	 * 标记前缀
 	 */
-	public String m_strPrefix = "";
+	public String prefix = "";
 
 	/**
 	 * 标记前缀
 	 */
-	public ISyntaxComponent m_Expression = null;
+	public ISyntaxComponent expression = null;
 }

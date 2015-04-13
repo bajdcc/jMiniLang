@@ -1,10 +1,6 @@
 package priv.bajdcc.semantic.tracker;
 
 import java.util.ArrayList;
-import org.vibur.objectpool.ConcurrentLinkedPool;
-import org.vibur.objectpool.PoolService;
-
-import priv.bajdcc.utility.ObjectFactory;
 
 /**
  * 跟踪器资源（链表）
@@ -15,32 +11,22 @@ public class TrackerResource {
 	/**
 	 * 指令记录集
 	 */
-	private ArrayList<InstructionRecord> m_arrInstRecords = new ArrayList<InstructionRecord>();
+	private ArrayList<InstructionRecord> arrInstRecords = new ArrayList<InstructionRecord>();
 
 	/**
 	 * 错误记录集
 	 */
-	private ArrayList<ErrorRecord> m_arrErrorRecords = new ArrayList<ErrorRecord>();
-
-	/**
-	 * 跟踪器池
-	 */
-	private PoolService<Tracker> m_poolTrackers = new ConcurrentLinkedPool<Tracker>(
-			new ObjectFactory<Tracker>() {
-				public Tracker create() {
-					return new Tracker();
-				};
-			}, 10, 1000, false);
+	private ArrayList<ErrorRecord> arrErrorRecords = new ArrayList<ErrorRecord>();
 
 	/**
 	 * 跟踪器链表头
 	 */
-	public Tracker m_headTracker = null;
+	public Tracker head = null;
 
 	/**
 	 * 跟踪器链表尾
 	 */
-	public Tracker m_tailTracker = null;
+	public Tracker tail = null;
 
 	/**
 	 * 添加指令记录
@@ -51,7 +37,7 @@ public class TrackerResource {
 	 */
 	public InstructionRecord addInstRecord(InstructionRecord prev) {
 		InstructionRecord record = new InstructionRecord(prev);
-		m_arrInstRecords.add(record);
+		arrInstRecords.add(record);
 		return record;
 	}
 
@@ -64,7 +50,7 @@ public class TrackerResource {
 	 */
 	public ErrorRecord addErrorRecord(ErrorRecord prev) {
 		ErrorRecord record = new ErrorRecord(prev);
-		m_arrErrorRecords.add(record);
+		arrErrorRecords.add(record);
 		return record;
 	}
 
@@ -75,14 +61,14 @@ public class TrackerResource {
 	 * 
 	 */
 	public Tracker addTracker() {
-		Tracker tracker = m_poolTrackers.take();
-		if (m_headTracker != null) {
+		Tracker tracker = new Tracker();
+		if (head != null) {
 			/* 将新的跟踪器插入表首 */
-			tracker.m_nextTracker = m_headTracker;
-			m_headTracker.m_prevTracker = tracker;
-			m_headTracker = tracker;
+			tracker.next = head;
+			head.prev = tracker;
+			head = tracker;
 		} else {
-			m_headTracker = m_tailTracker = tracker;
+			head = tail = tracker;
 		}
 		return tracker;
 	}
@@ -94,20 +80,19 @@ public class TrackerResource {
 	 *            不需要的跟踪器
 	 */
 	public void freeTracker(Tracker tracker) {
-		if (tracker == m_headTracker) {
-			if (tracker == m_tailTracker) {
-				m_headTracker = m_tailTracker = null;// 删除链表中的唯一项
+		if (tracker == head) {
+			if (tracker == tail) {
+				head = tail = null;// 删除链表中的唯一项
 			} else {
-				m_headTracker = m_headTracker.m_nextTracker;
-				m_headTracker.m_prevTracker = null;
+				head = head.next;
+				head.prev = null;
 			}
-		} else if (tracker == m_tailTracker) {
-			m_tailTracker = m_tailTracker.m_prevTracker;
-			m_tailTracker.m_nextTracker = null;
+		} else if (tracker == tail) {
+			tail = tail.prev;
+			tail.next = null;
 		} else {
-			tracker.m_nextTracker.m_prevTracker = tracker.m_prevTracker;
-			tracker.m_prevTracker.m_nextTracker = tracker.m_nextTracker;
+			tracker.next.prev = tracker.prev;
+			tracker.prev.next = tracker.next;
 		}
-		m_poolTrackers.restore(tracker);
 	}
 }

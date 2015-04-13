@@ -12,22 +12,22 @@ public class TokenBag {
 	/**
 	 * 保存的单词
 	 */
-	public Token m_Token = null;
+	public Token token = null;
 
 	/**
 	 * 保存的对象
 	 */
-	public Object m_Object = null;
+	public Object object = null;
 
 	public TokenBag() {
 		
 	}
 	
 	public TokenBag(Token token) {
-		m_Token = token;
+		this.token = token;
 	}
 	
 	public TokenBag(Object obj) {
-		m_Object = obj;
+		object = obj;
 	}
 }

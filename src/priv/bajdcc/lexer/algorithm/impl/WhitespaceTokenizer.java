@@ -35,7 +35,7 @@ public class WhitespaceTokenizer extends TokenAlgorithm {
 	 */
 	@Override
 	public Token getToken(String string, Token token) {
-		token.m_kToken = TokenType.WHITESPACE;
+		token.kToken = TokenType.WHITESPACE;
 		return token;
 	}
 }

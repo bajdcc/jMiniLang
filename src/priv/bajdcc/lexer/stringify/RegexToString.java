@@ -10,46 +10,46 @@ public class RegexToString implements IRegexComponentVisitor {
 	/**
 	 * 正则表达式的树型表达
 	 */
-	private StringBuilder m_Context = new StringBuilder();
+	private StringBuilder context = new StringBuilder();
 
 	/**
 	 * 前缀
 	 */
-	private StringBuilder m_Prefix = new StringBuilder();
+	private StringBuilder prefix = new StringBuilder();
 
 	/**
 	 * 前缀缩进
 	 */
 	private void appendPrefix() {
-		m_Prefix.append('\t');
-		m_Context.append(" {" + System.getProperty("line.separator"));
+		prefix.append('\t');
+		context.append(" {" + System.getProperty("line.separator"));
 	}
 
 	/**
 	 * 取消前缀缩进
 	 */
 	private void reducePrefix() {
-		m_Prefix.deleteCharAt(0);
-		m_Context.append(m_Prefix + "}" + System.getProperty("line.separator"));
+		prefix.deleteCharAt(0);
+		context.append(prefix + "}" + System.getProperty("line.separator"));
 	}
 
 	@Override
 	public void visitBegin(Charset node) {
-		m_Context.append(m_Prefix + "字符");
-		m_Context.append((node.m_bReverse ? "[取反]" : "") + "\t" + node);
-		m_Context.append(System.getProperty("line.separator"));
+		context.append(prefix + "字符");
+		context.append((node.bReverse ? "[取反]" : "") + "\t" + node);
+		context.append(System.getProperty("line.separator"));
 	}
 
 	@Override
 	public void visitBegin(Constructure node) {
-		m_Context.append(m_Prefix + (node.m_bBranch ? "分支" : "序列"));
+		context.append(prefix + (node.bBranch ? "分支" : "序列"));
 		appendPrefix();
 	}
 
 	@Override
 	public void visitBegin(Repetition node) {
-		m_Context.append(m_Prefix.toString() + "循环{" + node.m_iLowerBound + ","
-				+ node.m_iUpperBound + "}");
+		context.append(prefix.toString() + "循环{" + node.iLowerBound + ","
+				+ node.iUpperBound + "}");
 		appendPrefix();
 	}
 
@@ -70,6 +70,6 @@ public class RegexToString implements IRegexComponentVisitor {
 
 	@Override
 	public String toString() {
-		return m_Context.toString();
+		return context.toString();
 	}
 }

@@ -36,7 +36,7 @@ public class Main {
 				if (token == null) {
 					continue;
 				}
-				if (token.m_kToken == TokenType.EOF) {
+				if (token.kToken == TokenType.EOF) {
 					break;
 				}
 				ps.println(token.toString());

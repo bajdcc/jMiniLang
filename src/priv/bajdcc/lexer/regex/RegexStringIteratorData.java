@@ -9,26 +9,26 @@ public class RegexStringIteratorData implements Cloneable {
 	/**
 	 * 当前处理的位置
 	 */
-	public int m_iIndex = 0;
+	public int iIndex = 0;
 
 	/**
 	 * 字符
 	 */
-	public char m_chCurrent = 0;
+	public char chCurrent = 0;
 
 	/**
 	 * 字符类型
 	 */
-	public MetaType m_kMeta = MetaType.END;
+	public MetaType kMeta = MetaType.END;
 
 	public RegexStringIteratorData() {
 
 	}
 
 	public RegexStringIteratorData(int index, char current, MetaType meta) {
-		m_iIndex = index;
-		m_chCurrent = current;
-		m_kMeta = meta;
+		iIndex = index;
+		chCurrent = current;
+		kMeta = meta;
 	}
 	
 	@Override

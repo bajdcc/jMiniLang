@@ -15,22 +15,18 @@ import priv.bajdcc.semantic.tracker.InstructionRecord;
 import priv.bajdcc.semantic.tracker.Tracker;
 import priv.bajdcc.semantic.tracker.TrackerError;
 import priv.bajdcc.semantic.tracker.TrackerResource;
-import priv.bajdcc.syntax.RuleItem;
 import priv.bajdcc.syntax.Syntax;
 import priv.bajdcc.syntax.automata.npa.NPAEdge;
 import priv.bajdcc.syntax.automata.npa.NPAStatus;
 import priv.bajdcc.syntax.error.IErrorHandler;
 import priv.bajdcc.syntax.error.SyntaxException;
 import priv.bajdcc.syntax.exp.TokenExp;
+import priv.bajdcc.syntax.rule.RuleItem;
+import priv.bajdcc.utility.Position;
 import priv.bajdcc.utility.TrackerErrorBag;
 
 /**
- * 语义分析
- *
- * @author bajdcc
- */
-/**
- *
+ * 【语义分析】语义分析
  *
  * @author bajdcc
  */
@@ -39,37 +35,57 @@ public class Semantic extends Syntax implements IErrorHandler {
 	/**
 	 * 单词流工厂
 	 */
-	private TokenFactory m_TokenFactory = null;
+	private TokenFactory tokenFactory = null;
 
 	/**
 	 * 错误处理器
 	 */
-	private IErrorHandler m_defErrorHandler = this;
+	private IErrorHandler errorHandler = this;
 
 	/**
 	 * 存放生成的指令
 	 */
-	private ArrayList<Instruction> m_arrInsts = new ArrayList<Instruction>();
+	private ArrayList<Instruction> arrInsts = new ArrayList<Instruction>();
 
 	/**
 	 * 存放生成过程中的错误
 	 */
-	private ArrayList<TrackerError> m_arrErrors = new ArrayList<TrackerError>();
+	private ArrayList<TrackerError> arrErrors = new ArrayList<TrackerError>();
 
 	/**
 	 * 单词流
 	 */
-	private ArrayList<Token> m_arrTokens = new ArrayList<Token>();
+	private ArrayList<Token> arrTokens = new ArrayList<Token>();
 
 	/**
 	 * 当前的语义接口
 	 */
-	private ISemanticHandler m_Handler = null;
+	private ISemanticHandler semanticHandler = null;
 
 	/**
 	 * 语义分析结果
 	 */
-	private Object m_Object = null;
+	private Object object = null;
+
+	/**
+	 * 跟踪器资源
+	 */
+	private TrackerResource trackerResource = new TrackerResource();
+
+	/**
+	 * 没有错误的跟踪器数量
+	 */
+	private int iTrackerWithoutErrorCount = 0;
+
+	/**
+	 * 当前跟踪器
+	 */
+	private Tracker tracker = null;
+
+	/**
+	 * 是否打印调试信息
+	 */
+	private boolean bDebug = false;
 
 	/**
 	 * 设置错误处理器
@@ -78,16 +94,17 @@ public class Semantic extends Syntax implements IErrorHandler {
 	 *            错误处理器接口
 	 */
 	public void setErrorHandler(IErrorHandler handler) {
-		m_defErrorHandler = handler;
+		errorHandler = handler;
 	}
 
 	public Semantic(String context) throws RegexException {
 		super(true);
-		m_TokenFactory = new TokenFactory(context);// 用于分析的文本
-		m_TokenFactory.discard(TokenType.COMMENT);
-		m_TokenFactory.discard(TokenType.WHITESPACE);
-		m_TokenFactory.discard(TokenType.ERROR);
-		m_TokenFactory.scan();
+		tokenFactory = new TokenFactory(context);// 用于分析的文本
+		tokenFactory.discard(TokenType.COMMENT);
+		tokenFactory.discard(TokenType.WHITESPACE);
+		tokenFactory.discard(TokenType.ERROR);
+		tokenFactory.discard(TokenType.MACRO);
+		tokenFactory.scan();
 	}
 
 	/**
@@ -102,14 +119,14 @@ public class Semantic extends Syntax implements IErrorHandler {
 		if (handler == null) {
 			throw new NullPointerException("handler");
 		}
-		m_Handler = handler;
+		semanticHandler = handler;
 		super.infer(inferString);
-		m_Handler = null;
+		semanticHandler = null;
 	}
 
 	@Override
 	protected void onAddRuleItem(RuleItem item) {
-		item.m_Handler = m_Handler;
+		item.handler = semanticHandler;
 	}
 
 	/**
@@ -129,57 +146,57 @@ public class Semantic extends Syntax implements IErrorHandler {
 	 * 开始分析工作
 	 */
 	private void analysis() {
-		/* 跟踪器资源 */
-		TrackerResource trackerResource = new TrackerResource();
 		/* 可用NPA边表 */
 		ArrayList<NPAEdge> aliveEdgeList = new ArrayList<NPAEdge>();
 		/* 结束边 */
 		NPAEdge finalEdge = null;
-		/* 没有错误的跟踪器数量 */
-		int trackerWithoutErrorCount = 0;
 		/* 初始PDA状态集合 */
-		ArrayList<NPAStatus> initStatusList = m_NPA.getInitStatusList();
+		ArrayList<NPAStatus> initStatusList = npa.getInitStatusList();
 		/* 清空结果 */
-		m_arrInsts.clear();
-		m_arrErrors.clear();
+		arrInsts.clear();
+		arrErrors.clear();
 		/* 初始化跟踪器 */
 		for (NPAStatus npaStatus : initStatusList) {
 			Tracker tracker = trackerResource.addTracker();
-			tracker.m_rcdInst = trackerResource.addInstRecord(null);
-			tracker.m_rcdError = trackerResource.addErrorRecord(null);
-			tracker.m_npaStatus = npaStatus;
-			tracker.m_iterToken = m_TokenFactory;
-			trackerWithoutErrorCount++;
+			tracker.rcdInst = trackerResource.addInstRecord(null);
+			tracker.rcdError = trackerResource.addErrorRecord(null);
+			tracker.npaStatus = npaStatus;
+			tracker.iter = tokenFactory;
+			iTrackerWithoutErrorCount++;
 		}
 		/* 是否分析成功 */
 		boolean success = false;
 		/* 进行分析 */
-		while (trackerResource.m_headTracker != null && !success) {
-			Tracker tracker = trackerResource.m_headTracker;
-			while (tracker != null) {
-				Tracker nextTracker = tracker.m_nextTracker;				
+		while (trackerResource.head != null && !success) {
+			tracker = trackerResource.head;
+			while (tracker != null && !success) {
+				Tracker nextTracker = tracker.next;
+				if (bDebug) {
+					System.err.println(getTrackerStatus());
+				}
 				/* 对每一个跟踪器进行计算，构造level记录可用边优先级，可以防止冲突 */
 				/* 匹配=0 移进=0 左递归=1 归约=2 */
 				/* 对终结符则移进，对非终结符则匹配，互不冲突，故两者优先级相同 */
 				/* 左递归属于特殊的归约，区别是归约后不出栈 */
+				/* 注意：为什么识别二义性文法，跟踪器是带回溯的 */
 				int level = 2;
 				/* 筛选边 */
 				aliveEdgeList.clear();
 				finalEdge = null;
 				/* 遍历出边 */
-				for (NPAEdge npaEdge : tracker.m_npaStatus.m_OutEdges) {
+				for (NPAEdge npaEdge : tracker.npaStatus.outEdges) {
 					int sublevel = -1;
 					/* 若当前边使用了LA表，则输入不满足LA表时会被丢弃 */
-					if (npaEdge.m_Data.m_arrLookAhead != null) {
-						if (!npaEdge.m_Data.m_arrLookAhead
+					if (npaEdge.data.arrLookAhead != null) {
+						if (!npaEdge.data.arrLookAhead
 								.contains(getTokenId(tracker))) {
 							continue;
 						}
 					}
-					switch (npaEdge.m_Data.m_Action) {
+					switch (npaEdge.data.kAction) {
 					case FINISH:
 						/* 检查状态堆栈是否为空 */
-						if (tracker.m_stkStatus.isEmpty()) {
+						if (tracker.stkStatus.isEmpty()) {
 							finalEdge = npaEdge;
 						}
 						continue;
@@ -188,7 +205,7 @@ public class Semantic extends Syntax implements IErrorHandler {
 						break;
 					case MOVE:
 						/* 检查Move所需要的记号跟输入是否一致（匹配） */
-						if (npaEdge.m_Data.m_iToken != getTokenId(tracker)) {
+						if (npaEdge.data.iToken != getTokenId(tracker)) {
 							continue;// 失败
 						} else {
 							sublevel = 0;
@@ -196,8 +213,8 @@ public class Semantic extends Syntax implements IErrorHandler {
 						break;
 					case REDUCE:
 						/* 检查Reduce所需要的栈状态跟状态堆栈的栈顶元素是否一致 */
-						if (tracker.m_stkStatus.isEmpty()
-								|| npaEdge.m_Data.m_Status != tracker.m_stkStatus
+						if (tracker.stkStatus.isEmpty()
+								|| npaEdge.data.status != tracker.stkStatus
 										.peek()) {
 							continue;// 失败
 						} else {
@@ -223,8 +240,8 @@ public class Semantic extends Syntax implements IErrorHandler {
 				/* 检查是否有可用边 */
 				if (!aliveEdgeList.isEmpty()) {
 					/* 如果当前跟踪器没发生过错误，则调整trackerWithoutErrorCount的数值 */
-					if (!tracker.m_bRaiseError) {
-						trackerWithoutErrorCount += aliveEdgeList.size() - 1;
+					if (!tracker.bRaiseError) {
+						iTrackerWithoutErrorCount += aliveEdgeList.size() - 1;
 					}
 					/* 如果存在可供转移的边，则进行跳转，必要的时候复制跟踪器（用来回溯） */
 					int rev_i = aliveEdgeList.size();
@@ -235,174 +252,120 @@ public class Semantic extends Syntax implements IErrorHandler {
 						{
 							/* 复制新的跟踪器 */
 							newTracker = trackerResource.addTracker();
-							newTracker.m_bRaiseError = tracker.m_bRaiseError;
-							newTracker.m_stkStatus.clear();
-							newTracker.m_stkStatus.addAll(tracker.m_stkStatus);
-							newTracker.m_npaStatus = tracker.m_npaStatus;
-							newTracker.m_iterToken = tracker.m_iterToken.copy();
+							newTracker.bRaiseError = tracker.bRaiseError;
+							newTracker.stkStatus.clear();
+							newTracker.stkStatus.addAll(tracker.stkStatus);
+							newTracker.npaStatus = tracker.npaStatus;
+							newTracker.iter = tracker.iter.copy();
 							/* 复制错误记录集 */
-							if (!tracker.m_rcdError.m_arrErrors.isEmpty()) {
-								newTracker.m_rcdError = trackerResource
-										.addErrorRecord(tracker.m_rcdError);
+							if (!tracker.rcdError.arrErrors.isEmpty()) {
+								newTracker.rcdError = trackerResource
+										.addErrorRecord(tracker.rcdError);
 							} else {
-								newTracker.m_rcdError = trackerResource
-										.addErrorRecord(tracker.m_rcdError.m_prevErrorRecord);
+								newTracker.rcdError = trackerResource
+										.addErrorRecord(tracker.rcdError.prev);
 							}
 							/* 复制指令记录集 */
-							if (!tracker.m_rcdInst.m_arrInsts.isEmpty()) {
-								newTracker.m_rcdInst = trackerResource
-										.addInstRecord(tracker.m_rcdInst);
+							if (!tracker.rcdInst.arrInsts.isEmpty()) {
+								newTracker.rcdInst = trackerResource
+										.addInstRecord(tracker.rcdInst);
 							} else {
-								newTracker.m_rcdInst = trackerResource
-										.addInstRecord(tracker.m_rcdInst.m_prevInstRecord);
+								newTracker.rcdInst = trackerResource
+										.addInstRecord(tracker.rcdInst.prev);
 							}
 						} else {
 							newTracker = tracker;
 							/* 如果跟踪器需要分化，则在适当的时候改变自身的资源 */
 							if (aliveEdgeList.size() > 1) {
-								if (!tracker.m_rcdError.m_arrErrors.isEmpty()) {
-									newTracker.m_rcdInst = trackerResource
-											.addInstRecord(tracker.m_rcdInst);
+								if (!tracker.rcdError.arrErrors.isEmpty()) {
+									newTracker.rcdInst = trackerResource
+											.addInstRecord(tracker.rcdInst);
 								}
-								if (!tracker.m_rcdInst.m_arrInsts.isEmpty()) {
-									newTracker.m_rcdInst = trackerResource
-											.addInstRecord(tracker.m_rcdInst);
+								if (!tracker.rcdInst.arrInsts.isEmpty()) {
+									newTracker.rcdInst = trackerResource
+											.addInstRecord(tracker.rcdInst);
 								}
 							}
 						}
-						switch (edge.m_Data.m_Action) {
+						switch (edge.data.kAction) {
 						case FINISH:
 							break;
 						case LEFT_RECURSION:
 							break;
 						case MOVE:
-							newTracker.m_iterToken.ex().saveToken();
-							newTracker.m_iterToken.scan();// 匹配，前进一步
+							newTracker.iter.ex().saveToken();
+							newTracker.iter.scan();// 匹配，前进一步
 							break;
 						case REDUCE:
-							newTracker.m_stkStatus.pop();// 栈顶弹出
+							newTracker.stkStatus.pop();// 栈顶弹出
 							break;
 						case SHIFT:
-							newTracker.m_stkStatus.push(newTracker.m_npaStatus);// 移入新状态
+							newTracker.stkStatus.push(newTracker.npaStatus);// 移入新状态
 							break;
 						default:
 							break;
 						}
-						newTracker.m_rcdInst.m_arrInsts.add(new Instruction(
-								edge.m_Data.m_Inst, edge.m_Data.m_iIndex,
-								edge.m_Data.m_iHandler));// 添加指令和参数
-						newTracker.m_npaStatus = edge.m_End;// 通过这条边
+						newTracker.rcdInst.arrInsts.add(new Instruction(
+								edge.data.inst, edge.data.iIndex,
+								edge.data.iHandler));// 添加指令和参数
+						newTracker.npaStatus = edge.end;// 通过这条边
 					}
 				} else {// 无可用边
 					/* 检查当前输入时候否到结尾 */
-					if (!tracker.m_iterToken.ex().isEOF()) {
+					if (!tracker.iter.ex().isEOF()) {
 						/* 无可用边，且单词流未结束，则报错 */
-						if (!tracker.m_bRaiseError) {
+						if (!tracker.bRaiseError) {
 							/* 如果是第一次发生错误则调整状态 */
-							tracker.m_bRaiseError = true;
-							trackerWithoutErrorCount--;
+							tracker.bRaiseError = true;
+							iTrackerWithoutErrorCount--;
 							/* 如果存在没有发生错误的跟踪器，则删除当前跟踪器 */
-							if (trackerWithoutErrorCount > 0) {
-								tracker.m_iterToken = null;
+							if (iTrackerWithoutErrorCount > 0) {
+								tracker.iter = null;
 								trackerResource.freeTracker(tracker);
 								tracker = null;
 							}
 						}
 						/* 不存在没有错误的跟踪器，此时判断当前跟踪器是否有继续分析的价值 */
 						if (tracker != null) {
-							TrackerError error = new TrackerError(
-									tracker.m_iterToken.ex().lastPosition());
-							/* 寻找合适的错误处理器并处理 */
-							boolean processed = findCorrectHandler(tracker,
-									error);
-							/* 若没有错误处理器接受这个错误，则调用缺省的错误处理器 */
-							if (!processed) {
-								processed = handleError(tracker, error);
-							}
-							/* 如果没有处理器接受这个错误则输出缺省的错误消息 */
-							if (!processed) {
-								error.m_strMessage = String
-										.format("位置[%s]，类型[%s]，状态[%s]",
-												tracker.m_iterToken.ex()
-														.lastPosition(),
-												getTokenId(tracker),
-												tracker.m_npaStatus.m_Data.m_strLabel);
-								tracker.m_iterToken.scan();// 跳过
-							}
-							/* 提交错误 */
-							tracker.m_bInStepError = true;
-							tracker.m_rcdError.m_arrErrors.add(error);
+							validateTracker(false);
 						}
 					} else {// 单词流到达末尾，同时PDA没有可用边
-						tracker.m_bFinished = true;// 跟踪器标记为结束
+						tracker.bFinished = true;// 跟踪器标记为结束
 						/* 如果记号已经读完，则判断是否走到了终结状态 */
 						if (finalEdge != null)// 最终边
 						{
-							tracker.m_rcdInst.m_arrInsts.add(new Instruction(
-									finalEdge.m_Data.m_Inst,
-									finalEdge.m_Data.m_iIndex,
-									finalEdge.m_Data.m_iHandler));
+							tracker.rcdInst.arrInsts.add(new Instruction(
+									finalEdge.data.inst, finalEdge.data.iIndex,
+									finalEdge.data.iHandler));
 							/* 判断是否分析成功 */
-							if (!tracker.m_bRaiseError) {
+							if (!tracker.bRaiseError) {
 								/* 记录一个分析结果 */
 								ArrayList<Instruction> instList = new ArrayList<Instruction>();
-								InstructionRecord instRecord = tracker.m_rcdInst;
+								InstructionRecord instRecord = tracker.rcdInst;
 								/* 记录语法树指令 */
 								while (instRecord != null) {
-									instList.addAll(0, instRecord.m_arrInsts);
-									instRecord = instRecord.m_prevInstRecord;
+									instList.addAll(0, instRecord.arrInsts);
+									instRecord = instRecord.prev;
 								}
 								/* 保存结果 */
-								m_arrInsts.addAll(instList);
-								m_arrTokens.addAll(tracker.m_iterToken.ex()
-										.tokenList());
+								arrInsts.addAll(instList);
+								arrTokens.addAll(tracker.iter.ex().tokenList());
 								/* 删除当前跟踪器 */
-								tracker.m_iterToken = null;
+								tracker.iter = null;
 								trackerResource.freeTracker(tracker);
 								tracker = null;
 								/* 归约成功 */
 								success = true;
 							}
 						} else {
-							/* 无可用边，且单词流未结束，则报错 */
-							if (!tracker.m_bRaiseError) {
-								/* 如果是第一次发生错误则调整状态 */
-								tracker.m_bRaiseError = true;
-								trackerWithoutErrorCount--;
-								/* 如果存在没有发生错误的跟踪器，则删除当前跟踪器 */
-								if (trackerWithoutErrorCount > 0) {
-									tracker.m_iterToken = null;
-									trackerResource.freeTracker(tracker);
-									tracker = null;
-								}
-							}
-							/* 判断该跟踪器是否有继续分析的价值 */
-							if (tracker != null) {
-								TrackerError error = new TrackerError(
-										tracker.m_iterToken.position());
-								/* 寻找合适的错误处理器并处理 */
-								boolean processed = findCorrectHandler(tracker,
-										error);
-								/* 如果没有错误处理程序或者错误处理程序放弃处理，则产生缺省的错误消息 */
-								if (!processed) {
-									error.m_strMessage = String
-											.format("位置[%s]，状态 %s",
-													tracker.m_iterToken.ex()
-															.lastPosition(),
-													tracker.m_npaStatus.m_Data.m_strLabel);
-									tracker.m_iterToken.scan();// 跳过
-								}
-								/* 提交错误 */
-								tracker.m_bInStepError = true;
-								tracker.m_rcdError.m_arrErrors.add(error);
-							}
+							validateTracker(true);
 						}
 					}
 				}
 				/* 取出下一个跟踪器 */
 				tracker = nextTracker;
 			}
-			if (trackerWithoutErrorCount == 0)// 没有不存在错误的跟踪器
+			if (iTrackerWithoutErrorCount == 0)// 没有不存在错误的跟踪器
 			{
 				/* 根据当前发生错误的情况剔除跟踪器 */
 
@@ -411,48 +374,94 @@ public class Semantic extends Syntax implements IErrorHandler {
 				/* 当前步骤发生错误的跟踪器数量 */
 				int trackerWithErrorInStepCount = 0;
 				/* 检查发生错误的跟踪器数量 */
-				Tracker tmpTracker = trackerResource.m_headTracker;
+				Tracker tmpTracker = trackerResource.head;
 				while (tmpTracker != null) {
-					if (tmpTracker.m_bInStepError) {
+					if (tmpTracker.bInStepError) {
 						trackerWithErrorInStepCount++;
 					} else {
 						trackerWithoutErrorInStepCount++;
 					}
-					tmpTracker = tmpTracker.m_nextTracker;
+					tmpTracker = tmpTracker.next;
 				}
 				/* 如果同时存在发生错误和不发生错误的跟踪器，则剔除发生错误的跟踪器 */
 				if (trackerWithoutErrorInStepCount > 0
 						&& trackerWithErrorInStepCount > 0) {
-					tmpTracker = trackerResource.m_headTracker;
+					tmpTracker = trackerResource.head;
 					while (tmpTracker != null) {
-						if (tmpTracker.m_bInStepError) {
+						if (tmpTracker.bInStepError) {
 							trackerResource.freeTracker(tmpTracker);
 						}
-						tmpTracker = tmpTracker.m_nextTracker;
+						tmpTracker = tmpTracker.next;
 					}
 				}
 				/* 检查是否有到达终点的带有错误的跟踪器 */
-				tmpTracker = trackerResource.m_headTracker;
+				tmpTracker = trackerResource.head;
 				while (tmpTracker != null) {
-					tmpTracker.m_bInStepError = false;
-					if (tmpTracker.m_bFinished) {
+					tmpTracker.bInStepError = false;
+					if (tmpTracker.bFinished) {
 						/* 提交一份错误报告 */
-						ErrorRecord error = tmpTracker.m_rcdError;
+						ErrorRecord error = tmpTracker.rcdError;
 						while (error != null) {
-							m_arrErrors.addAll(error.m_arrErrors);
-							error = error.m_prevErrorRecord;
+							arrErrors.addAll(error.arrErrors);
+							error = error.prev;
 						}
 						/* 终止分析，删除跟踪器 */
-						while (trackerResource.m_headTracker != null) {
-							trackerResource.m_headTracker.m_iterToken = null;
-							trackerResource
-									.freeTracker(trackerResource.m_headTracker);
+						while (trackerResource.head != null) {
+							trackerResource.head.iter = null;
+							trackerResource.freeTracker(trackerResource.head);
 						}
 						break;
 					}
-					tmpTracker = tmpTracker.m_nextTracker;
+					tmpTracker = tmpTracker.next;
 				}
 			}
+		}
+	}
+
+	/**
+	 * 分析跟踪器是否有继续分析的价值
+	 * 
+	 * @param fatal
+	 *            跟踪器是否遇到严重且不可恢复的错误
+	 */
+	private void validateTracker(boolean fatal) {
+		/* 无可用边，且单词流未结束，则报错 */
+		if (!tracker.bRaiseError) {
+			/* 如果是第一次发生错误则调整状态 */
+			tracker.bRaiseError = true;
+			iTrackerWithoutErrorCount--;
+			/* 如果存在没有发生错误的跟踪器，则删除当前跟踪器 */
+			if (iTrackerWithoutErrorCount > 0) {
+				tracker.iter = null;
+				trackerResource.freeTracker(tracker);
+				tracker = null;
+			}
+		}
+		/* 判断该跟踪器是否有继续分析的价值 */
+		if (tracker != null) {
+			Position position = fatal ? tracker.iter.position() : tracker.iter
+					.ex().lastPosition();
+			TrackerError error = new TrackerError(position);
+			/* 寻找合适的错误处理器并处理 */
+			boolean processed = findCorrectHandler(tracker, error);
+			/* 若没有错误处理器接受这个错误，则调用缺省的错误处理器 */
+			if (!processed && !fatal) {
+				processed = handleError(tracker, error);
+			}
+			/* 如果没有错误处理程序或者错误处理程序放弃处理，则产生缺省的错误消息 */
+			if (!processed) {
+				if (!fatal) {
+					error.message = String.format("类型[%s]，状态[%s]", tracker.iter
+							.ex().token(), tracker.npaStatus.data.label);
+				} else {
+					error.message = String.format("状态[%s]",
+							tracker.npaStatus.data.label);
+				}
+				tracker.iter.scan();// 跳过
+			}
+			/* 提交错误 */
+			tracker.bInStepError = true;
+			tracker.rcdError.arrErrors.add(error);
 		}
 	}
 
@@ -467,25 +476,25 @@ public class Semantic extends Syntax implements IErrorHandler {
 	 */
 	private boolean findCorrectHandler(Tracker tracker, TrackerError error) {
 		/* 遍历当前状态的所有出边 */
-		for (NPAEdge edge : tracker.m_npaStatus.m_OutEdges) {
-			IErrorHandler handler = edge.m_Data.m_Handler;
+		for (NPAEdge edge : tracker.npaStatus.outEdges) {
+			IErrorHandler handler = edge.data.handler;
 			/* 如果找到了一个错误处理器则进行处理 */
 			if (handler != null) {
 				TrackerErrorBag bag = new TrackerErrorBag();
-				error.m_strMessage = handler.handle(tracker.m_iterToken, bag);
+				error.message = handler.handle(tracker.iter, bag);
 				/* 如果没有放弃则进行处理 */
-				if (!bag.m_bGiveUp) {
-					if (bag.m_bPass) {// 通过
-						if (edge.m_Data.m_ErrorJump != null) {// 有自定义错误处理器
-							tracker.m_npaStatus = edge.m_Data.m_ErrorJump;
+				if (!bag.bGiveUp) {
+					if (bag.bPass) {// 通过
+						if (edge.data.errorJump != null) {// 有自定义错误处理器
+							tracker.npaStatus = edge.data.errorJump;
 						} else {
-							tracker.m_npaStatus = edge.m_End;// 通过
+							tracker.npaStatus = edge.end;// 通过
 						}
 					}
-					if (bag.m_bRead) {// 跳过当前记号
+					if (bag.bRead) {// 跳过当前记号
 					}
-					if (bag.m_bHalt) {// 中止
-						tracker.m_bFinished = true;
+					if (bag.bHalt) {// 中止
+						tracker.bFinished = true;
 					}
 					return true;
 				}
@@ -505,14 +514,14 @@ public class Semantic extends Syntax implements IErrorHandler {
 	 */
 	private boolean handleError(Tracker tracker, TrackerError error) {
 		TrackerErrorBag bag = new TrackerErrorBag();
-		error.m_strMessage = m_defErrorHandler.handle(tracker.m_iterToken, bag);
+		error.message = errorHandler.handle(tracker.iter, bag);
 		/* 如果没有放弃则进行处理 */
-		if (!bag.m_bGiveUp) {
-			if (bag.m_bRead) {// 跳过当前记号
-				tracker.m_iterToken.scan();
+		if (!bag.bGiveUp) {
+			if (bag.bRead) {// 跳过当前记号
+				tracker.iter.scan();
 			}
-			if (bag.m_bHalt) {// 中止
-				tracker.m_bFinished = true;
+			if (bag.bHalt) {// 中止
+				tracker.bFinished = true;
 			}
 			return true;
 		}
@@ -528,12 +537,11 @@ public class Semantic extends Syntax implements IErrorHandler {
 	 * @return 终结符ID
 	 */
 	private int getTokenId(Tracker tracker) {
-		Token token = tracker.m_iterToken.ex().token();
-		for (TokenExp exp : m_arrTerminals) {
-			if (exp.m_kType == token.m_kToken
-					&& (exp.m_Object == null || exp.m_Object
-							.equals(token.m_Object))) {
-				return exp.m_iID;
+		Token token = tracker.iter.ex().token();
+		for (TokenExp exp : arrTerminals) {
+			if (exp.kType == token.kToken
+					&& (exp.object == null || exp.object.equals(token.object))) {
+				return exp.id;
 			}
 		}
 		return -1;
@@ -546,20 +554,20 @@ public class Semantic extends Syntax implements IErrorHandler {
 		/* 单词索引 */
 		int idxToken = 0;
 		/* 规则集合 */
-		ArrayList<RuleItem> items = m_NPA.getRuleItems();
+		ArrayList<RuleItem> items = npa.getRuleItems();
 		/* 数据处理堆栈 */
 		ParsingStack ps = new ParsingStack();
 		/* 遍历所有指令 */
-		for (Instruction inst : m_arrInsts) {
+		for (Instruction inst : arrInsts) {
 			/* 语义处理接口 */
 			ISemanticHandler handler = null;
 			/* 处理前 */
-			switch (inst.m_Inst) {
+			switch (inst.inst) {
 			case PASS:
 				idxToken++;
 				break;
 			case READ:
-				ps.set(inst.m_iIndex, m_arrTokens.get(idxToken));
+				ps.set(inst.iIndex, arrTokens.get(idxToken));
 				idxToken++;
 				break;
 			case SHIFT:
@@ -570,8 +578,8 @@ public class Semantic extends Syntax implements IErrorHandler {
 			case TRANSLATE:
 			case TRANSLATE_DISCARD:
 			case TRANSLATE_FINISH:
-				if (inst.m_iHandler != -1) {
-					handler = items.get(inst.m_iHandler).m_Handler;
+				if (inst.iHandler != -1) {
+					handler = items.get(inst.iHandler).handler;
 				}
 				break;
 			default:
@@ -579,14 +587,14 @@ public class Semantic extends Syntax implements IErrorHandler {
 			}
 			/* 处理时 */
 			if (handler != null) {
-				m_Object = handler.handle(ps, null, null);
+				object = handler.handle(ps, null, null);
 			}
 			/* 处理后 */
-			switch (inst.m_Inst) {
+			switch (inst.inst) {
 			case LEFT_RECURSION:
 				ps.pop();// 先pop再push为了让栈层成为current的引用
 				ps.push();
-				ps.set(inst.m_iIndex, m_Object);
+				ps.set(inst.iIndex, object);
 				break;
 			case LEFT_RECURSION_DISCARD:
 				ps.pop();
@@ -600,7 +608,7 @@ public class Semantic extends Syntax implements IErrorHandler {
 				break;
 			case TRANSLATE:
 				ps.pop();
-				ps.set(inst.m_iIndex, m_Object);
+				ps.set(inst.iIndex, object);
 				break;
 			case TRANSLATE_DISCARD:
 				ps.pop();
@@ -610,6 +618,12 @@ public class Semantic extends Syntax implements IErrorHandler {
 				break;
 			default:
 				break;
+			}
+			/* 打印调试信息 */
+			if (bDebug) {
+				System.err.println("#### " + inst.toString() + " ####");
+				System.err.println(ps.toString());
+				System.err.println();
 			}
 		}
 	}
@@ -625,9 +639,39 @@ public class Semantic extends Syntax implements IErrorHandler {
 	 */
 	@Override
 	public String handle(IRegexStringIterator token, TrackerErrorBag bag) {
-		bag.m_bHalt = true;
-		bag.m_bGiveUp = false;
+		bag.bHalt = true;
+		bag.bGiveUp = false;
 		return "Error";
+	}
+
+	/**
+	 * 获取跟踪器信息
+	 */
+	private String getTrackerStatus() {
+		/* 用于调试 */
+		System.err.println("#### #### ####");
+		System.err.println(tracker.iter.index());
+		System.err.println(tracker.iter.position());
+		System.err.println(tracker.npaStatus.data.label);
+		ArrayList<RuleItem> items = npa.getRuleItems();
+		StringBuffer sb = new StringBuffer();
+		sb.append(System.getProperty("line.separator"));
+		InstructionRecord rcd = tracker.rcdInst;
+		while (rcd != null) {
+			for (Instruction inst : rcd.arrInsts) {
+				sb.append(inst.toString());
+				if (inst.iHandler != -1) {
+					RuleItem item = items.get(inst.iHandler);
+					sb.append("\t"
+							+ getSingleString(item.parent.nonTerminal.name,
+									item.expression));
+				}
+				sb.append(System.getProperty("line.separator"));
+			}
+			rcd = rcd.prev;
+			sb.append(System.getProperty("line.separator"));
+		}
+		return sb.toString();
 	}
 
 	/**
@@ -637,7 +681,7 @@ public class Semantic extends Syntax implements IErrorHandler {
 		StringBuffer sb = new StringBuffer();
 		sb.append("#### 单词流 ####");
 		sb.append(System.getProperty("line.separator"));
-		for (Token token : m_arrTokens) {
+		for (Token token : arrTokens) {
 			sb.append(token.toString());
 			sb.append(System.getProperty("line.separator"));
 		}
@@ -651,8 +695,8 @@ public class Semantic extends Syntax implements IErrorHandler {
 		StringBuffer sb = new StringBuffer();
 		sb.append("#### 分析结果 ####");
 		sb.append(System.getProperty("line.separator"));
-		if (m_Object != null) {
-			sb.append(m_Object.toString());
+		if (object != null) {
+			sb.append(object.toString());
 			sb.append(System.getProperty("line.separator"));
 		}
 		return sb.toString();
@@ -662,18 +706,17 @@ public class Semantic extends Syntax implements IErrorHandler {
 	 * 获得指令集描述
 	 */
 	public String getInst() {
-		ArrayList<RuleItem> items = m_NPA.getRuleItems();
+		ArrayList<RuleItem> items = npa.getRuleItems();
 		StringBuffer sb = new StringBuffer();
 		sb.append("#### 指令集 ####");
 		sb.append(System.getProperty("line.separator"));
-		for (Instruction inst : m_arrInsts) {
+		for (Instruction inst : arrInsts) {
 			sb.append(inst.toString());
-			if (inst.m_iHandler != -1) {
-				RuleItem item = items.get(inst.m_iHandler);
+			if (inst.iHandler != -1) {
+				RuleItem item = items.get(inst.iHandler);
 				sb.append("\t\t"
-						+ getSingleString(
-								item.m_Parent.m_nonTerminal.m_strName,
-								item.m_Expression));
+						+ getSingleString(item.parent.nonTerminal.name,
+								item.expression));
 			}
 			sb.append(System.getProperty("line.separator"));
 		}
@@ -687,7 +730,7 @@ public class Semantic extends Syntax implements IErrorHandler {
 		StringBuffer sb = new StringBuffer();
 		sb.append("#### 错误列表 ####");
 		sb.append(System.getProperty("line.separator"));
-		for (TrackerError error : m_arrErrors) {
+		for (TrackerError error : arrErrors) {
 			sb.append(error.toString());
 			sb.append(System.getProperty("line.separator"));
 		}

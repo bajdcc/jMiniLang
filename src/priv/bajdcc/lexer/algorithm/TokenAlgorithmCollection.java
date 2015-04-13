@@ -17,28 +17,28 @@ public class TokenAlgorithmCollection implements Cloneable {
 	/**
 	 * 算法集合
 	 */
-	private ArrayList<ITokenAlgorithm> m_arrAlgorithms = new ArrayList<ITokenAlgorithm>();
+	private ArrayList<ITokenAlgorithm> arrAlgorithms = new ArrayList<ITokenAlgorithm>();
 
 	/**
 	 * 字符串迭代器
 	 */
-	private IRegexStringIterator m_Iterator = null;
+	private IRegexStringIterator iterator = null;
 
 	/**
 	 * 字符转换主体
 	 */
-	private IRegexStringFilterHost m_FilterHost = null;
+	private IRegexStringFilterHost filterHost = null;
 
 	/**
 	 * 错误处理
 	 */
-	private IErrorHandler m_Handler = null;
+	private IErrorHandler handler = null;
 
 	public TokenAlgorithmCollection(IRegexStringIterator iterator,
-			IRegexStringFilterHost host) {
-		m_Iterator = iterator;
-		m_FilterHost = host;
-		m_Handler = new TokenErrorAdvanceHandler(iterator);
+			IRegexStringFilterHost filterHost) {
+		this.iterator = iterator;
+		this.filterHost = filterHost;
+		handler = new TokenErrorAdvanceHandler(iterator);
 	}
 
 	/**
@@ -48,7 +48,7 @@ public class TokenAlgorithmCollection implements Cloneable {
 	 *            解析组件
 	 */
 	public void attach(ITokenAlgorithm alg) {
-		m_arrAlgorithms.add(alg);
+		arrAlgorithms.add(alg);
 	}
 
 	/**
@@ -58,29 +58,29 @@ public class TokenAlgorithmCollection implements Cloneable {
 	 *            解析组件
 	 */
 	public void detach(ITokenAlgorithm alg) {
-		m_arrAlgorithms.remove(alg);
+		arrAlgorithms.remove(alg);
 	}
 
 	/**
 	 * 清空解析组件
 	 */
 	public void clear() {
-		m_arrAlgorithms.clear();
+		arrAlgorithms.clear();
 	}
 
 	public Token scan() {
 		Token token = new Token();
-		token.m_kToken = TokenType.ERROR;
-		if (!m_Iterator.available()) {
-			token.m_kToken = TokenType.EOF;
+		token.kToken = TokenType.ERROR;
+		if (!iterator.available()) {
+			token.kToken = TokenType.EOF;
 		} else {
-			for (ITokenAlgorithm alg : m_arrAlgorithms) {
-				m_FilterHost.setFilter(alg);
-				m_Iterator.translate();
-				if (alg.accept(m_Iterator, token))
+			for (ITokenAlgorithm alg : arrAlgorithms) {
+				filterHost.setFilter(alg);
+				iterator.translate();
+				if (alg.accept(iterator, token))
 					return token;
 			}
-			m_Handler.handleError();
+			handler.handleError();
 		}
 		return token;
 	}
@@ -98,9 +98,9 @@ public class TokenAlgorithmCollection implements Cloneable {
 	public TokenAlgorithmCollection copy(IRegexStringIterator iter,
 			IRegexStringFilterHost filter) throws CloneNotSupportedException {
 		TokenAlgorithmCollection o = (TokenAlgorithmCollection) super.clone();
-		o.m_Iterator = iter;
-		o.m_FilterHost = filter;
-		o.m_Handler = new TokenErrorAdvanceHandler(iter);
+		o.iterator = iter;
+		o.filterHost = filter;
+		o.handler = new TokenErrorAdvanceHandler(iter);
 		return o;
 	}
 }

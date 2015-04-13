@@ -6,19 +6,15 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
-import org.vibur.objectpool.ConcurrentLinkedPool;
-import org.vibur.objectpool.PoolService;
-
 import priv.bajdcc.lexer.automata.BreadthFirstSearch;
-import priv.bajdcc.syntax.Rule;
-import priv.bajdcc.syntax.RuleItem;
 import priv.bajdcc.syntax.automata.nga.NGA;
 import priv.bajdcc.syntax.automata.nga.NGAEdge;
 import priv.bajdcc.syntax.automata.nga.NGAEdgeType;
 import priv.bajdcc.syntax.automata.nga.NGAStatus;
 import priv.bajdcc.syntax.exp.RuleExp;
 import priv.bajdcc.syntax.exp.TokenExp;
-import priv.bajdcc.utility.ObjectFactory;
+import priv.bajdcc.syntax.rule.Rule;
+import priv.bajdcc.syntax.rule.RuleItem;
 
 /**
  * <p>
@@ -33,42 +29,22 @@ public class NPA extends NGA {
 	/**
 	 * 规则集合
 	 */
-	private ArrayList<RuleItem> m_arrRuleItems = new ArrayList<RuleItem>();
+	private ArrayList<RuleItem> arrRuleItems = new ArrayList<RuleItem>();
 
 	/**
 	 * 起始状态集合
 	 */
-	private ArrayList<NPAStatus> m_arrInitStatusList = new ArrayList<NPAStatus>();
+	private ArrayList<NPAStatus> arrInitStatusList = new ArrayList<NPAStatus>();
 
 	/**
 	 * 起始规则
 	 */
-	private Rule m_initRule = null;
-
-	/**
-	 * 边对象池
-	 */
-	private PoolService<NPAEdge> m_EdgesPool = new ConcurrentLinkedPool<NPAEdge>(
-			new ObjectFactory<NPAEdge>() {
-				public NPAEdge create() {
-					return new NPAEdge();
-				};
-			}, 1024, 10240, false);
-
-	/**
-	 * 状态对象池
-	 */
-	private PoolService<NPAStatus> m_StatusPool = new ConcurrentLinkedPool<NPAStatus>(
-			new ObjectFactory<NPAStatus>() {
-				public NPAStatus create() {
-					return new NPAStatus();
-				};
-			}, 1024, 10240, false);
+	private Rule initRule = null;
 
 	public NPA(ArrayList<RuleExp> nonterminals, ArrayList<TokenExp> terminals,
 			Rule initNonterminal) {
 		super(nonterminals, terminals);
-		m_initRule = initNonterminal;
+		initRule = initNonterminal;
 		generateNPA();
 	}
 
@@ -82,11 +58,11 @@ public class NPA extends NGA {
 	 * @return 新的边
 	 */
 	protected NPAEdge connect(NPAStatus begin, NPAStatus end) {
-		NPAEdge edge = m_EdgesPool.take();// 申请一条新边
-		edge.m_Begin = begin;
-		edge.m_End = end;
-		begin.m_OutEdges.add(edge);// 添加进起始边的出边
-		end.m_InEdges.add(edge);// 添加进结束边的入边
+		NPAEdge edge = new NPAEdge();// 申请一条新边
+		edge.begin = begin;
+		edge.end = end;
+		begin.outEdges.add(edge);// 添加进起始边的出边
+		end.inEdges.add(edge);// 添加进结束边的入边
 		return edge;
 	}
 
@@ -99,8 +75,7 @@ public class NPA extends NGA {
 	 *            某条边
 	 */
 	protected void disconnect(NPAStatus status, NPAEdge edge) {
-		edge.m_End.m_InEdges.remove(edge);// 当前边的结束状态的入边集合去除当前边
-		m_EdgesPool.restore(edge);
+		edge.end.inEdges.remove(edge);// 当前边的结束状态的入边集合去除当前边
 	}
 
 	/**
@@ -111,18 +86,17 @@ public class NPA extends NGA {
 	 */
 	protected void disconnect(NPAStatus status) {
 		/* 清除所有入边 */
-		for (Iterator<NPAEdge> it = status.m_InEdges.iterator(); it.hasNext();) {
+		for (Iterator<NPAEdge> it = status.inEdges.iterator(); it.hasNext();) {
 			NPAEdge edge = it.next();
 			it.remove();
-			disconnect(edge.m_Begin, edge);
+			disconnect(edge.begin, edge);
 		}
 		/* 清除所有出边 */
-		for (Iterator<NPAEdge> it = status.m_OutEdges.iterator(); it.hasNext();) {
+		for (Iterator<NPAEdge> it = status.outEdges.iterator(); it.hasNext();) {
 			NPAEdge edge = it.next();
 			it.remove();
 			disconnect(status, edge);
 		}
-		m_StatusPool.restore(status);
 	}
 
 	/**
@@ -136,20 +110,20 @@ public class NPA extends NGA {
 		/* 下推自动机边（规则映射到NGA边） */
 		HashMap<Rule, ArrayList<NGAEdge>> ruleEdgeMap = new HashMap<Rule, ArrayList<NGAEdge>>();
 		/* 遍历每条规则 */
-		for (Entry<RuleItem, NGAStatus> entry : m_mapNGA.entrySet()) {
+		for (Entry<RuleItem, NGAStatus> entry : mapNGA.entrySet()) {
 			RuleItem key = entry.getKey();
 			NGAStatus value = entry.getValue();
 			/* 保存规则 */
-			m_arrRuleItems.add(key);
+			arrRuleItems.add(key);
 			/* 搜索当前规则中的所有状态 */
 			ArrayList<NGAStatus> CurrentNGAStatusList = getNGAStatusClosure(
 					new BreadthFirstSearch<NGAEdge, NGAStatus>(), value);
 			/* 搜索所有的边 */
 			for (NGAStatus status : CurrentNGAStatusList) {
-				for (NGAEdge edge : status.m_OutEdges) {
+				for (NGAEdge edge : status.outEdges) {
 					/* 若边为非终结符边，则加入邻接表，终结符->带终结符的所有边 */
-					if (edge.m_Data.m_Action == NGAEdgeType.RULE) {
-						Rule rule = edge.m_Data.m_Rule.m_Rule;
+					if (edge.data.kAction == NGAEdgeType.RULE) {
+						Rule rule = edge.data.rule.rule;
 						if (!ruleEdgeMap.containsKey(rule)) {
 							ruleEdgeMap.put(rule, new ArrayList<NGAEdge>());
 						}
@@ -162,9 +136,9 @@ public class NPA extends NGA {
 				/* 保存NGA状态 */
 				NGAStatusList.add(status);
 				/* 新建NPA状态 */
-				NPAStatus NPAStatus = m_StatusPool.take();
-				NPAStatus.m_Data.m_strLabel = status.m_Data.m_strLabel;
-				NPAStatus.m_Data.m_iRuleItem = m_arrRuleItems.indexOf(key);
+				NPAStatus NPAStatus = new NPAStatus();
+				NPAStatus.data.label = status.data.label;
+				NPAStatus.data.iRuleItem = arrRuleItems.indexOf(key);
 				NPAStatusList.add(NPAStatus);
 			}
 		}
@@ -175,56 +149,53 @@ public class NPA extends NGA {
 			/* 获得NPA状态 */
 			NPAStatus npaStatus = NPAStatusList.get(i);
 			/* 获得规则 */
-			RuleItem ruleItem = m_arrRuleItems
-					.get(npaStatus.m_Data.m_iRuleItem);
+			RuleItem ruleItem = arrRuleItems
+					.get(npaStatus.data.iRuleItem);
 			/* 检查是否为纯左递归，类似[A::=Aa]此类，无法直接添加纯左递归边，需要LA及归约 */
-			if (!isLeftRecursiveStatus(ngaStatus, ruleItem.m_Parent)) {
+			if (!isLeftRecursiveStatus(ngaStatus, ruleItem.parent)) {
 				/* 当前状态是否为初始状态且推导规则是否属于起始规则（无NGA入边） */
-				boolean isInitRuleStatus = m_initRule == ruleItem.m_Parent;
+				boolean isInitRuleStatus = initRule == ruleItem.parent;
 				/* 若是，则将当前状态对应的NPA状态加入初始状态表中 */
-				if (ngaStatus.m_InEdges.isEmpty() && isInitRuleStatus) {
-					m_arrInitStatusList.add(npaStatus);
+				if (ngaStatus.inEdges.isEmpty() && isInitRuleStatus) {
+					arrInitStatusList.add(npaStatus);
 				}
 				/* 建立计算优先级使用的记号表，其中元素为从当前状态出发的Rule或Token边的First集（LA预查优先） */
 				HashSet<Integer> tokenSet = new HashSet<Integer>();
 				/* 遍历文法自动机的所有边 */
-				for (NGAEdge edge : ngaStatus.m_OutEdges) {
-					switch (edge.m_Data.m_Action) {
+				for (NGAEdge edge : ngaStatus.outEdges) {
+					switch (edge.data.kAction) {
 					case EPSILON:
 						break;
 					case RULE:
 						/* 判断边是否为纯左递归 */
-						if (!isLeftRecursiveEdge(edge, ruleItem.m_Parent)) {
-							for (RuleItem item : edge.m_Data.m_Rule.m_Rule.m_arrRules) {
+						if (!isLeftRecursiveEdge(edge, ruleItem.parent)) {
+							for (RuleItem item : edge.data.rule.rule.arrRules) {
 								/* 起始状态 */
-								NGAStatus initItemStatus = m_mapNGA.get(item);
+								NGAStatus initItemStatus = mapNGA.get(item);
 								/* 判断状态是否为纯左递归 */
 								if (!isLeftRecursiveStatus(initItemStatus,
-										item.m_Parent)) {
+										item.parent)) {
 									/* 添加Shift边，功能为将一条状态序号放入堆栈顶 */
 									NPAEdge npaEdge = connect(npaStatus,
 											NPAStatusList.get(NGAStatusList
 													.indexOf(initItemStatus)));
-									npaEdge.m_Data.m_Handler = edge.m_Data.m_Handler;
-									npaEdge.m_Data.m_Action = NPAEdgeType.SHIFT;
-									npaEdge.m_Data.m_Inst = NPAInstruction.SHIFT;
-									npaEdge.m_Data.m_ErrorJump = NPAStatusList
+									npaEdge.data.handler = edge.data.handler;
+									npaEdge.data.kAction = NPAEdgeType.SHIFT;
+									npaEdge.data.inst = NPAInstruction.SHIFT;
+									npaEdge.data.errorJump = NPAStatusList
 											.get(NGAStatusList
-													.indexOf(edge.m_End));
+													.indexOf(edge.end));
 									/* 为移进项目构造LookAhead表，LA不吃字符，只是单纯压入新的状态（用于规约） */
-									npaEdge.m_Data.m_arrLookAhead = new HashSet<Integer>();
-									for (TokenExp exp : item.m_setFirstSetTokens) {
-										int id = exp.m_iID;
-										if (!tokenSet.contains(id)) { // 不重复添加，故分支前的LA预查会覆盖掉分支后的Rule规则
-											npaEdge.m_Data.m_arrLookAhead
-													.add(id);
-										}
+									npaEdge.data.arrLookAhead = new HashSet<Integer>();
+									for (TokenExp exp : item.setFirstSetTokens) {
+										npaEdge.data.arrLookAhead
+												.add(exp.id);
 									}
 								}
 							}
 							// 将当前非终结符的所有终结符First集加入tokenSet，以便非终结符的Move的LA操作（优先级）
-							for (TokenExp exp : edge.m_Data.m_Rule.m_Rule.m_arrTokens) {
-								tokenSet.add(exp.m_iID);
+							for (TokenExp exp : edge.data.rule.rule.arrTokens) {
+								tokenSet.add(exp.id);
 							}
 						}
 						break;
@@ -232,24 +203,24 @@ public class NPA extends NGA {
 						/* 添加Move边，功能为吃掉（匹配）一个终结符，若终结符不匹配，则报错（即不符合文法） */
 						NPAEdge npaEdge = connect(npaStatus,
 								NPAStatusList.get(NGAStatusList
-										.indexOf(edge.m_End)));
-						npaEdge.m_Data.m_Handler = edge.m_Data.m_Handler;
-						npaEdge.m_Data.m_Action = NPAEdgeType.MOVE;
-						npaEdge.m_Data.m_iToken = edge.m_Data.m_Token.m_iID;
-						npaEdge.m_Data.m_ErrorJump = npaEdge.m_End;
+										.indexOf(edge.end)));
+						npaEdge.data.handler = edge.data.handler;
+						npaEdge.data.kAction = NPAEdgeType.MOVE;
+						npaEdge.data.iToken = edge.data.token.id;
+						npaEdge.data.errorJump = npaEdge.end;
 						/* 根据StorageID配置指令 */
-						if (edge.m_Data.m_iStorage != -1) {
-							npaEdge.m_Data.m_Inst = NPAInstruction.READ;
-							npaEdge.m_Data.m_iIndex = edge.m_Data.m_iStorage;// 参数
+						if (edge.data.iStorage != -1) {
+							npaEdge.data.inst = NPAInstruction.READ;
+							npaEdge.data.iIndex = edge.data.iStorage;// 参数
 						} else {
-							npaEdge.m_Data.m_Inst = NPAInstruction.PASS;
+							npaEdge.data.inst = NPAInstruction.PASS;
 						}
 						/* 修改TokenSet */
-						if (tokenSet.contains(edge.m_Data.m_Token.m_iID)) {
+						if (tokenSet.contains(edge.data.token.id)) {
 							/* 使用LookAhead表 */
-							npaEdge.m_Data.m_arrLookAhead = new HashSet<Integer>();
+							npaEdge.data.arrLookAhead = new HashSet<Integer>();
 						} else {
-							tokenSet.add(edge.m_Data.m_Token.m_iID);
+							tokenSet.add(edge.data.token.id);
 						}
 						break;
 					default:
@@ -257,42 +228,42 @@ public class NPA extends NGA {
 					}
 				}
 				/* 如果当前NGA状态是结束状态（此时要进行规约），则检查是否需要添加其他边 */
-				if (ngaStatus.m_Data.m_bFinal) {
-					if (ruleEdgeMap.containsKey(ruleItem.m_Parent)) {
+				if (ngaStatus.data.bFinal) {
+					if (ruleEdgeMap.containsKey(ruleItem.parent)) {
 						/* 遍历文法自动机中附带了当前推导规则所属规则的边 */
 						ArrayList<NGAEdge> ruleEdges = ruleEdgeMap
-								.get(ruleItem.m_Parent);// 当前规约的文法的非终结符为A，获得包含A的所有边
+								.get(ruleItem.parent);// 当前规约的文法的非终结符为A，获得包含A的所有边
 						for (NGAEdge ngaEdge : ruleEdges) {
 							/* 判断纯左递归，冗长的表达式是为了获得当前边的所在推导式的起始非终结符 */
 							if (isLeftRecursiveEdge(
 									ngaEdge,
-									m_arrRuleItems.get(NPAStatusList
+									arrRuleItems.get(NPAStatusList
 											.get(NGAStatusList
-													.indexOf(ngaEdge.m_Begin)).m_Data.m_iRuleItem).m_Parent)) {
+													.indexOf(ngaEdge.begin)).data.iRuleItem).parent)) {
 								/* 添加Left Recursion边（特殊的Reduce边） */
 								NPAEdge npaEdge = connect(npaStatus,
 										NPAStatusList.get(NGAStatusList
-												.indexOf(ngaEdge.m_End)));
-								npaEdge.m_Data.m_Action = NPAEdgeType.LEFT_RECURSION;
-								if (ngaEdge.m_Data.m_iStorage != -1) {
-									npaEdge.m_Data.m_Inst = NPAInstruction.LEFT_RECURSION;
-									npaEdge.m_Data.m_iIndex = ngaEdge.m_Data.m_iStorage;
+												.indexOf(ngaEdge.end)));
+								npaEdge.data.kAction = NPAEdgeType.LEFT_RECURSION;
+								if (ngaEdge.data.iStorage != -1) {
+									npaEdge.data.inst = NPAInstruction.LEFT_RECURSION;
+									npaEdge.data.iIndex = ngaEdge.data.iStorage;
 								} else {
-									npaEdge.m_Data.m_Inst = NPAInstruction.LEFT_RECURSION_DISCARD;
+									npaEdge.data.inst = NPAInstruction.LEFT_RECURSION_DISCARD;
 								}
-								npaEdge.m_Data.m_iHandler = npaStatus.m_Data.m_iRuleItem;// 规约的规则
+								npaEdge.data.iHandler = npaStatus.data.iRuleItem;// 规约的规则
 								/* 为左递归构造Lookahead表（Follow集），若LA成功则进入左递归 */
-								npaEdge.m_Data.m_arrLookAhead = new HashSet<Integer>();
-								for (NGAEdge edge : ngaEdge.m_End.m_OutEdges) {
+								npaEdge.data.arrLookAhead = new HashSet<Integer>();
+								for (NGAEdge edge : ngaEdge.end.outEdges) {
 									/* 若出边为终结符，则直接加入（终结符First集仍是本身） */
-									if (edge.m_Data.m_Action == NGAEdgeType.TOKEN) {
-										npaEdge.m_Data.m_arrLookAhead
-												.add(edge.m_Data.m_Token.m_iID);
+									if (edge.data.kAction == NGAEdgeType.TOKEN) {
+										npaEdge.data.arrLookAhead
+												.add(edge.data.token.id);
 									} else {
 										/* 若出边为非终结符，则加入非终结符的First集 */
-										for (TokenExp exp : edge.m_Data.m_Rule.m_Rule.m_arrTokens) {
-											npaEdge.m_Data.m_arrLookAhead
-													.add(exp.m_iID);
+										for (TokenExp exp : edge.data.rule.rule.arrTokens) {
+											npaEdge.data.arrLookAhead
+													.add(exp.id);
 										}
 									}
 								}
@@ -300,27 +271,27 @@ public class NPA extends NGA {
 								/* 添加Reduce边 */
 								NPAEdge npaEdge = connect(npaStatus,
 										NPAStatusList.get(NGAStatusList
-												.indexOf(ngaEdge.m_End)));
-								npaEdge.m_Data.m_Action = NPAEdgeType.REDUCE;
-								npaEdge.m_Data.m_Status = NPAStatusList
+												.indexOf(ngaEdge.end)));
+								npaEdge.data.kAction = NPAEdgeType.REDUCE;
+								npaEdge.data.status = NPAStatusList
 										.get(NGAStatusList
-												.indexOf(ngaEdge.m_Begin));
-								if (ngaEdge.m_Data.m_iStorage != -1) {
-									npaEdge.m_Data.m_Inst = NPAInstruction.TRANSLATE;
-									npaEdge.m_Data.m_iIndex = ngaEdge.m_Data.m_iStorage;
+												.indexOf(ngaEdge.begin));
+								if (ngaEdge.data.iStorage != -1) {
+									npaEdge.data.inst = NPAInstruction.TRANSLATE;
+									npaEdge.data.iIndex = ngaEdge.data.iStorage;
 								} else {
-									npaEdge.m_Data.m_Inst = NPAInstruction.TRANSLATE_DISCARD;
+									npaEdge.data.inst = NPAInstruction.TRANSLATE_DISCARD;
 								}
-								npaEdge.m_Data.m_iHandler = npaStatus.m_Data.m_iRuleItem;// 规约的规则
+								npaEdge.data.iHandler = npaStatus.data.iRuleItem;// 规约的规则
 							}
 						}
 					}
 					if (isInitRuleStatus) {
 						/* 添加Finish边 */
 						NPAEdge npaEdge = connect(npaStatus, npaStatus);
-						npaEdge.m_Data.m_Action = NPAEdgeType.FINISH;
-						npaEdge.m_Data.m_Inst = NPAInstruction.TRANSLATE_FINISH;
-						npaEdge.m_Data.m_iHandler = npaStatus.m_Data.m_iRuleItem;
+						npaEdge.data.kAction = NPAEdgeType.FINISH;
+						npaEdge.data.inst = NPAInstruction.TRANSLATE_FINISH;
+						npaEdge.data.iHandler = npaStatus.data.iRuleItem;
 					}
 				}
 			}
@@ -337,13 +308,13 @@ public class NPA extends NGA {
 	 * @return 状态是否为左递归
 	 */
 	private static boolean isLeftRecursiveStatus(NGAStatus status, Rule rule) {
-		if (!status.m_InEdges.isEmpty())// 有入边，则无纯左递归
+		if (!status.inEdges.isEmpty())// 有入边，则无纯左递归
 		{
 			return false;
 		}
-		for (NGAEdge edge : status.m_OutEdges) {
-			if (edge.m_Data.m_Action != NGAEdgeType.RULE
-					|| edge.m_Data.m_Rule.m_Rule != rule) {
+		for (NGAEdge edge : status.outEdges) {
+			if (edge.data.kAction != NGAEdgeType.RULE
+					|| edge.data.rule.rule != rule) {
 				return false;
 			}
 		}
@@ -360,9 +331,9 @@ public class NPA extends NGA {
 	 * @return 状态是否为左递归
 	 */
 	private static boolean isLeftRecursiveEdge(NGAEdge edge, Rule rule) {
-		if (edge.m_Begin.m_InEdges.isEmpty()) {// 没有入边
-			return edge.m_Data.m_Action == NGAEdgeType.RULE
-					&& edge.m_Data.m_Rule.m_Rule == rule;
+		if (edge.begin.inEdges.isEmpty()) {// 没有入边
+			return edge.data.kAction == NGAEdgeType.RULE
+					&& edge.data.rule.rule == rule;
 		}
 		return false;
 	}
@@ -379,7 +350,7 @@ public class NPA extends NGA {
 	protected static ArrayList<NPAStatus> getNGAStatusClosure(
 			BreadthFirstSearch<NPAEdge, NPAStatus> bfs, NPAStatus status) {
 		status.visit(bfs);
-		return bfs.m_arrStatus;
+		return bfs.arrStatus;
 	}
 
 	/**
@@ -388,7 +359,7 @@ public class NPA extends NGA {
 	 * @return NPA初态表
 	 */
 	public ArrayList<NPAStatus> getInitStatusList() {
-		return m_arrInitStatusList;
+		return arrInitStatusList;
 	}
 
 	/**
@@ -398,7 +369,7 @@ public class NPA extends NGA {
 	 */
 	public ArrayList<NPAStatus> getNPAStatusList() {
 		ArrayList<NPAStatus> NPAStatusList = new ArrayList<NPAStatus>();
-		for (NPAStatus status : m_arrInitStatusList) {
+		for (NPAStatus status : arrInitStatusList) {
 			NPAStatusList.addAll(getNGAStatusClosure(
 					new BreadthFirstSearch<NPAEdge, NPAStatus>(), status));
 		}
@@ -411,7 +382,7 @@ public class NPA extends NGA {
 	 * @return NPA状态表
 	 */
 	public ArrayList<RuleItem> getRuleItems() {
-		return m_arrRuleItems;
+		return arrRuleItems;
 	}
 
 	/**
@@ -424,9 +395,9 @@ public class NPA extends NGA {
 		/* 输出初始状态 */
 		sb.append("#### 初始状态 ####");
 		sb.append(System.getProperty("line.separator"));
-		for (int i = 0; i < m_arrInitStatusList.size(); i++) {
+		for (int i = 0; i < arrInitStatusList.size(); i++) {
 			sb.append("状态[" + i + "]： "
-					+ m_arrInitStatusList.get(i).m_Data.m_strLabel);
+					+ arrInitStatusList.get(i).data.label);
 			sb.append(System.getProperty("line.separator"));
 		}
 		sb.append(System.getProperty("line.separator"));
@@ -438,32 +409,32 @@ public class NPA extends NGA {
 			/* 输出状态标签 */
 			sb.append("状态[" + i + "]： ");
 			sb.append(System.getProperty("line.separator"));
-			sb.append("\t项目：" + status.m_Data.m_strLabel);
+			sb.append("\t项目：" + status.data.label);
 			sb.append(System.getProperty("line.separator"));
 			sb.append("\t规则："
-					+ m_arrRuleItems.get(status.m_Data.m_iRuleItem).m_Parent.m_nonTerminal.m_strName);
+					+ arrRuleItems.get(status.data.iRuleItem).parent.nonTerminal.name);
 			sb.append(System.getProperty("line.separator"));
 			/* 输出边 */
-			for (NPAEdge edge : status.m_OutEdges) {
+			for (NPAEdge edge : status.outEdges) {
 				sb.append("\t\t----------------");
 				sb.append(System.getProperty("line.separator"));
 				/* 输出边的目标 */
-				sb.append("\t\t到达状态[" + statusList.indexOf(edge.m_End) + "]: "
-						+ edge.m_End.m_Data.m_strLabel);
+				sb.append("\t\t到达状态[" + statusList.indexOf(edge.end) + "]: "
+						+ edge.end.data.label);
 				sb.append(System.getProperty("line.separator"));
 				/* 输出边的类型 */
-				sb.append("\t\t类型：" + edge.m_Data.m_Action.getName());
-				switch (edge.m_Data.m_Action) {
+				sb.append("\t\t类型：" + edge.data.kAction.getName());
+				switch (edge.data.kAction) {
 				case FINISH:
 					break;
 				case LEFT_RECURSION:
 					break;
 				case MOVE:
-					sb.append("\t=> " + edge.m_Data.m_iToken + "("
-							+ m_arrTerminals.get(edge.m_Data.m_iToken) + ")");
+					sb.append("\t=> " + edge.data.iToken + "("
+							+ arrTerminals.get(edge.data.iToken) + ")");
 					break;
 				case REDUCE:
-					sb.append("\t=> " + edge.m_Data.m_Status.m_Data.m_strLabel);
+					sb.append("\t=> " + edge.data.status.data.label);
 					break;
 				case SHIFT:
 					break;
@@ -472,36 +443,36 @@ public class NPA extends NGA {
 				}
 				sb.append(System.getProperty("line.separator"));
 				/* 输出边的指令 */
-				sb.append("\t\t指令：" + edge.m_Data.m_Inst.getName());
-				switch (edge.m_Data.m_Inst) {
+				sb.append("\t\t指令：" + edge.data.inst.getName());
+				switch (edge.data.inst) {
 				case PASS:
 					break;
 				case READ:
-					sb.append("\t=> " + edge.m_Data.m_iIndex);
+					sb.append("\t=> " + edge.data.iIndex);
 					break;
 				case SHIFT:
 					break;
 				case LEFT_RECURSION:
 				case TRANSLATE:
 					sb.append("\t=> "
-							+ m_arrRuleItems.get(edge.m_Data.m_iHandler).m_Parent.m_nonTerminal.m_strName
-							+ " " + edge.m_Data.m_iIndex);
+							+ arrRuleItems.get(edge.data.iHandler).parent.nonTerminal.name
+							+ " " + edge.data.iIndex);
 					break;
 				case LEFT_RECURSION_DISCARD:
 				case TRANSLATE_DISCARD:
 				case TRANSLATE_FINISH:
 					sb.append("\t=> "
-							+ m_arrRuleItems.get(edge.m_Data.m_iHandler).m_Parent.m_nonTerminal.m_strName);
+							+ arrRuleItems.get(edge.data.iHandler).parent.nonTerminal.name);
 					break;
 				default:
 					break;
 				}
 				sb.append(System.getProperty("line.separator"));
 				/* 输出Lookahead表 */
-				if (edge.m_Data.m_arrLookAhead != null) {
+				if (edge.data.arrLookAhead != null) {
 					sb.append("\t\t预查：");
-					for (int id : edge.m_Data.m_arrLookAhead) {
-						sb.append("[" + m_arrTerminals.get(id) + "]");
+					for (int id : edge.data.arrLookAhead) {
+						sb.append("[" + arrTerminals.get(id) + "]");
 					}
 					sb.append(System.getProperty("line.separator"));
 				}

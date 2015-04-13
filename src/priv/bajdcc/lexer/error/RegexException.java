@@ -42,31 +42,31 @@ public class RegexException extends Exception {
 
 	public RegexException(RegexError error, Position pos) {
 		super(error.getMessage());
-		m_Position = pos;
-		m_kError = error;
+		position = pos;
+		kError = error;
 	}
 
 	/**
 	 * 位置
 	 */
-	private Position m_Position = new Position();
+	private Position position = new Position();
 	
 	/**
 	 * @return 错误位置
 	 */
 	public Position getPosition() {
-		return m_Position;
+		return position;
 	}
 	
 	/**
 	 * 错误类型
 	 */
-	private RegexError m_kError = RegexError.NULL;
+	private RegexError kError = RegexError.NULL;
 
 	/**
 	 * @return 错误类型
 	 */
 	public RegexError getErrorCode() {
-		return m_kError;
+		return kError;
 	}
 }

@@ -19,44 +19,44 @@ public class RegexStringIterator implements IRegexStringIterator, Cloneable {
 	/**
 	 * 存储字符串
 	 */
-	protected String m_strContext;
+	protected String context;
 
 	/**
 	 * 用于恢复的位置堆栈
 	 */
-	public Stack<Integer> m_stkIndex = new Stack<Integer>();
+	public Stack<Integer> stkIndex = new Stack<Integer>();
 
 	/**
 	 * 位置
 	 */
-	protected Position m_Position = new Position();
+	protected Position position = new Position();
 
 	/**
 	 * 用于恢复行列数的堆栈
 	 */
-	public Stack<Position> m_stkPosition = new Stack<Position>();
+	public Stack<Position> stkPosition = new Stack<Position>();
 
 	/**
 	 * 当前的分析信息
 	 */
-	protected RegexStringIteratorData m_Data = new RegexStringIteratorData();
+	protected RegexStringIteratorData data = new RegexStringIteratorData();
 
 	public RegexStringIterator() {
 
 	}
 
-	public RegexStringIterator(String strContext) {
-		m_strContext = strContext;
+	public RegexStringIterator(String context) {
+		this.context = context;
 	}
 
 	/**
 	 * 字符解析组件
 	 */
-	protected RegexStringUtility m_Utility = new RegexStringUtility(this);
+	protected RegexStringUtility utility = new RegexStringUtility(this);
 
 	@Override
 	public void err(RegexError error) throws RegexException {
-		throw new RegexException(error, m_Position);
+		throw new RegexException(error, position);
 	}
 
 	@Override
@@ -65,10 +65,10 @@ public class RegexStringIterator implements IRegexStringIterator, Cloneable {
 			advance();
 		}
 		translate();
-		m_Position.m_iColumn++;
-		if (m_Data.m_chCurrent == MetaType.NEW_LINE.getChar()) {
-			m_Position.m_iColumn = 0;
-			m_Position.m_iLine++;
+		position.iColumn++;
+		if (data.chCurrent == MetaType.NEW_LINE.getChar()) {
+			position.iColumn = 0;
+			position.iLine++;
 		}
 	}
 
@@ -79,17 +79,17 @@ public class RegexStringIterator implements IRegexStringIterator, Cloneable {
 
 	@Override
 	public Position position() {
-		return m_Position;
+		return position;
 	}
 
 	@Override
 	public void translate() {
 		if (!available()) {
-			m_Data.m_chCurrent = 0;
-			m_Data.m_kMeta = MetaType.END;
+			data.chCurrent = 0;
+			data.kMeta = MetaType.END;
 			return;
 		}
-		m_Data.m_chCurrent = current();
+		data.chCurrent = current();
 		transform();
 	}
 
@@ -97,37 +97,37 @@ public class RegexStringIterator implements IRegexStringIterator, Cloneable {
 	 * 分析字符类型
 	 */
 	protected void transform() {
-		m_Data.m_kMeta = MetaType.CHARACTER;
+		data.kMeta = MetaType.CHARACTER;
 	}
 
 	@Override
 	public boolean available() {
-		return m_Data.m_iIndex >= 0 && m_Data.m_iIndex < m_strContext.length();
+		return data.iIndex >= 0 && data.iIndex < context.length();
 	}
 
 	@Override
 	public void advance() {
-		m_Data.m_iIndex++;
+		data.iIndex++;
 	}
 
 	@Override
 	public char current() {
-		return m_strContext.charAt(m_Data.m_iIndex);
+		return context.charAt(data.iIndex);
 	}
 
 	@Override
 	public MetaType meta() {
-		return m_Data.m_kMeta;
+		return data.kMeta;
 	}
 
 	@Override
 	public int index() {
-		return m_Data.m_iIndex;
+		return data.iIndex;
 	}
 
 	@Override
 	public void expect(MetaType meta, RegexError error) throws RegexException {
-		if (m_Data.m_kMeta == meta) {
+		if (data.kMeta == meta) {
 			next();
 		} else {
 			err(error);
@@ -136,37 +136,37 @@ public class RegexStringIterator implements IRegexStringIterator, Cloneable {
 
 	@Override
 	public void snapshot() {
-		m_stkIndex.push(m_Data.m_iIndex);
-		m_stkPosition.push(new Position(m_Position.m_iColumn,
-				m_Position.m_iLine));
+		stkIndex.push(data.iIndex);
+		stkPosition.push(new Position(position.iColumn,
+				position.iLine));
 	}
 
 	@Override
 	public void cover() {
-		m_stkIndex.set(m_stkIndex.size() - 1, m_Data.m_iIndex);
-		m_stkPosition.set(m_stkPosition.size() - 1, m_Position);
+		stkIndex.set(stkIndex.size() - 1, data.iIndex);
+		stkPosition.set(stkPosition.size() - 1, new Position(position));
 	}
 
 	@Override
 	public void restore() {
-		m_Data.m_iIndex = m_stkIndex.pop();
-		m_Position = new Position(m_stkPosition.pop());
+		data.iIndex = stkIndex.pop();
+		position = new Position(stkPosition.pop());
 	}
 
 	@Override
 	public void discard() {
-		m_stkIndex.pop();
-		m_stkPosition.pop();
+		stkIndex.pop();
+		stkPosition.pop();
 	}
 
 	@Override
 	public RegexStringUtility utility() {
-		return m_Utility;
+		return utility;
 	}
 
 	@Override
 	public String getRegexDescription() {
-		return m_strContext;
+		return context;
 	}
 
 	@Override
@@ -177,8 +177,8 @@ public class RegexStringIterator implements IRegexStringIterator, Cloneable {
 	@Override
 	protected Object clone() throws CloneNotSupportedException {
 		RegexStringIterator o = (RegexStringIterator) super.clone();
-		o.m_Position = (Position) o.m_Position.clone();
-		o.m_Data = (RegexStringIteratorData) o.m_Data.clone();
+		o.position = (Position) o.position.clone();
+		o.data = (RegexStringIteratorData) o.data.clone();
 		return o;
 	}
 

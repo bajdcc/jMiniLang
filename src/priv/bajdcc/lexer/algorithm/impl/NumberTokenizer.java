@@ -36,12 +36,12 @@ public class NumberTokenizer extends TokenAlgorithm {
 	@Override
 	public Token getToken(String string, Token token) {
 		try {
-			token.m_kToken = TokenType.INTEGER;
-			token.m_Object = Integer.parseInt(string);
+			token.kToken = TokenType.INTEGER;
+			token.object = Integer.parseInt(string);
 			return token;
 		} catch (NumberFormatException e) {
-			token.m_kToken = TokenType.REAL;
-			token.m_Object = Double.parseDouble(string);
+			token.kToken = TokenType.REAL;
+			token.object = Double.parseDouble(string);
 		}
 		return token;
 	}

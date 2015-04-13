@@ -10,5 +10,5 @@ public class NGAEdge extends ENGA {
 	/**
 	 * 数据
 	 */
-	public NGAEdgeData m_Data = new NGAEdgeData();
+	public NGAEdgeData data = new NGAEdgeData();
 }

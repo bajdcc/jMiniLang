@@ -1,8 +1,9 @@
-package priv.bajdcc.syntax;
+package priv.bajdcc.syntax.rule;
 
 import java.util.HashSet;
 
 import priv.bajdcc.semantic.token.ISemanticHandler;
+import priv.bajdcc.syntax.ISyntaxComponent;
 import priv.bajdcc.syntax.exp.RuleExp;
 import priv.bajdcc.syntax.exp.TokenExp;
 
@@ -16,30 +17,30 @@ public class RuleItem {
 	/**
 	 * 规则表达式
 	 */
-	public ISyntaxComponent m_Expression = null;
+	public ISyntaxComponent expression = null;
 	
 	/**
 	 * 规则对应的语义分析接口
 	 */
-	public ISemanticHandler m_Handler = null;
+	public ISemanticHandler handler = null;
 
 	/**
 	 * First集合（终结符）
 	 */
-	public HashSet<TokenExp> m_setFirstSetTokens = new HashSet<TokenExp>();
+	public HashSet<TokenExp> setFirstSetTokens = new HashSet<TokenExp>();
 
 	/**
 	 * First集合（非终结符）
 	 */
-	public HashSet<RuleExp> m_setFirstSetRules = new HashSet<RuleExp>();
+	public HashSet<RuleExp> setFirstSetRules = new HashSet<RuleExp>();
 
 	/**
 	 * 父结点指针
 	 */
-	public Rule m_Parent = null;
+	public Rule parent = null;
 
 	public RuleItem(ISyntaxComponent exp, Rule parent) {
-		m_Expression = exp;
-		m_Parent = parent;
+		expression = exp;
+		this.parent = parent;
 	}
 }

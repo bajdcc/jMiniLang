@@ -10,5 +10,5 @@ public class NFAEdge extends ENFA {
 	/**
 	 * 数据
 	 */
-	public NFAEdgeData m_Data = new NFAEdgeData();
+	public NFAEdgeData data = new NFAEdgeData();
 }

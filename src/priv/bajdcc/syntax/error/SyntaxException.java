@@ -36,46 +36,46 @@ public class SyntaxException extends Exception {
 
 	public SyntaxException(SyntaxError error, Position pos, Object obj) {
 		super(error.getMessage());
-		m_Position = pos;
-		m_kError = error;
+		position = pos;
+		kError = error;
 		if (obj != null) {
-			m_strInfo = obj.toString();
+			info = obj.toString();
 		}
 	}
 
 	/**
 	 * 位置
 	 */
-	private Position m_Position = new Position();
+	private Position position = new Position();
 
 	/**
 	 * @return 错误位置
 	 */
 	public Position getPosition() {
-		return m_Position;
+		return position;
 	}
 
 	/**
 	 * 错误类型
 	 */
-	private SyntaxError m_kError = SyntaxError.NULL;
+	private SyntaxError kError = SyntaxError.NULL;
 
 	/**
 	 * @return 错误类型
 	 */
 	public SyntaxError getErrorCode() {
-		return m_kError;
+		return kError;
 	}
 
 	/**
 	 * 错误信息
 	 */
-	private String m_strInfo = "";
+	private String info = "";
 
 	/**
 	 * @return 错误信息
 	 */
 	public String getInfo() {
-		return m_strInfo;
+		return info;
 	}
 }

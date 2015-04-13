@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Stack;
 
-import org.vibur.objectpool.ConcurrentLinkedPool;
-import org.vibur.objectpool.PoolService;
-
 import priv.bajdcc.lexer.automata.BreadthFirstSearch;
 import priv.bajdcc.lexer.automata.EdgeType;
 import priv.bajdcc.lexer.regex.CharacterMap;
@@ -16,7 +13,6 @@ import priv.bajdcc.lexer.regex.Constructure;
 import priv.bajdcc.lexer.regex.IRegexComponent;
 import priv.bajdcc.lexer.regex.IRegexComponentVisitor;
 import priv.bajdcc.lexer.regex.Repetition;
-import priv.bajdcc.utility.ObjectFactory;
 
 /**
  * NFA构成算法（AST->NFA）
@@ -29,68 +25,48 @@ public class NFA implements IRegexComponentVisitor {
 	/**
 	 * 是否为调试模式（打印信息）
 	 */
-	protected boolean m_bDebug = false;
-
-	/**
-	 * 边对象池
-	 */
-	private PoolService<NFAEdge> m_EdgesPool = new ConcurrentLinkedPool<NFAEdge>(
-			new ObjectFactory<NFAEdge>() {
-				public NFAEdge create() {
-					return new NFAEdge();
-				};
-			}, 1024, 10240, false);
-
-	/**
-	 * 状态对象池
-	 */
-	private PoolService<NFAStatus> m_StatusPool = new ConcurrentLinkedPool<NFAStatus>(
-			new ObjectFactory<NFAStatus>() {
-				public NFAStatus create() {
-					return new NFAStatus();
-				};
-			}, 1024, 10240, false);
+	protected boolean bDebug = false;
 
 	/**
 	 * 深度
 	 */
-	private int m_iLevel = 0;
+	private int iLevel = 0;
 
 	/**
 	 * NFA栈
 	 */
-	private Stack<ArrayList<ENFA>> m_stkNFA = new Stack<ArrayList<ENFA>>();
+	private Stack<ArrayList<ENFA>> stkNFA = new Stack<ArrayList<ENFA>>();
 
 	/**
 	 * NFA子表
 	 */
-	private ArrayList<ENFA> m_childNFA = new ArrayList<ENFA>();
+	private ArrayList<ENFA> childNFA = new ArrayList<ENFA>();
 
 	/**
 	 * ENFA
 	 */
-	protected ENFA m_mainNFA = null;
+	protected ENFA nfa = null;
 
 	/**
 	 * 表达式树根结点
 	 */
-	protected IRegexComponent m_Expression = null;
+	protected IRegexComponent expression = null;
 
 	/**
 	 * Sigma状态集
 	 */
-	protected CharacterMap m_Map = new CharacterMap();
+	protected CharacterMap chMap = new CharacterMap();
 
 	public NFA(IRegexComponent exp, boolean debug) {
-		m_bDebug = debug;
-		m_Expression = exp;
-		m_Expression.visit(m_Map);
-		if (m_bDebug) {
+		bDebug = debug;
+		expression = exp;
+		expression.visit(chMap);
+		if (bDebug) {
 			System.out.println("#### 状态集合 ####");
 			System.out.println(getStatusString());
 		}
-		m_Expression.visit(this);
-		if (m_bDebug) {
+		expression.visit(this);
+		if (bDebug) {
 			System.out.println("#### EpsilonNFA ####");
 			System.out.println(getNFAString());
 		}
@@ -106,11 +82,11 @@ public class NFA implements IRegexComponentVisitor {
 	 * @return 新的边
 	 */
 	protected NFAEdge connect(NFAStatus begin, NFAStatus end) {
-		NFAEdge edge = m_EdgesPool.take();// 申请一条新边
-		edge.m_Begin = begin;
-		edge.m_End = end;
-		begin.m_OutEdges.add(edge);// 添加进起始边的出边
-		end.m_InEdges.add(edge);// 添加进结束边的入边
+		NFAEdge edge = new NFAEdge();// 申请一条新边
+		edge.begin = begin;
+		edge.end = end;
+		begin.outEdges.add(edge);// 添加进起始边的出边
+		end.inEdges.add(edge);// 添加进结束边的入边
 		return edge;
 	}
 
@@ -123,8 +99,7 @@ public class NFA implements IRegexComponentVisitor {
 	 *            某条边
 	 */
 	protected void disconnect(NFAStatus status, NFAEdge edge) {
-		edge.m_End.m_InEdges.remove(edge);// 当前边的结束状态的入边集合去除当前边
-		m_EdgesPool.restore(edge);
+		edge.end.inEdges.remove(edge);// 当前边的结束状态的入边集合去除当前边
 	}
 
 	/**
@@ -135,31 +110,30 @@ public class NFA implements IRegexComponentVisitor {
 	 */
 	protected void disconnect(NFAStatus status) {
 		/* 清除所有入边 */
-		for (Iterator<NFAEdge> it = status.m_InEdges.iterator(); it.hasNext();) {
+		for (Iterator<NFAEdge> it = status.inEdges.iterator(); it.hasNext();) {
 			NFAEdge edge = it.next();
 			it.remove();
-			disconnect(edge.m_Begin, edge);
+			disconnect(edge.begin, edge);
 		}
 		/* 清除所有出边 */
-		for (Iterator<NFAEdge> it = status.m_OutEdges.iterator(); it.hasNext();) {
+		for (Iterator<NFAEdge> it = status.outEdges.iterator(); it.hasNext();) {
 			NFAEdge edge = it.next();
 			it.remove();
 			disconnect(status, edge);
 		}
-		m_StatusPool.restore(status);
 	}
 
 	@Override
 	public void visitBegin(Charset node) {
 		enter();
 		ENFA enfa = new ENFA();
-		enfa.m_Begin = m_StatusPool.take();
-		enfa.m_End = m_StatusPool.take();
-		for (CharacterRange range : m_Map.getRanges()) {// 遍历所有字符区间
-			if (node.include(range.m_chLowerBound)) {// 若在当前结点范围内，则添加边
-				NFAEdge edge = connect(enfa.m_Begin, enfa.m_End);// 连接两个状态
-				edge.m_Data.m_Action = EdgeType.CHARSET;// 字符类型
-				edge.m_Data.m_Param = m_Map.find(range.m_chLowerBound);
+		enfa.begin = new NFAStatus();
+		enfa.end = new NFAStatus();
+		for (CharacterRange range : chMap.getRanges()) {// 遍历所有字符区间
+			if (node.include(range.chLowerBound)) {// 若在当前结点范围内，则添加边
+				NFAEdge edge = connect(enfa.begin, enfa.end);// 连接两个状态
+				edge.data.kAction = EdgeType.CHARSET;// 字符类型
+				edge.data.param = chMap.find(range.chLowerBound);
 			}
 		}
 		storeENFA(enfa);
@@ -186,24 +160,24 @@ public class NFA implements IRegexComponentVisitor {
 	public void visitEnd(Constructure node) {
 		leaveChildren();
 		ENFA result = null;
-		if (!node.m_bBranch) {
+		if (!node.bBranch) {
 			/* 将当前NFA的两端同每个子结点的两端串联 */
-			for (ENFA enfa : m_childNFA) {
+			for (ENFA enfa : childNFA) {
 				if (result == null) {
-					result = m_childNFA.get(0);
+					result = childNFA.get(0);
 				} else {
-					connect(result.m_End, enfa.m_Begin);
-					result.m_End = enfa.m_End;
+					connect(result.end, enfa.begin);
+					result.end = enfa.end;
 				}
 			}
 		} else {
 			result = new ENFA();
-			result.m_Begin = m_StatusPool.take();
-			result.m_End = m_StatusPool.take();
+			result.begin = new NFAStatus();
+			result.end = new NFAStatus();
 			/* 将当前NFA的两端同每个子结点的两端并联 */
-			for (ENFA enfa : m_childNFA) {
-				connect(result.m_Begin, enfa.m_Begin);
-				connect(enfa.m_End, result.m_End);
+			for (ENFA enfa : childNFA) {
+				connect(result.begin, enfa.begin);
+				connect(enfa.end, result.end);
 			}
 		}
 		storeENFA(result);
@@ -219,9 +193,9 @@ public class NFA implements IRegexComponentVisitor {
 		/* 构造子图副本 */
 		ArrayList<ENFA> subENFAList = new ArrayList<ENFA>();
 		ENFA enfa = new ENFA();
-		enfa.m_Begin = m_childNFA.get(0).m_Begin;
-		enfa.m_End = m_childNFA.get(0).m_End;
-		int count = Math.max(node.m_iLowerBound, node.m_iUpperBound);
+		enfa.begin = childNFA.get(0).begin;
+		enfa.end = childNFA.get(0).end;
+		int count = Math.max(node.iLowerBound, node.iUpperBound);
 		subENFAList.add(enfa);
 		/* 循环复制ENFA */
 		for (int i = 1; i <= count; i++) {
@@ -229,45 +203,45 @@ public class NFA implements IRegexComponentVisitor {
 		}
 		enfa = new ENFA();
 		/* 构造循环起始部分 */
-		if (node.m_iLowerBound > 0) {
-			enfa.m_Begin = m_childNFA.get(0).m_Begin;
-			enfa.m_End = m_childNFA.get(0).m_End;
-			for (int i = 1; i < node.m_iLowerBound; i++) {
-				connect(enfa.m_End, subENFAList.get(i).m_Begin);// 连接首尾
-				enfa.m_End = subENFAList.get(i).m_End;
+		if (node.iLowerBound > 0) {
+			enfa.begin = childNFA.get(0).begin;
+			enfa.end = childNFA.get(0).end;
+			for (int i = 1; i < node.iLowerBound; i++) {
+				connect(enfa.end, subENFAList.get(i).begin);// 连接首尾
+				enfa.end = subENFAList.get(i).end;
 			}
 		}
-		if (node.m_iUpperBound != -1) {// 有限循环，构造循环结束部分
-			for (int i = node.m_iLowerBound; i < node.m_iUpperBound; i++) {
-				if (enfa.m_End != null) {
-					connect(enfa.m_End, subENFAList.get(i).m_Begin);// 连接首尾
+		if (node.iUpperBound != -1) {// 有限循环，构造循环结束部分
+			for (int i = node.iLowerBound; i < node.iUpperBound; i++) {
+				if (enfa.end != null) {
+					connect(enfa.end, subENFAList.get(i).begin);// 连接首尾
 				} else {
 					enfa = subENFAList.get(i);
 				}
-				connect(subENFAList.get(i).m_Begin,
-						subENFAList.get(node.m_iUpperBound - 1).m_End);
+				connect(subENFAList.get(i).begin,
+						subENFAList.get(node.iUpperBound - 1).end);
 			}
 		} else {// 无限循环
 			NFAStatus tailBegin, tailEnd;
-			if (enfa.m_End == null) {// 循环最低次数为0，即未构造起始部分，故需构造
-				tailBegin = enfa.m_Begin = m_StatusPool.take();
-				tailEnd = enfa.m_End = m_StatusPool.take();
+			if (enfa.end == null) {// 循环最低次数为0，即未构造起始部分，故需构造
+				tailBegin = enfa.begin = new NFAStatus();
+				tailEnd = enfa.end = new NFAStatus();
 			} else {// 起始部分已构造完毕，故起始端无需再次构造
-				tailBegin = enfa.m_End;
-				tailEnd = enfa.m_End = m_StatusPool.take();
+				tailBegin = enfa.end;
+				tailEnd = enfa.end = new NFAStatus();
 			}
 			/* 构造无限循环的结束部分，连接起始端与循环端的双向e边 */
-			connect(tailBegin, subENFAList.get(node.m_iLowerBound).m_Begin);
-			connect(subENFAList.get(node.m_iLowerBound).m_End, tailBegin);
+			connect(tailBegin, subENFAList.get(node.iLowerBound).begin);
+			connect(subENFAList.get(node.iLowerBound).end, tailBegin);
 			connect(tailBegin, tailEnd);
 		}
 		/* 构造循环的头尾部分 */
-		NFAStatus begin = m_StatusPool.take();
-		NFAStatus end = m_StatusPool.take();
-		connect(begin, enfa.m_Begin);
-		connect(enfa.m_End, end);
-		enfa.m_Begin = begin;
-		enfa.m_End = end;
+		NFAStatus begin = new NFAStatus();
+		NFAStatus end = new NFAStatus();
+		connect(begin, enfa.begin);
+		connect(enfa.end, end);
+		enfa.begin = begin;
+		enfa.end = end;
 		storeENFA(enfa);
 		leave();
 	}
@@ -278,7 +252,7 @@ public class NFA implements IRegexComponentVisitor {
 	 * @return 当前栈顶NFA
 	 */
 	private ArrayList<ENFA> currentNFA() {
-		return m_stkNFA.peek();
+		return stkNFA.peek();
 	}
 
 	/**
@@ -295,18 +269,18 @@ public class NFA implements IRegexComponentVisitor {
 	 * 进入结点
 	 */
 	private void enter() {
-		if (m_iLevel == 0) {// 首次访问AST时
+		if (iLevel == 0) {// 首次访问AST时
 			enterChildren();
 		}
-		m_iLevel++;
+		iLevel++;
 	}
 
 	/**
 	 * 离开结点
 	 */
 	private void leave() {
-		m_iLevel--;
-		if (m_iLevel == 0) {// 离开整个AST时，存储结果
+		iLevel--;
+		if (iLevel == 0) {// 离开整个AST时，存储结果
 			leaveChildren();
 			store();
 		}
@@ -316,15 +290,15 @@ public class NFA implements IRegexComponentVisitor {
 	 * 进入子结点
 	 */
 	private void enterChildren() {
-		m_stkNFA.push(new ArrayList<ENFA>());// 新建ENFA表
-		m_childNFA = null;
+		stkNFA.push(new ArrayList<ENFA>());// 新建ENFA表
+		childNFA = null;
 	}
 
 	/**
 	 * 离开子结点
 	 */
 	private void leaveChildren() {
-		m_childNFA = m_stkNFA.pop();// 获得当前结点的子结点
+		childNFA = stkNFA.pop();// 获得当前结点的子结点
 	}
 
 	/**
@@ -333,9 +307,9 @@ public class NFA implements IRegexComponentVisitor {
 	private void store() {
 		// #### 注意 ####
 		// 本程序由regex构造的AST形成的NFA有明确且唯一的初态和终态
-		ENFA enfa = m_childNFA.get(0);// 此时位于顶层，故顶层首个ENFA为根ENFA
-		enfa.m_End.m_Data.m_bFinal = true;// 根ENFA的初态为begin，终态为end
-		m_mainNFA = enfa;
+		ENFA enfa = childNFA.get(0);// 此时位于顶层，故顶层首个ENFA为根ENFA
+		enfa.end.data.bFinal = true;// 根ENFA的初态为begin，终态为end
+		nfa = enfa;
 	}
 
 	/**
@@ -349,26 +323,26 @@ public class NFA implements IRegexComponentVisitor {
 		ArrayList<NFAStatus> srcStatusList = new ArrayList<NFAStatus>();// 初态表
 		ArrayList<NFAStatus> dstStatusList = new ArrayList<NFAStatus>();// 终态表
 		srcStatusList.addAll(getNFAStatusClosure(
-				new BreadthFirstSearch<NFAEdge, NFAStatus>(), enfa.m_Begin)); // 获取状态闭包
+				new BreadthFirstSearch<NFAEdge, NFAStatus>(), enfa.begin)); // 获取状态闭包
 		/* 复制状态 */
 		for (NFAStatus status : srcStatusList) {
-			NFAStatus newStatus = m_StatusPool.take();
-			newStatus.m_Data = status.m_Data;
+			NFAStatus newStatus = new NFAStatus();
+			newStatus.data = status.data;
 			dstStatusList.add(newStatus);
 		}
 		/* 复制边 */
 		for (int i = 0; i < srcStatusList.size(); i++) {
 			NFAStatus status = srcStatusList.get(i);
-			for (NFAEdge edge : status.m_OutEdges) {
+			for (NFAEdge edge : status.outEdges) {
 				NFAEdge newEdge = connect(dstStatusList.get(i),
-						dstStatusList.get(srcStatusList.indexOf(edge.m_End)));
-				newEdge.m_Data = edge.m_Data;
+						dstStatusList.get(srcStatusList.indexOf(edge.end)));
+				newEdge.data = edge.data;
 			}
 		}
 		/* 新建ENFA，连接初态和终态 */
 		ENFA result = new ENFA();
-		result.m_Begin = dstStatusList.get(srcStatusList.indexOf(enfa.m_Begin));
-		result.m_End = dstStatusList.get(srcStatusList.indexOf(enfa.m_End));
+		result.begin = dstStatusList.get(srcStatusList.indexOf(enfa.begin));
+		result.end = dstStatusList.get(srcStatusList.indexOf(enfa.end));
 		return result;
 	}
 
@@ -376,7 +350,7 @@ public class NFA implements IRegexComponentVisitor {
 	 * 获取字符映射表
 	 */
 	public CharacterMap getCharacterMap() {
-		return m_Map;
+		return chMap;
 	}
 
 	/**
@@ -391,14 +365,14 @@ public class NFA implements IRegexComponentVisitor {
 	protected static ArrayList<NFAStatus> getNFAStatusClosure(
 			BreadthFirstSearch<NFAEdge, NFAStatus> bfs, NFAStatus status) {
 		status.visit(bfs);
-		return bfs.m_arrStatus;
+		return bfs.arrStatus;
 	}
 
 	/**
 	 * 字符区间描述
 	 */
 	public String getStatusString() {
-		return m_Map.toString();
+		return chMap.toString();
 	}
 
 	/**
@@ -407,22 +381,22 @@ public class NFA implements IRegexComponentVisitor {
 	public String getNFAString() {
 		StringBuilder sb = new StringBuilder();
 		ArrayList<NFAStatus> statusList = getNFAStatusClosure(
-				new BreadthFirstSearch<NFAEdge, NFAStatus>(), m_mainNFA.m_Begin);// 获取状态闭包
+				new BreadthFirstSearch<NFAEdge, NFAStatus>(), nfa.begin);// 获取状态闭包
 		/* 生成NFA描述 */
 		for (int i = 0; i < statusList.size(); i++) {
 			NFAStatus status = statusList.get(i);
 			/* 状态 */
-			sb.append("状态[" + i + "]" + (status.m_Data.m_bFinal ? "[结束]" : "")
+			sb.append("状态[" + i + "]" + (status.data.bFinal ? "[结束]" : "")
 					+ System.getProperty("line.separator"));
 			/* 边 */
-			for (NFAEdge edge : status.m_OutEdges) {
-				sb.append("\t边 => [" + statusList.indexOf(edge.m_End) + "]"
+			for (NFAEdge edge : status.outEdges) {
+				sb.append("\t边 => [" + statusList.indexOf(edge.end) + "]"
 						+ System.getProperty("line.separator"));// 指向边
-				sb.append("\t\t类型 => " + edge.m_Data.m_Action.getName());
-				switch (edge.m_Data.m_Action)// 类型
+				sb.append("\t\t类型 => " + edge.data.kAction.getName());
+				switch (edge.data.kAction)// 类型
 				{
 				case CHARSET:
-					sb.append("\t" + m_Map.getRanges().get(edge.m_Data.m_Param));// 区间
+					sb.append("\t" + chMap.getRanges().get(edge.data.param));// 区间
 					break;
 				case EPSILON:
 					break;

@@ -4,13 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import org.vibur.objectpool.ConcurrentLinkedPool;
-import org.vibur.objectpool.PoolService;
 
 import priv.bajdcc.lexer.automata.BreadthFirstSearch;
 import priv.bajdcc.syntax.ISyntaxComponent;
 import priv.bajdcc.syntax.ISyntaxComponentVisitor;
-import priv.bajdcc.syntax.RuleItem;
 import priv.bajdcc.syntax.Syntax;
 import priv.bajdcc.syntax.exp.BranchExp;
 import priv.bajdcc.syntax.exp.OptionExp;
@@ -18,8 +15,8 @@ import priv.bajdcc.syntax.exp.PropertyExp;
 import priv.bajdcc.syntax.exp.RuleExp;
 import priv.bajdcc.syntax.exp.SequenceExp;
 import priv.bajdcc.syntax.exp.TokenExp;
+import priv.bajdcc.syntax.rule.RuleItem;
 import priv.bajdcc.syntax.stringify.NGAToString;
-import priv.bajdcc.utility.ObjectFactory;
 import priv.bajdcc.utility.VisitBag;
 
 /**
@@ -36,46 +33,26 @@ public class NGA implements ISyntaxComponentVisitor {
 	/**
 	 * 非终结符集合
 	 */
-	protected ArrayList<RuleExp> m_arrNonTerminals = null;
+	protected ArrayList<RuleExp> arrNonTerminals = null;
 
 	/**
 	 * 终结符集合
 	 */
-	protected ArrayList<TokenExp> m_arrTerminals = null;
+	protected ArrayList<TokenExp> arrTerminals = null;
 
 	/**
 	 * 规则到文法自动机状态的映射
 	 */
-	protected HashMap<RuleItem, NGAStatus> m_mapNGA = new HashMap<RuleItem, NGAStatus>();
-
-	/**
-	 * 边对象池
-	 */
-	private PoolService<NGAEdge> m_EdgesPool = new ConcurrentLinkedPool<NGAEdge>(
-			new ObjectFactory<NGAEdge>() {
-				public NGAEdge create() {
-					return new NGAEdge();
-				};
-			}, 1024, 10240, false);
-
-	/**
-	 * 状态对象池
-	 */
-	private PoolService<NGAStatus> m_StatusPool = new ConcurrentLinkedPool<NGAStatus>(
-			new ObjectFactory<NGAStatus>() {
-				public NGAStatus create() {
-					return new NGAStatus();
-				};
-			}, 1024, 10240, false);
+	protected HashMap<RuleItem, NGAStatus> mapNGA = new HashMap<RuleItem, NGAStatus>();
 
 	/**
 	 * 保存结果的数据包
 	 */
-	private NGABag m_Bag = null;
+	private NGABag bag = null;
 
 	public NGA(ArrayList<RuleExp> nonterminals, ArrayList<TokenExp> terminals) {
-		m_arrNonTerminals = nonterminals;
-		m_arrTerminals = terminals;
+		arrNonTerminals = nonterminals;
+		arrTerminals = terminals;
 		generateNGAMap();
 	}
 
@@ -89,11 +66,11 @@ public class NGA implements ISyntaxComponentVisitor {
 	 * @return 新的边
 	 */
 	protected NGAEdge connect(NGAStatus begin, NGAStatus end) {
-		NGAEdge edge = m_EdgesPool.take();// 申请一条新边
-		edge.m_Begin = begin;
-		edge.m_End = end;
-		begin.m_OutEdges.add(edge);// 添加进起始边的出边
-		end.m_InEdges.add(edge);// 添加进结束边的入边
+		NGAEdge edge = new NGAEdge();// 申请一条新边
+		edge.begin = begin;
+		edge.end = end;
+		begin.outEdges.add(edge);// 添加进起始边的出边
+		end.inEdges.add(edge);// 添加进结束边的入边
 		return edge;
 	}
 
@@ -106,8 +83,7 @@ public class NGA implements ISyntaxComponentVisitor {
 	 *            某条边
 	 */
 	protected void disconnect(NGAStatus status, NGAEdge edge) {
-		edge.m_End.m_InEdges.remove(edge);// 当前边的结束状态的入边集合去除当前边
-		m_EdgesPool.restore(edge);
+		edge.end.inEdges.remove(edge);// 当前边的结束状态的入边集合去除当前边
 	}
 
 	/**
@@ -118,37 +94,39 @@ public class NGA implements ISyntaxComponentVisitor {
 	 */
 	protected void disconnect(NGAStatus status) {
 		/* 清除所有入边 */
-		for (Iterator<NGAEdge> it = status.m_InEdges.iterator(); it.hasNext();) {
+		for (Iterator<NGAEdge> it = status.inEdges.iterator(); it.hasNext();) {
 			NGAEdge edge = it.next();
 			it.remove();
-			disconnect(edge.m_Begin, edge);
+			disconnect(edge.begin, edge);
 		}
 		/* 清除所有出边 */
-		for (Iterator<NGAEdge> it = status.m_OutEdges.iterator(); it.hasNext();) {
+		for (Iterator<NGAEdge> it = status.outEdges.iterator(); it.hasNext();) {
 			NGAEdge edge = it.next();
 			it.remove();
 			disconnect(status, edge);
 		}
-		m_StatusPool.restore(status);
 	}
 
 	/**
 	 * 产生NGA映射表
 	 */
 	private void generateNGAMap() {
-		for (RuleExp exp : m_arrNonTerminals) {
+		int j = 0;
+		for (RuleExp exp : arrNonTerminals) {
+			j++;
 			int i = 0;
-			for (RuleItem item : exp.m_Rule.m_arrRules) {
+			j = j + i - i;
+			for (RuleItem item : exp.rule.arrRules) {
 				/* 表达式转换成NGA */
-				m_Bag = new NGABag();
-				m_Bag.m_Expression = item.m_Expression;
-				m_Bag.m_strPrefix = exp.m_strName + "[" + i + "]";
-				m_Bag.m_Expression.visit(this);
-				ENGA enga = m_Bag.m_outputNGA;
+				bag = new NGABag();
+				bag.expression = item.expression;
+				bag.prefix = exp.name + "[" + i + "]";
+				bag.expression.visit(this);
+				ENGA enga = bag.nga;
 				/* NGA去Epsilon边 */
 				NGAStatus status = deleteEpsilon(enga);
 				/* 保存 */
-				m_mapNGA.put(item, status);
+				mapNGA.put(item, status);
 				i++;
 			}
 		}
@@ -164,7 +142,7 @@ public class NGA implements ISyntaxComponentVisitor {
 	private NGAStatus deleteEpsilon(ENGA enga) {
 		/* 获取状态闭包 */
 		ArrayList<NGAStatus> NGAStatusList = getNGAStatusClosure(
-				new BreadthFirstSearch<NGAEdge, NGAStatus>(), enga.m_Begin);
+				new BreadthFirstSearch<NGAEdge, NGAStatus>(), enga.begin);
 		/* 可到达状态集合 */
 		ArrayList<NGAStatus> availableStatus = new ArrayList<NGAStatus>();
 		/* 可到达标签集合 */
@@ -173,30 +151,30 @@ public class NGA implements ISyntaxComponentVisitor {
 		HashSet<String> availableLabelsSet = new HashSet<String>();
 		/* 搜索所有有效状态 */
 		availableStatus.add(NGAStatusList.get(0));
-		availableLabels.add(NGAStatusList.get(0).m_Data.m_strLabel);
-		availableLabelsSet.add(NGAStatusList.get(0).m_Data.m_strLabel);
+		availableLabels.add(NGAStatusList.get(0).data.label);
+		availableLabelsSet.add(NGAStatusList.get(0).data.label);
 		for (NGAStatus status : NGAStatusList) {
 			if (status == NGAStatusList.get(0)) {// 排除第一个
 				continue;
 			}
 			boolean available = false;
-			for (NGAEdge edge : status.m_InEdges) {
-				if (edge.m_Data.m_Action != NGAEdgeType.EPSILON) {// 不是Epsilon边
+			for (NGAEdge edge : status.inEdges) {
+				if (edge.data.kAction != NGAEdgeType.EPSILON) {// 不是Epsilon边
 					available = true;// 当前可到达
 					break;
 				}
 			}
 			if (available
-					&& !availableLabelsSet.contains(status.m_Data.m_strLabel)) {
+					&& !availableLabelsSet.contains(status.data.label)) {
 				availableStatus.add(status);
-				availableLabels.add(status.m_Data.m_strLabel);
-				availableLabelsSet.add(status.m_Data.m_strLabel);
+				availableLabels.add(status.data.label);
+				availableLabelsSet.add(status.data.label);
 			}
 		}
 		BreadthFirstSearch<NGAEdge, NGAStatus> epsilonBFS = new BreadthFirstSearch<NGAEdge, NGAStatus>() {
 			@Override
 			public boolean testEdge(NGAEdge edge) {
-				return edge.m_Data.m_Action == NGAEdgeType.EPSILON;
+				return edge.data.kAction == NGAEdgeType.EPSILON;
 			}
 		};
 		/* 遍历所有有效状态 */
@@ -208,28 +186,28 @@ public class NGA implements ISyntaxComponentVisitor {
 			epsilonClosure.remove(status);
 			/* 遍历Epsilon闭包的状态 */
 			for (NGAStatus epsilonStatus : epsilonClosure) {
-				if (epsilonStatus.m_Data.m_bFinal) {
+				if (epsilonStatus.data.bFinal) {
 					/* 如果闭包中有终态，则当前状态为终态 */
-					status.m_Data.m_bFinal = true;
+					status.data.bFinal = true;
 				}
 				/* 遍历闭包中所有边 */
-				for (NGAEdge edge : epsilonStatus.m_OutEdges) {
-					if (edge.m_Data.m_Action != NGAEdgeType.EPSILON) {
+				for (NGAEdge edge : epsilonStatus.outEdges) {
+					if (edge.data.kAction != NGAEdgeType.EPSILON) {
 						/* 获得索引 */
 						int idx = availableLabels
-								.indexOf(edge.m_End.m_Data.m_strLabel);
+								.indexOf(edge.end.data.label);
 						/* 如果当前边不是Epsilon边，就将闭包中的有效边添加到当前状态 */
-						connect(status, availableStatus.get(idx)).m_Data = edge.m_Data;
+						connect(status, availableStatus.get(idx)).data = edge.data;
 					}
 				}
 			}
 		}
 		/* 删除Epsilon边 */
 		for (NGAStatus status : NGAStatusList) {
-			for (Iterator<NGAEdge> it = status.m_OutEdges.iterator(); it
+			for (Iterator<NGAEdge> it = status.outEdges.iterator(); it
 					.hasNext();) {
 				NGAEdge edge = it.next();
-				if (edge.m_Data.m_Action == NGAEdgeType.EPSILON) {
+				if (edge.data.kAction == NGAEdgeType.EPSILON) {
 					it.remove();
 					disconnect(status, edge);// 删除Epsilon边
 				}
@@ -246,7 +224,7 @@ public class NGA implements ISyntaxComponentVisitor {
 			NGAStatusList.remove(status);// 删除无效状态
 			disconnect(status);// 删除与状态有关的所有边
 		}
-		return enga.m_Begin;
+		return enga.begin;
 	}
 
 	/**
@@ -261,22 +239,22 @@ public class NGA implements ISyntaxComponentVisitor {
 	protected static ArrayList<NGAStatus> getNGAStatusClosure(
 			BreadthFirstSearch<NGAEdge, NGAStatus> bfs, NGAStatus status) {
 		status.visit(bfs);
-		return bfs.m_arrStatus;
+		return bfs.arrStatus;
 	}
 
 	/**
 	 * 开始遍历子结点
 	 */
 	private void beginChilren() {
-		m_Bag.m_childNGA = null;
-		m_Bag.m_stkNGA.push(new ArrayList<ENGA>());
+		bag.childNGA = null;
+		bag.stkNGA.push(new ArrayList<ENGA>());
 	}
 
 	/**
 	 * 结束遍历子结点
 	 */
 	private void endChilren() {
-		m_Bag.m_childNGA = m_Bag.m_stkNGA.pop();
+		bag.childNGA = bag.stkNGA.pop();
 	}
 
 	/**
@@ -286,11 +264,11 @@ public class NGA implements ISyntaxComponentVisitor {
 	 *            EpsilonNGA
 	 */
 	private void store(ENGA enga) {
-		if (m_Bag.m_stkNGA.isEmpty()) {
-			enga.m_End.m_Data.m_bFinal = true;
-			m_Bag.m_outputNGA = enga;
+		if (bag.stkNGA.isEmpty()) {
+			enga.end.data.bFinal = true;
+			bag.nga = enga;
 		} else {
-			m_Bag.m_stkNGA.peek().add(enga);
+			bag.stkNGA.peek().add(enga);
 		}
 	}
 
@@ -329,9 +307,9 @@ public class NGA implements ISyntaxComponentVisitor {
 		/* 新建ENGA */
 		ENGA enga = createENGA(node);
 		/* 连接ENGA边并保存当前结点 */
-		NGAEdge edge = connect(enga.m_Begin, enga.m_End);
-		edge.m_Data.m_Action = NGAEdgeType.TOKEN;
-		edge.m_Data.m_Token = node;
+		NGAEdge edge = connect(enga.begin, enga.end);
+		edge.data.kAction = NGAEdgeType.TOKEN;
+		edge.data.token = node;
 		store(enga);
 	}
 
@@ -340,9 +318,9 @@ public class NGA implements ISyntaxComponentVisitor {
 		/* 新建ENGA */
 		ENGA enga = createENGA(node);
 		/* 连接ENGA边并保存当前结点 */
-		NGAEdge edge = connect(enga.m_Begin, enga.m_End);
-		edge.m_Data.m_Action = NGAEdgeType.RULE;
-		edge.m_Data.m_Rule = node;
+		NGAEdge edge = connect(enga.begin, enga.end);
+		edge.data.kAction = NGAEdgeType.RULE;
+		edge.data.rule = node;
 		store(enga);
 	}
 
@@ -351,13 +329,13 @@ public class NGA implements ISyntaxComponentVisitor {
 		endChilren();
 		/* 串联 */
 		ENGA enga = new ENGA();
-		for (ENGA child : m_Bag.m_childNGA) {
-			if (enga.m_Begin != null) {
-				connect(enga.m_End, child.m_Begin);// 首尾相连
-				enga.m_End = child.m_End;
+		for (ENGA child : bag.childNGA) {
+			if (enga.begin != null) {
+				connect(enga.end, child.begin);// 首尾相连
+				enga.end = child.end;
 			} else {
-				enga.m_Begin = m_Bag.m_childNGA.get(0).m_Begin;
-				enga.m_End = m_Bag.m_childNGA.get(0).m_End;
+				enga.begin = bag.childNGA.get(0).begin;
+				enga.end = bag.childNGA.get(0).end;
 			}
 		}
 		store(enga);
@@ -369,13 +347,13 @@ public class NGA implements ISyntaxComponentVisitor {
 		/* 新建ENGA */
 		ENGA enga = createENGA(node);
 		/* 并联 */
-		for (ENGA child : m_Bag.m_childNGA) {
+		for (ENGA child : bag.childNGA) {
 			/* 复制标签 */
-			child.m_Begin.m_Data.m_strLabel = enga.m_Begin.m_Data.m_strLabel;
-			child.m_End.m_Data.m_strLabel = enga.m_End.m_Data.m_strLabel;
+			child.begin.data.label = enga.begin.data.label;
+			child.end.data.label = enga.end.data.label;
 			/* 连接首尾 */
-			connect(enga.m_Begin, child.m_Begin);
-			connect(child.m_End, enga.m_End);
+			connect(enga.begin, child.begin);
+			connect(child.end, enga.end);
 		}
 		store(enga);
 	}
@@ -384,13 +362,13 @@ public class NGA implements ISyntaxComponentVisitor {
 	public void visitEnd(OptionExp node) {
 		endChilren();
 		/* 获得唯一的一个子结点 */
-		ENGA enga = m_Bag.m_childNGA.get(0);
-		enga.m_Begin.m_Data.m_strLabel = Syntax.getSingleString(
-				m_Bag.m_strPrefix, m_Bag.m_Expression, node, true);
-		enga.m_End.m_Data.m_strLabel = Syntax.getSingleString(
-				m_Bag.m_strPrefix, m_Bag.m_Expression, node, false);
+		ENGA enga = bag.childNGA.get(0);
+		enga.begin.data.label = Syntax.getSingleString(
+				bag.prefix, bag.expression, node, true);
+		enga.end.data.label = Syntax.getSingleString(
+				bag.prefix, bag.expression, node, false);
 		/* 添加可选边，即Epsilon边 */
-		connect(enga.m_Begin, enga.m_End);
+		connect(enga.begin, enga.end);
 		store(enga);
 	}
 
@@ -398,15 +376,15 @@ public class NGA implements ISyntaxComponentVisitor {
 	public void visitEnd(PropertyExp node) {
 		endChilren();
 		/* 获得唯一的一个子结点 */
-		ENGA enga = m_Bag.m_childNGA.get(0);
-		enga.m_Begin.m_Data.m_strLabel = Syntax.getSingleString(
-				m_Bag.m_strPrefix, m_Bag.m_Expression, node, true);
-		enga.m_End.m_Data.m_strLabel = Syntax.getSingleString(
-				m_Bag.m_strPrefix, m_Bag.m_Expression, node, false);
+		ENGA enga = bag.childNGA.get(0);
+		enga.begin.data.label = Syntax.getSingleString(
+				bag.prefix, bag.expression, node, true);
+		enga.end.data.label = Syntax.getSingleString(
+				bag.prefix, bag.expression, node, false);
 		/* 获得该结点的边 */
-		NGAEdge edge = enga.m_Begin.m_OutEdges.get(0);
-		edge.m_Data.m_iStorage = node.m_iStorage;
-		edge.m_Data.m_Handler = node.m_ErrorHandler;
+		NGAEdge edge = enga.begin.outEdges.get(0);
+		edge.data.iStorage = node.iStorage;
+		edge.data.handler = node.errorHandler;
 		store(enga);
 	}
 
@@ -419,12 +397,12 @@ public class NGA implements ISyntaxComponentVisitor {
 	 */
 	private ENGA createENGA(ISyntaxComponent node) {
 		ENGA enga = new ENGA();
-		enga.m_Begin = m_StatusPool.take();
-		enga.m_End = m_StatusPool.take();
-		enga.m_Begin.m_Data.m_strLabel = Syntax.getSingleString(
-				m_Bag.m_strPrefix, m_Bag.m_Expression, node, true);
-		enga.m_End.m_Data.m_strLabel = Syntax.getSingleString(
-				m_Bag.m_strPrefix, m_Bag.m_Expression, node, false);
+		enga.begin = new NGAStatus();
+		enga.end = new NGAStatus();
+		enga.begin.data.label = Syntax.getSingleString(
+				bag.prefix, bag.expression, node, true);
+		enga.end.data.label = Syntax.getSingleString(
+				bag.prefix, bag.expression, node, false);
 		return enga;
 	}
 
@@ -435,7 +413,7 @@ public class NGA implements ISyntaxComponentVisitor {
 		StringBuffer sb = new StringBuffer();
 		sb.append("#### 产生式 ####");
 		sb.append(System.getProperty("line.separator"));
-		for (NGAStatus status : m_mapNGA.values()) {
+		for (NGAStatus status : mapNGA.values()) {
 			sb.append(getNGAString(status, ""));
 			sb.append(System.getProperty("line.separator"));
 		}

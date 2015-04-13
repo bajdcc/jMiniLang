@@ -28,8 +28,8 @@ public class StringTokenizer extends TokenAlgorithm {
 	 */
 	@Override
 	public Token getToken(String string, Token token) {
-		token.m_kToken = TokenType.STRING;
-		token.m_Object = string;
+		token.kToken = TokenType.STRING;
+		token.object = string;
 		return token;
 	}
 }

@@ -6,7 +6,7 @@ package priv.bajdcc.lexer.token;
  * @author bajdcc
  */
 public enum TokenType {
-	KEYWORD("关 键 字"), ID("标识符"), WHITESPACE("空白字符"), CHARACTER("字符"), STRING(
+	KEYWORD("关键字"), ID("标识符"), WHITESPACE("空白字符"), CHARACTER("字符"), STRING(
 			"字符串"), INTEGER("整数"), REAL("实数"), EOF("全文末尾"), COMMENT("注释"), OPERATOR(
 			"操作符"), MACRO("宏"), ERROR("错误");
 

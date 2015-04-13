@@ -17,6 +17,8 @@ import priv.bajdcc.syntax.exp.RuleExp;
 import priv.bajdcc.syntax.exp.SequenceExp;
 import priv.bajdcc.syntax.exp.TokenExp;
 import priv.bajdcc.syntax.lexer.SyntaxLexer;
+import priv.bajdcc.syntax.rule.Rule;
+import priv.bajdcc.syntax.rule.RuleItem;
 import priv.bajdcc.syntax.solver.FirstsetSolver;
 import priv.bajdcc.syntax.stringify.SyntaxToString;
 import priv.bajdcc.syntax.token.OperatorType;
@@ -26,10 +28,10 @@ import priv.bajdcc.utility.BitVector2;
 import priv.bajdcc.utility.Position;
 
 /**
- * 文法构造器
+ * 【语法分析】文法构造器
  * 
- * 语法示例： Z -> A | B[1] | `abc` | ( A[0] | `c`<terminal comment text> |
- * C[1]<comment> | C[storage id]{Error handler name})
+ * 语法示例： <pre>Z -> A | B[1] | @abc | ( A[0] | @Terminal<terminal comment text> |
+ * C[1]&lt;comment&gt; | C[storage id]{Error handler name}) </pre>
  *
  * @author bajdcc
  */
@@ -38,66 +40,66 @@ public class Syntax {
 	/**
 	 * 终结符表
 	 */
-	protected ArrayList<TokenExp> m_arrTerminals = new ArrayList<TokenExp>();
+	protected ArrayList<TokenExp> arrTerminals = new ArrayList<TokenExp>();
 
 	/**
 	 * 终结符映射
 	 */
-	protected HashMap<String, TokenExp> m_mapTerminals = new HashMap<String, TokenExp>();
+	protected HashMap<String, TokenExp> mapTerminals = new HashMap<String, TokenExp>();
 
 	/**
 	 * 非终结符表
 	 */
-	protected ArrayList<RuleExp> m_arrNonTerminals = new ArrayList<RuleExp>();
+	protected ArrayList<RuleExp> arrNonTerminals = new ArrayList<RuleExp>();
 
 	/**
 	 * 非终结符映射
 	 */
-	protected HashMap<String, RuleExp> m_mapNonTerminals = new HashMap<String, RuleExp>();
+	protected HashMap<String, RuleExp> mapNonTerminals = new HashMap<String, RuleExp>();
 
 	/**
 	 * 错误处理表
 	 */
-	protected ArrayList<IErrorHandler> m_arrHandlers = new ArrayList<IErrorHandler>();
+	protected ArrayList<IErrorHandler> arrHandlers = new ArrayList<IErrorHandler>();
 	/**
 	 * 错误处理映射
 	 */
-	protected HashMap<String, IErrorHandler> m_mapHandlers = new HashMap<String, IErrorHandler>();
+	protected HashMap<String, IErrorHandler> mapHandlers = new HashMap<String, IErrorHandler>();
 
 	/**
 	 * 文法起始符号
 	 */
-	private String m_strBeginRuleName = "";
+	private String strBeginRuleName = "";
 
 	/**
 	 * 面向文法的词法分析器
 	 */
-	private SyntaxLexer m_SyntaxLexer = new SyntaxLexer();
+	private SyntaxLexer syntaxLexer = new SyntaxLexer();
 
 	/**
 	 * 当前字符
 	 */
-	private Token m_Token = null;
+	private Token token = null;
 
 	/**
 	 * 当前解析的文法规则
 	 */
-	private RuleExp m_Rule = null;
+	private RuleExp rule = null;
 
 	/**
 	 * 非确定性下推自动机
 	 */
-	protected NPA m_NPA = null;
+	protected NPA npa = null;
 
 	public Syntax() throws RegexException {
 		this(true);
 	}
 
 	public Syntax(boolean ignoreLexError) throws RegexException {
-		m_SyntaxLexer.discard(TokenType.COMMENT);
-		m_SyntaxLexer.discard(TokenType.WHITSPACE);
+		syntaxLexer.discard(TokenType.COMMENT);
+		syntaxLexer.discard(TokenType.WHITSPACE);
 		if (ignoreLexError) {
-			m_SyntaxLexer.discard(TokenType.ERROR);
+			syntaxLexer.discard(TokenType.ERROR);
 		}
 	}
 
@@ -113,9 +115,10 @@ public class Syntax {
 	 */
 	public void addTerminal(String name,
 			priv.bajdcc.lexer.token.TokenType type, Object obj) {
-		TokenExp exp = new TokenExp(m_arrTerminals.size(), name, type, obj);
-		if (m_mapTerminals.put(name, exp) == null) {
-			m_arrTerminals.add(exp);
+		TokenExp exp = new TokenExp(arrTerminals.size(), name, type, obj);
+		if (!mapTerminals.containsKey(name)) {
+			mapTerminals.put(name, exp);
+			arrTerminals.add(exp);
 		}
 	}
 
@@ -126,9 +129,10 @@ public class Syntax {
 	 *            非终结符名称
 	 */
 	public void addNonTerminal(String name) {
-		RuleExp exp = new RuleExp(m_arrNonTerminals.size(), name);
-		if (m_mapNonTerminals.put(name, exp) == null) {
-			m_arrNonTerminals.add(exp);
+		RuleExp exp = new RuleExp(arrNonTerminals.size(), name);
+		if (!mapNonTerminals.containsKey(name)) {
+			mapNonTerminals.put(name, exp);
+			arrNonTerminals.add(exp);
 		}
 	}
 
@@ -141,8 +145,9 @@ public class Syntax {
 	 *            处理接口
 	 */
 	public void addErrorHandler(String name, IErrorHandler handler) {
-		if (m_mapHandlers.put(name, handler) == null) {
-			m_arrHandlers.add(handler);
+		if (!mapHandlers.containsKey(name)) {
+			mapHandlers.put(name, handler);
+			arrHandlers.add(handler);
 		}
 	}
 
@@ -152,7 +157,7 @@ public class Syntax {
 	 * @throws SyntaxException
 	 */
 	public void infer(String inferString) throws SyntaxException {
-		m_SyntaxLexer.setContext(inferString);
+		syntaxLexer.setContext(inferString);
 		compile();
 	}
 
@@ -164,8 +169,8 @@ public class Syntax {
 	 * @throws SyntaxException
 	 */
 	private void err(SyntaxError error) throws SyntaxException {
-		throw new SyntaxException(error, m_SyntaxLexer.position(),
-				m_Token.m_Object);
+		throw new SyntaxException(error, syntaxLexer.position(),
+				token.object);
 	}
 
 	/**
@@ -192,7 +197,7 @@ public class Syntax {
 	 */
 	private void expect(TokenType type, SyntaxError error)
 			throws SyntaxException {
-		if (m_Token.m_kToken == type) {
+		if (token.kToken == type) {
 			next();
 		} else {
 			err(error);
@@ -210,7 +215,7 @@ public class Syntax {
 	 */
 	private void match(TokenType type, SyntaxError error)
 			throws SyntaxException {
-		if (m_Token.m_kToken != type) {
+		if (token.kToken != type) {
 			err(error);
 		}
 	}
@@ -222,10 +227,10 @@ public class Syntax {
 	 */
 	private RuleExp matchNonTerminal() throws SyntaxException {
 		match(TokenType.NONTERMINAL, SyntaxError.SYNTAX);
-		if (!m_mapNonTerminals.containsKey(m_Token.m_Object.toString())) {
+		if (!mapNonTerminals.containsKey(token.object.toString())) {
 			err(SyntaxError.UNDECLARED);
 		}
-		return m_mapNonTerminals.get(m_Token.m_Object.toString());
+		return mapNonTerminals.get(token.object.toString());
 	}
 
 	/**
@@ -235,10 +240,10 @@ public class Syntax {
 	 */
 	private TokenExp matchTerminal() throws SyntaxException {
 		match(TokenType.TERMINAL, SyntaxError.SYNTAX);
-		if (!m_mapTerminals.containsKey(m_Token.m_Object.toString())) {
+		if (!mapTerminals.containsKey(token.object.toString())) {
 			err(SyntaxError.UNDECLARED);
 		}
-		return m_mapTerminals.get(m_Token.m_Object.toString());
+		return mapTerminals.get(token.object.toString());
 	}
 
 	/**
@@ -248,10 +253,10 @@ public class Syntax {
 	 */
 	private IErrorHandler matchHandler() throws SyntaxException {
 		match(TokenType.HANDLER, SyntaxError.SYNTAX);
-		if (!m_mapHandlers.containsKey(m_Token.m_Object.toString())) {
+		if (!mapHandlers.containsKey(token.object.toString())) {
 			err(SyntaxError.UNDECLARED);
 		}
-		return m_mapHandlers.get(m_Token.m_Object.toString());
+		return mapHandlers.get(token.object.toString());
 	}
 
 	/**
@@ -267,13 +272,13 @@ public class Syntax {
 	private PropertyExp matchStorage(ISyntaxComponent exp, Object storage)
 			throws SyntaxException {
 		PropertyExp property;
-		if (m_Token.m_kToken == TokenType.STORAGE) {
+		if (token.kToken == TokenType.STORAGE) {
 			property = new PropertyExp((int) storage, null);
 			next();
 		} else {
 			property = new PropertyExp(-1, null);
 		}
-		property.m_Expression = exp;
+		property.expression = exp;
 		return property;
 	}
 
@@ -282,9 +287,9 @@ public class Syntax {
 	 */
 	private Token next() {
 		do {
-			m_Token = m_SyntaxLexer.nextToken();
-		} while (m_Token == null);
-		return m_Token;
+			token = syntaxLexer.nextToken();
+		} while (token == null);
+		return token;
 	}
 
 	/**
@@ -309,7 +314,7 @@ public class Syntax {
 		next();
 		matchNonTerminal();
 		/* 设定本次需要推导的非终结符 */
-		m_Rule = m_mapNonTerminals.get(m_Token.m_Object.toString());
+		rule = mapNonTerminals.get(token.object.toString());
 		/* 匹配推导符号"->" */
 		next();
 		expect(TokenType.OPERATOR, SyntaxError.SYNTAX);
@@ -324,9 +329,9 @@ public class Syntax {
 		/* 获得分析后的表达式根结点 */
 		ISyntaxComponent exp = doAnalysis(TokenType.EOF, null);
 		/* 将根结点添加进对应规则 */
-		RuleItem item = new RuleItem(exp, m_Rule.m_Rule);
+		RuleItem item = new RuleItem(exp, rule.rule);
 		onAddRuleItem(item);
-		m_Rule.m_Rule.m_arrRules.add(item);
+		rule.rule.arrRules.add(item);
 	}
 
 	/**
@@ -362,9 +367,9 @@ public class Syntax {
 		ISyntaxComponent result = sequence;
 
 		for (;;) {
-			if ((m_Token.m_kToken == type && (m_Token.m_Object == null || m_Token.m_Object
+			if ((token.kToken == type && (token.object == null || token.object
 					.equals(obj)))) {// 结束字符
-				if (m_SyntaxLexer.index() == 0) {// 表达式为空
+				if (syntaxLexer.index() == 0) {// 表达式为空
 					err(SyntaxError.NULL);
 				} else if (collection.isEmpty()) {// 部件为空
 					err(SyntaxError.INCOMPLETE);
@@ -372,13 +377,13 @@ public class Syntax {
 					next();
 					break;// 正常终止
 				}
-			} else if (m_Token.m_kToken == TokenType.EOF) {
+			} else if (token.kToken == TokenType.EOF) {
 				err(SyntaxError.INCOMPLETE);
 			}
 			ISyntaxComponent exp = null;// 当前待赋值的表达式
-			switch (m_Token.m_kToken) {
+			switch (token.kToken) {
 			case OPERATOR:
-				OperatorType op = (OperatorType) m_Token.m_Object;
+				OperatorType op = (OperatorType) token.object;
 				next();
 				switch (op) {
 				case ALTERNATIVE:
@@ -402,7 +407,7 @@ public class Syntax {
 				case LSQUARE:// '['
 					exp = doAnalysis(TokenType.OPERATOR, OperatorType.RSQUARE);// 递归分析
 					OptionExp option = new OptionExp();// 包装
-					option.m_Expression = exp;
+					option.expression = exp;
 					exp = option;
 					break;
 				default:
@@ -415,20 +420,20 @@ public class Syntax {
 			case TERMINAL:
 				exp = matchTerminal();
 				next();
-				PropertyExp property1 = matchStorage(exp, m_Token.m_Object);
+				PropertyExp property1 = matchStorage(exp, token.object);
 				exp = property1;
-				if (m_Token.m_kToken == TokenType.HANDLER) {
-					property1.m_ErrorHandler = matchHandler();
+				if (token.kToken == TokenType.HANDLER) {
+					property1.errorHandler = matchHandler();
 					next();
 				}
 				break;
 			case NONTERMINAL:
 				exp = matchNonTerminal();
 				next();
-				PropertyExp property2 = matchStorage(exp, m_Token.m_Object);
+				PropertyExp property2 = matchStorage(exp, token.object);
 				exp = property2;
-				if (m_Token.m_kToken == TokenType.HANDLER) {
-					property2.m_ErrorHandler = matchHandler();
+				if (token.kToken == TokenType.HANDLER) {
+					property2.errorHandler = matchHandler();
 					next();
 				}
 				break;
@@ -452,9 +457,9 @@ public class Syntax {
 	 * @throws SyntaxException
 	 */
 	public void initialize(String startSymbol) throws SyntaxException {
-		m_strBeginRuleName = startSymbol;
+		strBeginRuleName = startSymbol;
 		checkStartSymbol();
-		semanticAnalysis();
+		semanticAnalysis();		
 		generateNGA();
 	}
 
@@ -464,7 +469,7 @@ public class Syntax {
 	 * @throws SyntaxException
 	 */
 	private void checkStartSymbol() throws SyntaxException {
-		if (!m_mapNonTerminals.containsKey(m_strBeginRuleName)) {
+		if (!mapNonTerminals.containsKey(strBeginRuleName)) {
 			err(SyntaxError.UNDECLARED);
 		}
 	}
@@ -476,15 +481,15 @@ public class Syntax {
 	 */
 	private void semanticAnalysis() throws SyntaxException {
 		/* 非终结符数量 */
-		int size = m_arrNonTerminals.size();
+		int size = arrNonTerminals.size();
 		/* 计算规则的First集合 */
-		for (RuleExp exp : m_arrNonTerminals) {
-			for (RuleItem item : exp.m_Rule.m_arrRules) {
+		for (RuleExp exp : arrNonTerminals) {
+			for (RuleItem item : exp.rule.arrRules) {
 				FirstsetSolver solver = new FirstsetSolver();
-				item.m_Expression.visit(solver);// 计算规则的First集合
+				item.expression.visit(solver);// 计算规则的First集合
 				if (!solver.solve(item)) {// 若串长度可能为零，即产生空串
 					err(SyntaxError.EPSILON,
-							getSingleString(exp.m_strName, item.m_Expression));
+							getSingleString(exp.name, item.expression));
 				}
 			}
 		}
@@ -494,10 +499,10 @@ public class Syntax {
 		/* 计算非终结符First集合包含关系的布尔连通矩阵 */
 		{
 			int i = 0;
-			for (RuleExp exp : m_arrNonTerminals) {
-				for (RuleItem item : exp.m_Rule.m_arrRules) {
-					for (RuleExp rule : item.m_setFirstSetRules) {
-						firstsetDependency.set(i, rule.m_iID);
+			for (RuleExp exp : arrNonTerminals) {
+				for (RuleItem item : exp.rule.arrRules) {
+					for (RuleExp rule : item.setFirstSetRules) {
+						firstsetDependency.set(i, rule.id);
 					}
 				}
 				i++;
@@ -508,7 +513,7 @@ public class Syntax {
 			/* 标记并清除直接左递归 */
 			for (int i = 0; i < size; i++) {
 				if (firstsetDependency.test(i, i)) {
-					m_arrNonTerminals.get(i).m_Rule.m_iRecursiveLevel = 1;// 直接左递归
+					arrNonTerminals.get(i).rule.iRecursiveLevel = 1;// 直接左递归
 					firstsetDependency.clear(i, i);
 				}
 			}
@@ -532,10 +537,10 @@ public class Syntax {
 				/* 检查当前结果是否出现环 */
 				{
 					int i = 0;
-					for (RuleExp exp : m_arrNonTerminals) {
+					for (RuleExp exp : arrNonTerminals) {
 						if (r.test(i, i)) {
-							if (exp.m_Rule.m_iRecursiveLevel < 2) {
-								exp.m_Rule.m_iRecursiveLevel = level;
+							if (exp.rule.iRecursiveLevel < 2) {
+								exp.rule.iRecursiveLevel = level;
 							}
 						}
 						i++;
@@ -545,10 +550,10 @@ public class Syntax {
 				a = (BitVector2) r.clone();
 			}
 			/* 检查是否存在环并报告错误 */
-			for (RuleExp exp : m_arrNonTerminals) {
-				if (exp.m_Rule.m_iRecursiveLevel > 1) {
-					err(SyntaxError.INDIRECT_RECURSION, exp.m_strName
-							+ " level:" + exp.m_Rule.m_iRecursiveLevel);
+			for (RuleExp exp : arrNonTerminals) {
+				if (exp.rule.iRecursiveLevel > 1) {
+					err(SyntaxError.INDIRECT_RECURSION, exp.name
+							+ " level:" + exp.rule.iRecursiveLevel);
 				}
 			}
 		}
@@ -577,27 +582,27 @@ public class Syntax {
 				}
 				if (nodependencyRule == -1) {
 					err(SyntaxError.MISS_NODEPENDENCY_RULE,
-							m_arrNonTerminals.get(i).m_strName);
+							arrNonTerminals.get(i).name);
 				}
 				/* 计算该规则的终结符First集合 */
 				{
-					Rule rule = m_arrNonTerminals.get(nodependencyRule).m_Rule;
+					Rule rule = arrNonTerminals.get(nodependencyRule).rule;
 					/* 计算规则的终结符First集合 */
-					for (RuleItem item : rule.m_arrRules) {
-						for (RuleExp exp : item.m_setFirstSetRules) {
-							item.m_setFirstSetTokens
-									.addAll(exp.m_Rule.m_arrTokens);
+					for (RuleItem item : rule.arrRules) {
+						for (RuleExp exp : item.setFirstSetRules) {
+							item.setFirstSetTokens
+									.addAll(exp.rule.arrTokens);
 						}
 					}
 					/* 计算非终结符的终结符First集合 */
-					for (RuleItem item : rule.m_arrRules) {
-						rule.m_arrTokens.addAll(item.m_setFirstSetTokens);
+					for (RuleItem item : rule.arrRules) {
+						rule.arrTokens.addAll(item.setFirstSetTokens);
 					}
 					/* 修正左递归规则的终结符First集合 */
-					for (RuleItem item : rule.m_arrRules) {
-						if (item.m_setFirstSetRules.contains(m_arrNonTerminals
+					for (RuleItem item : rule.arrRules) {
+						if (item.setFirstSetRules.contains(arrNonTerminals
 								.get(nodependencyRule))) {
-							item.m_setFirstSetTokens.addAll(rule.m_arrTokens);
+							item.setFirstSetTokens.addAll(rule.arrTokens);
 						}
 					}
 				}
@@ -609,11 +614,11 @@ public class Syntax {
 			}
 		}
 		/* 搜索不能产生字符串的规则 */
-		for (RuleExp exp : m_arrNonTerminals) {
-			for (RuleItem item : exp.m_Rule.m_arrRules) {
-				if (item.m_setFirstSetTokens.isEmpty()) {
+		for (RuleExp exp : arrNonTerminals) {
+			for (RuleItem item : exp.rule.arrRules) {
+				if (item.setFirstSetTokens.isEmpty()) {
 					err(SyntaxError.FAILED,
-							getSingleString(exp.m_strName, item.m_Expression));
+							getSingleString(exp.name, item.expression));
 				}
 			}
 		}
@@ -623,8 +628,8 @@ public class Syntax {
 	 * 生成非确定性下推自动机
 	 */
 	private void generateNGA() {
-		m_NPA = new NPA(m_arrNonTerminals, m_arrTerminals,
-				m_mapNonTerminals.get(m_strBeginRuleName).m_Rule);
+		npa = new NPA(arrNonTerminals, arrTerminals,
+				mapNonTerminals.get(strBeginRuleName).rule);
 	}
 
 	/**
@@ -678,41 +683,41 @@ public class Syntax {
 		/* 起始符号 */
 		sb.append("#### 起始符号 ####");
 		sb.append(System.getProperty("line.separator"));
-		sb.append(m_strBeginRuleName);
+		sb.append(strBeginRuleName);
 		sb.append(System.getProperty("line.separator"));
 		/* 终结符 */
 		sb.append("#### 终结符 ####");
 		sb.append(System.getProperty("line.separator"));
-		for (TokenExp exp : m_arrTerminals) {
+		for (TokenExp exp : arrTerminals) {
 			sb.append(exp.toString());
 			sb.append(System.getProperty("line.separator"));
 		}
 		/* 非终结符 */
 		sb.append("#### 非终结符 ####");
 		sb.append(System.getProperty("line.separator"));
-		for (RuleExp exp : m_arrNonTerminals) {
+		for (RuleExp exp : arrNonTerminals) {
 			sb.append(exp.toString());
 			sb.append(System.getProperty("line.separator"));
 		}
 		/* 推导规则 */
 		sb.append("#### 文法产生式 ####");
 		sb.append(System.getProperty("line.separator"));
-		for (RuleExp exp : m_arrNonTerminals) {
-			for (RuleItem item : exp.m_Rule.m_arrRules) {
+		for (RuleExp exp : arrNonTerminals) {
+			for (RuleItem item : exp.rule.arrRules) {
 				/* 规则正文 */
-				sb.append(getSingleString(exp.m_strName, item.m_Expression));
+				sb.append(getSingleString(exp.name, item.expression));
 				sb.append(System.getProperty("line.separator"));
 				/* First集合 */
 				sb.append("\t--== 终结符First集合 ==--");
 				sb.append(System.getProperty("line.separator"));
-				for (TokenExp token : item.m_setFirstSetTokens) {
-					sb.append("\t\t" + token.m_strName);
+				for (TokenExp token : item.setFirstSetTokens) {
+					sb.append("\t\t" + token.name);
 					sb.append(System.getProperty("line.separator"));
 				}
 				sb.append("\t--== 非终结符First集合 ==--");
 				sb.append(System.getProperty("line.separator"));
-				for (RuleExp rule : item.m_setFirstSetRules) {
-					sb.append("\t\t" + rule.m_strName);
+				for (RuleExp rule : item.setFirstSetRules) {
+					sb.append("\t\t" + rule.name);
 					sb.append(System.getProperty("line.separator"));
 				}
 			}
@@ -725,9 +730,9 @@ public class Syntax {
 	 */
 	public String getOriginalString() {
 		StringBuffer sb = new StringBuffer();
-		for (RuleExp exp : m_arrNonTerminals) {
-			for (RuleItem item : exp.m_Rule.m_arrRules) {
-				sb.append(getSingleString(exp.m_strName, item.m_Expression));
+		for (RuleExp exp : arrNonTerminals) {
+			for (RuleItem item : exp.rule.arrRules) {
+				sb.append(getSingleString(exp.name, item.expression));
 				sb.append(System.getProperty("line.separator"));
 			}
 		}
@@ -738,14 +743,14 @@ public class Syntax {
 	 * 获得非确定性文法自动机描述
 	 */
 	public String getNGAString() {
-		return m_NPA.getNGAString();
+		return npa.getNGAString();
 	}
 
 	/**
 	 * 获得非确定性下推自动机描述
 	 */
 	public String getNPAString() {
-		return m_NPA.getNPAString();
+		return npa.getNPAString();
 	}
 
 	@Override

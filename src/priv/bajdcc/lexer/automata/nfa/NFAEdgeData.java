@@ -12,10 +12,10 @@ public class NFAEdgeData {
 	/**
 	 * 边类型
 	 */
-	public EdgeType m_Action = EdgeType.EPSILON;
+	public EdgeType kAction = EdgeType.EPSILON;
 	
 	/**
 	 * 数据
 	 */
-	public int m_Param = -1;
+	public int param = -1;
 }

@@ -12,20 +12,20 @@ public class TrackerError {
 	/**
 	 * 错误信息
 	 */
-	public String m_strMessage = "";
+	public String message = "";
 
 	/**
 	 * 位置
 	 */
-	public Position m_Position = null;
+	public Position position = null;
 
 	public TrackerError(Position pos) {
-		m_Position = pos;
+		position = pos;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("位置：[%s] 信息：%s", m_Position.toString(),
-				m_strMessage);
+		return String.format("位置：[%s] 信息：%s", position.toString(),
+				message);
 	}
 }

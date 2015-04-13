@@ -10,10 +10,10 @@ public class ENGA {
 	/**
 	 * 初态
 	 */
-	public NGAStatus m_Begin;
+	public NGAStatus begin;
 
 	/**
 	 * 终态
 	 */
-	public NGAStatus m_End;
+	public NGAStatus end;
 }

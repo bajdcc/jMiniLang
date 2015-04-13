@@ -13,21 +13,22 @@ import priv.bajdcc.lexer.token.Token;
  * @author bajdcc
  */
 public class TokenFactory extends Lexer {
-	
+
 	/**
 	 * 保存当前分析的单词流
 	 */
-	private ArrayList<Token> m_arrTokens = new ArrayList<Token>();
+	private ArrayList<Token> arrTokens = new ArrayList<Token>();
 
 	public TokenFactory(String context) throws RegexException {
 		super(context);
 	}
-	
+
 	@Override
 	public IRegexStringIterator copy() {
 		TokenFactory o = null;
 		try {
-			o = (TokenFactory) super.clone();			
+			o = (TokenFactory) super.clone();
+			o.arrTokens = new ArrayList<Token>(arrTokens);
 		} catch (CloneNotSupportedException e) {
 			e.printStackTrace();
 		}
@@ -36,11 +37,11 @@ public class TokenFactory extends Lexer {
 
 	@Override
 	public ArrayList<Token> tokenList() {
-		return m_arrTokens;
+		return arrTokens;
 	}
 
 	@Override
 	public void saveToken() {
-		m_arrTokens.add(m_Token);
-	}	
+		arrTokens.add(token);
+	}
 }

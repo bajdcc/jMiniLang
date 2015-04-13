@@ -16,17 +16,17 @@ public class NGAStatus {
 	/**
 	 * 出边集合
 	 */
-	public ArrayList<NGAEdge> m_OutEdges = new ArrayList<NGAEdge>();
+	public ArrayList<NGAEdge> outEdges = new ArrayList<NGAEdge>();
 
 	/**
 	 * 入边集合
 	 */
-	public ArrayList<NGAEdge> m_InEdges = new ArrayList<NGAEdge>();
+	public ArrayList<NGAEdge> inEdges = new ArrayList<NGAEdge>();
 
 	/**
 	 * 数据
 	 */
-	public NGAStatusData m_Data = new NGAStatusData();
+	public NGAStatusData data = new NGAStatusData();
 
 	/**
 	 * 用于遍历包括该状态在内的所有状态（连通），结果存放在PATH中
@@ -35,7 +35,7 @@ public class NGAStatus {
 	 *            遍历算法
 	 */
 	public void visit(BreadthFirstSearch<NGAEdge, NGAStatus> bfs) {
-		ArrayList<NGAStatus> stack = bfs.m_arrStatus;
+		ArrayList<NGAStatus> stack = bfs.arrStatus;
 		HashSet<NGAStatus> set = new HashSet<NGAStatus>();
 		stack.clear();
 		set.add(this);
@@ -44,15 +44,15 @@ public class NGAStatus {
 			NGAStatus status = stack.get(i);
 			VisitBag bag = new VisitBag();
 			bfs.visitBegin(status, bag);
-			if (bag.m_bVisitChildren) {
-				for (NGAEdge edge : status.m_OutEdges) {// 遍历状态的出边
-					if (!set.contains(edge.m_End) && bfs.testEdge(edge)) {// 边未被访问，且边类型符合要求
-						stack.add(edge.m_End);
-						set.add(edge.m_End);
+			if (bag.bVisitChildren) {
+				for (NGAEdge edge : status.outEdges) {// 遍历状态的出边
+					if (!set.contains(edge.end) && bfs.testEdge(edge)) {// 边未被访问，且边类型符合要求
+						stack.add(edge.end);
+						set.add(edge.end);
 					}
 				}
 			}
-			if (bag.m_bVisitEnd) {
+			if (bag.bVisitEnd) {
 				bfs.visitEnd(status);
 			}
 		}

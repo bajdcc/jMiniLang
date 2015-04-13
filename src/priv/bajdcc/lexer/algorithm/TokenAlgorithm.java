@@ -28,32 +28,32 @@ public abstract class TokenAlgorithm implements ITokenAlgorithm,
 	/**
 	 * 用来匹配的正则表达式
 	 */
-	protected Regex m_Regex = null;
+	protected Regex regex = null;
 
 	/**
 	 * 匹配结果
 	 */
-	protected String m_strMatch = "";
+	protected String strMatch = "";
 
 	/**
 	 * 字符过滤接口
 	 */
-	protected IRegexStringFilter m_Filter = null;
+	protected IRegexStringFilter filter = null;
 
 	/**
 	 * 字符类型哈段表
 	 */
-	protected HashMap<Character, MetaType> m_MetaMap = new HashMap<Character, MetaType>();
+	protected HashMap<Character, MetaType> mapMeta = new HashMap<Character, MetaType>();
 
 	public TokenAlgorithm(String regex, IRegexStringFilter filter)
 			throws RegexException {
-		m_Regex = new Regex(regex);
+		this.regex = new Regex(regex);
 		if (filter != null) {
-			m_Filter = filter;
-			m_Regex.setFilter(m_Filter);
-			MetaType[] metaTypes = m_Filter.getFilterMeta().getMetaTypes();
+			this.filter = filter;
+			this.regex.setFilter(filter);
+			MetaType[] metaTypes = filter.getFilterMeta().getMetaTypes();
 			for (int i = 0; i < metaTypes.length; i++) {
-				m_MetaMap.put(metaTypes[i].getChar(), metaTypes[i]);
+				mapMeta.put(metaTypes[i].getChar(), metaTypes[i]);
 			}
 		}
 	}
@@ -61,12 +61,12 @@ public abstract class TokenAlgorithm implements ITokenAlgorithm,
 	@Override
 	public boolean accept(IRegexStringIterator iterator, Token token) {
 		if (!iterator.available()) {
-			token.m_kToken = TokenType.EOF;
+			token.kToken = TokenType.EOF;
 			return true;
 		}
-		token.m_Position = new Position(iterator.position());
-		if (m_Regex.match(iterator, this)) {// 匹配成功
-			token = getToken(m_strMatch, token);// 自动转换单词
+		token.position = new Position(iterator.position());
+		if (regex.match(iterator, this)) {// 匹配成功
+			token = getToken(strMatch, token);// 自动转换单词
 			return true;
 		}
 		return false;
@@ -79,26 +79,26 @@ public abstract class TokenAlgorithm implements ITokenAlgorithm,
 
 	@Override
 	public IRegexStringFilter getRegexStringFilter() {
-		return m_Filter;
+		return filter;
 	}
 
 	@Override
 	public HashMap<Character, MetaType> getMetaHash() {
-		return m_MetaMap;
+		return mapMeta;
 	}
 
 	@Override
 	public void setResult(String result) {
-		m_strMatch = result;
+		strMatch = result;
 	}
 
 	@Override
 	public String getResult() {
-		return m_strMatch;
+		return strMatch;
 	}
 	
 	@Override
 	public String getRegexDescription() {
-		return m_Regex.getRegexDescription();
+		return regex.getRegexDescription();
 	}
 }

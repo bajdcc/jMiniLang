@@ -14,45 +14,45 @@ public class NPAEdgeData {
 	/**
 	 * 边类型
 	 */
-	public NPAEdgeType m_Action = NPAEdgeType.MOVE;
+	public NPAEdgeType kAction = NPAEdgeType.MOVE;
 
 	/**
 	 * 指令
 	 */
-	public NPAInstruction m_Inst = NPAInstruction.PASS;
+	public NPAInstruction inst = NPAInstruction.PASS;
 
 	/**
 	 * 指令参数
 	 */
-	public int m_iIndex = -1;
+	public int iIndex = -1;
 
 	/**
 	 * 处理序号
 	 */
-	public int m_iHandler = -1;
+	public int iHandler = -1;
 
 	/**
 	 * 状态参数
 	 */
-	public NPAStatus m_Status = null;
+	public NPAStatus status = null;
 
 	/**
 	 * 记号参数
 	 */
-	public int m_iToken = -1;
+	public int iToken = -1;
 
 	/**
 	 * LookAhead表
 	 */
-	public HashSet<Integer> m_arrLookAhead = null;
+	public HashSet<Integer> arrLookAhead = null;
 
 	/**
 	 * 错误处理器
 	 */
-	public IErrorHandler m_Handler = null;
+	public IErrorHandler handler = null;
 
 	/**
 	 * 出错后跳转的状态
 	 */
-	public NPAStatus m_ErrorJump = null;
+	public NPAStatus errorJump = null;
 }

@@ -10,15 +10,15 @@ public class DFAEdge {
 	/**
 	 * 初态
 	 */
-	public DFAStatus m_Begin;
+	public DFAStatus begin;
 
 	/**
 	 * 终态
 	 */
-	public DFAStatus m_End;
+	public DFAStatus end;
 
 	/**
 	 * 数据
 	 */
-	public DFAEdgeData m_Data = new DFAEdgeData();
+	public DFAEdgeData data = new DFAEdgeData();
 }

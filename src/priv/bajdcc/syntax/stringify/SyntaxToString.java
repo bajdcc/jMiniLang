@@ -18,50 +18,50 @@ public class SyntaxToString implements ISyntaxComponentVisitor {
 	/**
 	 * 文法推导式描述
 	 */
-	private StringBuilder m_Context = new StringBuilder();
+	private StringBuilder context = new StringBuilder();
 
 	/**
 	 * 存放结果的栈
 	 */
-	private Stack<ArrayList<String>> m_stkStringList = new Stack<ArrayList<String>>();
+	private Stack<ArrayList<String>> stkStringList = new Stack<ArrayList<String>>();
 
 	/**
 	 * 当前描述表
 	 */
-	private ArrayList<String> m_arrData = new ArrayList<String>();
+	private ArrayList<String> arrData = new ArrayList<String>();
 
 	/**
 	 * 焦点
 	 */
-	private ISyntaxComponent m_FocusedExp = null;
+	private ISyntaxComponent focusedExp = null;
 
 	/**
 	 * LR项目符号'*'，是否移进当前符号
 	 */
-	private boolean m_bFront = true;
+	private boolean bFront = true;
 
 	public SyntaxToString() {
 
 	}
 
 	public SyntaxToString(ISyntaxComponent exp, boolean front) {
-		m_FocusedExp = exp;
-		m_bFront = front;
+		focusedExp = exp;
+		bFront = front;
 	}
 
 	/**
 	 * 开始遍历子结点
 	 */
 	private void beginChilren() {
-		m_arrData = null;
-		m_stkStringList.push(new ArrayList<String>());
+		arrData = null;
+		stkStringList.push(new ArrayList<String>());
 	}
 
 	/**
 	 * 结束遍历子结点
 	 */
 	private void endChilren() {
-		m_arrData = m_stkStringList.pop();
+		arrData = stkStringList.pop();
 	}
 
 	/**
@@ -73,31 +73,31 @@ public class SyntaxToString implements ISyntaxComponentVisitor {
 	 *            描述
 	 */
 	private void store(ISyntaxComponent exp, String string) {
-		if (m_FocusedExp == exp) {
+		if (focusedExp == exp) {
 			/* 添加LR项目集符号 */
-			if (m_bFront) {
+			if (bFront) {
 				string = "*" + string;
 			} else {
 				string += " *";
 			}
 		}
-		if (m_stkStringList.isEmpty()) {
-			m_Context.append(string);
+		if (stkStringList.isEmpty()) {
+			context.append(string);
 		} else {
-			m_stkStringList.peek().add(string);
+			stkStringList.peek().add(string);
 		}
 	}
 
 	@Override
 	public void visitBegin(TokenExp node, VisitBag bag) {
-		bag.m_bVisitEnd = false;
-		store(node, " `" + node.m_strName + "`");
+		bag.bVisitEnd = false;
+		store(node, " `" + node.name + "` ");
 	}
 
 	@Override
 	public void visitBegin(RuleExp node, VisitBag bag) {
-		bag.m_bVisitEnd = false;
-		store(node, " " + node.m_strName);
+		bag.bVisitEnd = false;
+		store(node, " " + node.name + " ");
 	}
 
 	@Override
@@ -134,7 +134,7 @@ public class SyntaxToString implements ISyntaxComponentVisitor {
 	public void visitEnd(SequenceExp node) {
 		endChilren();
 		StringBuffer sb = new StringBuffer();
-		for (String string : m_arrData) {
+		for (String string : arrData) {
 			sb.append(string);
 		}
 		store(node, sb.toString());
@@ -145,7 +145,7 @@ public class SyntaxToString implements ISyntaxComponentVisitor {
 		endChilren();
 		StringBuffer sb = new StringBuffer();
 		sb.append(" (");
-		for (String string : m_arrData) {
+		for (String string : arrData) {
 			sb.append(string);
 			sb.append('|');
 		}
@@ -157,18 +157,18 @@ public class SyntaxToString implements ISyntaxComponentVisitor {
 	@Override
 	public void visitEnd(OptionExp node) {
 		endChilren();
-		store(node, " [" + m_arrData.get(0) + "] ");
+		store(node, " [" + arrData.get(0) + "] ");
 	}
 
 	@Override
 	public void visitEnd(PropertyExp node) {
 		endChilren();
-		store(node, m_arrData.get(0)
-				+ (node.m_iStorage == -1 ? "" : "[" + node.m_iStorage + "] "));
+		store(node, arrData.get(0)
+				+ (node.iStorage == -1 ? "" : "[" + node.iStorage + "] "));
 	}
 
 	@Override
 	public String toString() {
-		return m_Context.toString();
+		return context.toString();
 	}
 }

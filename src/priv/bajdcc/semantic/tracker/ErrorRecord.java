@@ -12,14 +12,14 @@ public class ErrorRecord {
 	/**
 	 * 错误集
 	 */
-	public ArrayList<TrackerError> m_arrErrors = new ArrayList<TrackerError>();
+	public ArrayList<TrackerError> arrErrors = new ArrayList<TrackerError>();
 	
 	/**
 	 * 前向指针
 	 */
-	public ErrorRecord m_prevErrorRecord = null;
+	public ErrorRecord prev = null;
 	
 	public ErrorRecord(ErrorRecord prev) {
-		m_prevErrorRecord = prev;	
+		this.prev = prev;	
 	}
 }

@@ -20,7 +20,7 @@ public class OperatorTokenizer extends TokenAlgorithm {
 	/**
 	 * 关键字哈希表
 	 */
-	private HashMap<String, OperatorType> m_HashOperator = new HashMap<String, OperatorType>();
+	private HashMap<String, OperatorType> hashOperator = new HashMap<String, OperatorType>();
 
 	public OperatorTokenizer() throws RegexException {
 		super(getRegexString(), null);
@@ -49,7 +49,7 @@ public class OperatorTokenizer extends TokenAlgorithm {
 	 */
 	private void initializeHashMap() {
 		for (OperatorType operator : OperatorType.values()) {// 关键字
-			m_HashOperator.put(operator.getName(), operator);
+			hashOperator.put(operator.getName(), operator);
 		}
 	}
 
@@ -62,8 +62,8 @@ public class OperatorTokenizer extends TokenAlgorithm {
 	 */
 	@Override
 	public Token getToken(String string, Token token) {
-		token.m_kToken = TokenType.OPERATOR;
-		token.m_Object = m_HashOperator.get(string);
+		token.kToken = TokenType.OPERATOR;
+		token.object = hashOperator.get(string);
 		return token;
 	}
 }

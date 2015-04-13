@@ -16,17 +16,17 @@ public class NPAStatus {
 	/**
 	 * 出边集合
 	 */
-	public ArrayList<NPAEdge> m_OutEdges = new ArrayList<NPAEdge>();
+	public ArrayList<NPAEdge> outEdges = new ArrayList<NPAEdge>();
 
 	/**
 	 * 入边集合
 	 */
-	public ArrayList<NPAEdge> m_InEdges = new ArrayList<NPAEdge>();
+	public ArrayList<NPAEdge> inEdges = new ArrayList<NPAEdge>();
 
 	/**
 	 * 数据
 	 */
-	public NPAStatusData m_Data = new NPAStatusData();
+	public NPAStatusData data = new NPAStatusData();
 
 	/**
 	 * 用于遍历包括该状态在内的所有状态（连通），结果存放在PATH中
@@ -35,7 +35,7 @@ public class NPAStatus {
 	 *            遍历算法
 	 */
 	public void visit(BreadthFirstSearch<NPAEdge, NPAStatus> bfs) {
-		ArrayList<NPAStatus> stack = bfs.m_arrStatus;
+		ArrayList<NPAStatus> stack = bfs.arrStatus;
 		HashSet<NPAStatus> set = new HashSet<NPAStatus>();
 		stack.clear();
 		set.add(this);
@@ -44,15 +44,15 @@ public class NPAStatus {
 			NPAStatus status = stack.get(i);
 			VisitBag bag = new VisitBag();
 			bfs.visitBegin(status, bag);
-			if (bag.m_bVisitChildren) {
-				for (NPAEdge edge : status.m_OutEdges) {// 遍历状态的出边
-					if (!set.contains(edge.m_End) && bfs.testEdge(edge)) {// 边未被访问，且边类型符合要求
-						stack.add(edge.m_End);
-						set.add(edge.m_End);
+			if (bag.bVisitChildren) {
+				for (NPAEdge edge : status.outEdges) {// 遍历状态的出边
+					if (!set.contains(edge.end) && bfs.testEdge(edge)) {// 边未被访问，且边类型符合要求
+						stack.add(edge.end);
+						set.add(edge.end);
 					}
 				}
 			}
-			if (bag.m_bVisitEnd) {
+			if (bag.bVisitEnd) {
 				bfs.visitEnd(status);
 			}
 		}

@@ -30,8 +30,8 @@ public class CommentTokenizer extends TokenAlgorithm {
 	 */
 	@Override
 	public Token getToken(String string, Token token) {
-		token.m_kToken = TokenType.COMMENT;
-		token.m_Object = string.trim();
+		token.kToken = TokenType.COMMENT;
+		token.object = string.trim();
 		return token;
 	}
 }

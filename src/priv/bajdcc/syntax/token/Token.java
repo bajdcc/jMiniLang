@@ -12,58 +12,58 @@ public class Token {
 	/**
 	 * 单词类型
 	 */
-	public TokenType m_kToken = TokenType.ERROR;
+	public TokenType kToken = TokenType.ERROR;
 
 	/**
 	 * 数据
 	 */
-	public Object m_Object = null;
+	public Object object = null;
 
 	/**
 	 * 位置
 	 */
-	public Position m_Position = new Position();
+	public Position position = new Position();
 
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(String.format("%04d,%03d: %s %s", m_Position.m_iLine,
-				m_Position.m_iColumn, m_kToken.getName(),
-				m_Object == null ? "(null)" : m_Object.toString()));
+		sb.append(String.format("%04d,%03d: %s %s", position.iLine,
+				position.iColumn, kToken.getName(),
+				object == null ? "(null)" : object.toString()));
 		return sb.toString();
 	}
 
 	public static Token transfer(priv.bajdcc.lexer.token.Token token) {
 		Token tk = new Token();
-		tk.m_Object = token.m_Object;
-		tk.m_Position = token.m_Position;
-		switch (token.m_kToken) {
+		tk.object = token.object;
+		tk.position = token.position;
+		switch (token.kToken) {
 		case COMMENT:
-			tk.m_kToken = TokenType.COMMENT;
+			tk.kToken = TokenType.COMMENT;
 			break;
 		case EOF:
-			tk.m_kToken = TokenType.EOF;
+			tk.kToken = TokenType.EOF;
 			break;
 		case ERROR:
-			tk.m_kToken = TokenType.ERROR;
+			tk.kToken = TokenType.ERROR;
 			break;
 		case ID:
-			tk.m_kToken = TokenType.NONTERMINAL;
+			tk.kToken = TokenType.NONTERMINAL;
 			break;
 		case MACRO:
-			tk.m_kToken = TokenType.HANDLER;
+			tk.kToken = TokenType.HANDLER;
 			break;
 		case OPERATOR:
-			tk.m_kToken = TokenType.OPERATOR;
+			tk.kToken = TokenType.OPERATOR;
 			break;
 		case STRING:
-			tk.m_kToken = TokenType.TERMINAL;
+			tk.kToken = TokenType.TERMINAL;
 			break;
 		case WHITESPACE:
-			tk.m_kToken = TokenType.WHITSPACE;
+			tk.kToken = TokenType.WHITSPACE;
 			break;
 		case INTEGER:
-			tk.m_kToken = TokenType.STORAGE;
+			tk.kToken = TokenType.STORAGE;
 			break;
 		default:
 			break;

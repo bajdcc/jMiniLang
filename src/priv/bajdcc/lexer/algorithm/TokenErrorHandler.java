@@ -14,9 +14,9 @@ public abstract class TokenErrorHandler implements IErrorHandler {
 	/**
 	 * 迭代器接口
 	 */
-	protected IRegexStringIterator m_Iterator = null;
+	protected IRegexStringIterator iterator = null;
 
 	public TokenErrorHandler(IRegexStringIterator iterator) {
-		m_Iterator = iterator;
+		this.iterator = iterator;
 	}
 }

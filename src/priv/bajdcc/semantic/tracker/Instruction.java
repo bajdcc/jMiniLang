@@ -12,31 +12,31 @@ public class Instruction {
 	/**
 	 * 指令
 	 */
-	public NPAInstruction m_Inst = NPAInstruction.PASS;
+	public NPAInstruction inst = NPAInstruction.PASS;
 
 	/**
 	 * 参数
 	 */
-	public int m_iIndex = -1;
+	public int iIndex = -1;
 
 	/**
 	 * 处理器
 	 */
-	public int m_iHandler = -1;
+	public int iHandler = -1;
 
 	public Instruction() {
 
 	}
 
 	public Instruction(NPAInstruction inst, int index, int handler) {
-		m_Inst = inst;
-		m_iIndex = index;
-		m_iHandler = handler;
+		this.inst = inst;
+		iIndex = index;
+		iHandler = handler;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("指令：%5s \t参数：%4d \t处理：%d", m_Inst.getName(), m_iIndex,
-				m_iHandler);
+		return String.format("指令：%5s \t参数：%4d \t处理：%d", inst.getName(), iIndex,
+				iHandler);
 	}
 }

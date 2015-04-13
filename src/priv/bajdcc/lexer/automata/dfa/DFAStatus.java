@@ -16,17 +16,17 @@ public class DFAStatus {
 	/**
 	 * 出边集合
 	 */
-	public HashSet<DFAEdge> m_OutEdges = new HashSet<DFAEdge>();
+	public HashSet<DFAEdge> outEdges = new HashSet<DFAEdge>();
 
 	/**
 	 * 入边集合
 	 */
-	public HashSet<DFAEdge> m_InEdges = new HashSet<DFAEdge>();
+	public HashSet<DFAEdge> inEdges = new HashSet<DFAEdge>();
 
 	/**
 	 * 数据
 	 */
-	public DFAStatusData m_Data = new DFAStatusData();
+	public DFAStatusData data = new DFAStatusData();
 
 	/**
 	 * 用于遍历包括该状态在内的所有状态（连通），结果存放在PATH中
@@ -35,7 +35,7 @@ public class DFAStatus {
 	 *            遍历算法
 	 */
 	public void visit(BreadthFirstSearch<DFAEdge, DFAStatus> bfs) {
-		ArrayList<DFAStatus> stack = bfs.m_arrStatus;
+		ArrayList<DFAStatus> stack = bfs.arrStatus;
 		HashSet<DFAStatus> set = new HashSet<DFAStatus>();
 		stack.clear();
 		set.add(this);
@@ -44,15 +44,15 @@ public class DFAStatus {
 			DFAStatus status = stack.get(i);
 			VisitBag bag = new VisitBag();
 			bfs.visitBegin(status, bag);
-			if (bag.m_bVisitChildren) {
-				for (DFAEdge edge : status.m_OutEdges) {// 遍历状态的出边
-					if (!set.contains(edge.m_End) && bfs.testEdge(edge)) {// 边未被访问，且边类型符合要求
-						stack.add(edge.m_End);
-						set.add(edge.m_End);
+			if (bag.bVisitChildren) {
+				for (DFAEdge edge : status.outEdges) {// 遍历状态的出边
+					if (!set.contains(edge.end) && bfs.testEdge(edge)) {// 边未被访问，且边类型符合要求
+						stack.add(edge.end);
+						set.add(edge.end);
 					}
 				}
 			}
-			if (bag.m_bVisitEnd) {
+			if (bag.bVisitEnd) {
 				bfs.visitEnd(status);
 			}
 		}

@@ -24,27 +24,27 @@ public class CharacterFilter implements IRegexStringFilter,
 		RegexStringIteratorData data = new RegexStringIteratorData();
 		try {
 			if (!iterator.available()) {
-				data.m_kMeta = MetaType.END;
-				data.m_chCurrent = MetaType.END.getChar();
+				data.kMeta = MetaType.END;
+				data.chCurrent = MetaType.END.getChar();
 			} else {
-				data.m_kMeta = iterator.meta();
-				data.m_chCurrent = iterator.current();
+				data.kMeta = iterator.meta();
+				data.chCurrent = iterator.current();
 				iterator.next();
-				if (data.m_kMeta == MetaType.SINGLE_QUOTE) {// 过滤单引号
-					data.m_kMeta = MetaType.NULL;
-				} else if (data.m_kMeta == MetaType.ESCAPE) {// 处理转义
-					data.m_chCurrent = iterator.current();
+				if (data.kMeta == MetaType.SINGLE_QUOTE) {// 过滤单引号
+					data.kMeta = MetaType.NULL;
+				} else if (data.kMeta == MetaType.ESCAPE) {// 处理转义
+					data.chCurrent = iterator.current();
 					iterator.next();
-					data.m_kMeta = MetaType.MUST_SAVE;
-					data.m_chCurrent = utility.fromEscape(data.m_chCurrent,
+					data.kMeta = MetaType.MUST_SAVE;
+					data.chCurrent = utility.fromEscape(data.chCurrent,
 							RegexError.ESCAPE);
 				}
 			}
 		} catch (RegexException e) {
 			System.err.println(e.getPosition() + " : "
 					+ e.getMessage());
-			data.m_kMeta = MetaType.ERROR;
-			data.m_chCurrent = MetaType.ERROR.getChar();
+			data.kMeta = MetaType.ERROR;
+			data.chCurrent = MetaType.ERROR.getChar();
 		}
 		return data;
 	}
