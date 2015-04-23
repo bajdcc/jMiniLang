@@ -34,22 +34,6 @@ public abstract class SelectSetSolver implements ISyntaxComponentVisitor {
 	protected abstract Collection<TokenExp> getFollow();
 
 	/**
-	 * 获得终结符ID
-	 * 
-	 * @param exp
-	 *            终结符
-	 */
-	protected abstract int getVtId(TokenExp exp);
-
-	/**
-	 * 获得非终结符ID
-	 * 
-	 * @param exp
-	 *            非终结符
-	 */
-	protected abstract int getVnId(RuleExp exp);
-
-	/**
 	 * 设置预测分析表的某一项为当前产生式
 	 * 
 	 * @param token
@@ -79,17 +63,17 @@ public abstract class SelectSetSolver implements ISyntaxComponentVisitor {
 		if (node.kType == TokenType.EOF) {// Epsilon
 			addRule();// 空串，则指令集为空（不压入新状态）
 			for (TokenExp token : getFollow()) {// 有空串，添加Follow集
-				setCellToRuleId(getVtId(token));
+				setCellToRuleId(token.id);
 			}
 			firstSymbol = false;
 		} else if (firstSymbol) {
 			addRule();// 需要添加指令集
-			setCellToRuleId(getVtId(node));
+			setCellToRuleId(node.id);
 			firstSymbol = false;
 			insertSymbol = true;
 		}
 		if (insertSymbol) {
-			addInstToRule(PredictType.TERMINAL, getVtId(node));
+			addInstToRule(PredictType.TERMINAL, node.id);
 		}
 	}
 
@@ -101,12 +85,12 @@ public abstract class SelectSetSolver implements ISyntaxComponentVisitor {
 			addRule();// 需要添加指令集
 			insertSymbol = true;
 			for (TokenExp token : node.rule.arrFirsts) {// 添加First集
-				setCellToRuleId(getVtId(token));
+				setCellToRuleId(token.id);
 			}
 			firstSymbol = false;
 		}
 		if (insertSymbol) {
-			addInstToRule(PredictType.NONTERMINAL, getVnId(node));
+			addInstToRule(PredictType.NONTERMINAL, node.id);
 		}
 	}
 

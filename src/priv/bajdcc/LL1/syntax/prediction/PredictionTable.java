@@ -2,7 +2,6 @@ package priv.bajdcc.LL1.syntax.prediction;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Stack;
 
 import priv.bajdcc.LL1.grammar.error.GrammarException;
@@ -32,16 +31,6 @@ public class PredictionTable extends SelectSetSolver {
 	 * 终结符集合
 	 */
 	protected ArrayList<TokenExp> arrTerminals = null;
-
-	/**
-	 * 非终结符映射
-	 */
-	protected HashMap<RuleExp, Integer> mapNonTerminals = new HashMap<RuleExp, Integer>();
-
-	/**
-	 * 终结符映射
-	 */
-	protected HashMap<TokenExp, Integer> mapTerminals = new HashMap<TokenExp, Integer>();
 
 	/**
 	 * 起始规则
@@ -109,21 +98,8 @@ public class PredictionTable extends SelectSetSolver {
 	 * 初始化
 	 */
 	private void initialize() {
-		initMap();
 		initTable();
 		predict();
-	}
-
-	/**
-	 * 初始化符号映射表
-	 */
-	private void initMap() {
-		for (int i = 0; i < arrNonTerminals.size(); i++) {
-			mapNonTerminals.put(arrNonTerminals.get(i), i);
-		}
-		for (int i = 0; i < arrTerminals.size(); i++) {
-			mapTerminals.put(arrTerminals.get(i), i);
-		}
 	}
 
 	/**
@@ -155,16 +131,6 @@ public class PredictionTable extends SelectSetSolver {
 	@Override
 	protected Collection<TokenExp> getFollow() {
 		return arrNonTerminals.get(indexVn).rule.arrFollows;
-	}
-
-	@Override
-	protected int getVtId(TokenExp exp) {
-		return mapTerminals.get(exp);
-	}
-
-	@Override
-	protected int getVnId(RuleExp exp) {
-		return mapNonTerminals.get(exp);
 	}
 
 	@Override
@@ -212,13 +178,12 @@ public class PredictionTable extends SelectSetSolver {
 		/* 核心堆栈 */
 		Stack<PredictionInstruction> spi = new Stack<PredictionInstruction>();
 		/* 结束符号进栈 */
-		spi.push(new PredictionInstruction(PredictType.TERMINAL,
-				getVtId(epsilon)));
+		spi.push(new PredictionInstruction(PredictType.TERMINAL, epsilon.id));
 		/* 起始符号进栈 */
 		spi.push(new PredictionInstruction(PredictType.NONTERMINAL,
-				mapNonTerminals.get(initRule.nonTerminal)));
+				initRule.nonTerminal.id));
 		/* 设置当前状态 */
-		int status = mapNonTerminals.get(initRule.nonTerminal);
+		int status = initRule.nonTerminal.id;
 		/* 执行步骤顺序 */
 		int index = 0;
 		while (!spi.isEmpty()) {

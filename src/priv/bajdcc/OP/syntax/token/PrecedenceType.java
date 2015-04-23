@@ -1,16 +1,16 @@
-package priv.bajdcc.LL1.syntax.token;
+package priv.bajdcc.OP.syntax.token;
 
 /**
- * 预测分析指令类型
+ * 算符优先关系类型
  * 
  * @author bajdcc
  */
-public enum PredictType {
-	TERMINAL("终结符"), NONTERMINAL("非终结符"), EPSILON("结束符");
+public enum PrecedenceType {
+	LT("<"), GT(">"), EQ("="), NULL("-");
 
 	private String name;
 
-	PredictType(String name) {
+	PrecedenceType(String name) {
 		this.name = name;
 	}
 

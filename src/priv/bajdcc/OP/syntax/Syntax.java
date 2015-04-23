@@ -1,29 +1,22 @@
-package priv.bajdcc.LL1.syntax;
+package priv.bajdcc.OP.syntax;
 
 import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 
-import priv.bajdcc.LL1.syntax.exp.BranchExp;
-import priv.bajdcc.LL1.syntax.exp.IExpCollction;
-import priv.bajdcc.LL1.syntax.exp.RuleExp;
-import priv.bajdcc.LL1.syntax.exp.SequenceExp;
-import priv.bajdcc.LL1.syntax.exp.TokenExp;
-import priv.bajdcc.LL1.syntax.handler.SyntaxException;
-import priv.bajdcc.LL1.syntax.handler.SyntaxException.SyntaxError;
-import priv.bajdcc.LL1.syntax.lexer.SyntaxLexer;
-import priv.bajdcc.LL1.syntax.rule.Rule;
-import priv.bajdcc.LL1.syntax.rule.RuleItem;
-import priv.bajdcc.LL1.syntax.solver.FirstSetSolver;
-import priv.bajdcc.LL1.syntax.solver.FollowSetSolver;
-import priv.bajdcc.LL1.syntax.stringify.SyntaxToString;
-import priv.bajdcc.LL1.syntax.token.OperatorType;
-import priv.bajdcc.LL1.syntax.token.Token;
-import priv.bajdcc.LL1.syntax.token.TokenType;
-import priv.bajdcc.util.BitVector2;
+import priv.bajdcc.OP.syntax.exp.BranchExp;
+import priv.bajdcc.OP.syntax.exp.IExpCollction;
+import priv.bajdcc.OP.syntax.exp.RuleExp;
+import priv.bajdcc.OP.syntax.exp.SequenceExp;
+import priv.bajdcc.OP.syntax.exp.TokenExp;
+import priv.bajdcc.OP.syntax.handler.SyntaxException;
+import priv.bajdcc.OP.syntax.handler.SyntaxException.SyntaxError;
+import priv.bajdcc.OP.syntax.lexer.SyntaxLexer;
+import priv.bajdcc.OP.syntax.rule.RuleItem;
+import priv.bajdcc.OP.syntax.solver.CheckOperatorGrammar;
+import priv.bajdcc.OP.syntax.stringify.SyntaxToString;
+import priv.bajdcc.OP.syntax.token.OperatorType;
+import priv.bajdcc.OP.syntax.token.Token;
+import priv.bajdcc.OP.syntax.token.TokenType;
 import priv.bajdcc.util.Position;
 import priv.bajdcc.util.lexer.error.RegexException;
 
@@ -66,11 +59,6 @@ public class Syntax {
 	protected String beginRuleName = null;
 
 	/**
-	 * 空串符号
-	 */
-	protected String epsilonName = null;
-
-	/**
 	 * 面向文法的词法分析器
 	 */
 	private SyntaxLexer syntaxLexer = new SyntaxLexer();
@@ -94,25 +82,6 @@ public class Syntax {
 		syntaxLexer.discard(TokenType.WHITSPACE);
 		if (ignoreLexError) {
 			syntaxLexer.discard(TokenType.ERROR);
-		}
-	}
-
-	/**
-	 * 定义空串名
-	 * 
-	 * @param name
-	 *            空串名称
-	 * @throws SyntaxException
-	 */
-	public void setEpsilonName(String name) throws SyntaxException {
-		TokenExp exp = new TokenExp(arrTerminals.size(), name,
-				priv.bajdcc.util.lexer.token.TokenType.EOF, null);
-		if (!mapTerminals.containsKey(name)) {
-			epsilonName = name;
-			mapTerminals.put(name, exp);
-			arrTerminals.add(exp);
-		} else {
-			err(SyntaxError.REDECLARATION);
 		}
 	}
 
@@ -173,7 +142,7 @@ public class Syntax {
 	 *            错误类型
 	 * @throws SyntaxException
 	 */
-	private void err(SyntaxError error) throws SyntaxException {
+	protected void err(SyntaxError error) throws SyntaxException {
 		throw new SyntaxException(error, syntaxLexer.position(), token.object);
 	}
 
@@ -406,7 +375,7 @@ public class Syntax {
 	public void initialize(String startSymbol) throws SyntaxException {
 		beginRuleName = startSymbol;
 		checkStartSymbol();
-		buildFirstAndFollow();
+		checkValid();
 	}
 
 	/**
@@ -421,185 +390,23 @@ public class Syntax {
 	}
 
 	/**
-	 * 构造First集和Follow集
+	 * 检查产生式的合法性
 	 * 
 	 * @throws SyntaxException
 	 */
-	private void buildFirstAndFollow() throws SyntaxException {
-		/* 非终结符数量 */
-		int size = arrNonTerminals.size();
-		/* 计算规则的First集合 */
+	private void checkValid() throws SyntaxException {
 		for (RuleExp exp : arrNonTerminals) {
 			for (RuleItem item : exp.rule.arrRules) {
-				FirstSetSolver solver = new FirstSetSolver();
-				item.expression.visit(solver);// 计算规则的First集合
-				exp.rule.epsilon |= solver.solve(item);
-			}
-		}
-		/* 建立连通矩阵 */
-		BitVector2 firstsetDependency = new BitVector2(size, size);// First集依赖矩阵
-		firstsetDependency.clear();
-		/* 计算非终结符First集合包含关系的布尔连通矩阵 */
-		{
-			int i = 0;
-			for (RuleExp exp : arrNonTerminals) {
-				for (RuleItem item : exp.rule.arrRules) {
-					for (RuleExp rule : item.setFirstSetRules) {
-						firstsetDependency.set(i, rule.id);
-					}
-				}
-				i++;
-			}
-		}
-		/* 检查间接左递归 */
-		{
-			/* 标记直接左递归 */
-			for (int i = 0; i < size; i++) {
-				if (firstsetDependency.test(i, i)) {// 出现直接左递归
-					err(SyntaxError.DIRECT_RECURSION,
-							arrNonTerminals.get(i).name);
-				}
-			}
-			/* 获得拷贝 */
-			BitVector2 a = (BitVector2) firstsetDependency.clone();
-			BitVector2 b = (BitVector2) firstsetDependency.clone();
-			BitVector2 r = new BitVector2(size, size);
-			/* 检查是否出现环 */
-			for (int level = 2; level < size; level++) {// Warshell算法：求有向图的传递闭包
-				/* 进行布尔连通矩阵乘法，即r=aXb */
-				for (int i = 0; i < size; i++) {
-					for (int j = 0; j < size; j++) {
-						r.clear(i, j);
-						for (int k = 0; k < size; k++) {
-							boolean value = r.test(i, j)
-									|| (a.test(i, k) && b.test(k, j));
-							r.set(i, j, value);
-						}
-					}
-				}
-				/* 检查当前结果是否出现环 */
-				{
-					int i = 0;
-					for (RuleExp exp : arrNonTerminals) {
-						if (r.test(i, i)) {
-							if (exp.rule.iRecursiveLevel < 2) {
-								exp.rule.iRecursiveLevel = level;
-							}
-						}
-						i++;
-					}
-				}
-				/* 保存结果 */
-				a = (BitVector2) r.clone();
-			}
-			/* 检查是否存在环并报告错误 */
-			for (RuleExp exp : arrNonTerminals) {
-				if (exp.rule.iRecursiveLevel > 1) {
-					err(SyntaxError.INDIRECT_RECURSION, exp.name + " level:"
-							+ exp.rule.iRecursiveLevel);
+				CheckOperatorGrammar check = new CheckOperatorGrammar();
+				item.expression.visit(check);
+				if (!check.isValid()) {
+					err(SyntaxError.CONSEQUENT_NONTERMINAL,
+							check.getInvalidName()
+									+ ": "
+									+ getSingleString(exp.name, item.expression));
 				}
 			}
 		}
-		/* 计算完整的First集合 */
-		{
-			/* 建立处理标记表 */
-			BitSet processed = new BitSet(size);
-			processed.clear();
-			for (int i = 0; i < size; i++) {
-				/* 找出一条无最左依赖的规则 */
-				int nodependencyRule = -1;// 最左依赖的规则索引
-				for (int j = 0; j < size; j++) {
-					if (!processed.get(j)) {
-						boolean empty = true;
-						for (int k = 0; k < size; k++) {
-							if (firstsetDependency.test(j, k)) {
-								empty = false;
-								break;
-							}
-						}
-						if (empty) {// 找到
-							nodependencyRule = j;
-							break;
-						}
-					}
-				}
-				if (nodependencyRule == -1) {
-					err(SyntaxError.MISS_NODEPENDENCY_RULE,
-							arrNonTerminals.get(i).name);
-				}
-				/* 计算该规则的终结符First集合 */
-				{
-					Rule rule = arrNonTerminals.get(nodependencyRule).rule;
-					/* 计算规则的终结符First集合 */
-					for (RuleItem item : rule.arrRules) {
-						for (RuleExp exp : item.setFirstSetRules) {
-							item.setFirstSetTokens.addAll(exp.rule.arrFirsts);
-						}
-					}
-					/* 计算非终结符的终结符First集合 */
-					for (RuleItem item : rule.arrRules) {
-						rule.arrFirsts.addAll(item.setFirstSetTokens);
-					}
-				}
-				/* 清除该规则 */
-				processed.set(nodependencyRule);
-				for (int j = 0; j < size; j++) {
-					firstsetDependency.clear(j, nodependencyRule);
-				}
-			}
-		}
-		/* 搜索不能产生字符串的规则 */
-		for (RuleExp exp : arrNonTerminals) {
-			for (RuleItem item : exp.rule.arrRules) {
-				if (item.setFirstSetTokens.isEmpty()) {
-					err(SyntaxError.FAILED,
-							getSingleString(exp.name, item.expression));
-				}
-			}
-		}
-		/* 求Follow集 */
-		mapNonTerminals.get(beginRuleName).rule.setFollows.add(mapTerminals
-				.get(epsilonName));
-		boolean update;
-		do {
-			update = false;
-			for (RuleExp origin : arrNonTerminals) {
-				for (RuleItem item : origin.rule.arrRules) {
-					for (RuleExp target : arrNonTerminals) {
-						FollowSetSolver solver = new FollowSetSolver(origin,
-								target);
-						if (origin.name.equals("E1") && target.name.equals("T")) {
-							update = !!update;
-						}
-						item.expression.visit(solver);
-						update |= solver.isUpdated();
-					}
-				}
-			}
-		} while (update);
-		/* 将哈希表按ID排序并保存 */
-		for (RuleExp exp : arrNonTerminals) {
-			for (RuleItem item : exp.rule.arrRules) {
-				item.arrFirstSetTokens = sortTerminal(item.setFirstSetTokens);
-				item.parent.arrFollows = sortTerminal(item.parent.setFollows);
-			}
-		}
-	}
-
-	/**
-	 * 给指定终结符集合按ID排序
-	 * 
-	 * @return
-	 */
-	private ArrayList<TokenExp> sortTerminal(Collection<TokenExp> colletion) {
-		ArrayList<TokenExp> list = new ArrayList<TokenExp>(colletion);
-		Collections.sort(list, new Comparator<TokenExp>() {
-			@Override
-			public int compare(TokenExp o1, TokenExp o2) {
-				return o1.id > o2.id ? 1 : (o1.id == o2.id ? 0 : -1);
-			}
-		});
-		return list;
 	}
 
 	/**
@@ -677,16 +484,17 @@ public class Syntax {
 				/* 规则正文 */
 				sb.append(getSingleString(exp.name, item.expression));
 				sb.append(System.getProperty("line.separator"));
-				/* First集合 */
-				sb.append("\t--== First ==--");
+				/* FirstVT集合 */
+				sb.append("\t--== FirstVT ==--");
 				sb.append(System.getProperty("line.separator"));
-				for (TokenExp token : item.arrFirstSetTokens) {
+				for (TokenExp token : exp.rule.arrFirstVT) {
 					sb.append("\t\t" + token.toString());
 					sb.append(System.getProperty("line.separator"));
 				}
-				sb.append("\t--== Follow ==--");
+				/* LastVT集合 */
+				sb.append("\t--== LastVT ==--");
 				sb.append(System.getProperty("line.separator"));
-				for (TokenExp token : item.parent.arrFollows) {
+				for (TokenExp token : exp.rule.arrLastVT) {
 					sb.append("\t\t" + token.toString());
 					sb.append(System.getProperty("line.separator"));
 				}
