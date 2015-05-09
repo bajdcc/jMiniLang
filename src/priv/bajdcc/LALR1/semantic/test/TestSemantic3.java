@@ -2,6 +2,7 @@ package priv.bajdcc.LALR1.semantic.test;
 
 import java.util.Scanner;
 
+import priv.bajdcc.LALR1.grammar.semantic.ISemanticRecorder;
 import priv.bajdcc.LALR1.grammar.symbol.IQuerySymbol;
 import priv.bajdcc.LALR1.semantic.Semantic;
 import priv.bajdcc.LALR1.semantic.token.IIndexedData;
@@ -29,19 +30,22 @@ public class TestSemantic3 {
 			semantic.addErrorHandler("sample", null);
 			ISemanticAnalyzier handleValue = new ISemanticAnalyzier() {
 				@Override
-				public Object handle(IIndexedData indexed, IQuerySymbol factoryj) {
+				public Object handle(IIndexedData indexed,
+						IQuerySymbol query, ISemanticRecorder recorder) {
 					return 1;
 				}
 			};
 			ISemanticAnalyzier handleCopy = new ISemanticAnalyzier() {
 				@Override
-				public Object handle(IIndexedData indexed, IQuerySymbol factory) {
+				public Object handle(IIndexedData indexed,
+						IQuerySymbol query, ISemanticRecorder recorder) {
 					return indexed.get(0).object;
 				}
 			};
 			ISemanticAnalyzier handleRec = new ISemanticAnalyzier() {
 				@Override
-				public Object handle(IIndexedData indexed, IQuerySymbol factory) {
+				public Object handle(IIndexedData indexed,
+						IQuerySymbol query, ISemanticRecorder recorder) {
 					int lop = Integer
 							.parseInt(indexed.get(0).object.toString());
 					return lop + 1;
@@ -58,7 +62,7 @@ public class TestSemantic3 {
 			System.out.println(semantic.getNGAString());
 			System.out.println(semantic.getNPAString());
 			System.out.println(semantic.getInst());
-			System.out.println(semantic.getError());
+			System.out.println(semantic.getTrackerError());
 			System.out.println(semantic.getTokenList());
 			System.out.println(semantic.getObject());
 			// scanner.close();

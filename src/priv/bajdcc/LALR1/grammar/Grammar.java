@@ -1,11 +1,14 @@
 package priv.bajdcc.LALR1.grammar;
 
 import priv.bajdcc.LALR1.grammar.error.LostHandler;
+import priv.bajdcc.LALR1.grammar.semantic.ISemanticRecorder;
+import priv.bajdcc.LALR1.grammar.semantic.SemanticRecorder;
 import priv.bajdcc.LALR1.grammar.semantic.infer.SemanticHandler;
 import priv.bajdcc.LALR1.grammar.symbol.IManageSymbol;
 import priv.bajdcc.LALR1.grammar.symbol.IQuerySymbol;
 import priv.bajdcc.LALR1.grammar.symbol.SymbolTable;
 import priv.bajdcc.LALR1.semantic.Semantic;
+import priv.bajdcc.LALR1.semantic.token.ISemanticAnalyzier;
 import priv.bajdcc.LALR1.syntax.handler.SyntaxException;
 import priv.bajdcc.util.lexer.error.RegexException;
 import priv.bajdcc.util.lexer.token.KeywordType;
@@ -32,6 +35,11 @@ public class Grammar extends Semantic {
 	 */
 	private SymbolTable symbol = new SymbolTable();
 
+	/**
+	 * 语义错误表
+	 */
+	private SemanticRecorder recorder = new SemanticRecorder();
+
 	public Grammar(String context) throws RegexException, SyntaxException {
 		super(context);
 		initialize();
@@ -46,19 +54,22 @@ public class Grammar extends Semantic {
 		declareTerminal();
 		declareNonTerminal();
 		declareErrorHandler();
+		declareActionHandler();
 		infer();
 	}
 
 	/**
 	 * 声明终结符
-	 * @throws SyntaxException 
+	 * 
+	 * @throws SyntaxException
 	 */
 	private void declareTerminal() throws SyntaxException {
-		addTerminal("IDENTIFIER", TokenType.ID, null);
-		addTerminal("STRING_LITERAL", TokenType.STRING, null);
+		addTerminal("ID", TokenType.ID, null);
+		addTerminal("BOOLEAN", TokenType.BOOL, null);
+		addTerminal("LITERAL", TokenType.STRING, null);
 		addTerminal("CHARACTER", TokenType.CHARACTER, null);
 		addTerminal("INTEGER", TokenType.INTEGER, null);
-		addTerminal("REAL", TokenType.REAL, null);
+		addTerminal("DECIMAL", TokenType.DECIMAL, null);
 		for (KeywordType keywordType : KeywordType.values()) {
 			addTerminal(keywordType.name(), TokenType.KEYWORD, keywordType);
 		}
@@ -116,40 +127,76 @@ public class Grammar extends Semantic {
 
 	/**
 	 * 声明非终结符
-	 * @throws SyntaxException 
+	 * 
+	 * @throws SyntaxException
 	 */
 	private void declareNonTerminal() throws SyntaxException {
-		String[] nonTerminals = new String[] { "program", "declaration_list",
-				"external_declaration", "function_definition", "declaration",
-				"type_specifier", "declarator", "compound_statement",
-				"pointer direct_declarator", "direct_declarator", "pointer",
-				"constant_expression", "parameter_list", "identifier_list",
-				"conditional_expression", "parameter_declaration",
-				"declaration_specifiers", "statement_list", "init_declarator",
-				"init_declarator_list", "initializer", "assignment_expression",
-				"initializer_list", "statement", "expression_statement",
-				"selection_statement", "iteration_statement", "jump_statement",
-				"expression", "unary_expression", "assignment_operator",
-				"logical_or_expression", "logical_and_expression",
-				"inclusive_or_expression", "exclusive_or_expression",
-				"and_expression", "equality_expression",
-				"relational_expression", "shift_expression",
-				"multiplicative_expression", "cast_expression",
-				"postfix_expression", "unary_operator", "type_name",
-				"primary_expression", "argument_expression_list",
-				"struct_or_union_specifier", "struct_or_union",
-				"struct_declarator", "struct_declaration",
-				"struct_declaration_list", "struct_declarator_list",
-				"specifier_qualifier_list", "type_qualifier", "enum_specifier",
-				"enumerator_list", "enumerator", "type_qualifier_list",
-				"parameter_type_list", "abstract_declarator",
-				"direct_abstract_declarator", "labeled_statement",
-				"additive_expression", "storage_class_specifier",
-				"for_statement", "while_statement", "if_statement",
-				"switch_statement" };
+		String[] nonTerminals = new String[] { "program", "stmt_list", "stmt",
+				"func", "var_stmt", "var_list", "exp_list", "exp", "exp0",
+				"exp1", "exp2", "exp3", "exp4", "exp5", "exp6", "exp7", "exp8",
+				"exp9", "type", "block", "call_exp", "call_stmt", "doc_list" };
 		for (String string : nonTerminals) {
 			addNonTerminal(string);
 		}
+	}
+
+	/**
+	 * 进行推导
+	 * 
+	 * @throws SyntaxException
+	 */
+	private void infer() throws SyntaxException {
+		/* 起始符号就是main函数 */
+		infer(handler.getSemanticHandler("main"), "program -> stmt_list[0]");
+		/* Block语句 */
+		infer(handler.getSemanticHandler("block"),
+				"block -> @LBR#do_enter_scope# [stmt_list[0]] @RBR#do_leave_scope#{lost_rbr}");
+		/* 当前块（Block）全部由语句组成 */
+		infer(handler.getSemanticHandler("stmt_list"),
+				"stmt_list -> stmt[0]{lost_stmt} [stmt_list[1]]");
+		/* 语句分为变量定义（赋值）、调用语句 */
+		infer(handler.getSemanticHandler("copy"),
+				"stmt -> var_stmt[0] | call_stmt[0] | block");
+		/* 变量定义（赋值）语句（由于支持Lambda，函数定义皆为Lambda形式） */
+		infer(handler.getSemanticHandler("var"),
+				"var_stmt -> (@VARIABLE[11] | @LET[12]) @ID[0]#declear_variable#{lost_token} @ASSIGN{lost_assign} (func[1]{lost_func} | exp[2]{lost_exp}) @SEMI{lost_semi}");
+		/* 表达式（算符文法） */
+		ISemanticAnalyzier exp_handler = handler.getSemanticHandler("exp");
+		infer(exp_handler, "exp -> exp0[0]");
+		infer(exp_handler,
+				"exp0 -> exp1[0] [@QUERY[4] exp0[6] @COLON[5]{lost_colon} exp0[7]]");
+		infer(exp_handler, "exp1 -> [exp1[1] (@AND_OP[2] | @OR_OP[2])] exp2[0]");
+		infer(exp_handler,
+				"exp2 -> [exp2[1] (@OR[2] | @XOR[2] | @AND[2])] exp3[0]");
+		infer(exp_handler, "exp3 -> [exp3[1] (@EQ_OP[2] | @NE_OP[2])] exp4[0]");
+		infer(exp_handler,
+				"exp4 -> [exp4[1] (@LT[2] | @GT[2] | @LE_OP[2] | @GE_OP[2])] exp5[0]");
+		infer(exp_handler,
+				"exp5 -> [exp5[1] (@LEFT_OP[2] | @RIGHT_OP[2])] exp6[0]");
+		infer(exp_handler, "exp6 -> [exp6[1] (@ADD[2] | @SUB[2])] exp7[0]");
+		infer(exp_handler,
+				"exp7 -> [exp7[1] (@MUL[2] | @DIV[2] | @MOD[2])] exp8[0]");
+		infer(exp_handler, "exp8 -> (@NOT_OP[3] | @NOT[3]) exp8[1] | exp9[0]");
+		infer(exp_handler,
+				"exp9 -> (@INC_OP[3] | @DEC_OP[3]) exp9[1] | type[0]");
+		/* 调用语句 */
+		infer(handler.getSemanticHandler("call_exp"),
+				"call_exp -> @CALL (@LPA{lost_lpa} func[0]{lost_call} @RPA{lost_rpa} | @ID[1]{lost_call}) @LPA{lost_lpa} [exp_list[2]] @RPA{lost_rpa}");
+		infer(handler.getSemanticHandler("call_stmt"),
+				"call_stmt -> call_exp[0] @SEMI{lost_semi}");
+		/* 函数定义 */
+		infer(handler.getSemanticHandler("token_list"),
+				"var_list -> @ID[0] [@COMMA var_list[1]]");
+		infer(handler.getSemanticHandler("exp_list"),
+				"exp_list -> exp[0] [@COMMA exp_list[1]]");
+		infer(handler.getSemanticHandler("token_list"),
+				"doc_list -> @LITERAL[0] [@COMMA exp_list[1]]");
+		infer(handler.getSemanticHandler("func"),
+				"func -> @FUNCTION [@LSQ doc_list[0]{lost_doc} @RSQ] (@ID[1]#predeclear_funcname#{lost_func_name} | @NOT[1]#predeclear_funcname#{lost_func_name}) @LPA{lost_lpa} [var_list[2]] @RPA{lost_rpa} (@PTR_OP{lost_func_body} exp[3]{lost_exp} | block[4]{lost_func_body})");
+		/* 基本数据类型 */
+		infer(handler.getSemanticHandler("type"),
+				"type -> @ID[0] | @INTEGER[0] | @DECIMAL[0] | @LITERAL[0] | @CHARACTER[0] | @BOOLEAN[0] | @LPA exp[1]{lost_exp} @RPA{lost_rpa} | call_exp[1]");
+		initialize("program");
 	}
 
 	/**
@@ -159,82 +206,35 @@ public class Grammar extends Semantic {
 	 */
 	private void declareErrorHandler() throws SyntaxException {
 		addErrorHandler("lost_exp", new LostHandler("表达式"));
+		addErrorHandler("lost_func", new LostHandler("函数"));
+		addErrorHandler("lost_token", new LostHandler("标识符"));
+		addErrorHandler("lost_func_name", new LostHandler("函数名"));
+		addErrorHandler("lost_func_body", new LostHandler("函数体"));
+		addErrorHandler("lost_stmt", new LostHandler("语句"));
+		addErrorHandler("lost_assign", new LostHandler("等号'='"));
+		addErrorHandler("lost_call", new LostHandler("调用主体"));
 		addErrorHandler("lost_lpa", new LostHandler("左圆括号'('"));
 		addErrorHandler("lost_rpa", new LostHandler("右圆括号')'"));
 		addErrorHandler("lost_lsq", new LostHandler("左方括号'['"));
 		addErrorHandler("lost_rsq", new LostHandler("右方括号']'"));
 		addErrorHandler("lost_lbr", new LostHandler("左花括号'{'"));
 		addErrorHandler("lost_rbr", new LostHandler("右花括号'}'"));
+		addErrorHandler("lost_colon", new LostHandler("冒号':'"));
 		addErrorHandler("lost_semi", new LostHandler("分号';'"));
+		addErrorHandler("lost_doc", new LostHandler("文档"));
 	}
 
 	/**
-	 * 进行推导
+	 * 声明动作处理器
 	 * 
 	 * @throws SyntaxException
 	 */
-	private void infer() throws SyntaxException {
-		infer("abstract_declarator           -> direct_abstract_declarator | pointer [direct_abstract_declarator]");
-		infer("additive_expression           -> [additive_expression (@ADD | @SUB)] multiplicative_expression");
-		infer("and_expression                -> [and_expression @AND] equality_expression");
-		infer("argument_expression_list      -> [argument_expression_list @COMMA] (assignment_expression | declaration_specifiers)");
-		infer("assignment_expression         -> conditional_expression | unary_expression assignment_operator assignment_expression");
-		infer("assignment_operator           -> @ASSIGN | @MUL_ASSIGN | @DIV_ASSIGN | @MOD_ASSIGN | @ADD_ASSIGN | @SUB_ASSIGN | @LEFT_ASSIGN | @RIGHT_ASSIGN | @AND_ASSIGN | @XOR_ASSIGN | @OR_ASSIGN");
-		infer("cast_expression               -> unary_expression");
-		infer("conditional_expression        -> logical_or_expression [@QUERY expression @COLON conditional_expression]");
-		infer("compound_statement            -> @LBR [[declaration_list] [statement_list]] @RBR");
-		infer("constant_expression           -> conditional_expression");
-		infer("declaration                   -> declaration_specifiers [init_declarator_list] @SEMI");
-		infer("declaration_list              -> [declaration_list] declaration");
-		infer("declaration_specifiers        -> [type_qualifier] [storage_class_specifier] type_specifier");
-		infer("declarator                    -> [pointer] direct_declarator");
-		infer("direct_abstract_declarator    -> @LPA [abstract_declarator] @RPA | [direct_abstract_declarator] @LSQ [constant_expression] @RSQ | @LPA parameter_type_list @RPA | direct_abstract_declarator @LPA @RPA");
-		infer("direct_declarator             -> @IDENTIFIER | @LPA declarator @RPA | direct_declarator (@LSQ [constant_expression] @RSQ | @LPA [(parameter_type_list | identifier_list)] @RPA)");
-		infer("equality_expression           -> [equality_expression (@EQ_OP | @NE_OP)] relational_expression");
-		infer("exclusive_or_expression       -> [exclusive_or_expression @XOR] and_expression");
-		infer("expression                    -> [expression @COMMA] assignment_expression");
-		infer("expression_statement          -> [expression] @SEMI");
-		infer("external_declaration          -> function_definition | declaration");
-		infer("for_statement                 -> @FOR @LPA expression_statement expression_statement [expression] @RPA statement");
-		infer("function_definition           -> declaration_specifiers declarator [declaration_list] compound_statement");
-		infer("identifier_list               -> [identifier_list @COMMA] @IDENTIFIER");
-		infer("if_statement                  -> @IF @LPA expression @RPA statement [@ELSE statement]");
-		infer("inclusive_or_expression       -> [inclusive_or_expression @OR] exclusive_or_expression");
-		infer("init_declarator               -> declarator [@ASSIGN initializer]");
-		infer("init_declarator_list          -> [init_declarator_list @COMMA] init_declarator");
-		infer("initializer                   -> assignment_expression | @LBR initializer_list [@COMMA] @RBR");
-		infer("initializer_list              -> [initializer_list @COMMA] initializer");
-		infer("iteration_statement           -> while_statement | for_statement");
-		infer("jump_statement                -> (@GOTO @IDENTIFIER | @CONTINUE | @BREAK | @RETURN [expression]) @SEMI");
-		infer("labeled_statement             -> @IDENTIFIER @COLON statement | @CASE constant_expression @COLON statement | @DEFAULT @COLON statement");
-		infer("logical_and_expression        -> [logical_and_expression @AND_OP] inclusive_or_expression");
-		infer("logical_or_expression         -> [logical_or_expression @OR_OP] logical_and_expression");
-		infer("multiplicative_expression     -> [multiplicative_expression (@MUL | @DIV | @MOD)] cast_expression");
-		infer("parameter_declaration         -> declaration_specifiers [declarator | abstract_declarator]");
-		infer("parameter_list                -> [parameter_list @COMMA] parameter_declaration");
-		infer("parameter_type_list           -> parameter_list [@COMMA @ELLIPSIS]");
-		infer("pointer                       -> @MUL [type_qualifier_list [pointer] | pointer]");
-		infer(handler.getSemanticHandler("postfix_expression"),
-				"postfix_expression            -> primary_expression[0] | postfix_expression (@LSQ expression @RSQ | @LPA [argument_expression_list] @RPA | @DOT @IDENTIFIER | @PTR_OP @IDENTIFIER | @INC_OP | @DEC_OP)");
-		infer(handler.getSemanticHandler("primary_expression"),
-				"primary_expression            -> @IDENTIFIER[0] | @INTEGER[0] | @REAL[0] | @STRING_LITERAL[0] | @CHARACTER[0] | @LPA expression[1]{lost_exp} @RPA{lost_rpa}");
-		infer("program                       -> external_declaration [program]");
-		infer("relational_expression         -> [relational_expression (@LT | @GT | @LE_OP | @GE_OP)] shift_expression");
-		infer("selection_statement           -> if_statement | switch_statement");
-		infer("shift_expression              -> [shift_expression (@LEFT_OP | @RIGHT_OP)] additive_expression");
-		infer("specifier_qualifier_list      -> (type_specifier | type_qualifier) [specifier_qualifier_list]");
-		infer("statement                     -> labeled_statement | compound_statement | expression_statement | selection_statement | iteration_statement | jump_statement");
-		infer("statement_list                -> [statement_list] statement");
-		infer("storage_class_specifier       -> @TYPEDEF | @EXTERN | @STATIC | @AUTO | @REGISTER");
-		infer("switch_statement              -> @SWITCH @LPA expression @RPA statement");
-		infer("type_name                     -> specifier_qualifier_list [abstract_declarator]");
-		infer("type_qualifier                -> @CONST | @VOLATILE");
-		infer("type_qualifier_list           -> [type_qualifier_list] type_qualifier");
-		infer("type_specifier                -> @VOID[1] | ([@SIGNED[0] | @UNSIGNED[0]] (@CHAR[1] | @SHORT[1] | @INT[1] | @LONG[1] | @FLOAT[1] | @DOUBLE[1] | @BOOL[1]))");
-		infer("unary_expression              -> postfix_expression | (@INC_OP | @DEC_OP | @SIZEOF) unary_expression | unary_operator cast_expression | @SIZEOF @LPA type_name @RPA");
-		infer("unary_operator                -> @AND | @MUL | @ADD | @SUB | @NOT | @NOT_OP");
-		infer("while_statement               -> @WHILE @LPA expression @RPA statement | @DO statement @WHILE @LPA expression @RPA @SEMI");
-		initialize("program");
+	private void declareActionHandler() throws SyntaxException {
+		String[] actionNames = new String[] { "do_enter_scope",
+				"do_leave_scope", "predeclear_funcname", "declear_variable" };
+		for (String string : actionNames) {
+			addActionHandler(string, handler.getActionHandler(string));
+		}
 	}
 
 	@Override
@@ -248,14 +248,27 @@ public class Grammar extends Semantic {
 	}
 
 	@Override
+	protected ISemanticRecorder getSemanticRecorderService() {
+		return recorder;
+	}
+
+	/**
+	 * 获得语义错误描述
+	 */
+	public String getSemanticError() {
+		return recorder.toString();
+	}
+
+	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(getNGAString());
 		sb.append(getNPAString());
 		sb.append(getInst());
-		sb.append(getError());
+		sb.append(getTrackerError());
+		sb.append(getSemanticError());
 		sb.append(getTokenList());
-		sb.append(getObject());
+		sb.append(recorder.isCorrect() ? symbol.toString() : getSemanticError());
 		return sb.toString();
 	}
 }

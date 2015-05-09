@@ -24,6 +24,6 @@ public class LostHandler implements IErrorHandler {
 	public String handle(IRegexStringIterator iterator, TrackerErrorBag bag) {
 		bag.bRead = false;
 		bag.bPass = true;
-		return "缺少符号：" + message;
+		return "缺少：" + message;
 	}
 }

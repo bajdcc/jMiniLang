@@ -87,7 +87,7 @@ public class ParsingStack implements IIndexedData {
 	}
 
 	@Override
-	public boolean exist(int index) {
+	public boolean exists(int index) {
 		return mapTokenBag.containsKey(index);
 	}
 

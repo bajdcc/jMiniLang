@@ -64,7 +64,7 @@ public class FirstSetSolver implements ISyntaxComponentVisitor {
 		bag.bVisitChildren = false;
 		bag.bVisitEnd = false;
 		setRules.add(node);
-		if (bZero) {
+		if (bZero && !node.rule.epsilon) {
 			bZero = false;
 		}
 	}

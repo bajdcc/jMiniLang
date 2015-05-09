@@ -2,15 +2,17 @@ package priv.bajdcc.LALR1.semantic.test;
 
 import java.util.Scanner;
 
+import priv.bajdcc.LALR1.grammar.semantic.ISemanticRecorder;
 import priv.bajdcc.LALR1.grammar.symbol.IManageSymbol;
 import priv.bajdcc.LALR1.grammar.symbol.IQuerySymbol;
 import priv.bajdcc.LALR1.semantic.Semantic;
 import priv.bajdcc.LALR1.semantic.token.IIndexedData;
+import priv.bajdcc.LALR1.semantic.token.IRandomAccessOfTokens;
+import priv.bajdcc.LALR1.semantic.token.ISemanticAction;
 import priv.bajdcc.LALR1.semantic.token.ISemanticAnalyzier;
 import priv.bajdcc.LALR1.semantic.token.TokenBag;
 import priv.bajdcc.LALR1.syntax.Syntax;
 import priv.bajdcc.LALR1.syntax.handler.IErrorHandler;
-import priv.bajdcc.LALR1.syntax.handler.ISemanticAction;
 import priv.bajdcc.LALR1.syntax.handler.SyntaxException;
 import priv.bajdcc.util.TrackerErrorBag;
 import priv.bajdcc.util.lexer.error.RegexException;
@@ -45,15 +47,17 @@ public class TestOperator {
 			semantic.addNonTerminal("E");
 			semantic.addNonTerminal("T");
 			semantic.addNonTerminal("F");
-			semantic.addActionHandler("enter_paran", new ISemanticAction() {				
+			semantic.addActionHandler("enter_paran", new ISemanticAction() {
 				@Override
-				public void handle(IManageSymbol manage) {
+				public void handle(IIndexedData indexed, IManageSymbol manage,
+						IRandomAccessOfTokens access, ISemanticRecorder recorder) {
 					System.out.println("enter");
 				}
 			});
-			semantic.addActionHandler("leave_paran", new ISemanticAction() {				
+			semantic.addActionHandler("leave_paran", new ISemanticAction() {
 				@Override
-				public void handle(IManageSymbol manage) {
+				public void handle(IIndexedData indexed, IManageSymbol manage,
+						IRandomAccessOfTokens access, ISemanticRecorder recorder) {
 					System.out.println("leave");
 				}
 			});
@@ -77,13 +81,15 @@ public class TestOperator {
 			});
 			ISemanticAnalyzier handleCopy = new ISemanticAnalyzier() {
 				@Override
-				public Object handle(IIndexedData indexed, IQuerySymbol factory) {
+				public Object handle(IIndexedData indexed,
+						IQuerySymbol query, ISemanticRecorder recorder) {
 					return indexed.get(0).object;
 				}
 			};
 			ISemanticAnalyzier handleBinop = new ISemanticAnalyzier() {
 				@Override
-				public Object handle(IIndexedData indexed, IQuerySymbol factory) {
+				public Object handle(IIndexedData indexed,
+						IQuerySymbol query, ISemanticRecorder recorder) {
 					int lop = Integer
 							.parseInt(indexed.get(0).object.toString());
 					int rop = Integer
@@ -114,7 +120,8 @@ public class TestOperator {
 			};
 			ISemanticAnalyzier handleValue = new ISemanticAnalyzier() {
 				@Override
-				public Object handle(IIndexedData indexed, IQuerySymbol factory) {
+				public Object handle(IIndexedData indexed,
+						IQuerySymbol query, ISemanticRecorder recorder) {
 					return indexed.get(0).token.object;
 				}
 			};
@@ -132,11 +139,11 @@ public class TestOperator {
 			semantic.infer(handleCopy,
 					"F -> @LPA#enter_paran#<(> E[0]{lost_exp} @RPA#leave_paran#{lost_exp_right}<)>");
 			semantic.initialize("Z");
-			//System.out.println(semantic.toString());
-			//System.out.println(semantic.getNGAString());
-			//System.out.println(semantic.getNPAString());
-			//System.out.println(semantic.getInst());
-			System.out.println(semantic.getError());
+			// System.out.println(semantic.toString());
+			// System.out.println(semantic.getNGAString());
+			// System.out.println(semantic.getNPAString());
+			// System.out.println(semantic.getInst());
+			System.out.println(semantic.getTrackerError());
 			System.out.println(semantic.getTokenList());
 			System.out.println(semantic.getObject());
 			// scanner.close();

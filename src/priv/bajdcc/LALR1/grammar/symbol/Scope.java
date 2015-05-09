@@ -5,12 +5,12 @@ package priv.bajdcc.LALR1.grammar.symbol;
  *
  * @author bajdcc
  */
-public class Namespace {
+public class Scope {
 
 	/**
 	 * 父结点
 	 */
-	public Namespace parent = null;
+	public Scope parent = null;
 	
 	/**
 	 * 命名空间名称

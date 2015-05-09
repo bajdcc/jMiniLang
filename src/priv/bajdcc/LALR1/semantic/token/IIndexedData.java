@@ -19,5 +19,5 @@ public interface IIndexedData {
 	 * @param index 索引
 	 * @return 若存在则返回是，应对可选或并列选项，可能返回否
 	 */
-	public boolean exist(int index);
+	public boolean exists(int index);
 }

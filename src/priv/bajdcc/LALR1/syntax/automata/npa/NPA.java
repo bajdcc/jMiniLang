@@ -6,13 +6,13 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
+import priv.bajdcc.LALR1.semantic.token.ISemanticAction;
 import priv.bajdcc.LALR1.syntax.automata.nga.NGA;
 import priv.bajdcc.LALR1.syntax.automata.nga.NGAEdge;
 import priv.bajdcc.LALR1.syntax.automata.nga.NGAEdgeType;
 import priv.bajdcc.LALR1.syntax.automata.nga.NGAStatus;
 import priv.bajdcc.LALR1.syntax.exp.RuleExp;
 import priv.bajdcc.LALR1.syntax.exp.TokenExp;
-import priv.bajdcc.LALR1.syntax.handler.ISemanticAction;
 import priv.bajdcc.LALR1.syntax.rule.Rule;
 import priv.bajdcc.LALR1.syntax.rule.RuleItem;
 import priv.bajdcc.util.lexer.automata.BreadthFirstSearch;
@@ -189,14 +189,16 @@ public class NPA extends NGA {
 									npaEdge.data.action = edge.data.action;
 									npaEdge.data.kAction = NPAEdgeType.SHIFT;
 									npaEdge.data.inst = NPAInstruction.SHIFT;
-									npaEdge.data.iHandler = arrActions.indexOf(edge.data.action);
 									npaEdge.data.errorJump = NPAStatusList
 											.get(NGAStatusList
 													.indexOf(edge.end));
 									/* 为移进项目构造LookAhead表，LA不吃字符，只是单纯压入新的状态（用于规约） */
 									npaEdge.data.arrLookAhead = new HashSet<Integer>();
 									for (TokenExp exp : item.setFirstSetTokens) {
-										npaEdge.data.arrLookAhead.add(exp.id);
+										if (!tokenSet.contains(exp.id)) {
+											npaEdge.data.arrLookAhead
+													.add(exp.id);
+										}
 									}
 								}
 							}
@@ -215,7 +217,8 @@ public class NPA extends NGA {
 						npaEdge.data.action = edge.data.action;
 						npaEdge.data.kAction = NPAEdgeType.MOVE;
 						npaEdge.data.iToken = edge.data.token.id;
-						npaEdge.data.iHandler = arrActions.indexOf(edge.data.action);
+						npaEdge.data.iHandler = arrActions
+								.indexOf(edge.data.action);
 						npaEdge.data.errorJump = npaEdge.end;
 						/* 根据StorageID配置指令 */
 						if (edge.data.iStorage != -1) {

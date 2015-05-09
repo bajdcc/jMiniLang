@@ -17,13 +17,13 @@ public class RuleItem {
 	/**
 	 * 规则表达式
 	 */
-	public ISyntaxComponent expression = null;	
+	public ISyntaxComponent expression = null;
 
 	/**
 	 * First集合（终结符）
 	 */
 	public HashSet<TokenExp> setFirstSetTokens = new HashSet<TokenExp>();
-	
+
 	/**
 	 * First集合（终结符）
 	 */
@@ -38,6 +38,11 @@ public class RuleItem {
 	 * 父结点指针
 	 */
 	public Rule parent = null;
+
+	/**
+	 * 是否产生空串
+	 */
+	public boolean epsilon = false;
 
 	public RuleItem(ISyntaxComponent exp, Rule parent) {
 		expression = exp;

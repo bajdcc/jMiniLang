@@ -1,9 +1,9 @@
 package priv.bajdcc.LALR1.syntax.exp;
 
+import priv.bajdcc.LALR1.semantic.token.ISemanticAction;
 import priv.bajdcc.LALR1.syntax.ISyntaxComponent;
 import priv.bajdcc.LALR1.syntax.ISyntaxComponentVisitor;
 import priv.bajdcc.LALR1.syntax.handler.IErrorHandler;
-import priv.bajdcc.LALR1.syntax.handler.ISemanticAction;
 import priv.bajdcc.util.VisitBag;
 
 /**

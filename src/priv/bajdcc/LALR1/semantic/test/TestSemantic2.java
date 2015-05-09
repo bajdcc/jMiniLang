@@ -47,7 +47,7 @@ public class TestSemantic2 {
 			System.out.println(semantic.getNGAString());
 			System.out.println(semantic.getNPAString());
 			System.out.println(semantic.getInst());
-			System.out.println(semantic.getError());
+			System.out.println(semantic.getTrackerError());
 			System.out.println(semantic.getTokenList());
 			// scanner.close();
 		} catch (RegexException e) {

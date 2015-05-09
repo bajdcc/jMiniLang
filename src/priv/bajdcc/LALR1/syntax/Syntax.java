@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
 
+import priv.bajdcc.LALR1.semantic.token.ISemanticAction;
 import priv.bajdcc.LALR1.syntax.automata.npa.NPA;
 import priv.bajdcc.LALR1.syntax.exp.BranchExp;
 import priv.bajdcc.LALR1.syntax.exp.IExpCollction;
@@ -13,7 +14,6 @@ import priv.bajdcc.LALR1.syntax.exp.RuleExp;
 import priv.bajdcc.LALR1.syntax.exp.SequenceExp;
 import priv.bajdcc.LALR1.syntax.exp.TokenExp;
 import priv.bajdcc.LALR1.syntax.handler.IErrorHandler;
-import priv.bajdcc.LALR1.syntax.handler.ISemanticAction;
 import priv.bajdcc.LALR1.syntax.handler.SyntaxException;
 import priv.bajdcc.LALR1.syntax.handler.SyntaxException.SyntaxError;
 import priv.bajdcc.LALR1.syntax.lexer.SyntaxLexer;
@@ -136,7 +136,7 @@ public class Syntax {
 			mapTerminals.put(name, exp);
 			arrTerminals.add(exp);
 		} else {
-			err(SyntaxError.REDECLARATION);
+			err(SyntaxError.REDECLARATION, name);
 		}
 	}
 

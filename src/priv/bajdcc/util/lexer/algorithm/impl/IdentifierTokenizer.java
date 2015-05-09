@@ -54,8 +54,21 @@ public class IdentifierTokenizer extends TokenAlgorithm {
 	@Override
 	public Token getToken(String string, Token token) {
 		if (mapKeywords.containsKey(string)) {
-			token.kToken = TokenType.KEYWORD;
-			token.object = mapKeywords.get(string);			
+			KeywordType kw = mapKeywords.get(string);
+			switch (kw) {
+			case TRUE:
+				token.kToken = TokenType.BOOL;
+				token.object = true;
+				break;
+			case FALSE:
+				token.kToken = TokenType.BOOL;
+				token.object = false;
+				break;
+			default:
+				token.kToken = TokenType.KEYWORD;
+				token.object = kw;
+				break;
+			}
 		} else {
 			token.kToken = TokenType.ID;
 			token.object = string;

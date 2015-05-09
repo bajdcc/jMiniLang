@@ -7,4 +7,8 @@ package priv.bajdcc.LALR1.grammar.symbol;
  */
 public interface IQuerySymbol {
 
+	/**
+	 * 得到命名空间查询接口
+	 */
+	public IQueryScopeSymbol getQueryScopeService();
 }

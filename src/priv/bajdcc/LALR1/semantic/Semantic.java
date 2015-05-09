@@ -2,11 +2,12 @@ package priv.bajdcc.LALR1.semantic;
 
 import java.util.ArrayList;
 
+import priv.bajdcc.LALR1.grammar.semantic.ISemanticRecorder;
 import priv.bajdcc.LALR1.grammar.symbol.IManageSymbol;
 import priv.bajdcc.LALR1.grammar.symbol.IQuerySymbol;
+import priv.bajdcc.LALR1.grammar.tree.Function;
 import priv.bajdcc.LALR1.semantic.lexer.TokenFactory;
 import priv.bajdcc.LALR1.semantic.token.ISemanticAnalyzier;
-import priv.bajdcc.LALR1.semantic.token.ParsingStack;
 import priv.bajdcc.LALR1.semantic.tracker.ErrorRecord;
 import priv.bajdcc.LALR1.semantic.tracker.Instruction;
 import priv.bajdcc.LALR1.semantic.tracker.InstructionRecord;
@@ -17,9 +18,7 @@ import priv.bajdcc.LALR1.syntax.Syntax;
 import priv.bajdcc.LALR1.syntax.automata.npa.NPAEdge;
 import priv.bajdcc.LALR1.syntax.automata.npa.NPAStatus;
 import priv.bajdcc.LALR1.syntax.exp.TokenExp;
-import priv.bajdcc.LALR1.syntax.handler.IActionFactory;
 import priv.bajdcc.LALR1.syntax.handler.IErrorHandler;
-import priv.bajdcc.LALR1.syntax.handler.ISemanticAction;
 import priv.bajdcc.LALR1.syntax.handler.SyntaxException;
 import priv.bajdcc.LALR1.syntax.rule.RuleItem;
 import priv.bajdcc.util.Position;
@@ -34,7 +33,7 @@ import priv.bajdcc.util.lexer.token.TokenType;
  *
  * @author bajdcc
  */
-public class Semantic extends Syntax implements IErrorHandler, IActionFactory {
+public class Semantic extends Syntax implements IErrorHandler {
 
 	/**
 	 * 单词流工厂
@@ -182,7 +181,7 @@ public class Semantic extends Syntax implements IErrorHandler, IActionFactory {
 				/* 匹配=0 移进=0 左递归=1 归约=2 */
 				/* 对终结符则移进，对非终结符则匹配，互不冲突，故两者优先级相同 */
 				/* 左递归属于特殊的归约，区别是归约后不出栈 */
-				/* 注意：为什么识别二义性文法，跟踪器是带回溯的 */
+				/* 注意：已除去二义性文法，跟踪器是不带回溯的 */
 				int level = 2;
 				/* 筛选边 */
 				aliveEdgeList.clear();
@@ -555,93 +554,25 @@ public class Semantic extends Syntax implements IErrorHandler, IActionFactory {
 	 * 进行语义处理
 	 */
 	private void run() {
-		/* 单词索引 */
-		int idxToken = 0;
 		/* 规则集合 */
 		ArrayList<RuleItem> items = npa.getRuleItems();
-		/* 数据处理堆栈 */
-		ParsingStack ps = new ParsingStack();
 		/* 符号表查询接口 */
 		IQuerySymbol query = getQuerySymbolService();
 		/* 符号表管理接口 */
 		IManageSymbol manage = getManageSymbolService();
+		/* 语义错误处理接口 */
+		ISemanticRecorder recorder = getSemanticRecorderService();
+		/* 运行时自动机 */
+		SemanticMachine machine = new SemanticMachine(items, arrActions,
+				arrTokens, query, manage, recorder, bDebug);
 		/* 遍历所有指令 */
 		for (Instruction inst : arrInsts) {
-			/* 语义动作接口 */
-			ISemanticAction action = null;
-			/* 语义处理接口 */
-			ISemanticAnalyzier handler = null;
-			/* 处理前 */
-			if (inst.iHandler != -1) {
-				switch (inst.inst) {
-				case PASS:
-				case READ:
-				case SHIFT:
-					action = arrActions.get(inst.iHandler);
-					break;
-				default:
-					handler = items.get(inst.iHandler).handler;
-					break;
-				}
-			}
-			switch (inst.inst) {
-			case PASS:
-				idxToken++;
-				break;
-			case READ:
-				ps.set(inst.iIndex, arrTokens.get(idxToken));
-				idxToken++;
-				break;
-			case SHIFT:
-				ps.push();
-				break;
-			default:
-				break;
-			}
-			/* 处理时 */
-			if (action != null) {
-				action.handle(manage);
-			}
-			if (handler != null) {
-				object = handler.handle(ps, query);
-			}
-			/* 处理后 */
-			switch (inst.inst) {
-			case LEFT_RECURSION:
-				ps.pop();// 先pop再push为了让栈层成为current的引用
-				ps.push();
-				ps.set(inst.iIndex, object);
-				break;
-			case LEFT_RECURSION_DISCARD:
-				ps.pop();
-				ps.push();
-				break;
-			case PASS:
-				break;
-			case READ:
-				break;
-			case SHIFT:
-				break;
-			case TRANSLATE:
-				ps.pop();
-				ps.set(inst.iIndex, object);
-				break;
-			case TRANSLATE_DISCARD:
-				ps.pop();
-				break;
-			case TRANSLATE_FINISH:
-				ps.pop();
-				break;
-			default:
-				break;
-			}
-			/* 打印调试信息 */
-			if (bDebug) {
-				System.err.println("#### " + inst.toString() + " ####");
-				System.err.println(ps.toString());
-				System.err.println();
-			}
+			machine.run(inst);
 		}
+		object = machine.getObject();
+		Function entry = (Function) object;
+		manage.getManageScopeService().registeFunc(
+				query.getQueryScopeService().getEntryName(), entry);
 	}
 
 	/**
@@ -663,6 +594,15 @@ public class Semantic extends Syntax implements IErrorHandler, IActionFactory {
 	}
 
 	/**
+	 * 获取语义错误处理接口
+	 * 
+	 * @return 语义错误处理接口
+	 */
+	protected ISemanticRecorder getSemanticRecorderService() {
+		return null;
+	}
+
+	/**
 	 * 缺省的错误处理器
 	 * 
 	 * @param iterator
@@ -676,11 +616,6 @@ public class Semantic extends Syntax implements IErrorHandler, IActionFactory {
 		bag.bHalt = true;
 		bag.bGiveUp = false;
 		return "Error";
-	}
-
-	@Override
-	public void invoke(String name) {
-
 	}
 
 	/**
@@ -763,11 +698,11 @@ public class Semantic extends Syntax implements IErrorHandler, IActionFactory {
 	}
 
 	/**
-	 * 获得错误描述
+	 * 获得语法错误描述
 	 */
-	public String getError() {
+	public String getTrackerError() {
 		StringBuffer sb = new StringBuffer();
-		sb.append("#### 错误列表 ####");
+		sb.append("#### 语法错误列表 ####");
 		sb.append(System.getProperty("line.separator"));
 		for (TrackerError error : arrErrors) {
 			sb.append(error.toString());

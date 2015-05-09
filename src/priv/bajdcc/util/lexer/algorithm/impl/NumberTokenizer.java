@@ -1,5 +1,6 @@
 package priv.bajdcc.util.lexer.algorithm.impl;
 
+import java.math.BigDecimal;
 import priv.bajdcc.util.lexer.algorithm.TokenAlgorithm;
 import priv.bajdcc.util.lexer.error.RegexException;
 import priv.bajdcc.util.lexer.token.Token;
@@ -36,12 +37,16 @@ public class NumberTokenizer extends TokenAlgorithm {
 	@Override
 	public Token getToken(String string, Token token) {
 		try {
-			token.kToken = TokenType.INTEGER;
-			token.object = Integer.parseInt(string);
-			return token;
-		} catch (NumberFormatException e) {
-			token.kToken = TokenType.REAL;
-			token.object = Double.parseDouble(string);
+			BigDecimal decimal = new BigDecimal(string);
+			token.object = decimal;
+			if (string.indexOf('.') == -1) {
+				token.object = decimal.toBigIntegerExact();
+				token.kToken = TokenType.INTEGER;
+			} else {
+				token.kToken = TokenType.DECIMAL;
+			}
+		} catch (ArithmeticException e) {
+			token.kToken = TokenType.DECIMAL;
 		}
 		return token;
 	}

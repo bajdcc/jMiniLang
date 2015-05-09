@@ -1,5 +1,6 @@
 package priv.bajdcc.LALR1.semantic.token;
 
+import priv.bajdcc.LALR1.grammar.semantic.ISemanticRecorder;
 import priv.bajdcc.LALR1.grammar.symbol.IQuerySymbol;
 
 /**
@@ -16,7 +17,10 @@ public interface ISemanticAnalyzier {
 	 *            索引包接口
 	 * @param factory
 	 *            单词工厂接口
+	 * @param recorder
+	 *            语义错误记录接口
 	 * @return 处理后的数据
 	 */
-	public Object handle(IIndexedData indexed, IQuerySymbol factory);
+	public Object handle(IIndexedData indexed, IQuerySymbol query,
+			ISemanticRecorder recorder);
 }

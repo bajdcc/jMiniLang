@@ -28,7 +28,7 @@ public class TestGrammar {
 			//System.out.println(grammar.getNGAString());
 			System.out.println(grammar.getNPAString());
 			System.out.println(grammar.getInst());
-			System.out.println(grammar.getError());
+			System.out.println(grammar.getTrackerError());
 			System.out.println(grammar.getTokenList());
 			System.out.println(grammar.getObject());
 			//FileWriter fw = new FileWriter("E:/testgrammar.txt");

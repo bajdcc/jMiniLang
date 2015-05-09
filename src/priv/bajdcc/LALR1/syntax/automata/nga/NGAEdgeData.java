@@ -1,9 +1,9 @@
 package priv.bajdcc.LALR1.syntax.automata.nga;
 
+import priv.bajdcc.LALR1.semantic.token.ISemanticAction;
 import priv.bajdcc.LALR1.syntax.exp.RuleExp;
 import priv.bajdcc.LALR1.syntax.exp.TokenExp;
 import priv.bajdcc.LALR1.syntax.handler.IErrorHandler;
-import priv.bajdcc.LALR1.syntax.handler.ISemanticAction;
 
 /**
  * 非确定性文法自动机边数据

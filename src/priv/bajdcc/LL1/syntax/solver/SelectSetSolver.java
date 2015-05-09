@@ -29,6 +29,11 @@ public abstract class SelectSetSolver implements ISyntaxComponentVisitor {
 	private boolean insertSymbol = false;
 
 	/**
+	 * 当前产生式规则是否可以推导出空串
+	 */
+	protected abstract boolean isEpsilon();
+
+	/**
 	 * 获得当前产生式左部的Follow集
 	 */
 	protected abstract Collection<TokenExp> getFollow();
@@ -83,13 +88,23 @@ public abstract class SelectSetSolver implements ISyntaxComponentVisitor {
 		bag.bVisitEnd = false;
 		if (firstSymbol) {
 			addRule();// 需要添加指令集
-			insertSymbol = true;
-			for (TokenExp token : node.rule.arrFirsts) {// 添加First集
-				setCellToRuleId(token.id);
+			if (isEpsilon()) {
+				for (TokenExp token : getFollow()) {// 有空串，添加Follow集
+					setCellToRuleId(token.id);
+				}
 			}
+			insertSymbol = true;
 			firstSymbol = false;
 		}
 		if (insertSymbol) {
+			for (TokenExp token : node.rule.arrFirsts) {// 添加First集
+				if (token.kType != TokenType.EOF) {
+					setCellToRuleId(token.id);
+				}
+			}
+			if (!node.rule.epsilon) {
+				insertSymbol = false;
+			}
 			addInstToRule(PredictType.NONTERMINAL, node.id);
 		}
 	}

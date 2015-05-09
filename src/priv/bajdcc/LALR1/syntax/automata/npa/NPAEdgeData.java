@@ -2,8 +2,8 @@ package priv.bajdcc.LALR1.syntax.automata.npa;
 
 import java.util.HashSet;
 
+import priv.bajdcc.LALR1.semantic.token.ISemanticAction;
 import priv.bajdcc.LALR1.syntax.handler.IErrorHandler;
-import priv.bajdcc.LALR1.syntax.handler.ISemanticAction;
 
 /**
  * 非确定性下推自动机边数据

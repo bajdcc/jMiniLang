@@ -14,7 +14,7 @@ public enum KeywordType {
 			"short"), SIGNED("signed"), SIZEOF("sizeof"), STATIC("static"), STRUCT(
 			"struct"), SWITCH("switch"), TRUE("true"), TYPEDEF("typedef"), UNION(
 			"union"), UNSIGNED("unsigned"), VOID("void"), VOLATILE("volatile"), WHILE(
-			"while");
+			"while"), VARIABLE("var"), FUNCTION("func"), LET("let"), CALL("call"), REF("ref");
 
 	private String name;
 

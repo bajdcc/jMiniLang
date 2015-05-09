@@ -63,6 +63,11 @@ public class PredictionTable extends SelectSetSolver {
 	private ArrayList<PredictionInstruction> instBag = null;
 
 	/**
+	 * 当前处理的产生式规则
+	 */
+	private RuleItem item = null;
+
+	/**
 	 * 字符串迭代器
 	 */
 	private IRegexStringIterator iter = null;
@@ -123,9 +128,15 @@ public class PredictionTable extends SelectSetSolver {
 		for (RuleExp exp : arrNonTerminals) {
 			indexVn++;
 			for (RuleItem item : exp.rule.arrRules) {
+				this.item = item;
 				item.expression.visit(this);
 			}
 		}
+	}
+
+	@Override
+	protected boolean isEpsilon() {
+		return item.epsilon;
 	}
 
 	@Override
@@ -137,6 +148,9 @@ public class PredictionTable extends SelectSetSolver {
 	protected void setCellToRuleId(int token) {
 		if (table[indexVn][token] == -1) {
 			table[indexVn][token] = indexBag;
+		} else if (table[indexVn][token] != indexBag) {
+			System.err.println(String.format("存在二义性冲突：位置（%d，%d），[%d]->[%d]",
+					indexVn, token, table[indexVn][token], indexBag));
 		}
 	}
 

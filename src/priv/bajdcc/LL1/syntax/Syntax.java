@@ -429,13 +429,21 @@ public class Syntax {
 		/* 非终结符数量 */
 		int size = arrNonTerminals.size();
 		/* 计算规则的First集合 */
-		for (RuleExp exp : arrNonTerminals) {
-			for (RuleItem item : exp.rule.arrRules) {
-				FirstSetSolver solver = new FirstSetSolver();
-				item.expression.visit(solver);// 计算规则的First集合
-				exp.rule.epsilon |= solver.solve(item);
+		boolean update;
+		do {
+			update = false;
+			for (RuleExp exp : arrNonTerminals) {
+				for (RuleItem item : exp.rule.arrRules) {
+					FirstSetSolver solver = new FirstSetSolver();
+					item.expression.visit(solver);// 计算规则的First集合
+					item.epsilon = solver.solve(item);
+					if (item.epsilon && !exp.rule.epsilon) {
+						exp.rule.epsilon = true;
+						update = true;
+					}
+				}
 			}
-		}
+		} while (update);
 		/* 建立连通矩阵 */
 		BitVector2 firstsetDependency = new BitVector2(size, size);// First集依赖矩阵
 		firstsetDependency.clear();
@@ -500,11 +508,13 @@ public class Syntax {
 				}
 			}
 		}
-		/* 计算完整的First集合 */
+		/* 建立规则的依赖关系 */
+		ArrayList<Integer> nodependencyList = new ArrayList<Integer>();
 		{
 			/* 建立处理标记表 */
 			BitSet processed = new BitSet(size);
 			processed.clear();
+			/* 寻找First集的依赖关系 */
 			for (int i = 0; i < size; i++) {
 				/* 找出一条无最左依赖的规则 */
 				int nodependencyRule = -1;// 最左依赖的规则索引
@@ -527,25 +537,26 @@ public class Syntax {
 					err(SyntaxError.MISS_NODEPENDENCY_RULE,
 							arrNonTerminals.get(i).name);
 				}
-				/* 计算该规则的终结符First集合 */
-				{
-					Rule rule = arrNonTerminals.get(nodependencyRule).rule;
-					/* 计算规则的终结符First集合 */
-					for (RuleItem item : rule.arrRules) {
-						for (RuleExp exp : item.setFirstSetRules) {
-							item.setFirstSetTokens.addAll(exp.rule.arrFirsts);
-						}
-					}
-					/* 计算非终结符的终结符First集合 */
-					for (RuleItem item : rule.arrRules) {
-						rule.arrFirsts.addAll(item.setFirstSetTokens);
-					}
-				}
 				/* 清除该规则 */
 				processed.set(nodependencyRule);
 				for (int j = 0; j < size; j++) {
 					firstsetDependency.clear(j, nodependencyRule);
 				}
+				nodependencyList.add(nodependencyRule);
+			}
+		}
+		for (int nodependencyRule : nodependencyList) {
+			/* 计算该规则的终结符First集合 */
+			Rule rule = arrNonTerminals.get(nodependencyRule).rule;
+			/* 计算规则的终结符First集合 */
+			for (RuleItem item : rule.arrRules) {
+				for (RuleExp exp : item.setFirstSetRules) {
+					item.setFirstSetTokens.addAll(exp.rule.arrFirsts);
+				}
+			}
+			/* 计算非终结符的终结符First集合 */
+			for (RuleItem item : rule.arrRules) {
+				rule.arrFirsts.addAll(item.setFirstSetTokens);
 			}
 		}
 		/* 搜索不能产生字符串的规则 */
@@ -560,7 +571,6 @@ public class Syntax {
 		/* 求Follow集 */
 		mapNonTerminals.get(beginRuleName).rule.setFollows.add(mapTerminals
 				.get(epsilonName));
-		boolean update;
 		do {
 			update = false;
 			for (RuleExp origin : arrNonTerminals) {

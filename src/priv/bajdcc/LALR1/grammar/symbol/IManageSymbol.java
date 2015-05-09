@@ -5,21 +5,10 @@ package priv.bajdcc.LALR1.grammar.symbol;
  *
  * @author bajdcc
  */
-public interface IManageSymbol {
+public interface IManageSymbol extends IQuerySymbol {
 
 	/**
-	 * 创建并进入新的命名空间
+	 * 得到命名空间管理接口
 	 */
-	public void enterNamespace();
-	
-	/**
-	 * 创建并进入新的命名空间
-	 * @param name 命名空间名称
-	 */
-	public void enterNamespace(String name);
-	
-	/**
-	 * 删除当前命名空间，返回上层
-	 */
-	public void leaveNamespace();
+	public IManageScopeSymbol getManageScopeService();
 }
