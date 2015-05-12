@@ -1,15 +1,23 @@
 
-#Compile Principles homework
+#简易解释器(Java)
 ===========================
 
-##Project No.1
+一个完整的、简易的解释器框架。
 
-### `Lexer` -- [*Java*, Using Regex built with NFA & DFA] 
-Technologic reference: `vzch`'s *RegexDebugger* & *FreeScript*)
-
-#### Procedure:
-	* Regex Expression String
-	* Regex Syntax Tree (Rep. Charset. Section)
-	* Epsilon NFA
-	* NFA
-	* DFA (Determine & Minimize)
+#### 包括：
+	* 词法分析，自动生成NFA和DFA并匹配。
+	* 语法分析，LALR(1)文法，可加语义动作（归约动作）。
+	* 语义分析，可生定义语义动作。
+	* 语法树。
+	* 面向栈的指令设计。
+	* 变量和过程调用本地化。
+	* 提供指令页导入，变量和过程导出。
+	* 代码页可序列化。
+	*
+	* 生成简易的正则表达式结构、NFA、DFA表。
+	* 生成简易的LR分析表。
+	* 生成简易的语义分析指令。
+	* 生成简易的语法树结构。
+	* 生成简易的代码页结构。
+	* 生成简易的虚拟机指令。
+	* 生成简易的运行时环境。
