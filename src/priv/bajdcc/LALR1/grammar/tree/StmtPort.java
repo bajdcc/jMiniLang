@@ -8,31 +8,21 @@ import priv.bajdcc.util.lexer.token.OperatorType;
 import priv.bajdcc.util.lexer.token.Token;
 
 /**
- * 【语义分析】赋值语句
+ * 【语义分析】导入/导出语句
  *
  * @author bajdcc
  */
-public class StmtAssign implements IStmt {
+public class StmtPort implements IStmt {
 
 	/**
-	 * 变量名
+	 * 名称
 	 */
 	private Token name = null;
-
-	/**
-	 * 表达式
-	 */
-	private IExp exp = null;
 
 	/**
 	 * 限定符
 	 */
 	private Token spec = null;
-
-	/**
-	 * 是否为声明
-	 */
-	private boolean decleared = false;
 
 	public Token getName() {
 		return name;
@@ -40,14 +30,6 @@ public class StmtAssign implements IStmt {
 
 	public void setName(Token name) {
 		this.name = name;
-	}
-
-	public IExp getExp() {
-		return exp;
-	}
-
-	public void setExp(IExp exp) {
-		this.exp = exp;
 	}
 
 	public Token getSpec() {
@@ -58,28 +40,17 @@ public class StmtAssign implements IStmt {
 		this.spec = spec;
 	}
 
-	public boolean isDecleared() {
-		return decleared;
-	}
-
-	public void setDecleared(boolean decleared) {
-		this.decleared = decleared;
-	}
-
 	@Override
 	public void analysis(ISemanticRecorder recorder) {
-		exp.analysis(recorder);
+
 	}
 
 	@Override
 	public void genCode(ICodegen codegen) {
-		exp.genCode(codegen);
-		codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(name.object));
 		KeywordType keyword = (KeywordType) spec.object;
-		if (keyword == KeywordType.LET) {
-			codegen.genCode(RuntimeInst.istore);
-		} else {
-			codegen.genCode(RuntimeInst.ialloc);
+		if (keyword == KeywordType.IMPORT) {
+			codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(name.object));
+			codegen.genCode(RuntimeInst.iimp);
 		}
 	}
 
@@ -94,8 +65,6 @@ public class StmtAssign implements IStmt {
 		sb.append(prefix.toString());
 		sb.append(spec.toRealString());
 		sb.append(" " + name.toRealString());
-		sb.append(" " + OperatorType.ASSIGN.getName() + " ");
-		sb.append(exp.print(prefix));
 		sb.append(OperatorType.SEMI.getName());
 		return sb.toString();
 	}

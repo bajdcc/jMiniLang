@@ -22,8 +22,22 @@ public class HashListMapEx<K, V> {
 	}
 
 	public void add(K k, V v) {
-		if (map.put(k, v) == null) {
+		V vv = map.put(k, v);
+		if (vv == null) {
 			list.add(v);
+		} else {
+			list.set(list.indexOf(vv), v);
+		}
+	}
+
+	public boolean put(K k, V v) {
+		V vv = map.put(k, v);
+		if (vv == null) {
+			list.add(v);
+			return false;
+		} else {
+			list.set(list.indexOf(vv), v);
+			return true;
 		}
 	}
 

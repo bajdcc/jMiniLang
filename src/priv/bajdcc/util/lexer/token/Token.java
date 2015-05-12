@@ -1,5 +1,8 @@
 package priv.bajdcc.util.lexer.token;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 import priv.bajdcc.util.Position;
 
 /**
@@ -7,7 +10,7 @@ import priv.bajdcc.util.Position;
  * 
  * @author bajdcc
  */
-public class Token {
+public class Token implements Cloneable {
 	/**
 	 * 单词类型
 	 */
@@ -24,10 +27,14 @@ public class Token {
 	public Position position = new Position();
 
 	public String toRealString() {
+		return getRealString(kToken, object);
+	}
+
+	public static String getRealString(TokenType type, Object object) {
 		if (object == null) {
 			return "";
 		}
-		switch (kToken) {
+		switch (type) {
 		case KEYWORD:
 			return ((KeywordType) object).getName();
 		case OPERATOR:
@@ -35,7 +42,7 @@ public class Token {
 		case STRING:
 			return "\"" + object.toString() + "\"";
 		case CHARACTER:
-			char ch = (char) (int) object;
+			char ch = (char) object;
 			return "'"
 					+ (Character.isISOControl(ch) ? String.format("\\u%04x",
 							(int) ch) : ch + "") + "'";
@@ -67,5 +74,34 @@ public class Token {
 				position.iColumn, kToken.getName(), object == null ? "(null)"
 						: object.toString(), toSimpleString()));
 		return sb.toString();
+	}
+
+	public Token copy() {
+		try {
+			return (Token) clone();
+		} catch (CloneNotSupportedException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public static Token createFromObject(Object object) {
+		Token token = new Token();
+		if (object instanceof String) {
+			token.kToken = TokenType.STRING;
+		} else if (object instanceof Character) {
+			token.kToken = TokenType.CHARACTER;
+		} else if (object instanceof BigInteger) {
+			token.kToken = TokenType.INTEGER;
+		} else if (object instanceof BigDecimal) {
+			token.kToken = TokenType.DECIMAL;
+		} else if (object instanceof Boolean) {
+			token.kToken = TokenType.BOOL;
+		} else {
+			token.kToken = TokenType.ERROR;
+			return token;
+		}
+		token.object = object;
+		return token;
 	}
 }

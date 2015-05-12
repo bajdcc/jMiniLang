@@ -1,6 +1,7 @@
 package priv.bajdcc.LALR1.grammar.tree;
 
 import priv.bajdcc.LALR1.grammar.codegen.ICodegen;
+import priv.bajdcc.LALR1.grammar.runtime.RuntimeInst;
 import priv.bajdcc.LALR1.grammar.semantic.ISemanticRecorder;
 import priv.bajdcc.util.lexer.token.OperatorType;
 
@@ -23,12 +24,13 @@ public class StmtInvoke implements IStmt {
 
 	@Override
 	public void analysis(ISemanticRecorder recorder) {
-
+		exp.analysis(recorder);
 	}
 
 	@Override
 	public void genCode(ICodegen codegen) {
-
+		exp.genCode(codegen);
+		codegen.genCode(RuntimeInst.ipop);
 	}
 
 	@Override

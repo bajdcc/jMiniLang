@@ -18,7 +18,7 @@ public class SyntaxException extends Exception {
 		NULL("推导式为空"), UNDECLARED("无法识别的符号"), SYNTAX("语法错误"), INCOMPLETE(
 				"推导式不完整"), EPSILON("可能产生空串"), INDIRECT_RECURSION("存在间接左递归"), FAILED(
 				"不能产生字符串"), MISS_NODEPENDENCY_RULE("找不到无最左依赖的规则"), REDECLARATION(
-				"重复定义");
+				"重复定义"), COMPILE_ERROR("编译错误");
 
 		private String message;
 

@@ -1,5 +1,6 @@
 package priv.bajdcc.LALR1.grammar.tree;
 
+
 import priv.bajdcc.LALR1.grammar.codegen.ICodegen;
 import priv.bajdcc.LALR1.grammar.semantic.ISemanticRecorder;
 import priv.bajdcc.LALR1.grammar.type.TokenTools;
@@ -61,12 +62,13 @@ public class ExpSinop implements IExp {
 
 	@Override
 	public void analysis(ISemanticRecorder recorder) {
-
+		operand.analysis(recorder);
 	}
 
 	@Override
 	public void genCode(ICodegen codegen) {
-
+		operand.genCode(codegen);
+		codegen.genCode(TokenTools.op2ins(token));
 	}
 
 	@Override

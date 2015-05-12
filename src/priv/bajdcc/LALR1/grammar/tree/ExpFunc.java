@@ -1,6 +1,7 @@
 package priv.bajdcc.LALR1.grammar.tree;
 
 import priv.bajdcc.LALR1.grammar.codegen.ICodegen;
+import priv.bajdcc.LALR1.grammar.runtime.RuntimeInst;
 import priv.bajdcc.LALR1.grammar.semantic.ISemanticRecorder;
 
 /**
@@ -35,12 +36,13 @@ public class ExpFunc implements IExp {
 
 	@Override
 	public void analysis(ISemanticRecorder recorder) {
-
+		func.analysis(recorder);
 	}
 
 	@Override
 	public void genCode(ICodegen codegen) {
-
+		codegen.genCode(RuntimeInst.ipush, codegen.getFuncIndex(func));
+		codegen.genCode(RuntimeInst.ildfun);
 	}
 
 	@Override

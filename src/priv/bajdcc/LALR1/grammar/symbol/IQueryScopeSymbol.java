@@ -53,6 +53,16 @@ public interface IQueryScopeSymbol {
 	public Function getFuncByName(String name);
 
 	/**
+	 * 根据真实过程名查找过程对象
+	 * 
+	 * @param name
+	 *            查询的过程名
+	 * 
+	 * @return 过程对象
+	 */
+	public Function getFuncByRealName(String name);
+
+	/**
 	 * 过程名是否已被占用
 	 * 
 	 * @param name

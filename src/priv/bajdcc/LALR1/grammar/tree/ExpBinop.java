@@ -74,12 +74,15 @@ public class ExpBinop implements IExp {
 
 	@Override
 	public void analysis(ISemanticRecorder recorder) {
-
+		leftOperand.analysis(recorder);
+		rightOperand.analysis(recorder);
 	}
 
 	@Override
 	public void genCode(ICodegen codegen) {
-
+		leftOperand.genCode(codegen);
+		rightOperand.genCode(codegen);
+		codegen.genCode(TokenTools.op2ins(token));
 	}
 
 	@Override

@@ -3,6 +3,7 @@ package priv.bajdcc.LALR1.grammar.tree;
 import java.util.ArrayList;
 
 import priv.bajdcc.LALR1.grammar.codegen.ICodegen;
+import priv.bajdcc.LALR1.grammar.runtime.RuntimeInst;
 import priv.bajdcc.LALR1.grammar.semantic.ISemanticRecorder;
 import priv.bajdcc.util.lexer.token.KeywordType;
 import priv.bajdcc.util.lexer.token.Token;
@@ -38,6 +39,11 @@ public class Function implements IExp {
 	 * 文档
 	 */
 	private ArrayList<String> doc = null;
+
+	/**
+	 * 外部化
+	 */
+	private boolean extern = false;
 
 	public Token getName() {
 		return name;
@@ -79,6 +85,14 @@ public class Function implements IExp {
 		this.doc = doc;
 	}
 
+	public boolean isExtern() {
+		return extern;
+	}
+
+	public void setExtern(boolean extern) {
+		this.extern = extern;
+	}
+
 	@Override
 	public boolean isConstant() {
 		return false;
@@ -91,12 +105,21 @@ public class Function implements IExp {
 
 	@Override
 	public void analysis(ISemanticRecorder recorder) {
-
+		block.analysis(recorder);
 	}
 
 	@Override
 	public void genCode(ICodegen codegen) {
-
+		codegen.genFuncEntry(realName);
+		int i = 0;
+		for (Token token : params) {
+			codegen.genCode(RuntimeInst.iloada, i);
+			codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(token.object));
+			codegen.genCode(RuntimeInst.ialloc);
+			i++;
+		}
+		block.genCode(codegen);
+		codegen.genCode(RuntimeInst.inop);
 	}
 
 	@Override
@@ -117,7 +140,9 @@ public class Function implements IExp {
 			sb.deleteCharAt(sb.length() - 1);
 		}
 		sb.append(") ");
-		sb.append(block.print(prefix));
+		if (block != null) {
+			sb.append(block.print(prefix));
+		}
 		return sb.toString();
 	}
 }

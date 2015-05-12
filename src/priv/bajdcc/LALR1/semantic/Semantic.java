@@ -20,6 +20,7 @@ import priv.bajdcc.LALR1.syntax.automata.npa.NPAStatus;
 import priv.bajdcc.LALR1.syntax.exp.TokenExp;
 import priv.bajdcc.LALR1.syntax.handler.IErrorHandler;
 import priv.bajdcc.LALR1.syntax.handler.SyntaxException;
+import priv.bajdcc.LALR1.syntax.handler.SyntaxException.SyntaxError;
 import priv.bajdcc.LALR1.syntax.rule.RuleItem;
 import priv.bajdcc.util.Position;
 import priv.bajdcc.util.TrackerErrorBag;
@@ -88,7 +89,7 @@ public class Semantic extends Syntax implements IErrorHandler {
 	/**
 	 * 是否打印调试信息
 	 */
-	private boolean bDebug = false;
+	private boolean debug = false;
 
 	/**
 	 * 设置错误处理器
@@ -174,7 +175,7 @@ public class Semantic extends Syntax implements IErrorHandler {
 			tracker = trackerResource.head;
 			while (tracker != null && !success) {
 				Tracker nextTracker = tracker.next;
-				if (bDebug) {
+				if (debug) {
 					System.err.println(getTrackerStatus());
 				}
 				/* 对每一个跟踪器进行计算，构造level记录可用边优先级，可以防止冲突 */
@@ -553,7 +554,12 @@ public class Semantic extends Syntax implements IErrorHandler {
 	/**
 	 * 进行语义处理
 	 */
-	private void run() {
+	private void run() throws SyntaxException {
+		if (!arrErrors.isEmpty()) {
+			System.err.println(getTrackerError());
+			throw new SyntaxException(SyntaxError.COMPILE_ERROR,
+					new Position(), "出现语法错误");
+		}
 		/* 规则集合 */
 		ArrayList<RuleItem> items = npa.getRuleItems();
 		/* 符号表查询接口 */
@@ -562,17 +568,24 @@ public class Semantic extends Syntax implements IErrorHandler {
 		IManageSymbol manage = getManageSymbolService();
 		/* 语义错误处理接口 */
 		ISemanticRecorder recorder = getSemanticRecorderService();
+		/* 复制单词流 */
+		ArrayList<Token> tokens = new ArrayList<Token>();
+		for (Token token : arrTokens) {
+			tokens.add(token.copy());
+		}
 		/* 运行时自动机 */
 		SemanticMachine machine = new SemanticMachine(items, arrActions,
-				arrTokens, query, manage, recorder, bDebug);
+				tokens, query, manage, recorder, debug);
 		/* 遍历所有指令 */
 		for (Instruction inst : arrInsts) {
 			machine.run(inst);
 		}
 		object = machine.getObject();
-		Function entry = (Function) object;
-		manage.getManageScopeService().registeFunc(
-				query.getQueryScopeService().getEntryName(), entry);
+		if (object != null) {
+			Function entry = (Function) object;
+			manage.getManageScopeService().registeFunc(entry.getRealName(),
+					entry);
+		}
 	}
 
 	/**

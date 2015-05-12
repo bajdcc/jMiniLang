@@ -1,10 +1,9 @@
-package priv.bajdcc.LALR1.grammar.semantic.infer;
+package priv.bajdcc.LALR1.grammar.semantic;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import priv.bajdcc.LALR1.grammar.error.SemanticException.SemanticError;
-import priv.bajdcc.LALR1.grammar.semantic.ISemanticRecorder;
 import priv.bajdcc.LALR1.grammar.symbol.IManageSymbol;
 import priv.bajdcc.LALR1.grammar.symbol.IQuerySymbol;
 import priv.bajdcc.LALR1.grammar.tree.Block;
@@ -19,7 +18,9 @@ import priv.bajdcc.LALR1.grammar.tree.IExp;
 import priv.bajdcc.LALR1.grammar.tree.IStmt;
 import priv.bajdcc.LALR1.grammar.tree.StmtAssign;
 import priv.bajdcc.LALR1.grammar.tree.StmtInvoke;
+import priv.bajdcc.LALR1.grammar.tree.StmtPort;
 import priv.bajdcc.LALR1.grammar.tree.StmtReturn;
+import priv.bajdcc.LALR1.grammar.type.TokenTools;
 import priv.bajdcc.LALR1.semantic.token.IIndexedData;
 import priv.bajdcc.LALR1.semantic.token.IRandomAccessOfTokens;
 import priv.bajdcc.LALR1.semantic.token.ISemanticAction;
@@ -103,17 +104,35 @@ public class SemanticHandler {
 					IRandomAccessOfTokens access, ISemanticRecorder recorder) {
 				KeywordType spec = (KeywordType) access.relativeGet(-1).object;
 				Token token = access.relativeGet(0);
+				String name = token.toRealString();
 				if (spec == KeywordType.VARIABLE) {
-					if (!manage.getQueryScopeService().findDeclaredSymbol(
-							token.toRealString())) {
-						manage.getManageScopeService().registerSymbol(
-								token.toRealString());
-					} else {
+					if (!manage.getQueryScopeService().findDeclaredSymbol(name)) {
+						if (!manage.getQueryScopeService().isRegisteredFunc(
+								name)) {
+							manage.getManageScopeService().registerSymbol(name);
+						} else {
+							recorder.add(SemanticError.VAR_FUN_CONFLICT, token);
+						}
+					} else if (!TokenTools.isExternalName(name)) {
 						recorder.add(SemanticError.VARIABLE_REDECLARAED, token);
 					}
-				} else if (!manage.getQueryScopeService().findDeclaredSymbol(
+				} else if (spec == KeywordType.LET) {
+					if (!manage.getQueryScopeService().findDeclaredSymbol(name)) {
+						recorder.add(SemanticError.VARIABLE_NOT_DECLARAED,
+								token);
+					}
+				}
+			}
+		});
+		/* 声明参数 */
+		mapSemanticAction.put("declear_param", new ISemanticAction() {
+			@Override
+			public void handle(IIndexedData indexed, IManageSymbol manage,
+					IRandomAccessOfTokens access, ISemanticRecorder recorder) {
+				Token token = access.relativeGet(0);
+				if (!manage.getManageScopeService().registerFutureSymbol(
 						token.toRealString())) {
-					recorder.add(SemanticError.VARIABLE_NOT_DECLARAED, token);
+					recorder.add(SemanticError.DUP_PARAM, token);
 				}
 			}
 		});
@@ -156,6 +175,18 @@ public class SemanticHandler {
 					triop.setThirdOperand((IExp) indexed.get(7).object);
 					return triop.simplify(recorder);
 				} else {
+					Object obj = indexed.get(0).object;
+					if (obj instanceof ExpValue) {
+						ExpValue value = (ExpValue) obj;
+						if (!value.isConstant()
+								&& !query
+										.getQueryScopeService()
+										.findDeclaredSymbol(
+												value.getToken().toRealString())) {
+							recorder.add(SemanticError.VARIABLE_NOT_DECLARAED,
+									value.getToken());
+						}
+					}
 					return indexed.get(0).object;
 				}
 			}
@@ -171,12 +202,6 @@ public class SemanticHandler {
 					ExpValue value = new ExpValue();
 					Token token = indexed.get(0).token;
 					value.setToken(token);
-					if (!value.isConstant()
-							&& !query.getQueryScopeService()
-									.findDeclaredSymbol(token.toRealString())) {
-						recorder.add(SemanticError.VARIABLE_NOT_DECLARAED,
-								token);
-					}
 					return value;
 				}
 			}
@@ -192,6 +217,7 @@ public class SemanticHandler {
 				func.setRealName(func.getName().toRealString());
 				Block block = new Block();
 				block.setStmts((ArrayList<IStmt>) indexed.get(0).object);
+				block.getStmts().add(new StmtReturn());
 				func.setBlock(block);
 				return func;
 			}
@@ -243,6 +269,9 @@ public class SemanticHandler {
 				if (indexed.exists(1)) {
 					ExpFunc func = new ExpFunc();
 					func.setFunc((Function) indexed.get(1).object);
+					if (assign.isDecleared()) {
+						func.getFunc().setRealName(token.toRealString());
+					}
 					assign.setExp(func);
 				} else {
 					assign.setExp((IExp) indexed.get(2).object);
@@ -259,15 +288,21 @@ public class SemanticHandler {
 				ExpInvoke invoke = new ExpInvoke();
 				if (indexed.exists(1)) {
 					Token token = indexed.get(1).token;
+					invoke.setName(token);
 					Function func = query.getQueryScopeService().getFuncByName(
 							token.toRealString());
 					if (func == null) {
-						recorder.add(SemanticError.MISSING_FUNCNAME, token);
+						if (TokenTools.isExternalName(token)) {
+							invoke.setExtern(token);
+						} else {
+							recorder.add(SemanticError.MISSING_FUNCNAME, token);
+						}
 					} else {
 						invoke.setFunc(func);
 					}
 				} else {
 					invoke.setFunc((Function) indexed.get(0).object);
+					invoke.setName(invoke.getFunc().getName());
 				}
 				if (indexed.exists(2)) {
 					invoke.setParams((ArrayList<IExp>) indexed.get(2).object);
@@ -339,11 +374,51 @@ public class SemanticHandler {
 					ret.setExp((IExp) indexed.get(3).object);
 					stmts.add(ret);
 					block.setStmts(stmts);
+					block.getStmts().add(new StmtReturn());
 					func.setBlock(block);
 				} else {
-					func.setBlock((Block) indexed.get(4).object);
+					Block block = (Block) indexed.get(4).object;
+					block.getStmts().add(new StmtReturn());
+					func.setBlock(block);
 				}
 				return func;
+			}
+		});
+		/* 返回语句 */
+		mapSemanticAnalyzier.put("return", new ISemanticAnalyzier() {
+			@Override
+			public Object handle(IIndexedData indexed, IQuerySymbol query,
+					ISemanticRecorder recorder) {
+				StmtReturn ret = new StmtReturn();
+				if (indexed.exists(0)) {
+					ret.setExp((IExp) indexed.get(0).object);
+				}
+				return ret;
+			}
+		});
+		/* 导入/导出 */
+		mapSemanticAnalyzier.put("port", new ISemanticAnalyzier() {
+			@Override
+			public Object handle(IIndexedData indexed, IQuerySymbol query,
+					ISemanticRecorder recorder) {
+				StmtPort port = new StmtPort();
+				Token token = indexed.get(0).token;
+				port.setName(token);
+				if (indexed.exists(1)) {
+					Token spec = indexed.get(1).token;
+					port.setSpec(spec);
+				} else {
+					Token spec = indexed.get(2).token;
+					port.setSpec(spec);
+					Function func = query.getQueryScopeService()
+							.getFuncByRealName(token.object.toString());
+					if (func == null) {
+						recorder.add(SemanticError.WRONG_EXTERN_SYMBOL, token);
+					} else {
+						func.setExtern(true);
+					}
+				}
+				return port;
 			}
 		});
 	}

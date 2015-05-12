@@ -27,14 +27,16 @@ public class Block implements ICommon {
 
 	@Override
 	public void analysis(ISemanticRecorder recorder) {
-		// TODO 自动生成的方法存根
-
+		for (IStmt stmt : stmts) {
+			stmt.analysis(recorder);
+		}
 	}
 
 	@Override
 	public void genCode(ICodegen codegen) {
-		// TODO 自动生成的方法存根
-
+		for (IStmt stmt : stmts) {
+			stmt.genCode(codegen);
+		}
 	}
 
 	@Override
@@ -53,7 +55,7 @@ public class Block implements ICommon {
 			sb.append(System.getProperty("line.separator"));
 		}
 		prefix.delete(0, 4);
-		sb.append(prefix.toString() + "}");
+		sb.append(prefix.toString() + "} ");
 		return sb.toString();
 	}
 }

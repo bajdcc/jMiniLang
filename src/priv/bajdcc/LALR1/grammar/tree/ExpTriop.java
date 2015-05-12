@@ -1,6 +1,7 @@
 package priv.bajdcc.LALR1.grammar.tree;
 
 import priv.bajdcc.LALR1.grammar.codegen.ICodegen;
+import priv.bajdcc.LALR1.grammar.runtime.RuntimeInst;
 import priv.bajdcc.LALR1.grammar.semantic.ISemanticRecorder;
 import priv.bajdcc.LALR1.grammar.type.TokenTools;
 import priv.bajdcc.util.lexer.token.Token;
@@ -109,12 +110,17 @@ public class ExpTriop implements IExp {
 
 	@Override
 	public void analysis(ISemanticRecorder recorder) {
-
+		firstOperand.analysis(recorder);
+		secondOperand.analysis(recorder);
+		thirdOperand.analysis(recorder);
 	}
 
 	@Override
 	public void genCode(ICodegen codegen) {
-
+		secondOperand.genCode(codegen);
+		thirdOperand.genCode(codegen);
+		firstOperand.genCode(codegen);
+		codegen.genCode(RuntimeInst.icond);
 	}
 
 	@Override

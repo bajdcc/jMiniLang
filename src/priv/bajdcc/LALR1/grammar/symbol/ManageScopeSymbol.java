@@ -1,11 +1,11 @@
 package priv.bajdcc.LALR1.grammar.symbol;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 
-import priv.bajdcc.LALR1.grammar.error.SemanticException;
+import priv.bajdcc.LALR1.grammar.semantic.ISemanticRecorder;
 import priv.bajdcc.LALR1.grammar.tree.Function;
+import priv.bajdcc.LALR1.grammar.type.TokenTools;
 import priv.bajdcc.util.HashListMap;
 import priv.bajdcc.util.HashListMapEx;
 import priv.bajdcc.util.Position;
@@ -17,35 +17,50 @@ import priv.bajdcc.util.lexer.token.TokenType;
  *
  * @author bajdcc
  */
-public class ManageScopeSymbol implements IManageScopeSymbol, IQueryScopeSymbol {
+public class ManageScopeSymbol implements IManageScopeSymbol,
+		IQueryScopeSymbol, IManageDataSymbol {
 
 	private static String ENTRY_NAME = "main";
 	private static String LAMBDA_PREFIX = "~lambda#";
 	private int lambdaId = 0;
-	private HashListMap<String> symbolList = new HashListMap<String>();
+	private HashListMap<Object> symbolList = new HashListMap<Object>();
 	private HashListMapEx<String, Function> funcMap = new HashListMapEx<String, Function>();
 	private ArrayList<HashSet<String>> stkScope = new ArrayList<HashSet<String>>();
+	private HashSet<String> symbolsInFutureBlock = new HashSet<String>();
 
 	public ManageScopeSymbol() {
 		enterScope();
+		funcMap.add(ENTRY_NAME, new Function());
 	}
 
 	@Override
 	public void enterScope() {
 		stkScope.add(0, new HashSet<String>());
+		for (String name : symbolsInFutureBlock) {
+			registerSymbol(name);
+		}
+		symbolsInFutureBlock.clear();
 	}
 
 	@Override
 	public void leaveScope() {
 		stkScope.remove(0);
+		symbolsInFutureBlock.clear();
 	}
 
 	@Override
 	public boolean findDeclaredSymbol(String name) {
+		if (symbolsInFutureBlock.contains(name)) {
+			return true;
+		}
 		for (HashSet<String> hashSet : stkScope) {
 			if (hashSet.contains(name)) {
 				return true;
 			}
+		}
+		if (TokenTools.isExternalName(name)) {
+			registerSymbol(name);
+			return true;
 		}
 		return false;
 	}
@@ -75,6 +90,16 @@ public class ManageScopeSymbol implements IManageScopeSymbol, IQueryScopeSymbol 
 	}
 
 	@Override
+	public Function getFuncByRealName(String name) {
+		for (Function func : funcMap.list) {
+			if (name.equals(func.getRealName())) {
+				return func;
+			}
+		}
+		return null;
+	}
+
+	@Override
 	public void registerSymbol(String name) {
 		stkScope.get(0).add(name);
 		symbolList.add(name);
@@ -100,13 +125,35 @@ public class ManageScopeSymbol implements IManageScopeSymbol, IQueryScopeSymbol 
 		return func.getRealName() != null;
 	}
 
+	@Override
+	public boolean registerFutureSymbol(String name) {
+		return symbolsInFutureBlock.add(name);
+	}
+
+	public void check(ISemanticRecorder recorder) {
+		for (Function func : funcMap.list) {
+			func.analysis(recorder);
+		}
+	}
+
+	@Override
+	public HashListMap<Object> getSymbolList() {
+		return symbolList;
+	}
+
+	@Override
+	public HashListMapEx<String, Function> getFuncMap() {
+		return funcMap;
+	}
+
 	public String getSymbolString() {
 		StringBuffer sb = new StringBuffer();
 		sb.append("#### 符号表 ####");
 		sb.append(System.getProperty("line.separator"));
 		int i = 0;
-		for (String symbol : symbolList.list) {
-			sb.append(i + ": " + symbol);
+		for (Object symbol : symbolList.list) {
+			sb.append(i + ": " + "[" + symbol.getClass().getName() + "] "
+					+ symbol);
 			sb.append(System.getProperty("line.separator"));
 			i++;
 		}
@@ -119,10 +166,10 @@ public class ManageScopeSymbol implements IManageScopeSymbol, IQueryScopeSymbol 
 		sb.append(System.getProperty("line.separator"));
 		int i = 0;
 		for (Function func : funcMap.list) {
-			sb.append(System.getProperty("line.separator"));
 			sb.append("----==== #" + i + " ====----");
 			sb.append(System.getProperty("line.separator"));
 			sb.append(func.toString());
+			sb.append(System.getProperty("line.separator"));
 			sb.append(System.getProperty("line.separator"));
 			i++;
 		}

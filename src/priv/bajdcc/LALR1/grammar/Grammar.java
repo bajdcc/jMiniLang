@@ -1,15 +1,19 @@
 package priv.bajdcc.LALR1.grammar;
 
+import priv.bajdcc.LALR1.grammar.codegen.Codegen;
 import priv.bajdcc.LALR1.grammar.error.LostHandler;
+import priv.bajdcc.LALR1.grammar.runtime.RuntimeCodePage;
 import priv.bajdcc.LALR1.grammar.semantic.ISemanticRecorder;
+import priv.bajdcc.LALR1.grammar.semantic.SemanticHandler;
 import priv.bajdcc.LALR1.grammar.semantic.SemanticRecorder;
-import priv.bajdcc.LALR1.grammar.semantic.infer.SemanticHandler;
 import priv.bajdcc.LALR1.grammar.symbol.IManageSymbol;
 import priv.bajdcc.LALR1.grammar.symbol.IQuerySymbol;
 import priv.bajdcc.LALR1.grammar.symbol.SymbolTable;
 import priv.bajdcc.LALR1.semantic.Semantic;
 import priv.bajdcc.LALR1.semantic.token.ISemanticAnalyzier;
 import priv.bajdcc.LALR1.syntax.handler.SyntaxException;
+import priv.bajdcc.LALR1.syntax.handler.SyntaxException.SyntaxError;
+import priv.bajdcc.util.Position;
 import priv.bajdcc.util.lexer.error.RegexException;
 import priv.bajdcc.util.lexer.token.KeywordType;
 import priv.bajdcc.util.lexer.token.OperatorType;
@@ -36,6 +40,11 @@ public class Grammar extends Semantic {
 	private SymbolTable symbol = new SymbolTable();
 
 	/**
+	 * 代码生成
+	 */
+	private Codegen code = null;
+
+	/**
 	 * 语义错误表
 	 */
 	private SemanticRecorder recorder = new SemanticRecorder();
@@ -56,6 +65,8 @@ public class Grammar extends Semantic {
 		declareErrorHandler();
 		declareActionHandler();
 		infer();
+		check();
+		gencode();
 	}
 
 	/**
@@ -134,7 +145,8 @@ public class Grammar extends Semantic {
 		String[] nonTerminals = new String[] { "program", "stmt_list", "stmt",
 				"func", "var_stmt", "var_list", "exp_list", "exp", "exp0",
 				"exp1", "exp2", "exp3", "exp4", "exp5", "exp6", "exp7", "exp8",
-				"exp9", "type", "block", "call_exp", "call_stmt", "doc_list" };
+				"exp9", "type", "block", "call_exp", "call_stmt", "ret_stmt",
+				"doc_list", "port_stmt" };
 		for (String string : nonTerminals) {
 			addNonTerminal(string);
 		}
@@ -147,7 +159,8 @@ public class Grammar extends Semantic {
 	 */
 	private void infer() throws SyntaxException {
 		/* 起始符号就是main函数 */
-		infer(handler.getSemanticHandler("main"), "program -> stmt_list[0]");
+		infer(handler.getSemanticHandler("main"),
+				"program -> stmt_list[0]{lost_stmt}");
 		/* Block语句 */
 		infer(handler.getSemanticHandler("block"),
 				"block -> @LBR#do_enter_scope# [stmt_list[0]] @RBR#do_leave_scope#{lost_rbr}");
@@ -156,10 +169,16 @@ public class Grammar extends Semantic {
 				"stmt_list -> stmt[0]{lost_stmt} [stmt_list[1]]");
 		/* 语句分为变量定义（赋值）、调用语句 */
 		infer(handler.getSemanticHandler("copy"),
-				"stmt -> var_stmt[0] | call_stmt[0] | block");
+				"stmt -> var_stmt[0] | call_stmt[0] | ret_stmt[0] | port_stmt[0] | block");
+		/* 返回语句 */
+		infer(handler.getSemanticHandler("return"),
+				"ret_stmt -> @RETURN [exp[0]] @SEMI{lost_semi}");
 		/* 变量定义（赋值）语句（由于支持Lambda，函数定义皆为Lambda形式） */
 		infer(handler.getSemanticHandler("var"),
 				"var_stmt -> (@VARIABLE[11] | @LET[12]) @ID[0]#declear_variable#{lost_token} @ASSIGN{lost_assign} (func[1]{lost_func} | exp[2]{lost_exp}) @SEMI{lost_semi}");
+		/* 导入与导出语句 */
+		infer(handler.getSemanticHandler("port"),
+				"port_stmt -> (@IMPORT[1] | @EXPORT[2]) @LITERAL[0]{lost_string} @SEMI{lost_semi}");
 		/* 表达式（算符文法） */
 		ISemanticAnalyzier exp_handler = handler.getSemanticHandler("exp");
 		infer(exp_handler, "exp -> exp0[0]");
@@ -178,7 +197,7 @@ public class Grammar extends Semantic {
 				"exp7 -> [exp7[1] (@MUL[2] | @DIV[2] | @MOD[2])] exp8[0]");
 		infer(exp_handler, "exp8 -> (@NOT_OP[3] | @NOT[3]) exp8[1] | exp9[0]");
 		infer(exp_handler,
-				"exp9 -> (@INC_OP[3] | @DEC_OP[3]) exp9[1] | type[0]");
+				"exp9 -> (@INC_OP[3] | @DEC_OP[3]) exp9[1] | exp9[1] (@INC_OP[3] | @DEC_OP[3]) | type[0]");
 		/* 调用语句 */
 		infer(handler.getSemanticHandler("call_exp"),
 				"call_exp -> @CALL (@LPA{lost_lpa} func[0]{lost_call} @RPA{lost_rpa} | @ID[1]{lost_call}) @LPA{lost_lpa} [exp_list[2]] @RPA{lost_rpa}");
@@ -186,7 +205,7 @@ public class Grammar extends Semantic {
 				"call_stmt -> call_exp[0] @SEMI{lost_semi}");
 		/* 函数定义 */
 		infer(handler.getSemanticHandler("token_list"),
-				"var_list -> @ID[0] [@COMMA var_list[1]]");
+				"var_list -> @ID[0]#declear_param# [@COMMA var_list[1]]");
 		infer(handler.getSemanticHandler("exp_list"),
 				"exp_list -> exp[0] [@COMMA exp_list[1]]");
 		infer(handler.getSemanticHandler("token_list"),
@@ -211,6 +230,7 @@ public class Grammar extends Semantic {
 		addErrorHandler("lost_func_name", new LostHandler("函数名"));
 		addErrorHandler("lost_func_body", new LostHandler("函数体"));
 		addErrorHandler("lost_stmt", new LostHandler("语句"));
+		addErrorHandler("lost_string", new LostHandler("字符串"));
 		addErrorHandler("lost_assign", new LostHandler("等号'='"));
 		addErrorHandler("lost_call", new LostHandler("调用主体"));
 		addErrorHandler("lost_lpa", new LostHandler("左圆括号'('"));
@@ -231,9 +251,35 @@ public class Grammar extends Semantic {
 	 */
 	private void declareActionHandler() throws SyntaxException {
 		String[] actionNames = new String[] { "do_enter_scope",
-				"do_leave_scope", "predeclear_funcname", "declear_variable" };
+				"do_leave_scope", "predeclear_funcname", "declear_variable",
+				"declear_param" };
 		for (String string : actionNames) {
 			addActionHandler(string, handler.getActionHandler(string));
+		}
+	}
+
+	/**
+	 * 语法树建成之后的详细语义检查
+	 * 
+	 * @throws SyntaxException
+	 */
+	private void check() throws SyntaxException {
+		if (recorder.isCorrect()) {
+			symbol.check(recorder);
+		} else {
+			System.err.println(getSemanticError());
+			throw new SyntaxException(SyntaxError.COMPILE_ERROR,
+					new Position(), "请检查代码");
+		}
+	}
+
+	/**
+	 * 产生中间代码
+	 */
+	private void gencode() {
+		if (recorder.isCorrect()) {
+			code = new Codegen(symbol);
+			code.gencode();
 		}
 	}
 
@@ -259,16 +305,39 @@ public class Grammar extends Semantic {
 		return recorder.toString();
 	}
 
+	/**
+	 * 获得中间代码描述
+	 */
+	public String getInst() {
+		return code.toString();
+	}
+
+	/**
+	 * 生成目标代码
+	 * 
+	 * @throws SyntaxException
+	 */
+	public RuntimeCodePage getCodePage() throws SyntaxException {
+		if (!recorder.isCorrect()) {
+			System.err.println(getSemanticError());
+			throw new SyntaxException(SyntaxError.COMPILE_ERROR,
+					new Position(), "请检查代码");
+		}
+		return code.genCodePage();
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(getNGAString());
-		sb.append(getNPAString());
-		sb.append(getInst());
+		// sb.append(getNGAString());
+		// sb.append(getNPAString());
 		sb.append(getTrackerError());
 		sb.append(getSemanticError());
 		sb.append(getTokenList());
-		sb.append(recorder.isCorrect() ? symbol.toString() : getSemanticError());
+		if (recorder != null && recorder.isCorrect()) {
+			sb.append(symbol.toString());
+			sb.append(getInst());
+		}
 		return sb.toString();
 	}
 }

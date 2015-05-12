@@ -11,4 +11,6 @@ public interface IManageSymbol extends IQuerySymbol {
 	 * 得到命名空间管理接口
 	 */
 	public IManageScopeSymbol getManageScopeService();
+	
+	public IManageDataSymbol getManageDataService();
 }

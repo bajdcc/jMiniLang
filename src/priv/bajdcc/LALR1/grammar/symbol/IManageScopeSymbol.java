@@ -37,4 +37,10 @@ public interface IManageScopeSymbol {
 	 *            过程
 	 */
 	public void registeFunc(String name, Function func);
+	
+	/**
+	 * 注册下个块的参数表
+	 * @return 无冲突则返回真
+	 */
+	public boolean registerFutureSymbol(String name);
 }

@@ -1,7 +1,9 @@
 package priv.bajdcc.LALR1.grammar.tree;
 
 import priv.bajdcc.LALR1.grammar.codegen.ICodegen;
+import priv.bajdcc.LALR1.grammar.runtime.RuntimeInst;
 import priv.bajdcc.LALR1.grammar.semantic.ISemanticRecorder;
+import priv.bajdcc.LALR1.grammar.type.TokenTools;
 import priv.bajdcc.util.lexer.token.Token;
 import priv.bajdcc.util.lexer.token.TokenType;
 
@@ -29,7 +31,7 @@ public class ExpValue implements IExp {
 	public boolean isConstant() {
 		return token.kToken != TokenType.ID;
 	}
-	
+
 	@Override
 	public IExp simplify(ISemanticRecorder recorder) {
 		return this;
@@ -42,7 +44,16 @@ public class ExpValue implements IExp {
 
 	@Override
 	public void genCode(ICodegen codegen) {
-
+		codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(token.object));
+		if (token.kToken != TokenType.ID) {
+			codegen.genCode(RuntimeInst.iload);
+		} else {
+			if (TokenTools.isExternalName(token)) {
+				codegen.genCode(RuntimeInst.iloadx);
+			}else{
+				codegen.genCode(RuntimeInst.iloadv);
+			}
+		}
 	}
 
 	@Override

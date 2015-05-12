@@ -4,44 +4,36 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 import priv.bajdcc.LALR1.grammar.Grammar;
+import priv.bajdcc.LALR1.grammar.runtime.IRuntimeDebugExec;
+import priv.bajdcc.LALR1.grammar.runtime.IRuntimeDebugValue;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeCodePage;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeException;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeMachine;
+import priv.bajdcc.LALR1.grammar.runtime.RuntimeObject;
+import priv.bajdcc.LALR1.grammar.runtime.RuntimeObjectType;
 import priv.bajdcc.LALR1.syntax.handler.SyntaxException;
 import priv.bajdcc.util.lexer.error.RegexException;
 
 @SuppressWarnings("unused")
-public class TestGrammar2 {
+public class TestGrammar3 {
 
 	public static void main(String[] args) {
 		try {
-			String[] exprs = new String[] {
-					"var a = 1;",
-					"var a = 4 + 4;",
-					"var a = !(!true * (++4 / !4 + 4 ? 5 & 6 && true ^ !\"ddd\" | 'r' : 8.0+9*9));",
-					"var a = 3.0 + 4.0 / 7 * 8.9;",
-					"var a = 3000.0 << ++2.0;",
-					"var a = true << 9 ? 1 + 3 : 2;",
-					"var a = 5;let a = a + 4 + a ? 3 : 5;var t = func main1(){};",
-					"var d= func [\"d\",\"t\"] ~()->a;",
-					"var d = func ~()->4;",
-					"var a = call (func ~(a) {call (func b(c){var b = '5'+ 66; call b(666);})();}) (6);",
-					"var a = call (func ~(a) {\n"
-					+ "call (func b(c){\n"
-					+ "var c = '5'+ 1;\n"
-					+ "var d = c;\n"
-					+ "//call b(666);\n"
-					+ "let c = 7;\n" + "})(7);\n"
-					+ "}) (44);",
-					"var a = call\n"
-					+ "(func ~(x, y) -> x + y)\n"
-					+ " (1, 2);\n",
-					"var d = 4;"
-					+ "var c = d || 6;",
-							};
+			String a = "\n"
+					+ "var g_a = func ~(x, y) { return x + y;};\n"
+					+ "export \"g_a\";";
+
+			String b = "import \"test1\";\n"
+					+ "var d = call g_a(1,2);\n"
+					+ "var c = g_gk;\n" 
+					+ "call g_print(c);\n"
+					+ "var t = call g_print(c);";
+
 			/*
 			 * BufferedReader br = new BufferedReader(new
 			 * FileReader("E:/http.c")); String line = ""; StringBuffer sb = new
@@ -49,12 +41,44 @@ public class TestGrammar2 {
 			 * sb.append(line + System.getProperty("line.separator")); }
 			 * br.close();
 			 */
-			Grammar grammar = new Grammar(exprs[exprs.length - 1]);
+			Grammar grammar = new Grammar(a);
 			System.out.println(grammar.toString());
 			RuntimeCodePage page = grammar.getCodePage();
 			System.out.println(page.toString());
 			RuntimeMachine machine = new RuntimeMachine();
 			machine.run("test1", page);
+
+			Grammar grammar2 = new Grammar(b);
+			System.out.println(grammar2.toString());
+			RuntimeCodePage page2 = grammar2.getCodePage();
+			page2.getInfo().addExternalValue("g_gk", new IRuntimeDebugValue() {
+				@Override
+				public RuntimeObject getRuntimeObject() {
+					return new RuntimeObject("abc");
+				}
+			});
+			page2.getInfo().addExternalFunc("g_print", new IRuntimeDebugExec() {
+				@Override
+				public String getDoc() {
+					return "Print";
+				}
+
+				@Override
+				public List<RuntimeObjectType> getArgsType() {
+					final ArrayList<RuntimeObjectType> types = new ArrayList<RuntimeObjectType>();
+					types.add(RuntimeObjectType.kObject);
+					return types;
+				}
+
+				@Override
+				public RuntimeObject ExternalProcCall(List<RuntimeObject> args) {
+					System.out.println(args.get(0).getObj());
+					return null;
+				}
+			});
+			System.out.println(page2.toString());
+			machine.run("test2", page2);
+
 			// FileWriter fw = new FileWriter("E:/testgrammar.txt");
 			// fw.append(grammar.toString());
 			// fw.close();
@@ -69,8 +93,7 @@ public class TestGrammar2 {
 			// System.err.println(e.getMessage());
 			// e.printStackTrace();
 		} catch (RuntimeException e) {
-			System.err.println(e.getPosition() + ": "
-					+ e.getInfo());
+			System.err.println(e.getPosition() + ": " + e.getInfo());
 			e.printStackTrace();
 			// } catch (IOException e) {
 			// System.err.println(e.getMessage());

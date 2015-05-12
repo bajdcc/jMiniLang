@@ -1,5 +1,7 @@
 package priv.bajdcc.LALR1.grammar.symbol;
 
+import priv.bajdcc.LALR1.grammar.semantic.ISemanticRecorder;
+
 /**
  * 【语义分析】符号表
  *
@@ -21,7 +23,16 @@ public class SymbolTable implements IQuerySymbol, IManageSymbol {
 	public IQueryScopeSymbol getQueryScopeService() {
 		return manageScopeSymbol;
 	}
+	
+	@Override
+	public IManageDataSymbol getManageDataService() {
+		return manageScopeSymbol;
+	}
 
+	public void check(ISemanticRecorder recorder) {
+		manageScopeSymbol.check(recorder);
+	}
+	
 	@Override
 	public String toString() {
 		return manageScopeSymbol.toString();

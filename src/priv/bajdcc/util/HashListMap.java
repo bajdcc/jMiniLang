@@ -27,6 +27,14 @@ public class HashListMap<T> {
 		}
 	}
 
+	public int put(T t) {
+		if (map.containsKey(t)) {
+			return map.get(t);
+		}
+		add(t);
+		return list.size() - 1;
+	}
+
 	public int indexOf(T t) {
 		return map.get(t);
 	}
