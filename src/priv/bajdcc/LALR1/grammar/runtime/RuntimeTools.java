@@ -36,6 +36,12 @@ public class RuntimeTools {
 			}
 		}
 			break;
+		case icl:
+		case icg:
+		case icle:
+		case icge:
+		case ice:
+		case icne:
 		case iadd:
 		case iand:
 		case iandl:
@@ -59,19 +65,6 @@ public class RuntimeTools {
 			}
 		}
 			break;
-		case icond: {
-			RuntimeObject obj = stk.load();
-			Token tk = Token.createFromObject(obj.getObj());
-			RuntimeObject f = stk.load();
-			RuntimeObject t = stk.load();
-			int branch = TokenTools.tri(tk);
-			if (branch != 0) {
-				stk.store(branch == 1 ? t : f);
-			} else {
-				return false;
-			}
-		}
-			break;
 		default:
 			break;
 		}
@@ -81,24 +74,16 @@ public class RuntimeTools {
 	public static boolean calcJump(RuntimeRegister reg, RuntimeInst inst,
 			IRuntimeStack stk) throws RuntimeException {
 		switch (inst) {
-		case ije:
-			break;
-		case ijf:
-			break;
-		case ijg:
-			break;
-		case ijge:
-			break;
-		case ijl:
-			break;
-		case ijle:
-			break;
 		case ijmp:
-			stk.opJmp();
-			break;
-		case ijnz:
+			stk.opJump();
 			break;
 		case ijt:
+			stk.opJumpBool(true);
+			break;
+		case ijf:
+			stk.opJumpBool(false);
+			break;
+		case ijnz:
 			break;
 		case ijz:
 			break;
@@ -109,7 +94,7 @@ public class RuntimeTools {
 	}
 
 	public static boolean calcData(RuntimeRegister reg, RuntimeInst inst,
-			IRuntimeStack stk) throws RuntimeException {
+			IRuntimeStack stk) throws Exception {
 		switch (inst) {
 		case ialloc:
 			stk.opStoreDirect();
@@ -162,7 +147,10 @@ public class RuntimeTools {
 			stk.opLoadExtern();
 			break;
 		case icallx:
-			stk.opCallExtern();
+			stk.opCallExtern(false);
+			break;
+		case ically:
+			stk.opCallExtern(true);
 			break;
 		default:
 			return false;

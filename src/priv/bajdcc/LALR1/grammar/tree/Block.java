@@ -36,6 +36,9 @@ public class Block implements ICommon {
 	public void genCode(ICodegen codegen) {
 		for (IStmt stmt : stmts) {
 			stmt.genCode(codegen);
+			if (stmt instanceof StmtReturn) {
+				break;
+			}
 		}
 	}
 

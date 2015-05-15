@@ -19,6 +19,10 @@ public interface IManageScopeSymbol {
 	 */
 	public void leaveScope();
 	
+	/**
+	 * 删除所有预期参数
+	 */
+	public void clearFutureArgs();
 
 	/**
 	 * 注册符号

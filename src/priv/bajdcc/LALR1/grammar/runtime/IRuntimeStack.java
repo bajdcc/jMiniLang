@@ -16,7 +16,7 @@ public interface IRuntimeStack {
 	public void opStore() throws RuntimeException;
 	public void opStoreDirect() throws RuntimeException;
 	public void opAssign() throws RuntimeException;
-	public void opOpenFunc();
+	public void opOpenFunc() throws RuntimeException;
 	public void opLoadArgs() throws RuntimeException;
 	public void opPushArgs() throws RuntimeException;
 	public void opReturn() throws RuntimeException;
@@ -24,8 +24,9 @@ public interface IRuntimeStack {
 	public void opPushNull();
 	public void opPushZero();
 	public void opLoadVar() throws RuntimeException;
-	public void opJmp() throws RuntimeException;
+	public void opJump() throws RuntimeException;
+	public void opJumpBool(boolean bool) throws RuntimeException;
 	public void opImport() throws RuntimeException;
 	public void opLoadExtern() throws RuntimeException;
-	public void opCallExtern() throws RuntimeException;
+	public void opCallExtern(boolean invoke) throws Exception;
 }

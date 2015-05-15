@@ -274,8 +274,8 @@ public class TokenTools {
 				}
 				return true;
 			case STRING:
-				String lstr = (String) lop.object;
-				String rstr = (String) rop.object;
+				String rstr = (String) lop.object;
+				String lstr = (String) rop.object;
 				switch (type) {
 				case PLUS:
 					lop.object = lstr + rstr;

@@ -51,7 +51,7 @@ public class StmtReturn implements IStmt {
 		sb.append(prefix.toString());
 		sb.append(KeywordType.RETURN.getName());
 		if (exp != null) {
-			sb.append("");
+			sb.append(" ");
 			sb.append(exp.print(prefix));
 		}
 		sb.append(OperatorType.SEMI.getName());

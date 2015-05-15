@@ -11,6 +11,7 @@ import java.util.Scanner;
 import priv.bajdcc.LALR1.grammar.Grammar;
 import priv.bajdcc.LALR1.grammar.runtime.IRuntimeDebugExec;
 import priv.bajdcc.LALR1.grammar.runtime.IRuntimeDebugValue;
+import priv.bajdcc.LALR1.grammar.runtime.IRuntimeStatus;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeCodePage;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeException;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeMachine;
@@ -64,14 +65,12 @@ public class TestGrammar3 {
 				}
 
 				@Override
-				public List<RuntimeObjectType> getArgsType() {
-					final ArrayList<RuntimeObjectType> types = new ArrayList<RuntimeObjectType>();
-					types.add(RuntimeObjectType.kObject);
-					return types;
+				public RuntimeObjectType[] getArgsType() {
+					return new RuntimeObjectType[] { RuntimeObjectType.kObject };
 				}
 
 				@Override
-				public RuntimeObject ExternalProcCall(List<RuntimeObject> args) {
+				public RuntimeObject ExternalProcCall(List<RuntimeObject> args, IRuntimeStatus status) {
 					System.out.println(args.get(0).getObj());
 					return null;
 				}

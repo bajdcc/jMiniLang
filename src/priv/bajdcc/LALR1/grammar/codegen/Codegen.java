@@ -26,8 +26,6 @@ public class Codegen implements ICodegen {
 	private CodegenData data = new CodegenData();
 	private RuntimeDebugInfo info = new RuntimeDebugInfo();
 
-	public static final int MAX_NOPCODE = 20;
-
 	public Codegen(SymbolTable symbol) {
 		symbolList = symbol.getManageDataService().getSymbolList();
 		funcMap = symbol.getManageDataService().getFuncMap();
@@ -84,23 +82,34 @@ public class Codegen implements ICodegen {
 	}
 
 	@Override
-	public void genCode(RuntimeInst inst) {
-		data.pushCode(new RuntimeInstNon(inst));
+	public RuntimeInstNon genCode(RuntimeInst inst) {
+		RuntimeInstNon in = new RuntimeInstNon(inst);
+		data.pushCode(in);
+		return in;
 	}
 
 	@Override
-	public void genCode(RuntimeInst inst, int op1) {
-		data.pushCode(new RuntimeInstUnary(inst, op1));
+	public RuntimeInstUnary genCode(RuntimeInst inst, int op1) {
+		RuntimeInstUnary in = new RuntimeInstUnary(inst, op1);
+		data.pushCode(in);
+		return in;
 	}
 
 	@Override
-	public void genCode(RuntimeInst inst, int op1, int op2) {
-		data.pushCode(new RuntimeInstBinary(inst, op1, op2));
+	public RuntimeInstBinary genCode(RuntimeInst inst, int op1, int op2) {
+		RuntimeInstBinary in = new RuntimeInstBinary(inst, op1, op2);
+		data.pushCode(in);
+		return in;
 	}
 
 	@Override
 	public int genDataRef(Object object) {
 		return symbolList.put(object);
+	}
+	
+	@Override
+	public int getCodeIndex() {
+		return data.getCodeIndex();
 	}
 
 	public String getCodeString() {

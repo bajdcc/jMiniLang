@@ -17,6 +17,7 @@ import priv.bajdcc.LALR1.grammar.tree.Function;
 import priv.bajdcc.LALR1.grammar.tree.IExp;
 import priv.bajdcc.LALR1.grammar.tree.IStmt;
 import priv.bajdcc.LALR1.grammar.tree.StmtAssign;
+import priv.bajdcc.LALR1.grammar.tree.StmtIf;
 import priv.bajdcc.LALR1.grammar.tree.StmtInvoke;
 import priv.bajdcc.LALR1.grammar.tree.StmtPort;
 import priv.bajdcc.LALR1.grammar.tree.StmtReturn;
@@ -134,6 +135,14 @@ public class SemanticHandler {
 						token.toRealString())) {
 					recorder.add(SemanticError.DUP_PARAM, token);
 				}
+			}
+		});
+		/* 声明参数 */
+		mapSemanticAction.put("func_clearargs", new ISemanticAction() {
+			@Override
+			public void handle(IIndexedData indexed, IManageSymbol manage,
+					IRandomAccessOfTokens access, ISemanticRecorder recorder) {
+				manage.getManageScopeService().clearFutureArgs();
 			}
 		});
 	}
@@ -294,7 +303,10 @@ public class SemanticHandler {
 					if (func == null) {
 						if (TokenTools.isExternalName(token)) {
 							invoke.setExtern(token);
-						} else {
+						} else if (query.getQueryScopeService().findDeclaredSymbol(token.toRealString())){
+							invoke.setExtern(token);
+							invoke.setInvoke(true);
+						}else{
 							recorder.add(SemanticError.MISSING_FUNCNAME, token);
 						}
 					} else {
@@ -419,6 +431,20 @@ public class SemanticHandler {
 					}
 				}
 				return port;
+			}
+		});
+		/* 条件语句 */
+		mapSemanticAnalyzier.put("if", new ISemanticAnalyzier() {
+			@Override
+			public Object handle(IIndexedData indexed, IQuerySymbol query,
+					ISemanticRecorder recorder) {
+				StmtIf cond = new StmtIf();
+				cond.setExp((IExp) indexed.get(0).object);
+				cond.setTrueBlock((Block) indexed.get(1).object);
+				if (indexed.exists(2)) {
+					cond.setFalseBlock((Block) indexed.get(2).object);
+				}
+				return cond;
 			}
 		});
 	}

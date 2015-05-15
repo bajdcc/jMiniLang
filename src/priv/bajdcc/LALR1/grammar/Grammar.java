@@ -146,7 +146,7 @@ public class Grammar extends Semantic {
 				"func", "var_stmt", "var_list", "exp_list", "exp", "exp0",
 				"exp1", "exp2", "exp3", "exp4", "exp5", "exp6", "exp7", "exp8",
 				"exp9", "type", "block", "call_exp", "call_stmt", "ret_stmt",
-				"doc_list", "port_stmt" };
+				"doc_list", "port_stmt", "if" };
 		for (String string : nonTerminals) {
 			addNonTerminal(string);
 		}
@@ -169,16 +169,16 @@ public class Grammar extends Semantic {
 				"stmt_list -> stmt[0]{lost_stmt} [stmt_list[1]]");
 		/* 语句分为变量定义（赋值）、调用语句 */
 		infer(handler.getSemanticHandler("copy"),
-				"stmt -> var_stmt[0] | call_stmt[0] | ret_stmt[0] | port_stmt[0] | block");
+				"stmt -> ((var_stmt[0] | ret_stmt[0] | port_stmt[0]) @SEMI{lost_semi}) | call_stmt[0] | block[0] | if[0]");
 		/* 返回语句 */
 		infer(handler.getSemanticHandler("return"),
 				"ret_stmt -> @RETURN [exp[0]] @SEMI{lost_semi}");
 		/* 变量定义（赋值）语句（由于支持Lambda，函数定义皆为Lambda形式） */
 		infer(handler.getSemanticHandler("var"),
-				"var_stmt -> (@VARIABLE[11] | @LET[12]) @ID[0]#declear_variable#{lost_token} @ASSIGN{lost_assign} (func[1]{lost_func} | exp[2]{lost_exp}) @SEMI{lost_semi}");
+				"var_stmt -> (@VARIABLE[11] | @LET[12]) @ID[0]#declear_variable#{lost_token} @ASSIGN{lost_assign} (func[1]{lost_func} | exp[2]{lost_exp})");
 		/* 导入与导出语句 */
 		infer(handler.getSemanticHandler("port"),
-				"port_stmt -> (@IMPORT[1] | @EXPORT[2]) @LITERAL[0]{lost_string} @SEMI{lost_semi}");
+				"port_stmt -> (@IMPORT[1] | @EXPORT[2]) @LITERAL[0]{lost_string}");
 		/* 表达式（算符文法） */
 		ISemanticAnalyzier exp_handler = handler.getSemanticHandler("exp");
 		infer(exp_handler, "exp -> exp0[0]");
@@ -211,10 +211,13 @@ public class Grammar extends Semantic {
 		infer(handler.getSemanticHandler("token_list"),
 				"doc_list -> @LITERAL[0] [@COMMA exp_list[1]]");
 		infer(handler.getSemanticHandler("func"),
-				"func -> @FUNCTION [@LSQ doc_list[0]{lost_doc} @RSQ] (@ID[1]#predeclear_funcname#{lost_func_name} | @NOT[1]#predeclear_funcname#{lost_func_name}) @LPA{lost_lpa} [var_list[2]] @RPA{lost_rpa} (@PTR_OP{lost_func_body} exp[3]{lost_exp} | block[4]{lost_func_body})");
+				"func -> @FUNCTION#func_clearargs# [@LSQ doc_list[0]{lost_doc} @RSQ] (@ID[1]#predeclear_funcname#{lost_func_name} | @NOT[1]#predeclear_funcname#{lost_func_name}) @LPA{lost_lpa} [var_list[2]] @RPA{lost_rpa} (@PTR_OP{lost_func_body} exp[3]{lost_exp} | block[4]{lost_func_body})");
 		/* 基本数据类型 */
 		infer(handler.getSemanticHandler("type"),
 				"type -> @ID[0] | @INTEGER[0] | @DECIMAL[0] | @LITERAL[0] | @CHARACTER[0] | @BOOLEAN[0] | @LPA exp[1]{lost_exp} @RPA{lost_rpa} | call_exp[1]");
+		/* 条件语句 */
+		infer(handler.getSemanticHandler("if"),
+				"if -> @IF @LPA{lost_lpa} exp[0]{lost_exp} @RPA{lost_rpa} block[1]{lost_block} [@ELSE block[2]{lost_block}]");
 		initialize("program");
 	}
 
@@ -229,6 +232,7 @@ public class Grammar extends Semantic {
 		addErrorHandler("lost_token", new LostHandler("标识符"));
 		addErrorHandler("lost_func_name", new LostHandler("函数名"));
 		addErrorHandler("lost_func_body", new LostHandler("函数体"));
+		addErrorHandler("lost_block", new LostHandler("块"));
 		addErrorHandler("lost_stmt", new LostHandler("语句"));
 		addErrorHandler("lost_string", new LostHandler("字符串"));
 		addErrorHandler("lost_assign", new LostHandler("等号'='"));
@@ -252,7 +256,7 @@ public class Grammar extends Semantic {
 	private void declareActionHandler() throws SyntaxException {
 		String[] actionNames = new String[] { "do_enter_scope",
 				"do_leave_scope", "predeclear_funcname", "declear_variable",
-				"declear_param" };
+				"declear_param", "func_clearargs" };
 		for (String string : actionNames) {
 			addActionHandler(string, handler.getActionHandler(string));
 		}

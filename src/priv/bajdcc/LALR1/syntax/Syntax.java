@@ -271,7 +271,7 @@ public class Syntax {
 	private RuleExp matchNonTerminal() throws SyntaxException {
 		match(TokenType.NONTERMINAL, SyntaxError.SYNTAX);
 		if (!mapNonTerminals.containsKey(token.object.toString())) {
-			err(SyntaxError.UNDECLARED);
+			err(SyntaxError.UNDECLARED, token);
 		}
 		return mapNonTerminals.get(token.object.toString());
 	}
@@ -284,7 +284,7 @@ public class Syntax {
 	private TokenExp matchTerminal() throws SyntaxException {
 		match(TokenType.TERMINAL, SyntaxError.SYNTAX);
 		if (!mapTerminals.containsKey(token.object.toString())) {
-			err(SyntaxError.UNDECLARED);
+			err(SyntaxError.UNDECLARED, token);
 		}
 		return mapTerminals.get(token.object.toString());
 	}
@@ -297,7 +297,7 @@ public class Syntax {
 	private IErrorHandler matchHandler() throws SyntaxException {
 		match(TokenType.HANDLER, SyntaxError.SYNTAX);
 		if (!mapHandlers.containsKey(token.object.toString())) {
-			err(SyntaxError.UNDECLARED);
+			err(SyntaxError.UNDECLARED, token);
 		}
 		return mapHandlers.get(token.object.toString());
 	}
@@ -310,7 +310,7 @@ public class Syntax {
 	private ISemanticAction matchAction() throws SyntaxException {
 		match(TokenType.ACTION, SyntaxError.SYNTAX);
 		if (!mapActions.containsKey(token.object.toString())) {
-			err(SyntaxError.UNDECLARED);
+			err(SyntaxError.UNDECLARED, token);
 		}
 		return mapActions.get(token.object.toString());
 	}

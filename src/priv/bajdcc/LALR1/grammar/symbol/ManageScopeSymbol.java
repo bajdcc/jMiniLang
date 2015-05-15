@@ -39,12 +39,17 @@ public class ManageScopeSymbol implements IManageScopeSymbol,
 		for (String name : symbolsInFutureBlock) {
 			registerSymbol(name);
 		}
-		symbolsInFutureBlock.clear();
+		clearFutureArgs();
 	}
 
 	@Override
 	public void leaveScope() {
 		stkScope.remove(0);
+		clearFutureArgs();
+	}
+	
+	@Override
+	public void clearFutureArgs(){
 		symbolsInFutureBlock.clear();
 	}
 
@@ -111,7 +116,7 @@ public class ManageScopeSymbol implements IManageScopeSymbol,
 			func.setRealName(func.getName().toRealString());
 			symbolList.add(func.getRealName());
 		} else {
-			func.setRealName(LAMBDA_PREFIX + lambdaId);
+			func.setRealName(LAMBDA_PREFIX + lambdaId++);
 		}
 		funcMap.add(func.getRealName(), func);
 	}

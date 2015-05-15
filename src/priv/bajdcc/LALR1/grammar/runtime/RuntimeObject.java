@@ -8,7 +8,7 @@ import java.math.BigInteger;
  *
  * @author bajdcc
  */
-public class RuntimeObject {
+public class RuntimeObject implements Cloneable {
 
 	private Object obj = null;
 	private RuntimeObjectType type = RuntimeObjectType.kNull;
@@ -38,11 +38,26 @@ public class RuntimeObject {
 		calcTypeFromObject();
 	}
 
+	public RuntimeObject(RuntimeObject obj) {
+		copyFrom(obj);
+	}
+
 	public void copyFrom(RuntimeObject obj) {
-		this.obj = obj.obj;
-		this.readonly = obj.readonly;
-		this.copyable = obj.copyable;
-		this.type = obj.type;
+		if (obj != null) {
+			this.obj = obj.obj;
+			this.readonly = obj.readonly;
+			this.copyable = obj.copyable;
+			this.type = obj.type;
+		} else {
+			calcTypeFromObject();
+		}
+	}
+
+	public static RuntimeObject createObject(RuntimeObject obj) {
+		if (obj == null) {
+			return null;
+		}
+		return new RuntimeObject(obj);
 	}
 
 	public void calcTypeFromObject() {
@@ -100,7 +115,19 @@ public class RuntimeObject {
 		if (obj instanceof Boolean) {
 			return RuntimeObjectType.kBool;
 		}
+		if (obj instanceof Integer) {
+			return RuntimeObjectType.kPtr;
+		}
 		return RuntimeObjectType.kNull;
+	}
+
+	public RuntimeObject clone() {
+		try {
+			return (RuntimeObject) super.clone();
+		} catch (CloneNotSupportedException e) {
+			e.printStackTrace();
+		}
+		return new RuntimeObject(null);
 	}
 
 	@Override

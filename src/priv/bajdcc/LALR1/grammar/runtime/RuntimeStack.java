@@ -11,7 +11,8 @@ import java.util.Stack;
 public class RuntimeStack {
 
 	private static final int MAX_DATASTACKSIZE = 100;
-	private static final int MAX_CALLSTACKSIZE = 10;
+	private static final int MAX_CALLSTACKSIZE = 20;
+	private static final int MAX_ARGSIZE = 12;
 
 	/**
 	 * 数据堆栈
@@ -37,6 +38,10 @@ public class RuntimeStack {
 	public RuntimeObject popData() {
 		return stkData.pop();
 	}
+	
+	public RuntimeObject top() {
+		return stkData.peek();
+	}
 
 	public boolean isEmptyStack() {
 		return stkData.isEmpty();
@@ -56,15 +61,14 @@ public class RuntimeStack {
 		stkCall.get(0).getTmp().put(idx, obj);
 	}
 
-	public void pushFuncData() {
+	public boolean pushFuncData() {
 		stkCall.add(0, new RuntimeFunc());
-		if (stkCall.size() > MAX_CALLSTACKSIZE) {
-			throw new StackOverflowError("调用堆栈溢出");
-		}
+		return stkCall.size() < MAX_CALLSTACKSIZE;
 	}
 
-	public void pushFuncArgs(RuntimeObject obj) {
+	public boolean pushFuncArgs(RuntimeObject obj) {
 		stkCall.get(0).addParams(obj);
+		return stkCall.get(0).getParams().size() < MAX_ARGSIZE;
 	}
 
 	public void opReturn(RuntimeRegister reg) {

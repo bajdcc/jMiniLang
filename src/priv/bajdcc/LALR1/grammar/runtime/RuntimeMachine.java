@@ -15,7 +15,7 @@ import priv.bajdcc.util.lexer.token.OperatorType;
  *
  * @author bajdcc
  */
-public class RuntimeMachine implements IRuntimeStack {
+public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 
 	private HashListMapEx<String, RuntimeCodePage> pageMap = new HashListMapEx<String, RuntimeCodePage>();
 	private HashMap<String, ArrayList<RuntimeCodePage>> pageRefer = new HashMap<String, ArrayList<RuntimeCodePage>>();
@@ -32,7 +32,7 @@ public class RuntimeMachine implements IRuntimeStack {
 
 	private RuntimeCodePage currentPage = null;
 	private String pageName = null;
-	private boolean debug = false;
+	protected boolean debug = true;
 
 	public void run(String name, InputStream input) throws Exception {
 		run(name, RuntimeCodePage.importFromStream(input));
@@ -98,6 +98,13 @@ public class RuntimeMachine implements IRuntimeStack {
 		}
 		return stack.popData();
 	}
+	
+	public RuntimeObject top() throws RuntimeException {
+		if (stack.isEmptyStack()) {
+			err(RuntimeError.NULL_STACK);
+		}
+		return stack.top();
+	}
 
 	private int loadInt() throws RuntimeException {
 		RuntimeObject obj = load();
@@ -107,6 +114,14 @@ public class RuntimeMachine implements IRuntimeStack {
 		return (int) obj.getObj();
 	}
 
+	private boolean loadBool() throws RuntimeException {
+		RuntimeObject obj = top();
+		if (!(obj.getObj() instanceof Boolean)) {
+			err(RuntimeError.WRONG_OPERTAOR);
+		}
+		return (boolean) obj.getObj();
+	}
+
 	@Override
 	public void store(RuntimeObject obj) {
 		stack.pushData(obj);
@@ -114,8 +129,7 @@ public class RuntimeMachine implements IRuntimeStack {
 
 	@Override
 	public void push() throws RuntimeException {
-		RuntimeObject obj = new RuntimeObject(current(),
-				RuntimeObjectType.kParam);
+		RuntimeObject obj = new RuntimeObject(current());
 		obj.setReadonly(true);
 		store(obj);
 		next();
@@ -174,7 +188,6 @@ public class RuntimeMachine implements IRuntimeStack {
 		int idx = loadInt();
 		RuntimeObject obj = fetchFromGlobalData(idx);
 		obj.setReadonly(true);
-		obj.setType(RuntimeObjectType.kParam);
 		stack.pushData(obj);
 	}
 
@@ -215,8 +228,10 @@ public class RuntimeMachine implements IRuntimeStack {
 	}
 
 	@Override
-	public void opOpenFunc() {
-		stack.pushFuncData();
+	public void opOpenFunc() throws RuntimeException {
+		if (!stack.pushFuncData()) {
+			err(RuntimeError.STACK_OVERFLOW);
+		}
 	}
 
 	@Override
@@ -233,7 +248,9 @@ public class RuntimeMachine implements IRuntimeStack {
 	public void opPushArgs() throws RuntimeException {
 		RuntimeObject obj = load();
 		obj.setReadonly(true);
-		stack.pushFuncArgs(obj);
+		if(!stack.pushFuncArgs(obj)){
+			err(RuntimeError.ARG_OVERFLOW);
+		}
 	}
 
 	@Override
@@ -266,13 +283,22 @@ public class RuntimeMachine implements IRuntimeStack {
 	@Override
 	public void opLoadVar() throws RuntimeException {
 		int idx = loadInt();
-		store(stack.findVariable(idx));
+		store(RuntimeObject.createObject((stack.findVariable(idx))));
 	}
 
 	@Override
-	public void opJmp() throws RuntimeException {
+	public void opJump() throws RuntimeException {
 		reg.execId = current();
-		next();
+	}
+
+	@Override
+	public void opJumpBool(boolean bool) throws RuntimeException {
+		boolean tf = loadBool();
+		if (!(tf ^ bool)) {
+			reg.execId = current();
+		} else {
+			next();
+		}
 	}
 
 	@Override
@@ -304,32 +330,52 @@ public class RuntimeMachine implements IRuntimeStack {
 	}
 
 	@Override
-	public void opCallExtern() throws RuntimeException {
+	public void opCallExtern(boolean invoke) throws Exception {
 		int idx = loadInt();
-		RuntimeObject obj = fetchFromGlobalData(idx);
-		String name = obj.getObj().toString();
+		String name = "";
+		if (invoke) {
+			RuntimeObject obj = stack.findVariable(idx);
+			if (obj.getType() == RuntimeObjectType.kFunc) {
+				int address = (int) obj.getObj();
+				stack.opCall(address, pageName, reg.execId, pageName,
+						currentPage.getInfo().getFuncNameByAddress(address));
+				reg.execId = address;
+				return;
+			} else {
+				err(RuntimeError.WRONG_LOAD_EXTERN);
+			}
+		} else {
+			RuntimeObject obj = fetchFromGlobalData(idx);
+			name = obj.getObj().toString();
+		}
 		List<RuntimeCodePage> refers = pageRefer.get(currentPage.getInfo()
 				.getDataMap().get("name"));
 		for (RuntimeCodePage page : refers) {
 			IRuntimeDebugExec exec = page.getInfo().getExecCallByName(name);
 			if (exec != null) {
 				int argsCount = stack.getFuncArgsCount();
-				if (exec.getArgsType().size() != argsCount) {
+				RuntimeObjectType[] types = exec.getArgsType();
+				if ((types == null && argsCount != 0)
+						|| (types != null && types.length != argsCount)) {
 					err(RuntimeError.WRONG_ARGCOUNT);
 				}
 				ArrayList<RuntimeObject> args = new ArrayList<RuntimeObject>();
 				for (int i = 0; i < argsCount; i++) {
-					RuntimeObjectType type = exec.getArgsType().get(i);
-					if (type != RuntimeObjectType.kObject
-							&& exec.getArgsType().get(i) != stack.loadFuncArgs(
-									i).getType()) {
-						err(RuntimeError.WRONG_ARGTYPE);
+					if (types != null) {
+						RuntimeObjectType type = types[i];
+						if (type != RuntimeObjectType.kObject) {
+							RuntimeObject objParam = stack.loadFuncArgs(i);
+							RuntimeObjectType objType = objParam.getType();
+							if (objType != type) {
+								err(RuntimeError.WRONG_ARGTYPE);
+							}
+						}
 					}
 					args.add(stack.loadFuncArgs(i));
 				}
 				stack.opCall(reg.execId, reg.pageId, reg.execId, reg.pageId,
 						name);
-				RuntimeObject retVal = exec.ExternalProcCall(args);
+				RuntimeObject retVal = exec.ExternalProcCall(args, this);
 				if (retVal == null) {
 					store(new RuntimeObject(null));
 				} else {
@@ -352,5 +398,33 @@ public class RuntimeMachine implements IRuntimeStack {
 			}
 		}
 		err(RuntimeError.WRONG_LOAD_EXTERN);
+	}
+
+	@Override
+	public String getHelpString(String name) {
+		List<RuntimeCodePage> refers = pageRefer.get(currentPage.getInfo()
+				.getDataMap().get("name"));
+		for (RuntimeCodePage page : refers) {
+			IRuntimeDebugExec exec = page.getInfo().getExecCallByName(name);
+			if (exec != null) {
+				String doc = exec.getDoc();
+				return doc == null ? "过程无文档" : doc;
+			}
+		}
+		return "过程不存在";
+	}
+
+	@Override
+	public int getFuncAddr(String name) throws RuntimeException {
+		List<RuntimeCodePage> refers = pageRefer.get(currentPage.getInfo()
+				.getDataMap().get("name"));
+		for (RuntimeCodePage page : refers) {
+			int address = page.getInfo().getAddressOfExportFunc(name);
+			if (address != -1) {
+				return address;
+			}
+		}
+		err(RuntimeError.WRONG_FUNCNAME);
+		return -1;
 	}
 }

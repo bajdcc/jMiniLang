@@ -13,12 +13,12 @@ public class RuntimeFunc {
 	/**
 	 * 调用地址
 	 */
-	private int address = 0;
+	private int address = -1;
 
 	/**
 	 * 名称
 	 */
-	private String name = "";
+	private String name = "extern";
 
 	/**
 	 * 当前的代码页名
@@ -28,7 +28,7 @@ public class RuntimeFunc {
 	/**
 	 * 当前的代码页名
 	 */
-	private String currentPage = "";
+	private String currentPage = "extern";
 
 	/**
 	 * 保存的返回指令地址

@@ -2,6 +2,7 @@ package priv.bajdcc.LALR1.grammar.tree;
 
 import priv.bajdcc.LALR1.grammar.codegen.ICodegen;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeInst;
+import priv.bajdcc.LALR1.grammar.runtime.RuntimeInstUnary;
 import priv.bajdcc.LALR1.grammar.semantic.ISemanticRecorder;
 import priv.bajdcc.LALR1.grammar.type.TokenTools;
 import priv.bajdcc.util.lexer.token.Token;
@@ -117,10 +118,15 @@ public class ExpTriop implements IExp {
 
 	@Override
 	public void genCode(ICodegen codegen) {
-		secondOperand.genCode(codegen);
-		thirdOperand.genCode(codegen);
 		firstOperand.genCode(codegen);
-		codegen.genCode(RuntimeInst.icond);
+		RuntimeInstUnary jf = codegen.genCode(RuntimeInst.ijf, -1);
+		codegen.genCode(RuntimeInst.ipop);
+		secondOperand.genCode(codegen);
+		RuntimeInstUnary jmp = codegen.genCode(RuntimeInst.ijmp, -1);
+		jf.op1 = codegen.getCodeIndex();
+		codegen.genCode(RuntimeInst.ipop);
+		thirdOperand.genCode(codegen);
+		jmp.op1 = codegen.getCodeIndex();
 	}
 
 	@Override

@@ -1,5 +1,6 @@
 package priv.bajdcc.LALR1.grammar.runtime;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
 /**
@@ -7,8 +8,9 @@ import java.util.HashMap;
  *
  * @author bajdcc
  */
-public class RuntimeDebugInfo implements IRuntimeDebugInfo {
+public class RuntimeDebugInfo implements IRuntimeDebugInfo, Serializable {
 
+	private static final long serialVersionUID = 1L;
 	private HashMap<String, Object> dataMap = new HashMap<String, Object>();
 	private HashMap<String, Integer> exports = new HashMap<String, Integer>();
 	private HashMap<Integer, String> func = new HashMap<Integer, String>();

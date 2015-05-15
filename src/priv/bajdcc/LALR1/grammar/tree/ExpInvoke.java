@@ -36,6 +36,11 @@ public class ExpInvoke implements IExp {
 	 */
 	private ArrayList<IExp> params = new ArrayList<IExp>();
 
+	/**
+	 * 是否为函数指针调用
+	 */
+	private boolean invoke = false;
+
 	public Token getName() {
 		return name;
 	}
@@ -66,6 +71,14 @@ public class ExpInvoke implements IExp {
 
 	public void setParams(ArrayList<IExp> params) {
 		this.params = params;
+	}
+
+	public boolean isInvoke() {
+		return invoke;
+	}
+
+	public void setInvoke(boolean invoke) {
+		this.invoke = invoke;
 	}
 
 	@Override
@@ -114,7 +127,11 @@ public class ExpInvoke implements IExp {
 		} else {
 			codegen.genCode(RuntimeInst.ipush,
 					codegen.genDataRef(extern.object));
-			codegen.genCode(RuntimeInst.icallx);
+			if (invoke) {
+				codegen.genCode(RuntimeInst.ically);
+			} else {
+				codegen.genCode(RuntimeInst.icallx);
+			}
 		}
 	}
 
@@ -137,15 +154,20 @@ public class ExpInvoke implements IExp {
 			sb.append(KeywordType.EXTERN.getName() + " "
 					+ extern.toRealString());
 		}
-		sb.append("(");
-		for (IExp param : params) {
-			sb.append(param.print(prefix));
-			sb.append(",");
-		}
 		if (!params.isEmpty()) {
-			sb.deleteCharAt(sb.length() - 1);
+			sb.append("( ");
+			if (params.size() == 1) {
+				sb.append(params.get(0).print(prefix));
+			} else {
+				for (int i = 0; i < params.size(); i++) {
+					sb.append(params.get(i).print(prefix));
+					if (i != params.size() - 1) {
+						sb.append(",");
+					}
+				}
+			}
+			sb.append(" )");
 		}
-		sb.append(")");
 		return sb.toString();
 	}
 }
