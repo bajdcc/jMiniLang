@@ -6,19 +6,19 @@ import priv.bajdcc.LALR1.grammar.semantic.ISemanticRecorder;
 import priv.bajdcc.util.lexer.token.OperatorType;
 
 /**
- * 【语义分析】赋值语句
+ * 【语义分析】表达式语句
  *
  * @author bajdcc
  */
-public class StmtInvoke implements IStmt {
+public class StmtExp implements IStmt {
 
-	private ExpInvoke exp = null;
+	private IExp exp = null;
 
-	public ExpInvoke getExp() {
+	public IExp getExp() {
 		return exp;
 	}
 
-	public void setExp(ExpInvoke exp) {
+	public void setExp(IExp exp) {
 		this.exp = exp;
 	}
 

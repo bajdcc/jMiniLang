@@ -8,11 +8,11 @@ import priv.bajdcc.util.lexer.token.OperatorType;
 import priv.bajdcc.util.lexer.token.Token;
 
 /**
- * 【语义分析】赋值语句
+ * 【语义分析】赋值表达式
  *
  * @author bajdcc
  */
-public class StmtAssign implements IStmt {
+public class ExpAssign implements IExp {
 
 	/**
 	 * 变量名
@@ -67,6 +67,16 @@ public class StmtAssign implements IStmt {
 	}
 
 	@Override
+	public boolean isConstant() {
+		return false;
+	}
+
+	@Override
+	public IExp simplify(ISemanticRecorder recorder) {
+		return this;
+	}
+
+	@Override
 	public void analysis(ISemanticRecorder recorder) {
 		exp.analysis(recorder);
 	}
@@ -91,12 +101,10 @@ public class StmtAssign implements IStmt {
 	@Override
 	public String print(StringBuilder prefix) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(prefix.toString());
 		sb.append(spec.toRealString());
 		sb.append(" " + name.toRealString());
 		sb.append(" " + OperatorType.ASSIGN.getName() + " ");
 		sb.append(exp.print(prefix));
-		sb.append(OperatorType.SEMI.getName());
 		return sb.toString();
 	}
 }

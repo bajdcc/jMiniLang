@@ -625,7 +625,7 @@ public class Semantic extends Syntax implements IErrorHandler {
 	 * @return 处理信息
 	 */
 	@Override
-	public String handle(IRegexStringIterator token, TrackerErrorBag bag) {
+	public String handle(IRegexStringIterator iterator, TrackerErrorBag bag) {
 		bag.bHalt = true;
 		bag.bGiveUp = false;
 		return "Error";

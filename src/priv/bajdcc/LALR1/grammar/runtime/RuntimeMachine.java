@@ -187,7 +187,6 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	public void opLoad() throws RuntimeException {
 		int idx = loadInt();
 		RuntimeObject obj = fetchFromGlobalData(idx);
-		obj.setReadonly(true);
 		stack.pushData(obj);
 	}
 
@@ -211,20 +210,16 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 			err(RuntimeError.READONLY_VAR);
 		}
 		target.copyFrom(obj);
+		store(target);
 	}
 
 	@Override
 	public void opStoreDirect() throws RuntimeException {
 		int idx = loadInt();
 		RuntimeObject obj = load();
+		obj.setReadonly(false);
 		stack.storeVariableDirect(idx, obj);
-	}
-
-	@Override
-	public void opAssign() throws RuntimeException {
-		RuntimeObject obj = load();
-		int idx = loadInt();
-		stack.storeVariableDirect(idx, obj);
+		store(obj);
 	}
 
 	@Override
@@ -341,6 +336,8 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 						currentPage.getInfo().getFuncNameByAddress(address));
 				reg.execId = address;
 				return;
+			} else if(obj.getType() == RuntimeObjectType.kFunc){
+				err(RuntimeError.WRONG_LOAD_EXTERN);
 			} else {
 				err(RuntimeError.WRONG_LOAD_EXTERN);
 			}

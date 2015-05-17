@@ -20,4 +20,5 @@ public interface ICodegen {
 	public int genDataRef(Object object);
 	public int getFuncIndex(Function func);
 	public int getCodeIndex();
+	public ICodegenBlock getBlockService();
 }

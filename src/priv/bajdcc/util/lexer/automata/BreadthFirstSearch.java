@@ -7,9 +7,7 @@ import priv.bajdcc.util.VisitBag;
 /**
  * 宽度优先搜索
  * 
- * @author bajdcc
- * @param T
- *            状态类型
+ * @author bajdcc 状态类型
  */
 public class BreadthFirstSearch<Edge, Status> implements
 		IBreadthFirstSearch<Edge, Status> {

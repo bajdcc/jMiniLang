@@ -71,4 +71,20 @@ public interface IQueryScopeSymbol {
 	 * @return 是否占用
 	 */
 	public boolean isRegisteredFunc(String name);
+	
+	/**
+	 * 进入循环体
+	 */
+	public void enterBlock();
+
+	/**
+	 * 离开循环体
+	 */
+	public void leaveBlock();
+	
+	/**
+	 * 是否在循环体内
+	 * @return 在循环体内则为真
+	 */
+	public boolean isInBlock();
 }

@@ -12,7 +12,7 @@ import priv.bajdcc.LALR1.interpret.module.ModuleBase;
 public class Interpreter extends RuntimeMachine {
 
 	public Interpreter() throws Exception {
-		debug = true;
+		debug = false;
 		builtin();
 	}
 

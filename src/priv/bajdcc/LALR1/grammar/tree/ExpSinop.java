@@ -1,9 +1,11 @@
 package priv.bajdcc.LALR1.grammar.tree;
 
-
 import priv.bajdcc.LALR1.grammar.codegen.ICodegen;
+import priv.bajdcc.LALR1.grammar.error.SemanticException.SemanticError;
+import priv.bajdcc.LALR1.grammar.runtime.RuntimeInst;
 import priv.bajdcc.LALR1.grammar.semantic.ISemanticRecorder;
 import priv.bajdcc.LALR1.grammar.type.TokenTools;
+import priv.bajdcc.util.lexer.token.OperatorType;
 import priv.bajdcc.util.lexer.token.Token;
 import priv.bajdcc.util.lexer.token.TokenType;
 
@@ -62,13 +64,27 @@ public class ExpSinop implements IExp {
 
 	@Override
 	public void analysis(ISemanticRecorder recorder) {
-		operand.analysis(recorder);
+		OperatorType type = (OperatorType) token.object;
+		if (type == OperatorType.PLUS_PLUS || type == OperatorType.MINUS_MINUS) {
+			if (!(operand instanceof ExpValue)) {
+				recorder.add(SemanticError.INVALID_OPERATOR, token);
+			}
+		} else {
+			operand.analysis(recorder);
+		}
 	}
 
 	@Override
 	public void genCode(ICodegen codegen) {
 		operand.genCode(codegen);
 		codegen.genCode(TokenTools.op2ins(token));
+		OperatorType type = (OperatorType) token.object;
+		if (type == OperatorType.PLUS_PLUS || type == OperatorType.MINUS_MINUS) {
+			ExpValue value = (ExpValue) operand;
+			codegen.genCode(RuntimeInst.ipush,
+					codegen.genDataRef(value.getToken().object));
+			codegen.genCode(RuntimeInst.istore);
+		}
 	}
 
 	@Override

@@ -10,12 +10,9 @@ import priv.bajdcc.util.lexer.automata.BreadthFirstSearch;
 /**
  * NGA序列化（宽度优先搜索）
  * 
- * @author bajdcc
- * @param T
- *            状态类型
+ * @author bajdcc 状态类型
  */
-public class NGAToString extends
-		BreadthFirstSearch<NGAEdge, NGAStatus> {
+public class NGAToString extends BreadthFirstSearch<NGAEdge, NGAStatus> {
 
 	/**
 	 * 描述
@@ -26,7 +23,7 @@ public class NGAToString extends
 	 * 前缀
 	 */
 	private String prefix = "";
-	
+
 	/**
 	 * 存放状态的集合
 	 */
@@ -60,8 +57,7 @@ public class NGAToString extends
 		/* 输出边 */
 		for (NGAEdge edge : status.outEdges) {
 			appendPrefix();
-			context.append("\t到达 " + arrNGAStatus.indexOf(edge.end)
-					+ "  ：  ");
+			context.append("\t到达 " + arrNGAStatus.indexOf(edge.end) + "  ：  ");
 			context.append(edge.data.kAction.getName());
 			switch (edge.data.kAction) {
 			case EPSILON:

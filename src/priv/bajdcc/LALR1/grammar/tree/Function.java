@@ -116,6 +116,7 @@ public class Function implements IExp {
 			codegen.genCode(RuntimeInst.iloada, i);
 			codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(token.object));
 			codegen.genCode(RuntimeInst.ialloc);
+			codegen.genCode(RuntimeInst.ipop);
 			i++;
 		}
 		block.genCode(codegen);
@@ -134,9 +135,10 @@ public class Function implements IExp {
 		sb.append("(");
 		for (Token param : params) {
 			sb.append(param.toRealString());
-			sb.append(",");
+			sb.append(", ");
 		}
 		if (!params.isEmpty()) {
+			sb.deleteCharAt(sb.length() - 1);
 			sb.deleteCharAt(sb.length() - 1);
 		}
 		sb.append(") ");

@@ -75,6 +75,7 @@ public class StmtIf implements IStmt {
 			jmp.op1 = codegen.getCodeIndex();
 		} else {
 			jf.op1 = codegen.getCodeIndex();
+			codegen.genCode(RuntimeInst.ipop);
 		}
 	}
 

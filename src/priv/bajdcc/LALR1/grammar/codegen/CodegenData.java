@@ -2,6 +2,7 @@ package priv.bajdcc.LALR1.grammar.codegen;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Stack;
 
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeInst;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeInstBase;
@@ -17,6 +18,7 @@ public class CodegenData {
 	public ArrayList<RuntimeInstBase> insts = new ArrayList<RuntimeInstBase>();
 	public HashMap<String, Integer> funcEntriesMap = new HashMap<String, Integer>();
 	public ArrayList<RuntimeInstUnary> callsToWriteBack = new ArrayList<RuntimeInstUnary>();
+	private Stack<CodegenBlock> stkBlock = new Stack<CodegenBlock>();
 	private int idxCode = 0;
 
 	public void pushCode(RuntimeInstBase code) {
@@ -38,5 +40,17 @@ public class CodegenData {
 
 	public int getCodeIndex() {
 		return idxCode;
+	}
+
+	public void enterBlockEntry(CodegenBlock block) {
+		stkBlock.push(block);
+	}
+
+	public void leaveBlockEntry() {
+		stkBlock.pop();
+	}
+
+	public CodegenBlock getBlock() {
+		return stkBlock.peek();
 	}
 }

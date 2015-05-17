@@ -7,7 +7,9 @@ import priv.bajdcc.LALR1.grammar.error.SemanticException.SemanticError;
 import priv.bajdcc.LALR1.grammar.symbol.IManageSymbol;
 import priv.bajdcc.LALR1.grammar.symbol.IQuerySymbol;
 import priv.bajdcc.LALR1.grammar.tree.Block;
+import priv.bajdcc.LALR1.grammar.tree.ExpAssign;
 import priv.bajdcc.LALR1.grammar.tree.ExpBinop;
+import priv.bajdcc.LALR1.grammar.tree.ExpCycleCtrl;
 import priv.bajdcc.LALR1.grammar.tree.ExpFunc;
 import priv.bajdcc.LALR1.grammar.tree.ExpInvoke;
 import priv.bajdcc.LALR1.grammar.tree.ExpSinop;
@@ -16,9 +18,9 @@ import priv.bajdcc.LALR1.grammar.tree.ExpValue;
 import priv.bajdcc.LALR1.grammar.tree.Function;
 import priv.bajdcc.LALR1.grammar.tree.IExp;
 import priv.bajdcc.LALR1.grammar.tree.IStmt;
-import priv.bajdcc.LALR1.grammar.tree.StmtAssign;
+import priv.bajdcc.LALR1.grammar.tree.StmtExp;
+import priv.bajdcc.LALR1.grammar.tree.StmtFor;
 import priv.bajdcc.LALR1.grammar.tree.StmtIf;
-import priv.bajdcc.LALR1.grammar.tree.StmtInvoke;
 import priv.bajdcc.LALR1.grammar.tree.StmtPort;
 import priv.bajdcc.LALR1.grammar.tree.StmtReturn;
 import priv.bajdcc.LALR1.grammar.type.TokenTools;
@@ -145,6 +147,14 @@ public class SemanticHandler {
 				manage.getManageScopeService().clearFutureArgs();
 			}
 		});
+		/* 循环体 */
+		mapSemanticAction.put("do_enter_cycle", new ISemanticAction() {
+			@Override
+			public void handle(IIndexedData indexed, IManageSymbol manage,
+					IRandomAccessOfTokens access, ISemanticRecorder recorder) {
+				manage.getQueryScopeService().enterBlock();
+			}
+		});
 	}
 
 	/**
@@ -265,7 +275,7 @@ public class SemanticHandler {
 			@Override
 			public Object handle(IIndexedData indexed, IQuerySymbol query,
 					ISemanticRecorder recorder) {
-				StmtAssign assign = new StmtAssign();
+				ExpAssign assign = new ExpAssign();
 				Token token = indexed.get(0).token;
 				assign.setName(token);
 				if (indexed.exists(11)) {
@@ -303,10 +313,11 @@ public class SemanticHandler {
 					if (func == null) {
 						if (TokenTools.isExternalName(token)) {
 							invoke.setExtern(token);
-						} else if (query.getQueryScopeService().findDeclaredSymbol(token.toRealString())){
+						} else if (query.getQueryScopeService()
+								.findDeclaredSymbol(token.toRealString())) {
 							invoke.setExtern(token);
 							invoke.setInvoke(true);
-						}else{
+						} else {
 							recorder.add(SemanticError.MISSING_FUNCNAME, token);
 						}
 					} else {
@@ -319,16 +330,6 @@ public class SemanticHandler {
 				if (indexed.exists(2)) {
 					invoke.setParams((ArrayList<IExp>) indexed.get(2).object);
 				}
-				return invoke;
-			}
-		});
-		/* 调用语句 */
-		mapSemanticAnalyzier.put("call_stmt", new ISemanticAnalyzier() {
-			@Override
-			public Object handle(IIndexedData indexed, IQuerySymbol query,
-					ISemanticRecorder recorder) {
-				StmtInvoke invoke = new StmtInvoke();
-				invoke.setExp((ExpInvoke) indexed.get(0).object);
 				return invoke;
 			}
 		});
@@ -433,18 +434,63 @@ public class SemanticHandler {
 				return port;
 			}
 		});
+		/* 表达式语句 */
+		mapSemanticAnalyzier.put("stmt_exp", new ISemanticAnalyzier() {
+			@Override
+			public Object handle(IIndexedData indexed, IQuerySymbol query,
+					ISemanticRecorder recorder) {
+				StmtExp exp = new StmtExp();
+				exp.setExp((IExp) indexed.get(0).object);
+				return exp;
+			}
+		});
 		/* 条件语句 */
 		mapSemanticAnalyzier.put("if", new ISemanticAnalyzier() {
 			@Override
 			public Object handle(IIndexedData indexed, IQuerySymbol query,
 					ISemanticRecorder recorder) {
-				StmtIf cond = new StmtIf();
-				cond.setExp((IExp) indexed.get(0).object);
-				cond.setTrueBlock((Block) indexed.get(1).object);
+				StmtIf stmt = new StmtIf();
+				stmt.setExp((IExp) indexed.get(0).object);
+				stmt.setTrueBlock((Block) indexed.get(1).object);
 				if (indexed.exists(2)) {
-					cond.setFalseBlock((Block) indexed.get(2).object);
+					stmt.setFalseBlock((Block) indexed.get(2).object);
 				}
-				return cond;
+				return stmt;
+			}
+		});
+		/* 循环语句 */
+		mapSemanticAnalyzier.put("for", new ISemanticAnalyzier() {
+			@Override
+			public Object handle(IIndexedData indexed, IQuerySymbol query,
+					ISemanticRecorder recorder) {
+				query.getQueryScopeService().leaveBlock();
+				StmtFor stmt = new StmtFor();
+				if (indexed.exists(0)) {
+					stmt.setVar((IExp) indexed.get(0).object);
+				}
+				if (indexed.exists(1)) {
+					stmt.setCond((IExp) indexed.get(1).object);
+				}
+				if (indexed.exists(2)) {
+					stmt.setCtrl((IExp) indexed.get(2).object);
+				}
+				stmt.setBlock((Block) indexed.get(3).object);
+				return stmt;
+			}
+		});
+		/* 循环控制表达式 */
+		mapSemanticAnalyzier.put("cycle", new ISemanticAnalyzier() {
+			@Override
+			public Object handle(IIndexedData indexed, IQuerySymbol query,
+					ISemanticRecorder recorder) {
+				ExpCycleCtrl exp = new ExpCycleCtrl();
+				if (indexed.exists(0)) {
+					exp.setName(indexed.get(0).token);
+				}
+				if (!query.getQueryScopeService().isInBlock()) {
+					recorder.add(SemanticError.WRONG_CYCLE, exp.getName());
+				}
+				return exp;
 			}
 		});
 	}
@@ -459,7 +505,7 @@ public class SemanticHandler {
 	public ISemanticAnalyzier getSemanticHandler(String name) {
 		ISemanticAnalyzier obj = mapSemanticAnalyzier.get(name);
 		if (obj == null) {
-			throw new NullPointerException();
+			throw new NullPointerException(name);
 		}
 		return obj;
 	}
@@ -474,7 +520,7 @@ public class SemanticHandler {
 	public ISemanticAction getActionHandler(String name) {
 		ISemanticAction obj = mapSemanticAction.get(name);
 		if (obj == null) {
-			throw new NullPointerException();
+			throw new NullPointerException(name);
 		}
 		return obj;
 	}

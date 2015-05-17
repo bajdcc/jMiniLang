@@ -18,7 +18,7 @@ public interface IManageScopeSymbol {
 	 * 删除当前命名空间，返回上层
 	 */
 	public void leaveScope();
-	
+
 	/**
 	 * 删除所有预期参数
 	 */
@@ -41,9 +41,12 @@ public interface IManageScopeSymbol {
 	 *            过程
 	 */
 	public void registeFunc(String name, Function func);
-	
+
 	/**
 	 * 注册下个块的参数表
+	 * 
+	 * @param name
+	 *            参数名
 	 * @return 无冲突则返回真
 	 */
 	public boolean registerFutureSymbol(String name);

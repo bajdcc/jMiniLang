@@ -65,7 +65,7 @@ public class TestInterpret {
 							"import \"sys.base\";\n"
 							+ "var f = func ~(n) ->\n"
 							+ "    n <= 2 ? 1 : call f(n-1) + call f(n-2);"
-							+ "call g_print(call f(10));\n"
+							+ "call g_print(call f(6));\n"
 							,
 							
 							//"import \"sys.base\";\n"

@@ -19,7 +19,7 @@ import priv.bajdcc.util.HashListMapEx;
  *
  * @author bajdcc
  */
-public class Codegen implements ICodegen {
+public class Codegen implements ICodegen, ICodegenBlock {
 
 	private HashListMap<Object> symbolList = new HashListMap<Object>();
 	private HashListMapEx<String, Function> funcMap = new HashListMapEx<String, Function>();
@@ -103,10 +103,49 @@ public class Codegen implements ICodegen {
 	}
 
 	@Override
+	public ICodegenBlock getBlockService() {
+		return this;
+	}
+
+	@Override
+	public RuntimeInstUnary genBreak() {
+		CodegenBlock block = data.getBlock();
+		if (block == null) {
+			return null;
+		}
+		RuntimeInstUnary in = new RuntimeInstUnary(RuntimeInst.ijmp,
+				block.breakId);
+		data.pushCode(in);
+		return in;
+	}
+
+	@Override
+	public RuntimeInstUnary genContinue() {
+		CodegenBlock block = data.getBlock();
+		if (block == null) {
+			return null;
+		}
+		RuntimeInstUnary in = new RuntimeInstUnary(RuntimeInst.ijmp,
+				block.continueId);
+		data.pushCode(in);
+		return in;
+	}
+	
+	@Override
+	public void enterBlockEntry(CodegenBlock block) {
+		data.enterBlockEntry(block);
+	}
+
+	@Override
+	public void leaveBlockEntry() {
+		data.leaveBlockEntry();
+	}
+
+	@Override
 	public int genDataRef(Object object) {
 		return symbolList.put(object);
 	}
-	
+
 	@Override
 	public int getCodeIndex() {
 		return data.getCodeIndex();

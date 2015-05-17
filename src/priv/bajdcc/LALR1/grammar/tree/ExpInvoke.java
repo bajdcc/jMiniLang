@@ -162,7 +162,7 @@ public class ExpInvoke implements IExp {
 				for (int i = 0; i < params.size(); i++) {
 					sb.append(params.get(i).print(prefix));
 					if (i != params.size() - 1) {
-						sb.append(",");
+						sb.append(", ");
 					}
 				}
 			}

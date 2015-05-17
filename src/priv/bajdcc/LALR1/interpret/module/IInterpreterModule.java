@@ -11,13 +11,13 @@ public interface IInterpreterModule {
 
 	/**
 	 * 返回模块名
-	 * @return
+	 * @return 模块名
 	 */
 	public String getModuleName();
 	
 	/**
 	 * 返回代码页
-	 * @return
+	 * @return 代码页
 	 */
 	public RuntimeCodePage getCodePage() throws Exception;
 }

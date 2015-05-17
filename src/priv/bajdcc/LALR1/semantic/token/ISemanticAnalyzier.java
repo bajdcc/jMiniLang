@@ -15,7 +15,7 @@ public interface ISemanticAnalyzier {
 	 * 
 	 * @param indexed
 	 *            索引包接口
-	 * @param factory
+	 * @param query
 	 *            单词工厂接口
 	 * @param recorder
 	 *            语义错误记录接口

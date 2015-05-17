@@ -3,6 +3,7 @@ package priv.bajdcc.LALR1.grammar.symbol;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import priv.bajdcc.LALR1.grammar.runtime.RuntimeObject;
 import priv.bajdcc.LALR1.grammar.semantic.ISemanticRecorder;
 import priv.bajdcc.LALR1.grammar.tree.Function;
 import priv.bajdcc.LALR1.grammar.type.TokenTools;
@@ -27,6 +28,7 @@ public class ManageScopeSymbol implements IManageScopeSymbol,
 	private HashListMapEx<String, Function> funcMap = new HashListMapEx<String, Function>();
 	private ArrayList<HashSet<String>> stkScope = new ArrayList<HashSet<String>>();
 	private HashSet<String> symbolsInFutureBlock = new HashSet<String>();
+	private int cycleLevel = 0;
 
 	public ManageScopeSymbol() {
 		enterScope();
@@ -47,9 +49,9 @@ public class ManageScopeSymbol implements IManageScopeSymbol,
 		stkScope.remove(0);
 		clearFutureArgs();
 	}
-	
+
 	@Override
-	public void clearFutureArgs(){
+	public void clearFutureArgs() {
 		symbolsInFutureBlock.clear();
 	}
 
@@ -157,7 +159,8 @@ public class ManageScopeSymbol implements IManageScopeSymbol,
 		sb.append(System.getProperty("line.separator"));
 		int i = 0;
 		for (Object symbol : symbolList.list) {
-			sb.append(i + ": " + "[" + symbol.getClass().getName() + "] "
+			sb.append(i + ": " + "["
+					+ RuntimeObject.fromObject(symbol).getName() + "] "
 					+ symbol);
 			sb.append(System.getProperty("line.separator"));
 			i++;
@@ -187,5 +190,20 @@ public class ManageScopeSymbol implements IManageScopeSymbol,
 		sb.append(getSymbolString());
 		sb.append(getFuncString());
 		return sb.toString();
+	}
+
+	@Override
+	public void enterBlock() {
+		cycleLevel++;
+	}
+
+	@Override
+	public void leaveBlock() {
+		cycleLevel--;
+	}
+
+	@Override
+	public boolean isInBlock() {
+		return cycleLevel > 0;
 	}
 }

@@ -426,7 +426,7 @@ public class DFA extends NFA {
 	/**
 	 * 建立状态
 	 * 
-	 * @param finalStatus
+	 * @param finalStatus 终态
 	 * @return 状态转换矩阵
 	 */
 	public int[][] buildTransition(Collection<Integer> finalStatus) {
