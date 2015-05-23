@@ -21,4 +21,11 @@ public interface IRuntimeStatus {
 	 * @throws RuntimeException 
 	 */
 	public int getFuncAddr(String name) throws RuntimeException;
+	
+	/**
+	 * 载入代码并运行
+	 * @param name 文件名
+	 * @throws RuntimeException 
+	 */
+	public void runPage(String name) throws Exception;
 }

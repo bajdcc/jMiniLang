@@ -37,4 +37,9 @@ public class SymbolTable implements IQuerySymbol, IManageSymbol {
 	public String toString() {
 		return manageScopeSymbol.toString();
 	}
+
+	@Override
+	public IQueryBlockSymbol getQueryBlockService() {
+		return manageScopeSymbol;
+	}
 }

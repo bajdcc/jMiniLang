@@ -10,9 +10,11 @@ import priv.bajdcc.LALR1.interpret.module.ModuleBase;
  * @author bajdcc
  */
 public class Interpreter extends RuntimeMachine {
+	
+	private static final boolean DEBUG = false;
 
 	public Interpreter() throws Exception {
-		debug = false;
+		debug = DEBUG;
 		builtin();
 	}
 

@@ -15,7 +15,8 @@ public enum KeywordType {
 			"struct"), SWITCH("switch"), TRUE("true"), TYPEDEF("typedef"), UNION(
 			"union"), UNSIGNED("unsigned"), VOID("void"), VOLATILE("volatile"), WHILE(
 			"while"), VARIABLE("var"), FUNCTION("func"), LET("let"), CALL(
-			"call"), IMPORT("import"), EXPORT("export");
+			"call"), IMPORT("import"), EXPORT("export"), YIELD("yield"), FOREACH(
+			"foreach");
 
 	private String name;
 

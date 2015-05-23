@@ -8,56 +8,44 @@ import priv.bajdcc.LALR1.grammar.semantic.ISemanticRecorder;
 import priv.bajdcc.LALR1.grammar.tree.closure.IClosureScope;
 import priv.bajdcc.util.lexer.token.KeywordType;
 import priv.bajdcc.util.lexer.token.OperatorType;
+import priv.bajdcc.util.lexer.token.Token;
 
 /**
- * 【语义分析】循环语句
+ * 【语义分析】迭代循环语句
  *
  * @author bajdcc
  */
-public class StmtFor implements IStmt {
+public class StmtForeach implements IStmt {
 
 	/**
-	 * 初始化
+	 * 变量
 	 */
-	private IExp var = null;
+	private Token var = null;
 
 	/**
-	 * 条件
+	 * 迭代表达式
 	 */
-	private IExp cond = null;
-
-	/**
-	 * 控制
-	 */
-	private IExp ctrl = null;
+	private IExp enumerator = null;
 
 	/**
 	 * 块
 	 */
 	private Block block = null;
 
-	public IExp getVar() {
+	public Token getVar() {
 		return var;
 	}
 
-	public void setVar(IExp var) {
+	public void setVar(Token var) {
 		this.var = var;
 	}
 
-	public IExp getCond() {
-		return cond;
+	public IExp getEnumerator() {
+		return enumerator;
 	}
 
-	public void setCond(IExp cond) {
-		this.cond = cond;
-	}
-
-	public IExp getCtrl() {
-		return ctrl;
-	}
-
-	public void setCtrl(IExp ctrl) {
-		this.ctrl = ctrl;
+	public void setEnumerator(IExp enumerator) {
+		this.enumerator = enumerator;
 	}
 
 	public Block getBlock() {
@@ -70,43 +58,36 @@ public class StmtFor implements IStmt {
 
 	@Override
 	public void analysis(ISemanticRecorder recorder) {
-		if (var != null) {
-			var.analysis(recorder);
-		}
-		if (cond != null) {
-			cond.analysis(recorder);
-		}
-		if (ctrl != null) {
-			ctrl.analysis(recorder);
-		}
+		enumerator.analysis(recorder);
 		block.analysis(recorder);
 	}
 
 	@Override
 	public void genCode(ICodegen codegen) {
-		if (var != null) {
-			var.genCode(codegen);
-		}
+		codegen.genCode(RuntimeInst.ipushx);
+		codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(var.object));
+		codegen.genCode(RuntimeInst.ialloc);
+		codegen.genCode(RuntimeInst.ipop);
 		CodegenBlock cb = new CodegenBlock();
 		RuntimeInstUnary start = codegen.genCode(RuntimeInst.ijmp, -1);
 		cb.breakId = codegen.getCodeIndex();
+		codegen.genCode(RuntimeInst.ipop);
+		codegen.genCode(RuntimeInst.iyldx);
 		RuntimeInstUnary breakJmp = codegen.genCode(RuntimeInst.ijmp, -1);
 		cb.continueId = codegen.getCodeIndex();
 		RuntimeInstUnary continueJmp = codegen.genCode(RuntimeInst.ijmp, -1);
-		start.op1 = codegen.getCodeIndex();
-		if (cond != null) {
-			cond.genCode(codegen);
-			codegen.genCode(RuntimeInst.ijf, cb.breakId);
-		}
+		start.op1 = cb.continueId;
+		int content = codegen.getCodeIndex();
+		enumerator.genCode(codegen);
+		codegen.genCode(RuntimeInst.ijnan, cb.breakId);
+		codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(var.object));
+		codegen.genCode(RuntimeInst.istore);
+		codegen.genCode(RuntimeInst.ipop);
 		codegen.getBlockService().enterBlockEntry(cb);
 		block.genCode(codegen);
 		codegen.getBlockService().leaveBlockEntry();
 		continueJmp.op1 = codegen.getCodeIndex();
-		if (ctrl != null) {
-			ctrl.genCode(codegen);
-			codegen.genCode(RuntimeInst.ipop);
-		}
-		codegen.genCode(RuntimeInst.ijmp, start.op1);
+		codegen.genCode(RuntimeInst.ijmp, content);
 		breakJmp.op1 = codegen.getCodeIndex();
 	}
 
@@ -119,21 +100,15 @@ public class StmtFor implements IStmt {
 	public String print(StringBuilder prefix) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(prefix.toString());
-		sb.append(KeywordType.FOR.getName());
+		sb.append(KeywordType.FOREACH.getName());
 		sb.append(" ( ");
-		if (var != null) {
-			sb.append(var.print(prefix));
-			sb.append(OperatorType.SEMI.getName());
-		}
-		if (cond != null) {
-			sb.append(" ");
-			sb.append(cond.print(prefix));
-			sb.append(OperatorType.SEMI.getName());
-		}
-		if (ctrl != null) {
-			sb.append(" ");
-			sb.append(ctrl.print(prefix));
-		}
+		sb.append(KeywordType.VARIABLE.getName());
+		sb.append(" ");
+		sb.append(var.toRealString());
+		sb.append(" ");
+		sb.append(OperatorType.COLON.getName());
+		sb.append(" ");
+		sb.append(enumerator.print(prefix));
 		sb.append(" ) ");
 		sb.append(block.print(prefix));
 		return sb.toString();
@@ -141,15 +116,6 @@ public class StmtFor implements IStmt {
 
 	@Override
 	public void addClosure(IClosureScope scope) {
-		if (var != null) {
-			var.addClosure(scope);
-		}
-		if (cond != null) {
-			cond.addClosure(scope);
-		}
-		if (ctrl != null) {
-			ctrl.addClosure(scope);
-		}
-		block.addClosure(scope);
+
 	}
 }

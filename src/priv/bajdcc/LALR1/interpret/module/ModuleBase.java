@@ -1,12 +1,17 @@
 package priv.bajdcc.LALR1.interpret.module;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.util.List;
+
 import priv.bajdcc.LALR1.grammar.Grammar;
 import priv.bajdcc.LALR1.grammar.runtime.IRuntimeDebugExec;
 import priv.bajdcc.LALR1.grammar.runtime.IRuntimeDebugInfo;
 import priv.bajdcc.LALR1.grammar.runtime.IRuntimeDebugValue;
 import priv.bajdcc.LALR1.grammar.runtime.IRuntimeStatus;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeCodePage;
+import priv.bajdcc.LALR1.grammar.runtime.RuntimeException;
+import priv.bajdcc.LALR1.grammar.runtime.RuntimeException.RuntimeError;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeObject;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeObjectType;
 
@@ -24,11 +29,55 @@ public class ModuleBase implements IInterpreterModule {
 
 	@Override
 	public RuntimeCodePage getCodePage() throws Exception {
-		String base = "var g_author = func ~() -> \"bajdcc\";\n"
+		String base = "var g_author = func [\"标准库的作者：bajdcc\"] ~() -> \"bajdcc\";\n"
+				+ "export \"g_author\";\n"
 				+ "var g_max = func ~(a, b) -> a > b ? a : b;\n"
+				+ "export \"g_max\";\n"
 				+ "var g_min = func ~(a, b) -> a < b ? a : b;\n"
-				+ "export \"g_author\";\n" + "export \"g_max\";\n"
-				+ "export \"g_min\";\n";
+				+ "export \"g_min\";\n"
+				+ "var g_lt = func ~(a, b) -> a < b;\n"
+				+ "export \"g_lt\";\n"
+				+ "var g_gt = func ~(a, b) -> a > b;\n"
+				+ "export \"g_gt\";\n"
+				+ "var g_eq = func ~(a, b) -> a == b;\n"
+				+ "export \"g_eq\";\n"
+				+ "var g_mod = func ~(a, b) -> a % b == 0;\n"
+				+ "export \"g_mod\";\n"
+				+ "var g_curry_1 = func ~(a, b) {\n"
+				+ "    var curry = func ~(c) -> call a(b, c);\n"
+				+ "    return curry;"
+				+ "};\n"
+				+ "export \"g_curry_1\";\n"
+				+ "var g_swap = func ~(a) {\n"
+				+ "    var swap = func ~(b, c) -> call a(c, b);\n"
+				+ "    return swap;"
+				+ "};\n"
+				+ "export \"g_swap\";\n"
+				+ "var g_println = func ~() {\n"
+				+ "    call g_print(g_endl);\n"
+				+ "};\n"
+				+ "export \"g_println\";\n"
+				+ "var g_range = yield ~(a, b) {\n"
+				+ "    for (var i = a; i <= b; i++) {\n"
+				+ "        yield i;\n"
+				+ "    }\n"
+				+ "};\n"
+				+ "export \"g_range\";\n"
+				+ "var g_range_foreach = func ~(a, b, c) {\n"
+				+ "    foreach (var i : call g_range(a, b)) {\n"
+				+ "        call c(i);\n"
+				+ "    }\n"
+				+ "};\n"
+				+ "export \"g_range_foreach\";\n"
+				+ "var g_range_any = func ~(a, b, c) {\n"
+				+ "    foreach (var i : call g_range(a, b)) {\n"
+				+ "        if (call c(i)) {\n"
+				+ "            return true;"
+				+ "        }\n"
+				+ "    }\n"
+				+ "    return false;\n"
+				+ "};\n"
+				+ "export \"g_range_any\";\n" + "\n";
 
 		Grammar grammar = new Grammar(base);
 		RuntimeCodePage page = grammar.getCodePage();
@@ -77,6 +126,24 @@ public class ModuleBase implements IInterpreterModule {
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 					IRuntimeStatus status) throws Exception {
 				System.out.print(args.get(0).getObj());
+				return null;
+			}
+		});
+		info.addExternalFunc("g_printn", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "标准输出并换行";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[] { RuntimeObjectType.kObject };
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+					IRuntimeStatus status) throws Exception {
+				System.out.println(args.get(0).getObj());
 				return null;
 			}
 		});
@@ -154,24 +221,6 @@ public class ModuleBase implements IInterpreterModule {
 						.getObj().toString()));
 			}
 		});
-		info.addExternalFunc("g_load_func", new IRuntimeDebugExec() {
-			@Override
-			public String getDoc() {
-				return "获取函数地址";
-			}
-
-			@Override
-			public RuntimeObjectType[] getArgsType() {
-				return new RuntimeObjectType[] { RuntimeObjectType.kString };
-			}
-
-			@Override
-			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
-					IRuntimeStatus status) throws Exception {
-				return new RuntimeObject(status.getFuncAddr(args.get(0)
-						.getObj().toString()), RuntimeObjectType.kFunc);
-			}
-		});
 		info.addExternalFunc("g_get_type", new IRuntimeDebugExec() {
 			@Override
 			public String getDoc() {
@@ -188,6 +237,69 @@ public class ModuleBase implements IInterpreterModule {
 					IRuntimeStatus status) throws Exception {
 				return new RuntimeObject(args.get(0).getObj().getClass()
 						.getName());
+			}
+		});
+		info.addExternalFunc("g_exit", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "程序退出";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return null;
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+					IRuntimeStatus status) throws Exception {
+				throw new RuntimeException(RuntimeError.EXIT, -1, "用户自行退出");
+			}
+		});
+		info.addExternalFunc("g_load", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "载入并运行程序";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[] { RuntimeObjectType.kString };
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+					IRuntimeStatus status) throws Exception {
+				status.runPage(args.get(0).getObj().toString());
+				return null;
+			}
+		});
+		info.addExternalFunc("g_print_file", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "载入并运行程序";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[] { RuntimeObjectType.kString };
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+					IRuntimeStatus status) throws Exception {
+				try {
+					BufferedReader br = new BufferedReader(new FileReader(args
+							.get(0).getObj().toString()));
+					String line = null;
+					while ((line = br.readLine()) != null) {
+						System.out.println(line);
+					}
+					br.close();
+				} catch (Exception e) {
+					System.err.println(e.getMessage());
+				}
+				return null;
 			}
 		});
 		buildIORead(info);

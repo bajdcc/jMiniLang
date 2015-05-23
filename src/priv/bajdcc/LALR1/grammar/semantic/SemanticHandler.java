@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import priv.bajdcc.LALR1.grammar.error.SemanticException.SemanticError;
+import priv.bajdcc.LALR1.grammar.symbol.BlockType;
 import priv.bajdcc.LALR1.grammar.symbol.IManageSymbol;
 import priv.bajdcc.LALR1.grammar.symbol.IQuerySymbol;
 import priv.bajdcc.LALR1.grammar.tree.Block;
@@ -18,8 +19,10 @@ import priv.bajdcc.LALR1.grammar.tree.ExpValue;
 import priv.bajdcc.LALR1.grammar.tree.Function;
 import priv.bajdcc.LALR1.grammar.tree.IExp;
 import priv.bajdcc.LALR1.grammar.tree.IStmt;
+import priv.bajdcc.LALR1.grammar.tree.StmtBlock;
 import priv.bajdcc.LALR1.grammar.tree.StmtExp;
 import priv.bajdcc.LALR1.grammar.tree.StmtFor;
+import priv.bajdcc.LALR1.grammar.tree.StmtForeach;
 import priv.bajdcc.LALR1.grammar.tree.StmtIf;
 import priv.bajdcc.LALR1.grammar.tree.StmtPort;
 import priv.bajdcc.LALR1.grammar.tree.StmtReturn;
@@ -116,7 +119,9 @@ public class SemanticHandler {
 						} else {
 							recorder.add(SemanticError.VAR_FUN_CONFLICT, token);
 						}
-					} else if (!TokenTools.isExternalName(name)) {
+					} else if (!TokenTools.isExternalName(name)
+							&& manage.getQueryScopeService()
+									.findDeclaredSymbolDirect(name)) {
 						recorder.add(SemanticError.VARIABLE_REDECLARAED, token);
 					}
 				} else if (spec == KeywordType.LET) {
@@ -145,6 +150,11 @@ public class SemanticHandler {
 			public void handle(IIndexedData indexed, IManageSymbol manage,
 					IRandomAccessOfTokens access, ISemanticRecorder recorder) {
 				manage.getManageScopeService().clearFutureArgs();
+				Token token = access.relativeGet(0);
+				KeywordType type = (KeywordType) token.object;
+				if (type == KeywordType.YIELD) {
+					manage.getQueryBlockService().enterBlock(BlockType.kYield);
+				}
 			}
 		});
 		/* 循环体 */
@@ -152,7 +162,7 @@ public class SemanticHandler {
 			@Override
 			public void handle(IIndexedData indexed, IManageSymbol manage,
 					IRandomAccessOfTokens access, ISemanticRecorder recorder) {
-				manage.getQueryScopeService().enterBlock();
+				manage.getQueryBlockService().enterBlock(BlockType.kCycle);
 			}
 		});
 	}
@@ -280,14 +290,11 @@ public class SemanticHandler {
 				assign.setName(token);
 				if (indexed.exists(11)) {
 					assign.setDecleared(true);
-					assign.setSpec(indexed.get(11).token);
-				} else {
-					assign.setDecleared(false);
-					assign.setSpec(indexed.get(12).token);
 				}
 				if (indexed.exists(1)) {
 					ExpFunc func = new ExpFunc();
 					func.setFunc((Function) indexed.get(1).object);
+					func.genClosure();
 					if (assign.isDecleared()) {
 						func.getFunc().setRealName(token.toRealString());
 					}
@@ -374,24 +381,30 @@ public class SemanticHandler {
 				Token token = indexed.get(1).token;
 				Function func = query.getQueryScopeService().getFuncByName(
 						token.toRealString());
+				if (!indexed.exists(10)) {
+					func.setYield(true);
+					query.getQueryBlockService().leaveBlock(BlockType.kYield);
+				}
 				if (indexed.exists(2)) {
 					func.setParams((ArrayList<Token>) indexed.get(2).object);
 				}
 				if (indexed.exists(0)) {
-					func.setDoc((ArrayList<String>) indexed.get(0).object);
+					func.setDoc((ArrayList<Token>) indexed.get(0).object);
+				}
+				StmtReturn ret = new StmtReturn();
+				if (func.isYield()) {
+					ret.setYield(true);
 				}
 				if (indexed.exists(3)) {
 					Block block = new Block();
 					ArrayList<IStmt> stmts = new ArrayList<IStmt>();
-					StmtReturn ret = new StmtReturn();
 					ret.setExp((IExp) indexed.get(3).object);
 					stmts.add(ret);
 					block.setStmts(stmts);
-					block.getStmts().add(new StmtReturn());
 					func.setBlock(block);
 				} else {
 					Block block = (Block) indexed.get(4).object;
-					block.getStmts().add(new StmtReturn());
+					block.getStmts().add(ret);
 					func.setBlock(block);
 				}
 				return func;
@@ -406,6 +419,21 @@ public class SemanticHandler {
 				if (indexed.exists(0)) {
 					ret.setExp((IExp) indexed.get(0).object);
 				}
+				if (indexed.exists(1)) {
+					if (!indexed.exists(0)
+							|| !query.getQueryBlockService().isInBlock(
+									BlockType.kYield)) {
+						recorder.add(SemanticError.WRONG_YIELD,
+								indexed.get(1).token);
+					}
+					ret.setYield(true);
+				} else if (query.getQueryBlockService().isInBlock(
+						BlockType.kYield)) {
+					if (indexed.exists(0)) {
+						recorder.add(SemanticError.WRONG_YIELD,
+								indexed.get(1).token);
+					}
+				}
 				return ret;
 			}
 		});
@@ -417,12 +445,8 @@ public class SemanticHandler {
 				StmtPort port = new StmtPort();
 				Token token = indexed.get(0).token;
 				port.setName(token);
-				if (indexed.exists(1)) {
-					Token spec = indexed.get(1).token;
-					port.setSpec(spec);
-				} else {
-					Token spec = indexed.get(2).token;
-					port.setSpec(spec);
+				if (!indexed.exists(1)) {
+					port.setImported(false);
 					Function func = query.getQueryScopeService()
 							.getFuncByRealName(token.object.toString());
 					if (func == null) {
@@ -463,7 +487,7 @@ public class SemanticHandler {
 			@Override
 			public Object handle(IIndexedData indexed, IQuerySymbol query,
 					ISemanticRecorder recorder) {
-				query.getQueryScopeService().leaveBlock();
+				query.getQueryBlockService().leaveBlock(BlockType.kCycle);
 				StmtFor stmt = new StmtFor();
 				if (indexed.exists(0)) {
 					stmt.setVar((IExp) indexed.get(0).object);
@@ -478,6 +502,22 @@ public class SemanticHandler {
 				return stmt;
 			}
 		});
+		mapSemanticAnalyzier.put("foreach", new ISemanticAnalyzier() {
+			@Override
+			public Object handle(IIndexedData indexed, IQuerySymbol query,
+					ISemanticRecorder recorder) {
+				query.getQueryBlockService().leaveBlock(BlockType.kCycle);
+				StmtForeach stmt = new StmtForeach();
+				stmt.setVar(indexed.get(0).token);
+				stmt.setEnumerator((IExp) indexed.get(1).object);
+				stmt.setBlock((Block) indexed.get(2).object);
+				if (!stmt.getEnumerator().isEnumerable()) {
+					recorder.add(SemanticError.WRONG_ENUMERABLE, stmt.getVar());
+				}
+				stmt.getEnumerator().setYield();
+				return stmt;
+			}
+		});
 		/* 循环控制表达式 */
 		mapSemanticAnalyzier.put("cycle", new ISemanticAnalyzier() {
 			@Override
@@ -487,10 +527,20 @@ public class SemanticHandler {
 				if (indexed.exists(0)) {
 					exp.setName(indexed.get(0).token);
 				}
-				if (!query.getQueryScopeService().isInBlock()) {
+				if (!query.getQueryBlockService().isInBlock(BlockType.kCycle)) {
 					recorder.add(SemanticError.WRONG_CYCLE, exp.getName());
 				}
 				return exp;
+			}
+		});
+		/* BLOCK语句 */
+		mapSemanticAnalyzier.put("block_stmt", new ISemanticAnalyzier() {
+			@Override
+			public Object handle(IIndexedData indexed, IQuerySymbol query,
+					ISemanticRecorder recorder) {
+				StmtBlock block = new StmtBlock();
+				block.setBlock((Block) indexed.get(0).object);
+				return block;
 			}
 		});
 	}

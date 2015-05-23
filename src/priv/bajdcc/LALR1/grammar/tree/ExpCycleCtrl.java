@@ -2,6 +2,7 @@ package priv.bajdcc.LALR1.grammar.tree;
 
 import priv.bajdcc.LALR1.grammar.codegen.ICodegen;
 import priv.bajdcc.LALR1.grammar.semantic.ISemanticRecorder;
+import priv.bajdcc.LALR1.grammar.tree.closure.IClosureScope;
 import priv.bajdcc.util.lexer.token.KeywordType;
 import priv.bajdcc.util.lexer.token.Token;
 
@@ -27,6 +28,11 @@ public class ExpCycleCtrl implements IExp {
 
 	@Override
 	public boolean isConstant() {
+		return false;
+	}
+
+	@Override
+	public boolean isEnumerable() {
 		return false;
 	}
 
@@ -58,5 +64,15 @@ public class ExpCycleCtrl implements IExp {
 	@Override
 	public String print(StringBuilder prefix) {
 		return name.toRealString();
+	}
+
+	@Override
+	public void addClosure(IClosureScope scope) {
+
+	}
+
+	@Override
+	public void setYield() {
+		
 	}
 }

@@ -3,7 +3,9 @@ package priv.bajdcc.LALR1.grammar.tree;
 import java.util.ArrayList;
 
 import priv.bajdcc.LALR1.grammar.codegen.ICodegen;
+import priv.bajdcc.LALR1.grammar.runtime.RuntimeInst;
 import priv.bajdcc.LALR1.grammar.semantic.ISemanticRecorder;
+import priv.bajdcc.LALR1.grammar.tree.closure.IClosureScope;
 
 /**
  * 【语义分析】块
@@ -34,12 +36,14 @@ public class Block implements ICommon {
 
 	@Override
 	public void genCode(ICodegen codegen) {
+		codegen.genCode(RuntimeInst.iscpi);
 		for (IStmt stmt : stmts) {
 			stmt.genCode(codegen);
 			if (stmt instanceof StmtReturn) {
 				break;
 			}
 		}
+		codegen.genCode(RuntimeInst.iscpo);
 	}
 
 	@Override
@@ -58,7 +62,17 @@ public class Block implements ICommon {
 			sb.append(System.getProperty("line.separator"));
 		}
 		prefix.delete(0, 4);
-		sb.append(prefix.toString() + "} ");
+		sb.append(prefix.toString() + "}");
 		return sb.toString();
+	}
+
+	@Override
+	public void addClosure(IClosureScope scope) {
+		for (IStmt stmt : stmts) {
+			stmt.addClosure(scope);
+			if (stmt instanceof StmtReturn) {
+				break;
+			}
+		}
 	}
 }

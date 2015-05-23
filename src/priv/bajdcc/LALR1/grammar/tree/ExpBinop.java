@@ -1,7 +1,10 @@
 package priv.bajdcc.LALR1.grammar.tree;
 
 import priv.bajdcc.LALR1.grammar.codegen.ICodegen;
+import priv.bajdcc.LALR1.grammar.runtime.RuntimeInst;
+import priv.bajdcc.LALR1.grammar.runtime.RuntimeInstUnary;
 import priv.bajdcc.LALR1.grammar.semantic.ISemanticRecorder;
+import priv.bajdcc.LALR1.grammar.tree.closure.IClosureScope;
 import priv.bajdcc.LALR1.grammar.type.TokenTools;
 import priv.bajdcc.util.lexer.token.Token;
 import priv.bajdcc.util.lexer.token.TokenType;
@@ -58,6 +61,11 @@ public class ExpBinop implements IExp {
 	}
 
 	@Override
+	public boolean isEnumerable() {
+		return leftOperand.isEnumerable() ^ rightOperand.isEnumerable();
+	}
+
+	@Override
 	public IExp simplify(ISemanticRecorder recorder) {
 		if (!isConstant()) {
 			return this;
@@ -80,9 +88,24 @@ public class ExpBinop implements IExp {
 
 	@Override
 	public void genCode(ICodegen codegen) {
-		rightOperand.genCode(codegen);
+		RuntimeInst inst = TokenTools.op2ins(token);
 		leftOperand.genCode(codegen);
-		codegen.genCode(TokenTools.op2ins(token));
+		RuntimeInstUnary jmp = null;
+		switch (inst) {
+		case iand:
+			jmp = codegen.genCode(RuntimeInst.ijfx, -1);
+			break;
+		case ior:
+			jmp = codegen.genCode(RuntimeInst.ijtx, -1);
+			break;
+		default:
+			break;
+		}
+		rightOperand.genCode(codegen);
+		codegen.genCode(inst);
+		if (jmp != null) {
+			jmp.op1 = codegen.getCodeIndex();
+		}
 	}
 
 	@Override
@@ -94,5 +117,17 @@ public class ExpBinop implements IExp {
 	@Override
 	public String print(StringBuilder prefix) {
 		return toString();
+	}
+
+	@Override
+	public void addClosure(IClosureScope scope) {
+		leftOperand.addClosure(scope);
+		rightOperand.addClosure(scope);
+	}
+
+	@Override
+	public void setYield() {
+		leftOperand.setYield();
+		rightOperand.setYield();
 	}
 }

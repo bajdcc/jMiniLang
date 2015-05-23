@@ -16,6 +16,7 @@ public interface ICodegen {
 	public void genFuncEntry(String funcName);
 	public RuntimeInstNon genCode(RuntimeInst inst);
 	public RuntimeInstUnary genCode(RuntimeInst inst, int op1);
+	public RuntimeInstUnary genCodeWithFuncWriteBack(RuntimeInst inst, int op1);
 	public RuntimeInstBinary genCode(RuntimeInst inst, int op1, int op2);
 	public int genDataRef(Object object);
 	public int getFuncIndex(Function func);

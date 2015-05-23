@@ -147,7 +147,7 @@ public class Grammar extends Semantic {
 				"var_list", "exp_list", "exp", "exp0", "exp1", "exp2", "exp3",
 				"exp4", "exp5", "exp6", "exp7", "exp8", "exp9", "type",
 				"block", "call_exp", "call", "ret", "doc_list", "port", "if",
-				"for", "cycle_ctrl" };
+				"for", "foreach", "cycle_ctrl", "block_stmt" };
 		for (String string : nonTerminals) {
 			addNonTerminal(string);
 		}
@@ -165,21 +165,23 @@ public class Grammar extends Semantic {
 		/* Block语句 */
 		infer(handler.getSemanticHandler("block"),
 				"block -> @LBR#do_enter_scope# [stmt_list[0]] @RBR#do_leave_scope#{lost_rbr}");
+		infer(handler.getSemanticHandler("block_stmt"),
+				"block_stmt -> block[0]");
 		/* 当前块（Block）全部由语句组成 */
 		infer(handler.getSemanticHandler("stmt_list"),
 				"stmt_list -> stmt[0]{lost_stmt} [stmt_list[1]]");
 		/* 语句分为变量定义（赋值）、调用语句 */
 		infer(handler.getSemanticHandler("copy"),
-				"stmt_exp -> var[0] | ret[0] | call[0] | cycle_ctrl[0] | exp[0]");
+				"stmt_exp -> var[0] | call[0] | cycle_ctrl[0] | exp[0]");
 		infer(handler.getSemanticHandler("copy"),
-				"stmt -> stmt_stmt[0] | block[0] | stmt_ctrl[0]");
+				"stmt -> stmt_stmt[0] | stmt_ctrl[0] | block_stmt[0]");
 		infer(handler.getSemanticHandler("stmt_exp"),
 				"stmt_stmt -> stmt_exp[0] @SEMI{lost_semi}");
 		infer(handler.getSemanticHandler("copy"),
-				"stmt_ctrl -> port[0] | if[0] | for[0]");
+				"stmt_ctrl -> ret[0] | port[0] | if[0] | for[0] | foreach[0]");
 		/* 返回语句 */
 		infer(handler.getSemanticHandler("return"),
-				"ret -> @RETURN [exp[0]] @SEMI{lost_semi}");
+				"ret -> (@YIELD[1] | @RETURN) [exp[0]] @SEMI{lost_semi}");
 		/* 变量定义（赋值）语句（由于支持Lambda，函数定义皆为Lambda形式） */
 		infer(handler.getSemanticHandler("var"),
 				"var -> (@VARIABLE[11] | @LET[12]) @ID[0]#declear_variable#{lost_token} @ASSIGN{lost_assign} (func[1]{lost_func} | exp[2]{lost_exp})");
@@ -216,7 +218,7 @@ public class Grammar extends Semantic {
 		infer(handler.getSemanticHandler("token_list"),
 				"doc_list -> @LITERAL[0] [@COMMA exp_list[1]]");
 		infer(handler.getSemanticHandler("func"),
-				"func -> @FUNCTION#func_clearargs# [@LSQ doc_list[0]{lost_doc} @RSQ] (@ID[1]#predeclear_funcname#{lost_func_name} | @NOT[1]#predeclear_funcname#{lost_func_name}) @LPA{lost_lpa} [var_list[2]] @RPA{lost_rpa} (@PTR_OP{lost_func_body} exp[3]{lost_exp} | block[4]{lost_func_body})");
+				"func -> (@FUNCTION[10]#func_clearargs# | @YIELD#func_clearargs#) [@LSQ doc_list[0]{lost_doc} @RSQ] (@ID[1]#predeclear_funcname#{lost_func_name} | @NOT[1]#predeclear_funcname#{lost_func_name}) @LPA{lost_lpa} [var_list[2]] @RPA{lost_rpa} (@PTR_OP{lost_func_body} exp[3]{lost_exp} | block[4]{lost_func_body})");
 		/* 基本数据类型 */
 		infer(handler.getSemanticHandler("type"),
 				"type -> @ID[0] | @INTEGER[0] | @DECIMAL[0] | @LITERAL[0] | @CHARACTER[0] | @BOOLEAN[0] | @LPA exp[1]{lost_exp} @RPA{lost_rpa} | call[1]");
@@ -226,6 +228,9 @@ public class Grammar extends Semantic {
 		/* 循环语句 */
 		infer(handler.getSemanticHandler("for"),
 				"for -> @FOR#do_enter_cycle# @LPA{lost_lpa} [var[0]] @SEMI{lost_semi} [exp[1]] @SEMI{lost_semi} [exp[2] | var[2]] @RPA{lost_rpa} block[3]{lost_block}");
+		/* 循环语句 */
+		infer(handler.getSemanticHandler("foreach"),
+				"foreach -> @FOREACH#do_enter_cycle# @LPA{lost_lpa} @VARIABLE{lost_var} @ID[0]#declear_variable#{lost_token} @COLON{lost_colon} exp[1]{lost_exp} @RPA{lost_rpa} block[2]{lost_block}");
 		/* 循环控制语句 */
 		infer(handler.getSemanticHandler("cycle"),
 				"cycle_ctrl -> @BREAK[0] | @CONTINUE[0]");
@@ -257,6 +262,7 @@ public class Grammar extends Semantic {
 		addErrorHandler("lost_colon", new LostHandler("冒号':'"));
 		addErrorHandler("lost_semi", new LostHandler("分号';'"));
 		addErrorHandler("lost_doc", new LostHandler("文档"));
+		addErrorHandler("lost_var", new LostHandler("赋值"));
 	}
 
 	/**

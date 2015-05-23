@@ -2,6 +2,10 @@ package priv.bajdcc.LALR1.grammar.runtime;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import priv.bajdcc.util.HashListMapEx2;
 
 /**
  * 【运行时】调用函数基本单位
@@ -48,7 +52,21 @@ public class RuntimeFunc {
 	/**
 	 * 临时变量
 	 */
-	private HashMap<Integer, RuntimeObject> tmp = new HashMap<Integer, RuntimeObject>();
+	private List<HashMap<Integer, RuntimeObject>> tmp = new ArrayList<HashMap<Integer, RuntimeObject>>();
+
+	/**
+	 * 函数闭包
+	 */
+	private Map<Integer, RuntimeObject> closure = new HashMap<Integer, RuntimeObject>();
+
+	/**
+	 * YIELD
+	 */
+	private HashListMapEx2<String, RuntimeStack> yields = null;
+
+	public RuntimeFunc() {
+		enterScope();
+	}
 
 	public int getAddress() {
 		return address;
@@ -110,20 +128,51 @@ public class RuntimeFunc {
 		params.add(param);
 	}
 
-	public HashMap<Integer, RuntimeObject> getTmp() {
+	public List<HashMap<Integer, RuntimeObject>> getTmp() {
 		return tmp;
 	}
 
 	public void addTmp(int idx, RuntimeObject val) {
-		tmp.put(idx, val);
+		tmp.get(0).put(idx, val);
+	}
+
+	public void enterScope() {
+		tmp.add(0, new HashMap<Integer, RuntimeObject>());
+	}
+
+	public void leaveScope() {
+		tmp.remove(0);
+	}
+
+	public Map<Integer, RuntimeObject> getClosure() {
+		return closure;
+	}
+
+	public void addClosure(int idx, RuntimeObject val) {
+		closure.put(idx, val);
+	}
+
+	public RuntimeStack getYields(String hash) {
+		return yields == null ? null : yields.get(hash);
+	}
+
+	public void addYieldStack(String hash, RuntimeStack stack) {
+		if (yields == null) {
+			yields = new HashListMapEx2<String, RuntimeStack>();
+		}
+		yields.add(hash, stack);
+	}
+
+	public void popYieldStack() {
+		yields.pop();
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(System.getProperty("line.separator"));
-		sb.append(String.format("代码页：%s，地址：%08x，名称：%s，参数：%s，变量：%s",
-				currentPage, currentPc, name, params, tmp));
+		sb.append(String.format("代码页：%s，地址：%d，名称：%s，参数：%s，变量：%s，闭包：%s",
+				currentPage, currentPc, name, params, tmp, closure));
 		return sb.toString();
 	}
 }

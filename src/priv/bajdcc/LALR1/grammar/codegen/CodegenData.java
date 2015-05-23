@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Stack;
 
-import priv.bajdcc.LALR1.grammar.runtime.RuntimeInst;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeInstBase;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeInstUnary;
 
@@ -22,16 +21,17 @@ public class CodegenData {
 	private int idxCode = 0;
 
 	public void pushCode(RuntimeInstBase code) {
-		checkWriteBackInst(code);
 		insts.add(code);
 		idxCode += code.getAdvanceLength();
 	}
 
+	public void pushCodeWithFuncWriteBack(RuntimeInstBase code) {
+		checkWriteBackInst(code);
+		pushCode(code);
+	}
+
 	private void checkWriteBackInst(RuntimeInstBase code) {
-		if (code.inst == RuntimeInst.ildfun || code.inst == RuntimeInst.icall) {
-			callsToWriteBack
-					.add((RuntimeInstUnary) insts.get(insts.size() - 1));
-		}
+		callsToWriteBack.add((RuntimeInstUnary) code);
 	}
 
 	public void pushFuncEntry(String name) {
@@ -52,5 +52,9 @@ public class CodegenData {
 
 	public CodegenBlock getBlock() {
 		return stkBlock.peek();
+	}
+
+	public boolean hasBlock() {
+		return !stkBlock.isEmpty();
 	}
 }

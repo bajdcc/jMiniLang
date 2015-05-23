@@ -1,7 +1,9 @@
 package priv.bajdcc.LALR1.grammar.symbol;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Stack;
 
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeObject;
 import priv.bajdcc.LALR1.grammar.semantic.ISemanticRecorder;
@@ -18,8 +20,8 @@ import priv.bajdcc.util.lexer.token.TokenType;
  *
  * @author bajdcc
  */
-public class ManageScopeSymbol implements IManageScopeSymbol,
-		IQueryScopeSymbol, IManageDataSymbol {
+public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
+		IManageDataSymbol, IManageScopeSymbol {
 
 	private static String ENTRY_NAME = "main";
 	private static String LAMBDA_PREFIX = "~lambda#";
@@ -28,11 +30,15 @@ public class ManageScopeSymbol implements IManageScopeSymbol,
 	private HashListMapEx<String, Function> funcMap = new HashListMapEx<String, Function>();
 	private ArrayList<HashSet<String>> stkScope = new ArrayList<HashSet<String>>();
 	private HashSet<String> symbolsInFutureBlock = new HashSet<String>();
-	private int cycleLevel = 0;
+	private HashMap<BlockType, Integer> blockLevel = new HashMap<BlockType, Integer>();
+	private Stack<BlockType> blockStack = new Stack<BlockType>();
 
 	public ManageScopeSymbol() {
 		enterScope();
 		funcMap.add(ENTRY_NAME, new Function());
+		for (BlockType type : BlockType.values()) {
+			blockLevel.put(type, 0);
+		}
 	}
 
 	@Override
@@ -73,6 +79,14 @@ public class ManageScopeSymbol implements IManageScopeSymbol,
 	}
 
 	@Override
+	public boolean findDeclaredSymbolDirect(String name) {
+		if (symbolsInFutureBlock.contains(name)) {
+			return true;
+		}
+		return stkScope.get(0).contains(name);
+	}
+
+	@Override
 	public boolean isUniqueSymbolOfBlock(String name) {
 		return stkScope.get(0).contains(name);
 	}
@@ -93,7 +107,17 @@ public class ManageScopeSymbol implements IManageScopeSymbol,
 
 	@Override
 	public Function getFuncByName(String name) {
-		return funcMap.get(name);
+		Function func = funcMap.get(name);
+		if (func != null) {
+			return func;
+		}
+		for (Function function : funcMap.list) {
+			String funcName = function.getRealName();
+			if (funcName != null && funcName.equals(name)) {
+				return function;
+			}
+		}
+		return null;
 	}
 
 	@Override
@@ -193,17 +217,51 @@ public class ManageScopeSymbol implements IManageScopeSymbol,
 	}
 
 	@Override
-	public void enterBlock() {
-		cycleLevel++;
+	public void enterBlock(BlockType type) {
+		switch (type) {
+		case kCycle:
+			int level = blockLevel.get(type);
+			blockLevel.put(type, level + 1);
+			break;
+		case kFunc:
+		case kYield:
+			blockStack.push(type);
+			break;
+		default:
+			break;
+
+		}
 	}
 
 	@Override
-	public void leaveBlock() {
-		cycleLevel--;
+	public void leaveBlock(BlockType type) {
+		switch (type) {
+		case kCycle:
+			int level = blockLevel.get(type);
+			blockLevel.put(type, level - 1);
+			break;
+		case kFunc:
+		case kYield:
+			if (blockStack.peek() == type) {
+				blockStack.pop();
+			}
+			break;
+		default:
+			break;
+		}
 	}
 
 	@Override
-	public boolean isInBlock() {
-		return cycleLevel > 0;
+	public boolean isInBlock(BlockType type) {
+		switch (type) {
+		case kCycle:
+			return blockLevel.get(type) > 0;
+		case kFunc:
+		case kYield:
+			return blockStack.isEmpty() ? false : (blockStack.peek() == type);
+		default:
+			break;
+		}
+		return false;
 	}
 }

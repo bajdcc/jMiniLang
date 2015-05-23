@@ -4,6 +4,7 @@ import priv.bajdcc.LALR1.grammar.codegen.ICodegen;
 import priv.bajdcc.LALR1.grammar.error.SemanticException.SemanticError;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeInst;
 import priv.bajdcc.LALR1.grammar.semantic.ISemanticRecorder;
+import priv.bajdcc.LALR1.grammar.tree.closure.IClosureScope;
 import priv.bajdcc.LALR1.grammar.type.TokenTools;
 import priv.bajdcc.util.lexer.token.OperatorType;
 import priv.bajdcc.util.lexer.token.Token;
@@ -45,6 +46,11 @@ public class ExpSinop implements IExp {
 	@Override
 	public boolean isConstant() {
 		return operand.isConstant();
+	}
+	
+	@Override
+	public boolean isEnumerable() {
+		return operand.isEnumerable();
 	}
 
 	@Override
@@ -95,5 +101,15 @@ public class ExpSinop implements IExp {
 	@Override
 	public String print(StringBuilder prefix) {
 		return toString();
+	}
+
+	@Override
+	public void addClosure(IClosureScope scope) {
+		operand.addClosure(scope);
+	}
+
+	@Override
+	public void setYield() {
+		operand.setYield();
 	}
 }

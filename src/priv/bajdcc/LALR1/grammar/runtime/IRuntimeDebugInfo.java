@@ -15,7 +15,7 @@ public interface IRuntimeDebugInfo {
 	 * @param name
 	 */
 	HashMap<String, Object> getDataMap();
-
+	
 	/**
 	 * 根据当前指令页地址找到函数名
 	 * 

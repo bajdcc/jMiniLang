@@ -1,7 +1,5 @@
 package priv.bajdcc.LALR1.grammar.runtime;
 
-import java.util.List;
-
 /**
  * 【中间代码】指令结构基类
  *
@@ -22,5 +20,5 @@ public abstract class RuntimeInstBase {
 		return toString(" ");
 	}
 	
-	public abstract void gen(List<Integer> insts);
+	public abstract void gen(ICodegenByteWriter writer);
 }

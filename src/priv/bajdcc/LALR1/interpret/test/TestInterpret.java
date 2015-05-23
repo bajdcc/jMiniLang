@@ -55,6 +55,7 @@ public class TestInterpret {
 							+ ");\n",
 							
 							"import \"sys.base\";\n"
+							+ "call g_print(call g_doc(\"g_author\") + g_endl);\n"
 							+ "call g_print(call g_doc(\"g_print\") + g_endl);\n"
 							+ "call g_print(call g_doc(\"g_stdin_read_int\") + g_endl);\n"
 							+ "call g_print(call g_doc(\"g_new\") + g_endl);\n"
@@ -62,11 +63,11 @@ public class TestInterpret {
 							+ "call g_print(call g_to_string(call g_new(5)));\n"
 							,
 							
-							"import \"sys.base\";\n"
-							+ "var f = func ~(n) ->\n"
-							+ "    n <= 2 ? 1 : call f(n-1) + call f(n-2);"
-							+ "call g_print(call f(6));\n"
-							,
+							//"import \"sys.base\";\n"
+							//+ "var f = func ~(n) ->\n"
+							//+ "    n <= 2 ? 1 : call f(n-1) + call f(n-2);"
+							//+ "call g_print(call f(6));\n"
+							//,
 							
 							//"import \"sys.base\";\n"
 							//+ "call g_print(call g_load_func(\"g_max\"));\n"

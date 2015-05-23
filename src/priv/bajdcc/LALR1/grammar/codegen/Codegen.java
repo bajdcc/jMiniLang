@@ -1,7 +1,9 @@
 package priv.bajdcc.LALR1.grammar.codegen;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import priv.bajdcc.LALR1.grammar.runtime.ICodegenByteWriter;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeCodePage;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeDebugInfo;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeInst;
@@ -19,12 +21,13 @@ import priv.bajdcc.util.HashListMapEx;
  *
  * @author bajdcc
  */
-public class Codegen implements ICodegen, ICodegenBlock {
+public class Codegen implements ICodegen, ICodegenBlock, ICodegenByteWriter {
 
 	private HashListMap<Object> symbolList = new HashListMap<Object>();
 	private HashListMapEx<String, Function> funcMap = new HashListMapEx<String, Function>();
 	private CodegenData data = new CodegenData();
 	private RuntimeDebugInfo info = new RuntimeDebugInfo();
+	private List<Byte> insts = null;
 
 	public Codegen(SymbolTable symbol) {
 		symbolList = symbol.getManageDataService().getSymbolList();
@@ -41,7 +44,7 @@ public class Codegen implements ICodegen, ICodegenBlock {
 	 */
 	public void gencode() {
 		genCode(RuntimeInst.iopena);
-		genCode(RuntimeInst.ipush, 0);
+		genCodeWithFuncWriteBack(RuntimeInst.ipush, 0);
 		genCode(RuntimeInst.icall);
 		genCode(RuntimeInst.ipop);
 		genCode(RuntimeInst.ihalt);
@@ -49,6 +52,8 @@ public class Codegen implements ICodegen, ICodegenBlock {
 		for (Function func : funcMap.list) {
 			if (func.isExtern()) {
 				info.addExports(func.getRealName(), data.getCodeIndex());
+				info.addExternalFunc(func.getRealName(), new CodegenFuncDoc(
+						func.getDoc()));
 			}
 			func.genCode(this);
 		}
@@ -60,17 +65,17 @@ public class Codegen implements ICodegen, ICodegenBlock {
 	 * @return 代码页
 	 */
 	public RuntimeCodePage genCodePage() {
-		ArrayList<Object> objs = new ArrayList<Object>();
+		List<Object> objs = new ArrayList<Object>();
 		for (Object token : symbolList.list) {
 			objs.add(token);
 		}
-		ArrayList<Integer> insts = new ArrayList<Integer>();
+		insts = new ArrayList<Byte>();
 		for (RuntimeInstUnary unary : data.callsToWriteBack) {
 			unary.op1 = data.funcEntriesMap.get(funcMap.list.get(unary.op1)
 					.getRealName());
 		}
 		for (RuntimeInstBase inst : data.insts) {
-			inst.gen(insts);
+			inst.gen(this);
 		}
 		return new RuntimeCodePage(objs, insts, info);
 	}
@@ -92,6 +97,13 @@ public class Codegen implements ICodegen, ICodegenBlock {
 	public RuntimeInstUnary genCode(RuntimeInst inst, int op1) {
 		RuntimeInstUnary in = new RuntimeInstUnary(inst, op1);
 		data.pushCode(in);
+		return in;
+	}
+
+	@Override
+	public RuntimeInstUnary genCodeWithFuncWriteBack(RuntimeInst inst, int op1) {
+		RuntimeInstUnary in = new RuntimeInstUnary(inst, op1);
+		data.pushCodeWithFuncWriteBack(in);
 		return in;
 	}
 
@@ -130,7 +142,7 @@ public class Codegen implements ICodegen, ICodegenBlock {
 		data.pushCode(in);
 		return in;
 	}
-	
+
 	@Override
 	public void enterBlockEntry(CodegenBlock block) {
 		data.enterBlockEntry(block);
@@ -139,6 +151,11 @@ public class Codegen implements ICodegen, ICodegenBlock {
 	@Override
 	public void leaveBlockEntry() {
 		data.leaveBlockEntry();
+	}
+
+	@Override
+	public boolean isInBlock() {
+		return data.hasBlock();
 	}
 
 	@Override
@@ -155,8 +172,10 @@ public class Codegen implements ICodegen, ICodegenBlock {
 		StringBuilder sb = new StringBuilder();
 		sb.append("#### 中间代码 ####");
 		sb.append(System.getProperty("line.separator"));
+		int idx = 0;
 		for (RuntimeInstBase inst : data.insts) {
-			sb.append(inst.toString("\t"));
+			sb.append(String.format("%03d\t%s", idx, inst.toString("\t")));
+			idx += inst.getAdvanceLength();
 			sb.append(System.getProperty("line.separator"));
 		}
 		return sb.toString();
@@ -165,5 +184,17 @@ public class Codegen implements ICodegen, ICodegenBlock {
 	@Override
 	public String toString() {
 		return getCodeString();
+	}
+
+	@Override
+	public void genInst(RuntimeInst inst) {
+		insts.add((byte) inst.ordinal());
+	}
+
+	@Override
+	public void genOp(int op) {
+		for (int i = 0; i < 4; i++) {
+			insts.add((byte) (op >> 8 * i & 0xFF));
+		}
 	}
 }

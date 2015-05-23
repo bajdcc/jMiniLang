@@ -1,7 +1,5 @@
 package priv.bajdcc.LALR1.grammar.runtime;
 
-import java.util.List;
-
 /**
  * 【中间代码】二元操作符
  *
@@ -18,13 +16,13 @@ public class RuntimeInstBinary extends RuntimeInstUnary {
 
 	@Override
 	public int getAdvanceLength() {
-		return 3;
+		return 4 + super.getAdvanceLength();
 	}
 
 	@Override
-	public void gen(List<Integer> insts) {
-		super.gen(insts);
-		insts.add(op2);
+	public void gen(ICodegenByteWriter writer) {
+		super.gen(writer);
+		writer.genOp(op2);
 	}
 
 	@Override

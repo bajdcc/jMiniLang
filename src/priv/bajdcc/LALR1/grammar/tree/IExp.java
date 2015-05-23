@@ -13,6 +13,11 @@ public interface IExp extends ICommon {
 	 * 是否是左值（即不可修改的常量）
 	 */
 	public boolean isConstant();
+	
+	/**
+	 * 是否可枚举
+	 */
+	public boolean isEnumerable();
 
 	/**
 	 * 表达式化简
@@ -21,4 +26,9 @@ public interface IExp extends ICommon {
 	 *            错误记录
 	 */
 	public IExp simplify(ISemanticRecorder recorder);
+	
+	/**
+	 * 设置YIELD
+	 */
+	public void setYield();
 }

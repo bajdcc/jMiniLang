@@ -1,7 +1,5 @@
 package priv.bajdcc.LALR1.grammar.runtime;
 
-import java.util.List;
-
 /**
  * 【中间代码】零元操作数指令
  *
@@ -19,7 +17,7 @@ public class RuntimeInstNon extends RuntimeInstBase {
 	}
 
 	@Override
-	public void gen(List<Integer> insts) {
-		insts.add(inst.ordinal());
+	public void gen(ICodegenByteWriter writer) {
+		writer.genInst(inst);
 	}
 }

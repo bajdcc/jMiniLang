@@ -4,6 +4,7 @@ import priv.bajdcc.LALR1.grammar.codegen.ICodegen;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeInst;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeInstUnary;
 import priv.bajdcc.LALR1.grammar.semantic.ISemanticRecorder;
+import priv.bajdcc.LALR1.grammar.tree.closure.IClosureScope;
 import priv.bajdcc.util.lexer.token.KeywordType;
 
 /**
@@ -65,17 +66,14 @@ public class StmtIf implements IStmt {
 	public void genCode(ICodegen codegen) {
 		exp.genCode(codegen);
 		RuntimeInstUnary jf = codegen.genCode(RuntimeInst.ijf, -1);
-		codegen.genCode(RuntimeInst.ipop);
 		trueBlock.genCode(codegen);
 		if (falseBlock != null) {
 			RuntimeInstUnary jmp = codegen.genCode(RuntimeInst.ijmp, -1);
 			jf.op1 = codegen.getCodeIndex();
-			codegen.genCode(RuntimeInst.ipop);
 			falseBlock.genCode(codegen);
 			jmp.op1 = codegen.getCodeIndex();
 		} else {
 			jf.op1 = codegen.getCodeIndex();
-			codegen.genCode(RuntimeInst.ipop);
 		}
 	}
 
@@ -89,12 +87,25 @@ public class StmtIf implements IStmt {
 		StringBuilder sb = new StringBuilder();
 		sb.append(prefix.toString());
 		sb.append(KeywordType.IF.getName());
-		sb.append(" (" + exp.print(prefix) + ") ");
+		sb.append(" (");
+		sb.append(exp.print(prefix));
+		sb.append(") ");
 		sb.append(trueBlock.print(prefix));
 		if (falseBlock != null) {
-			sb.append(" " + KeywordType.ELSE.getName() + " ");
+			sb.append(" ");
+			sb.append(KeywordType.ELSE.getName());
+			sb.append(" ");
 			sb.append(falseBlock.print(prefix));
 		}
 		return sb.toString();
+	}
+
+	@Override
+	public void addClosure(IClosureScope scope) {
+		exp.addClosure(scope);
+		trueBlock.addClosure(scope);
+		if (falseBlock != null) {
+			falseBlock.addClosure(scope);
+		}
 	}
 }

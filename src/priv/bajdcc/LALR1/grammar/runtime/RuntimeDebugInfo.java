@@ -17,7 +17,7 @@ public class RuntimeDebugInfo implements IRuntimeDebugInfo, Serializable {
 	private HashMap<String, IRuntimeDebugValue> externalValue = new HashMap<String, IRuntimeDebugValue>();
 	private HashMap<String, IRuntimeDebugExec> externalExec = new HashMap<String, IRuntimeDebugExec>();
 
-	public void addExports(String name, int addr) {
+	public void addExports(String name, Integer addr) {
 		exports.put(name, addr);
 	}
 

@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import priv.bajdcc.LALR1.grammar.codegen.ICodegen;
 import priv.bajdcc.LALR1.grammar.error.SemanticException.SemanticError;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeInst;
+import priv.bajdcc.LALR1.grammar.runtime.RuntimeInstUnary;
 import priv.bajdcc.LALR1.grammar.semantic.ISemanticRecorder;
+import priv.bajdcc.LALR1.grammar.tree.closure.IClosureScope;
 import priv.bajdcc.util.lexer.token.KeywordType;
 import priv.bajdcc.util.lexer.token.Token;
 
@@ -40,6 +42,11 @@ public class ExpInvoke implements IExp {
 	 * 是否为函数指针调用
 	 */
 	private boolean invoke = false;
+
+	/**
+	 * 是否为YIELD调用
+	 */
+	private boolean yield = false;
 
 	public Token getName() {
 		return name;
@@ -81,9 +88,25 @@ public class ExpInvoke implements IExp {
 		this.invoke = invoke;
 	}
 
+	public boolean isYield() {
+		return yield;
+	}
+
+	public void setYield(boolean yield) {
+		this.yield = yield;
+	}
+
 	@Override
 	public boolean isConstant() {
 		return false;
+	}
+
+	@Override
+	public boolean isEnumerable() {
+		if (func != null) {
+			return func.isEnumerable();
+		}
+		return true;
 	}
 
 	@Override
@@ -97,6 +120,9 @@ public class ExpInvoke implements IExp {
 			checkArgsCount(recorder);
 			if (func.getRealName().startsWith("~")) {
 				func.analysis(recorder);
+			}
+			if (func.isYield() ^ yield) {
+				recorder.add(SemanticError.WRONG_YIELD, name);
 			}
 		}
 	}
@@ -116,21 +142,60 @@ public class ExpInvoke implements IExp {
 
 	@Override
 	public void genCode(ICodegen codegen) {
-		codegen.genCode(RuntimeInst.iopena);
-		for (IExp exp : params) {
-			exp.genCode(codegen);
-			codegen.genCode(RuntimeInst.ipusha);
-		}
-		if (func != null) {
-			codegen.genCode(RuntimeInst.ipush, codegen.getFuncIndex(func));
-			codegen.genCode(RuntimeInst.icall);
-		} else {
-			codegen.genCode(RuntimeInst.ipush,
-					codegen.genDataRef(extern.object));
-			if (invoke) {
-				codegen.genCode(RuntimeInst.ically);
+		if (yield) {
+			int yldLine = codegen.getCodeIndex();
+			RuntimeInstUnary yld = codegen.genCode(RuntimeInst.ijyld, -1);
+			if (func != null) {
+				codegen.genCode(RuntimeInst.ipush, 1); // call本地地址，1
+				codegen.genCode(RuntimeInst.iyldi);
+				for (IExp exp : params) {
+					exp.genCode(codegen);
+					codegen.genCode(RuntimeInst.iyldi);
+				}
+				codegen.genCodeWithFuncWriteBack(RuntimeInst.ipush,
+						codegen.getFuncIndex(func));
+				codegen.genCode(RuntimeInst.iyldi);
 			} else {
-				codegen.genCode(RuntimeInst.icallx);
+				if (invoke) {
+					codegen.genCode(RuntimeInst.ipush, 2); // call本地符号，2
+					codegen.genCode(RuntimeInst.iyldi);
+				} else {
+					codegen.genCode(RuntimeInst.ipush, 3); // call外部模块，3
+					codegen.genCode(RuntimeInst.iyldi);
+				}
+				for (IExp exp : params) {
+					exp.genCode(codegen);
+					codegen.genCode(RuntimeInst.iyldi);
+				}
+				codegen.genCode(RuntimeInst.ipush,
+						codegen.genDataRef(extern.object));
+				codegen.genCode(RuntimeInst.iyldi);
+			}
+			codegen.genCode(RuntimeInst.iyldy, yldLine);
+			codegen.genCode(RuntimeInst.iyldo);
+			RuntimeInstUnary jmp = codegen.genCode(RuntimeInst.ijmp, -1);
+			yld.op1 = codegen.getCodeIndex();
+			codegen.genCode(RuntimeInst.iyldr, yldLine);
+			codegen.genCode(RuntimeInst.iyldo);
+			jmp.op1 = codegen.getCodeIndex();
+		} else {
+			codegen.genCode(RuntimeInst.iopena);
+			for (IExp exp : params) {
+				exp.genCode(codegen);
+				codegen.genCode(RuntimeInst.ipusha);
+			}
+			if (func != null) {
+				codegen.genCodeWithFuncWriteBack(RuntimeInst.ipush,
+						codegen.getFuncIndex(func));
+				codegen.genCode(RuntimeInst.icall);
+			} else {
+				codegen.genCode(RuntimeInst.ipush,
+						codegen.genDataRef(extern.object));
+				if (invoke) {
+					codegen.genCode(RuntimeInst.ically);
+				} else {
+					codegen.genCode(RuntimeInst.icallx);
+				}
 			}
 		}
 	}
@@ -143,16 +208,21 @@ public class ExpInvoke implements IExp {
 	@Override
 	public String print(StringBuilder prefix) {
 		StringBuilder sb = new StringBuilder();
+		if (yield) {
+			sb.append(KeywordType.YIELD.getName());
+			sb.append(" ");
+		}
 		sb.append(KeywordType.CALL.getName() + " ");
 		if (func != null) {
 			if (!func.getRealName().startsWith("~")) {
-				sb.append(func.getName().toRealString());
+				sb.append(func.getRealName());
 			} else {
 				sb.append(func.print(prefix));
 			}
 		} else {
-			sb.append(KeywordType.EXTERN.getName() + " "
-					+ extern.toRealString());
+			sb.append(KeywordType.EXTERN.getName());
+			sb.append(" ");
+			sb.append(extern.toRealString());
 		}
 		if (!params.isEmpty()) {
 			sb.append("( ");
@@ -169,5 +239,20 @@ public class ExpInvoke implements IExp {
 			sb.append(" )");
 		}
 		return sb.toString();
+	}
+
+	@Override
+	public void addClosure(IClosureScope scope) {
+		if (invoke) {
+			scope.addRef(extern.object);
+		}
+		for (IExp exp : params) {
+			exp.addClosure(scope);
+		}
+	}
+
+	@Override
+	public void setYield() {
+		yield = true;
 	}
 }

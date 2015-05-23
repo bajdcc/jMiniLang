@@ -19,6 +19,7 @@ import priv.bajdcc.LALR1.grammar.runtime.RuntimeException;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeMachine;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeObject;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeObjectType;
+import priv.bajdcc.LALR1.grammar.runtime.RuntimeException.RuntimeError;
 import priv.bajdcc.LALR1.interpret.Interpreter;
 import priv.bajdcc.LALR1.syntax.handler.SyntaxException;
 import priv.bajdcc.util.lexer.error.RegexException;
@@ -33,12 +34,13 @@ public class TestInterpret2 {
 			Interpreter interpreter = new Interpreter();
 			int i = 0;
 			while (true) {
+				System.out.print(">> ");
 				String code = scanner.nextLine();
 				try {
 					Grammar grammar = new Grammar(code);
-					System.out.println(grammar.toString());
+					// System.out.println(grammar.toString());
 					RuntimeCodePage page = grammar.getCodePage();
-					System.out.println(page.toString());
+					// System.out.println(page.toString());
 					ByteArrayOutputStream baos = new ByteArrayOutputStream();
 					RuntimeCodePage.exportFromStream(page, baos);
 					ByteArrayInputStream bais = new ByteArrayInputStream(
@@ -46,22 +48,21 @@ public class TestInterpret2 {
 					interpreter.run("test_" + i++, bais);
 				} catch (RegexException e) {
 					System.err.println(e.getPosition() + "," + e.getMessage());
-					e.printStackTrace();
+					//e.printStackTrace();
 				} catch (RuntimeException e) {
 					System.err.println(e.getPosition() + ": " + e.getInfo());
-					e.printStackTrace();
+					if (e.getkError() == RuntimeError.EXIT) {
+						break;
+					}
+					//e.printStackTrace();
 				} catch (Exception e) {
 					System.err.println(e.getMessage());
-					e.printStackTrace();
+					//e.printStackTrace();
 				}
 			}
-		} catch (SyntaxException e) {
-			System.err.println(e.getPosition() + "," + e.getMessage() + " "
-					+ e.getInfo());
-			e.printStackTrace();
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 	}
 }

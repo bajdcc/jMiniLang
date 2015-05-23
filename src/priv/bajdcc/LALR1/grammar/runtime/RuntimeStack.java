@@ -1,6 +1,9 @@
 package priv.bajdcc.LALR1.grammar.runtime;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 /**
@@ -13,6 +16,11 @@ public class RuntimeStack {
 	private static final int MAX_DATASTACKSIZE = 100;
 	private static final int MAX_CALLSTACKSIZE = 20;
 	private static final int MAX_ARGSIZE = 12;
+
+	public RuntimeStack prev = null;
+	public int level = 0;
+
+	public RuntimeRegister reg = new RuntimeRegister();
 
 	/**
 	 * 数据堆栈
@@ -28,6 +36,11 @@ public class RuntimeStack {
 
 	}
 
+	public RuntimeStack(RuntimeStack prev) {
+		this.prev = prev;
+		this.level = prev.level + 1;
+	}
+
 	public void pushData(RuntimeObject obj) {
 		stkData.push(obj);
 		if (stkData.size() > MAX_DATASTACKSIZE) {
@@ -38,7 +51,7 @@ public class RuntimeStack {
 	public RuntimeObject popData() {
 		return stkData.pop();
 	}
-	
+
 	public RuntimeObject top() {
 		return stkData.peek();
 	}
@@ -49,7 +62,15 @@ public class RuntimeStack {
 
 	public RuntimeObject findVariable(int idx) {
 		for (RuntimeFunc func : stkCall) {
-			RuntimeObject obj = func.getTmp().get(idx);
+			List<HashMap<Integer, RuntimeObject>> tmp = func.getTmp();
+			RuntimeObject obj;
+			for (Map<Integer, RuntimeObject> scope : tmp) {
+				obj = scope.get(idx);
+				if (obj != null) {
+					return obj;
+				}
+			}
+			obj = func.getClosure().get(idx);
 			if (obj != null) {
 				return obj;
 			}
@@ -58,7 +79,19 @@ public class RuntimeStack {
 	}
 
 	public void storeVariableDirect(int idx, RuntimeObject obj) {
-		stkCall.get(0).getTmp().put(idx, obj);
+		stkCall.get(0).addTmp(idx, obj);
+	}
+
+	public void enterScope() {
+		stkCall.get(0).enterScope();
+	}
+
+	public void leaveScope() {
+		stkCall.get(0).leaveScope();
+	}
+
+	public void storeClosure(int idx, RuntimeObject obj) {
+		stkCall.get(0).getClosure().put(idx, obj);
 	}
 
 	public boolean pushFuncData() {
@@ -81,6 +114,23 @@ public class RuntimeStack {
 		return stkCall.get(0).getParams().size();
 	}
 
+	public int getFuncLevel() {
+		return stkCall.size();
+	}
+
+	public RuntimeStack getYieldStack(String hash) {
+		return stkCall.get(0).getYields(hash);
+	}
+
+	public void addYieldStack(String hash,
+			RuntimeStack stack) {
+		stkCall.get(0).addYieldStack(hash, stack);
+	}
+
+	public void popYieldStack() {
+		stkCall.get(0).popYieldStack();
+	}
+
 	public RuntimeObject loadFuncArgs(int idx) {
 		return stkCall.get(0).getParam(idx);
 	}
@@ -99,9 +149,9 @@ public class RuntimeStack {
 		StringBuilder sb = new StringBuilder();
 		sb.append("=========================");
 		sb.append(System.getProperty("line.separator"));
-		sb.append("Data: " + stkData);
+		sb.append("数据栈: " + stkData);
 		sb.append(System.getProperty("line.separator"));
-		sb.append("Call: " + stkCall);
+		sb.append("调用栈: " + stkCall);
 		sb.append(System.getProperty("line.separator"));
 		return sb.toString();
 	}

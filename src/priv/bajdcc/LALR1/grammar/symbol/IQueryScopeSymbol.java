@@ -11,13 +11,22 @@ import priv.bajdcc.util.lexer.token.Token;
 public interface IQueryScopeSymbol {
 
 	/**
-	 * 创建并进入新的命名空间
+	 * 查找变量名
 	 * 
 	 * @param name
 	 *            查询的符号名
 	 * @return 符号名是否存在
 	 */
 	public boolean findDeclaredSymbol(String name);
+	
+	/**
+	 * 查找变量名（当前命名空间）
+	 * 
+	 * @param name
+	 *            查询的符号名
+	 * @return 符号名是否存在
+	 */
+	public boolean findDeclaredSymbolDirect(String name);
 
 	/**
 	 * 在当前块下是否为唯一符号（检查重复定义）
@@ -71,20 +80,4 @@ public interface IQueryScopeSymbol {
 	 * @return 是否占用
 	 */
 	public boolean isRegisteredFunc(String name);
-	
-	/**
-	 * 进入循环体
-	 */
-	public void enterBlock();
-
-	/**
-	 * 离开循环体
-	 */
-	public void leaveBlock();
-	
-	/**
-	 * 是否在循环体内
-	 * @return 在循环体内则为真
-	 */
-	public boolean isInBlock();
 }

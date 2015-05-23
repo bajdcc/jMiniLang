@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Sealed: true
+Main-Class: priv.bajdcc.LALR1.interpret.test.TestInterpret2
+

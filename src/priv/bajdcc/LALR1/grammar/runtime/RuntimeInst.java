@@ -6,6 +6,7 @@ package priv.bajdcc.LALR1.grammar.runtime;
  * @author bajdcc
  */
 public enum RuntimeInst {
+	ihalt,			// 停止
 	inop,			// 空指令
 	ipush,			// [op1]进栈
 	ipop,			// 出栈
@@ -13,12 +14,22 @@ public enum RuntimeInst {
 	ipushx,			// 空进栈
 	ipushz,			// 参数零进栈
 	ipusha,			// 数据栈[top]进调用栈
+	ipushn,			// 非数进栈
 	iloada,			// 调用栈进数据栈[top]
 	icall,			// 过程调用
 	icallx,			// 外部过程调用，数据段
 	ically,			// 外部过程调用，参数栈
 	iret,			// 过程返回
-	ihalt,			// 停止
+	
+	iyldl,			// 协程返回
+	iyldr,			// 协程进入
+	iyldx,			// 协程销毁
+	iyldy,			// 协程创建
+	iyldi,			// 协程队列数据入队，从栈
+	iyldo,			// 协程队列数据出队，从栈
+	
+	iscpi,			// 进入命名空间
+	iscpo,			// 离开命名空间
 	
 	iload,			// 数值载入
 	iloadv,			// 变量载入
@@ -32,8 +43,12 @@ public enum RuntimeInst {
 	ijmp,			// 跳转
 	ijz,			// 为零，[top]=0跳转到绝对地址op1
 	ijnz,			// 非零，[top]<>0跳转到绝对地址op1
-	ijt,			// [top]为真跳转到绝对地址op1
-	ijf,			// [top]为假跳转到绝对地址op1
+	ijt,			// [top]为真跳转到绝对地址op1，弹出数据
+	ijf,			// [top]为假跳转到绝对地址op1，弹出数据
+	ijtx,			// [top]为真跳转到绝对地址op1，不弹出数据
+	ijfx,			// [top]为假跳转到绝对地址op1，不弹出数据
+	ijnan,			// 结果为非数（用户迭代中止）
+	ijyld,			// 已创建协程则跳转
 	
 	iinc,			// 自增，[top]++
 	idec,			// 自减，[top]--

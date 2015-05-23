@@ -4,6 +4,7 @@ import priv.bajdcc.LALR1.grammar.codegen.ICodegen;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeInst;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeInstUnary;
 import priv.bajdcc.LALR1.grammar.semantic.ISemanticRecorder;
+import priv.bajdcc.LALR1.grammar.tree.closure.IClosureScope;
 import priv.bajdcc.LALR1.grammar.type.TokenTools;
 import priv.bajdcc.util.lexer.token.Token;
 import priv.bajdcc.util.lexer.token.TokenType;
@@ -86,6 +87,12 @@ public class ExpTriop implements IExp {
 	}
 
 	@Override
+	public boolean isEnumerable() {
+		return !firstOperand.isEnumerable() && secondOperand.isEnumerable()
+				&& thirdOperand.isEnumerable();
+	}
+
+	@Override
 	public IExp simplify(ISemanticRecorder recorder) {
 		if (!isConstant()) {
 			return this;
@@ -140,5 +147,17 @@ public class ExpTriop implements IExp {
 	@Override
 	public String print(StringBuilder prefix) {
 		return toString();
+	}
+
+	@Override
+	public void addClosure(IClosureScope scope) {
+		firstOperand.addClosure(scope);
+		secondOperand.addClosure(scope);
+		thirdOperand.addClosure(scope);
+	}
+
+	@Override
+	public void setYield() {
+		
 	}
 }

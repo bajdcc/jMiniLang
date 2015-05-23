@@ -3,6 +3,7 @@ package priv.bajdcc.LALR1.grammar.tree;
 import priv.bajdcc.LALR1.grammar.codegen.ICodegen;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeInst;
 import priv.bajdcc.LALR1.grammar.semantic.ISemanticRecorder;
+import priv.bajdcc.LALR1.grammar.tree.closure.IClosureScope;
 import priv.bajdcc.util.lexer.token.KeywordType;
 import priv.bajdcc.util.lexer.token.OperatorType;
 import priv.bajdcc.util.lexer.token.Token;
@@ -20,9 +21,9 @@ public class StmtPort implements IStmt {
 	private Token name = null;
 
 	/**
-	 * 限定符
+	 * 是否为导入
 	 */
-	private Token spec = null;
+	private boolean imported = true;
 
 	public Token getName() {
 		return name;
@@ -32,12 +33,12 @@ public class StmtPort implements IStmt {
 		this.name = name;
 	}
 
-	public Token getSpec() {
-		return spec;
+	public boolean isImported() {
+		return imported;
 	}
 
-	public void setSpec(Token spec) {
-		this.spec = spec;
+	public void setImported(boolean imported) {
+		this.imported = imported;
 	}
 
 	@Override
@@ -47,8 +48,7 @@ public class StmtPort implements IStmt {
 
 	@Override
 	public void genCode(ICodegen codegen) {
-		KeywordType keyword = (KeywordType) spec.object;
-		if (keyword == KeywordType.IMPORT) {
+		if (imported) {
 			codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(name.object));
 			codegen.genCode(RuntimeInst.iimp);
 		}
@@ -63,9 +63,15 @@ public class StmtPort implements IStmt {
 	public String print(StringBuilder prefix) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(prefix.toString());
-		sb.append(spec.toRealString());
+		sb.append(imported ? KeywordType.IMPORT.getName() : KeywordType.EXPORT
+				.getName());
 		sb.append(" " + name.toRealString());
 		sb.append(OperatorType.SEMI.getName());
 		return sb.toString();
+	}
+
+	@Override
+	public void addClosure(IClosureScope scope) {
+		
 	}
 }

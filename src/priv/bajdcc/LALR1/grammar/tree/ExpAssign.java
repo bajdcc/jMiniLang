@@ -3,6 +3,7 @@ package priv.bajdcc.LALR1.grammar.tree;
 import priv.bajdcc.LALR1.grammar.codegen.ICodegen;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeInst;
 import priv.bajdcc.LALR1.grammar.semantic.ISemanticRecorder;
+import priv.bajdcc.LALR1.grammar.tree.closure.IClosureScope;
 import priv.bajdcc.util.lexer.token.KeywordType;
 import priv.bajdcc.util.lexer.token.OperatorType;
 import priv.bajdcc.util.lexer.token.Token;
@@ -25,11 +26,6 @@ public class ExpAssign implements IExp {
 	private IExp exp = null;
 
 	/**
-	 * 限定符
-	 */
-	private Token spec = null;
-
-	/**
 	 * 是否为声明
 	 */
 	private boolean decleared = false;
@@ -50,14 +46,6 @@ public class ExpAssign implements IExp {
 		this.exp = exp;
 	}
 
-	public Token getSpec() {
-		return spec;
-	}
-
-	public void setSpec(Token spec) {
-		this.spec = spec;
-	}
-
 	public boolean isDecleared() {
 		return decleared;
 	}
@@ -68,6 +56,11 @@ public class ExpAssign implements IExp {
 
 	@Override
 	public boolean isConstant() {
+		return false;
+	}
+
+	@Override
+	public boolean isEnumerable() {
 		return false;
 	}
 
@@ -85,11 +78,10 @@ public class ExpAssign implements IExp {
 	public void genCode(ICodegen codegen) {
 		exp.genCode(codegen);
 		codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(name.object));
-		KeywordType keyword = (KeywordType) spec.object;
-		if (keyword == KeywordType.LET) {
-			codegen.genCode(RuntimeInst.istore);
-		} else {
+		if (decleared) {
 			codegen.genCode(RuntimeInst.ialloc);
+		} else {
+			codegen.genCode(RuntimeInst.istore);
 		}
 	}
 
@@ -101,10 +93,24 @@ public class ExpAssign implements IExp {
 	@Override
 	public String print(StringBuilder prefix) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(spec.toRealString());
+		sb.append(decleared ? KeywordType.VARIABLE.getName() : KeywordType.LET
+				.getName());
 		sb.append(" " + name.toRealString());
 		sb.append(" " + OperatorType.ASSIGN.getName() + " ");
 		sb.append(exp.print(prefix));
 		return sb.toString();
+	}
+
+	@Override
+	public void addClosure(IClosureScope scope) {
+		if (decleared) {
+			scope.addDecl(name.object);
+		}
+		exp.addClosure(scope);
+	}
+
+	@Override
+	public void setYield() {
+		
 	}
 }

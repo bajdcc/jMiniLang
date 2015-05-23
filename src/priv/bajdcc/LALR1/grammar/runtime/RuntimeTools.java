@@ -23,6 +23,10 @@ public class RuntimeTools {
 				throw new RuntimeException(RuntimeError.NULL_OPERATOR,
 						reg.execId, "不允许空值运算");
 			}
+			if (obj.getType() == RuntimeObjectType.kNan) {
+				stk.store(obj);
+				return true;
+			}
 			if (obj.isReadonly()
 					&& (inst == RuntimeInst.iinc || inst == RuntimeInst.idec)) {
 				return false;
@@ -54,10 +58,19 @@ public class RuntimeTools {
 		case ishr:
 		case isub:
 		case ixor: {
+			RuntimeObject obj2 = stk.load();
 			RuntimeObject obj = stk.load();
+			if (obj.getType() == RuntimeObjectType.kNan) {
+				stk.store(obj);
+				return true;
+			}
+			if (obj2.getType() == RuntimeObjectType.kNan) {
+				stk.store(obj2);
+				return true;
+			}
 			Token tk = Token.createFromObject(obj.getObj());
 			if (TokenTools.bin(TokenTools.ins2op(inst), tk,
-					Token.createFromObject(stk.load().getObj()))) {
+					Token.createFromObject(obj2.getObj()))) {
 				obj.setObj(tk.object);
 				stk.store(obj);
 			} else {
@@ -83,9 +96,23 @@ public class RuntimeTools {
 		case ijf:
 			stk.opJumpBool(false);
 			break;
-		case ijnz:
+		case ijtx:
+			stk.opJumpBoolRetain(true);
+			break;
+		case ijfx:
+			stk.opJumpBoolRetain(false);
 			break;
 		case ijz:
+			stk.opJumpZero(true);
+			break;
+		case ijnz:
+			stk.opJumpZero(false);
+			break;
+		case ijyld:
+			stk.opJumpYield();
+			break;
+		case ijnan:
+			stk.opJumpNan();
 			break;
 		default:
 			return false;
@@ -134,6 +161,9 @@ public class RuntimeTools {
 		case ipushz:
 			stk.opPushZero();
 			break;
+		case ipushn:
+			stk.opPushNan();
+			break;
 		case iret:
 			stk.opReturn();
 			break;
@@ -152,9 +182,39 @@ public class RuntimeTools {
 		case ically:
 			stk.opCallExtern(true);
 			break;
+		case iyldi:
+			stk.opYield(true);
+			break;
+		case iyldo:
+			stk.opYield(false);
+			break;
+		case iyldl:
+			stk.opYieldSwitch(false);
+			break;
+		case iyldr:
+			stk.opYieldSwitch(true);
+			break;
+		case iyldx:
+			stk.opYieldDestroyContext();
+			break;
+		case iyldy:
+			stk.opYieldCreateContext();
+			break;
+		case iscpi:
+			stk.opScope(true);
+			break;
+		case iscpo:
+			stk.opScope(false);
+			break;
 		default:
 			return false;
 		}
 		return true;
+	}
+
+	public static String getYieldHash(int stackLevel, int funcLevel,
+			String pageName, int line) {
+		return String.format("%d#%d#%s#%d", stackLevel, funcLevel, pageName,
+				line);
 	}
 }

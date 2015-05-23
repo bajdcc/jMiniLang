@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import priv.bajdcc.LALR1.grammar.codegen.ICodegen;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeInst;
 import priv.bajdcc.LALR1.grammar.semantic.ISemanticRecorder;
+import priv.bajdcc.LALR1.grammar.tree.closure.IClosureScope;
 import priv.bajdcc.util.lexer.token.KeywordType;
 import priv.bajdcc.util.lexer.token.Token;
 
@@ -38,12 +39,17 @@ public class Function implements IExp {
 	/**
 	 * 文档
 	 */
-	private ArrayList<String> doc = null;
+	private ArrayList<Token> doc = null;
 
 	/**
 	 * 外部化
 	 */
 	private boolean extern = false;
+
+	/**
+	 * 是否支持YIELD
+	 */
+	private boolean yield = false;
 
 	public Token getName() {
 		return name;
@@ -77,11 +83,19 @@ public class Function implements IExp {
 		this.block = block;
 	}
 
-	public ArrayList<String> getDoc() {
-		return doc;
+	public String getDoc() {
+		if (doc == null || doc.isEmpty()) {
+			return "过程无文档";
+		}
+		StringBuilder sb = new StringBuilder();
+		for (Token token : doc) {
+			sb.append(token.object.toString());
+			sb.append(System.getProperty("line.separator"));
+		}
+		return sb.toString();
 	}
 
-	public void setDoc(ArrayList<String> doc) {
+	public void setDoc(ArrayList<Token> doc) {
 		this.doc = doc;
 	}
 
@@ -93,9 +107,22 @@ public class Function implements IExp {
 		this.extern = extern;
 	}
 
+	public boolean isYield() {
+		return yield;
+	}
+
+	public void setYield(boolean yield) {
+		this.yield = yield;
+	}
+
 	@Override
 	public boolean isConstant() {
 		return false;
+	}
+
+	@Override
+	public boolean isEnumerable() {
+		return yield;
 	}
 
 	@Override
@@ -131,7 +158,13 @@ public class Function implements IExp {
 	@Override
 	public String print(StringBuilder prefix) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(KeywordType.FUNCTION.getName() + " " + realName);
+		if (yield) {
+			sb.append(KeywordType.YIELD.getName());
+			sb.append(" ");
+		}
+		sb.append(KeywordType.FUNCTION.getName());
+		sb.append(" ");
+		sb.append(realName);
 		sb.append("(");
 		for (Token param : params) {
 			sb.append(param.toRealString());
@@ -146,5 +179,18 @@ public class Function implements IExp {
 			sb.append(block.print(prefix));
 		}
 		return sb.toString();
+	}
+
+	@Override
+	public void addClosure(IClosureScope scope) {
+		for (Token param : params) {
+			scope.addDecl(param.object);
+		}
+		block.addClosure(scope);
+	}
+
+	@Override
+	public void setYield() {
+
 	}
 }

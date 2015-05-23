@@ -3,7 +3,7 @@ package priv.bajdcc.LALR1.grammar.runtime;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 【目标代码】代码页
@@ -17,19 +17,19 @@ public class RuntimeCodePage implements Serializable {
 	/**
 	 * 数据
 	 */
-	private ArrayList<Object> data = null;
+	private List<Object> data = null;
 
 	/**
 	 * 指令
 	 */
-	private ArrayList<Integer> insts = null;
+	private List<Byte> insts = null;
 
 	/**
 	 * 调试开发
 	 */
 	private IRuntimeDebugInfo info = null;
 
-	public RuntimeCodePage(ArrayList<Object> data, ArrayList<Integer> insts,
+	public RuntimeCodePage(List<Object> data, List<Byte> insts,
 			IRuntimeDebugInfo info) {
 		this.data = data;
 		this.insts = insts;
@@ -45,11 +45,11 @@ public class RuntimeCodePage implements Serializable {
 		ObjectTools.serialize(page, output);
 	}
 
-	public ArrayList<Object> getData() {
+	public List<Object> getData() {
 		return data;
 	}
 
-	public ArrayList<Integer> getInsts() {
+	public List<Byte> getInsts() {
 		return insts;
 	}
 

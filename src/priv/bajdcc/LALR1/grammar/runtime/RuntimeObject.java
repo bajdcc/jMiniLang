@@ -3,8 +3,10 @@ package priv.bajdcc.LALR1.grammar.runtime;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+import priv.bajdcc.LALR1.grammar.runtime.data.RuntimeFuncObject;
+
 /**
- * 【中间代码】运行时对象
+ * 【运行时】运行时对象
  *
  * @author bajdcc
  */
@@ -36,6 +38,13 @@ public class RuntimeObject implements Cloneable {
 		this.readonly = readonly;
 		this.copyable = copyable;
 		calcTypeFromObject();
+	}
+	
+	public RuntimeObject(Object obj, RuntimeObjectType type, boolean readonly, boolean copyable) {
+		this.obj = obj;
+		this.type = type;
+		this.readonly = readonly;
+		this.copyable = copyable;
 	}
 
 	public RuntimeObject(RuntimeObject obj) {
@@ -117,6 +126,9 @@ public class RuntimeObject implements Cloneable {
 		}
 		if (obj instanceof Integer) {
 			return RuntimeObjectType.kPtr;
+		}
+		if (obj instanceof RuntimeFuncObject) {
+			return RuntimeObjectType.kFunc;
 		}
 		return RuntimeObjectType.kNull;
 	}

@@ -7,8 +7,8 @@ package priv.bajdcc.LALR1.grammar.runtime;
  */
 public enum RuntimeObjectType {
 
-	kNull("空"), kPtr("指针"), kObject("对象"), kInt("整数"), kReal("实数"), kChar(
-			"字符"), kString("字符串"), kBool("布尔"), kFunc("函数"), kLocal("本地化");
+	kNull("空"), kPtr("指针"), kObject("对象"), kInt("整数"), kReal("实数"), kChar("字符"), kString(
+			"字符串"), kBool("布尔"), kFunc("函数"), kNan("非数");
 
 	private String name;
 
