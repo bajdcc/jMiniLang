@@ -1,6 +1,7 @@
 package priv.bajdcc.LALR1.grammar.tree;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import priv.bajdcc.LALR1.grammar.codegen.ICodegen;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeInst;
@@ -17,14 +18,18 @@ public class Block implements ICommon {
 	/**
 	 * 语句集合
 	 */
-	private ArrayList<IStmt> stmts = new ArrayList<IStmt>();
+	private List<IStmt> stmts = null;
 
-	public ArrayList<IStmt> getStmts() {
-		return stmts;
+	public Block() {
+		stmts = new ArrayList<IStmt>();
 	}
 
-	public void setStmts(ArrayList<IStmt> stmts) {
+	public Block(List<IStmt> stmts) {
 		this.stmts = stmts;
+	}
+
+	public List<IStmt> getStmts() {
+		return stmts;
 	}
 
 	@Override

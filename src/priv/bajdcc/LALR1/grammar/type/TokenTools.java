@@ -26,7 +26,7 @@ public class TokenTools {
 	/**
 	 * 精度
 	 */
-	private static final int SCALE_NUM = 10;
+	public static final int SCALE_NUM = 10;
 
 	private static HashMap<TokenType, ITokenConventer> mapConverter = new HashMap<TokenType, ITokenConventer>();
 	private static HashMap<OperatorType, RuntimeInst> mapOp2Ins = new HashMap<OperatorType, RuntimeInst>();
@@ -473,10 +473,23 @@ public class TokenTools {
 	 * @return 运算是否合法
 	 */
 	private static boolean promote(Token lop, Token rop) {
-		ITokenConventer conventer = mapConverter.get(lop.kToken);
+		return promote(lop.kToken, rop);
+	}
+	
+	/**
+	 * 操作数提升（即向上转换），提升主要看左操作数（这样即隐含类型转换）
+	 * 
+	 * @param type
+	 *            左操作数类型
+	 * @param rop
+	 *            右操作数
+	 * @return 运算是否合法
+	 */
+	public static boolean promote(TokenType type, Token rop) {
+		ITokenConventer conventer = mapConverter.get(type);
 		if (conventer != null) {
-			Token token = mapConverter.get(lop.kToken).convert(rop);
-			return token.kToken == lop.kToken;
+			Token token = mapConverter.get(type).convert(rop);
+			return token.kToken == type;
 		} else {
 			return false;
 		}

@@ -29,6 +29,11 @@ public abstract class SelectSetSolver implements ISyntaxComponentVisitor {
 	private boolean insertSymbol = false;
 
 	/**
+	 * 当前产生式从左到右片段是否产生空串
+	 */
+	private boolean epsilon = true;
+
+	/**
 	 * 当前产生式规则是否可以推导出空串
 	 */
 	protected abstract boolean isEpsilon();
@@ -80,6 +85,9 @@ public abstract class SelectSetSolver implements ISyntaxComponentVisitor {
 		if (insertSymbol) {
 			addInstToRule(PredictType.TERMINAL, node.id);
 		}
+		if (node.kType != TokenType.EOF) {
+			epsilon = false;
+		}
 	}
 
 	@Override
@@ -88,24 +96,21 @@ public abstract class SelectSetSolver implements ISyntaxComponentVisitor {
 		bag.bVisitEnd = false;
 		if (firstSymbol) {
 			addRule();// 需要添加指令集
-			if (isEpsilon()) {
-				for (TokenExp token : getFollow()) {// 有空串，添加Follow集
-					setCellToRuleId(token.id);
-				}
-			}
 			insertSymbol = true;
 			firstSymbol = false;
 		}
 		if (insertSymbol) {
-			for (TokenExp token : node.rule.arrFirsts) {// 添加First集
-				if (token.kType != TokenType.EOF) {
-					setCellToRuleId(token.id);
+			if (epsilon) {
+				for (TokenExp token : node.rule.arrFirsts) {// 添加First集
+					if (token.kType != TokenType.EOF) {
+						setCellToRuleId(token.id);
+					}
 				}
 			}
-			if (!node.rule.epsilon) {
-				insertSymbol = false;
-			}
-			addInstToRule(PredictType.NONTERMINAL, node.id);
+		}
+		addInstToRule(PredictType.NONTERMINAL, node.id);
+		if (!node.rule.epsilon) {
+			epsilon = false;
 		}
 	}
 
@@ -114,6 +119,7 @@ public abstract class SelectSetSolver implements ISyntaxComponentVisitor {
 		bag.bVisitEnd = false;
 		firstSymbol = true;
 		insertSymbol = false;
+		epsilon = true;
 	}
 
 	@Override

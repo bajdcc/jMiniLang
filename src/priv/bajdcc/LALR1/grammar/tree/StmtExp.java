@@ -25,13 +25,17 @@ public class StmtExp implements IStmt {
 
 	@Override
 	public void analysis(ISemanticRecorder recorder) {
-		exp.analysis(recorder);
+		if (exp != null) {
+			exp.analysis(recorder);
+		}
 	}
 
 	@Override
 	public void genCode(ICodegen codegen) {
-		exp.genCode(codegen);
-		codegen.genCode(RuntimeInst.ipop);
+		if (exp != null) {
+			exp.genCode(codegen);
+			codegen.genCode(RuntimeInst.ipop);
+		}
 	}
 
 	@Override
@@ -43,13 +47,17 @@ public class StmtExp implements IStmt {
 	public String print(StringBuilder prefix) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(prefix.toString());
-		sb.append(exp.print(prefix));
+		if (exp != null) {
+			sb.append(exp.print(prefix));
+		}
 		sb.append(OperatorType.SEMI.getName());
 		return sb.toString();
 	}
 
 	@Override
 	public void addClosure(IClosureScope scope) {
-		exp.addClosure(scope);
+		if (exp != null) {
+			exp.addClosure(scope);
+		}
 	}
 }

@@ -139,6 +139,32 @@ public class TestInterpret4 {
 							+ "call g_range_foreach(lower_bound, upper_bound, prime);\n"
 							+ "\n",
 							
+							// 打印质数版本3
+					"import \"sys.base\";\nimport \"sys.math\";\n"
+							+ "call g_print(\"输入下限：\");\n"
+							+ "var lower_bound = call g_stdin_read_int();\n"
+							+ "call g_print(\"输入上限：\");\n"
+							+ "var upper_bound = call g_stdin_read_int();\n"
+							+ "var print_prime = func ~(a, b) {\n"
+							+ "    for (var i = a; i <= b; i++) {\n"
+							+ "        if (i <= 1) {\n"
+							+ "            continue;\n"
+							+ "        }\n"
+							+ "        var sq = call g_sqrt(i);\n"
+							+ "        for (var j = 2; j <= sq; j++) {\n"
+							+ "            if (i % j == 0) {\n"
+							+ "                break;\n"
+							+ "            }\n"
+							+ "        }\n"
+							+ "        if (j > sq) {\n"
+							+ "            call g_print(i);\n"
+							+ "            call g_println();\n"
+							+ "        }\n"
+							+ "    }\n"
+							+ "};\n"
+							+ "call print_prime(lower_bound, upper_bound);\n"
+							+ "\n",
+							
 							};
 
 			Interpreter interpreter = new Interpreter();

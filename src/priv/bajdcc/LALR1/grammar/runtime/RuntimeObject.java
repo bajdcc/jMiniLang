@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import priv.bajdcc.LALR1.grammar.runtime.data.RuntimeFuncObject;
+import priv.bajdcc.util.lexer.token.TokenType;
 
 /**
  * 【运行时】运行时对象
@@ -131,6 +132,23 @@ public class RuntimeObject implements Cloneable {
 			return RuntimeObjectType.kFunc;
 		}
 		return RuntimeObjectType.kNull;
+	}
+	
+	public static TokenType toTokenType(RuntimeObjectType obj) {
+		switch (obj) {
+		case kBool:
+			return TokenType.BOOL;
+		case kChar:
+			return TokenType.CHARACTER;
+		case kInt:
+			return TokenType.INTEGER;
+		case kReal:
+			return TokenType.DECIMAL;
+		case kString:
+			return TokenType.STRING;
+		default:
+			return TokenType.ERROR;
+		}
 	}
 
 	public RuntimeObject clone() {

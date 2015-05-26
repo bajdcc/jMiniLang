@@ -176,7 +176,7 @@ public class Grammar extends Semantic {
 		infer(handler.getSemanticHandler("copy"),
 				"stmt -> stmt_stmt[0] | stmt_ctrl[0] | block_stmt[0]");
 		infer(handler.getSemanticHandler("stmt_exp"),
-				"stmt_stmt -> stmt_exp[0] @SEMI{lost_semi}");
+				"stmt_stmt -> [stmt_exp[0]] @SEMI{lost_semi}");
 		infer(handler.getSemanticHandler("copy"),
 				"stmt_ctrl -> ret[0] | port[0] | if[0] | for[0] | foreach[0]");
 		/* 返回语句 */
@@ -224,7 +224,7 @@ public class Grammar extends Semantic {
 				"type -> @ID[0] | @INTEGER[0] | @DECIMAL[0] | @LITERAL[0] | @CHARACTER[0] | @BOOLEAN[0] | @LPA exp[1]{lost_exp} @RPA{lost_rpa} | call[1]");
 		/* 条件语句 */
 		infer(handler.getSemanticHandler("if"),
-				"if -> @IF @LPA{lost_lpa} exp[0]{lost_exp} @RPA{lost_rpa} block[1]{lost_block} [@ELSE block[2]{lost_block}]");
+				"if -> @IF @LPA{lost_lpa} exp[0]{lost_exp} @RPA{lost_rpa} block[1]{lost_block} [@ELSE (block[2]{lost_block} | if[3]{lost_block})]");
 		/* 循环语句 */
 		infer(handler.getSemanticHandler("for"),
 				"for -> @FOR#do_enter_cycle# @LPA{lost_lpa} [var[0]] @SEMI{lost_semi} [exp[1]] @SEMI{lost_semi} [exp[2] | var[2]] @RPA{lost_rpa} block[3]{lost_block}");

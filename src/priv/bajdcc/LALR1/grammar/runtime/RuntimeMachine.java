@@ -16,6 +16,8 @@ import priv.bajdcc.LALR1.grammar.runtime.data.RuntimeFuncObject;
 import priv.bajdcc.LALR1.grammar.type.TokenTools;
 import priv.bajdcc.util.HashListMapEx;
 import priv.bajdcc.util.lexer.token.OperatorType;
+import priv.bajdcc.util.lexer.token.Token;
+import priv.bajdcc.util.lexer.token.TokenType;
 
 /**
  * 【虚拟机】运行时自动机
@@ -447,7 +449,15 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 		int idx = loadInt();
 		String name = "";
 		if (invoke) {
-			RuntimeObject obj = stack.findVariable(idx);
+			RuntimeStack itStack = stack;
+			RuntimeObject obj = null;
+			while (obj == null && itStack != null) {
+				obj = itStack.findVariable(idx);
+				itStack = itStack.prev;
+			}
+			if (obj == null) {
+				err(RuntimeError.WRONG_LOAD_EXTERN);
+			}
 			if (obj.getType() == RuntimeObjectType.kFunc) {
 				RuntimeFuncObject func = (RuntimeFuncObject) obj.getObj();
 				Map<Integer, RuntimeObject> env = func.getEnv();
@@ -498,19 +508,28 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 						|| (types != null && types.length != argsCount)) {
 					err(RuntimeError.WRONG_ARGCOUNT);
 				}
-				ArrayList<RuntimeObject> args = new ArrayList<RuntimeObject>();
+				List<RuntimeObject> args = new ArrayList<RuntimeObject>();
 				for (int i = 0; i < argsCount; i++) {
-					if (types != null) {
-						RuntimeObjectType type = types[i];
-						if (type != RuntimeObjectType.kObject) {
-							RuntimeObject objParam = stack.loadFuncArgs(i);
-							RuntimeObjectType objType = objParam.getType();
-							if (objType != type) {
+					RuntimeObjectType type = types[i];
+					RuntimeObject objParam = stack.loadFuncArgs(i);
+					if (type != RuntimeObjectType.kObject) {
+						RuntimeObjectType objType = objParam.getType();
+						if (objType != type) {
+							Token token = Token.createFromObject(objParam
+									.getObj());
+							TokenType objTokenType = RuntimeObject
+									.toTokenType(type);
+							if (objTokenType == TokenType.ERROR) {
 								err(RuntimeError.WRONG_ARGTYPE);
+							}
+							if (!TokenTools.promote(objTokenType, token)) {
+								err(RuntimeError.WRONG_ARGTYPE);
+							} else {
+								objParam.setObj(token.object);
 							}
 						}
 					}
-					args.add(stack.loadFuncArgs(i));
+					args.add(objParam);
 				}
 				stack.opCall(stack.reg.execId, stack.reg.pageId,
 						stack.reg.execId, stack.reg.pageId, name);

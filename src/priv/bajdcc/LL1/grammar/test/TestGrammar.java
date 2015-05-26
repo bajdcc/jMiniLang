@@ -17,7 +17,8 @@ public class TestGrammar {
 		// System.out.println("Z -> `a`<,> | B | [`a` `b` Z B]");
 		try {
 			// Scanner scanner = new Scanner(System.in);
-			Grammar grammar = new Grammar("(i * i) * (i + i) - i");
+			//Grammar grammar = new Grammar("(i * i) * (i + i) - i");
+			Grammar grammar = new Grammar("i + i * i");
 			grammar.addTerminal("SYMBOL", TokenType.ID, "i");
 			grammar.addTerminal("PLUS", TokenType.OPERATOR, OperatorType.PLUS);
 			grammar.addTerminal("MINUS", TokenType.OPERATOR, OperatorType.MINUS);

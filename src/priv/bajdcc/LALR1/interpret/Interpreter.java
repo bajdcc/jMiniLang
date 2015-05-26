@@ -3,6 +3,7 @@ package priv.bajdcc.LALR1.interpret;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeMachine;
 import priv.bajdcc.LALR1.interpret.module.IInterpreterModule;
 import priv.bajdcc.LALR1.interpret.module.ModuleBase;
+import priv.bajdcc.LALR1.interpret.module.ModuleMath;
 
 /**
  * 【运行时】扩展/内建虚拟机
@@ -10,7 +11,7 @@ import priv.bajdcc.LALR1.interpret.module.ModuleBase;
  * @author bajdcc
  */
 public class Interpreter extends RuntimeMachine {
-	
+
 	private static final boolean DEBUG = false;
 
 	public Interpreter() throws Exception {
@@ -23,7 +24,8 @@ public class Interpreter extends RuntimeMachine {
 	}
 
 	private void buildModule() throws Exception {
-		IInterpreterModule[] modules = new IInterpreterModule[] { new ModuleBase() };
+		IInterpreterModule[] modules = new IInterpreterModule[] {
+				new ModuleBase(), new ModuleMath() };
 
 		for (IInterpreterModule module : modules) {
 			run(module.getModuleName(), module.getCodePage());

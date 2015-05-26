@@ -2,6 +2,7 @@ package priv.bajdcc.LALR1.grammar.semantic;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import priv.bajdcc.LALR1.grammar.error.SemanticException.SemanticError;
 import priv.bajdcc.LALR1.grammar.symbol.BlockType;
@@ -244,8 +245,7 @@ public class SemanticHandler {
 				Function func = new Function();
 				func.setName(query.getQueryScopeService().getEntryToken());
 				func.setRealName(func.getName().toRealString());
-				Block block = new Block();
-				block.setStmts((ArrayList<IStmt>) indexed.get(0).object);
+				Block block = new Block((List<IStmt>) indexed.get(0).object);
 				block.getStmts().add(new StmtReturn());
 				func.setBlock(block);
 				return func;
@@ -257,11 +257,10 @@ public class SemanticHandler {
 			@Override
 			public Object handle(IIndexedData indexed, IQuerySymbol query,
 					ISemanticRecorder recorder) {
-				Block block = new Block();
-				if (indexed.exists(0)) {
-					block.setStmts((ArrayList<IStmt>) indexed.get(0).object);
+				if (!indexed.exists(0)) {
+					return new Block();
 				}
-				return block;
+				return new Block((List<IStmt>) indexed.get(0).object);
 			}
 		});
 		/* 语句集合 */
@@ -396,11 +395,10 @@ public class SemanticHandler {
 					ret.setYield(true);
 				}
 				if (indexed.exists(3)) {
-					Block block = new Block();
-					ArrayList<IStmt> stmts = new ArrayList<IStmt>();
+					List<IStmt> stmts = new ArrayList<IStmt>();
 					ret.setExp((IExp) indexed.get(3).object);
 					stmts.add(ret);
-					block.setStmts(stmts);
+					Block block = new Block(stmts);
 					func.setBlock(block);
 				} else {
 					Block block = (Block) indexed.get(4).object;
@@ -464,7 +462,9 @@ public class SemanticHandler {
 			public Object handle(IIndexedData indexed, IQuerySymbol query,
 					ISemanticRecorder recorder) {
 				StmtExp exp = new StmtExp();
-				exp.setExp((IExp) indexed.get(0).object);
+				if (indexed.exists(0)) {
+					exp.setExp((IExp) indexed.get(0).object);
+				}
 				return exp;
 			}
 		});
@@ -478,6 +478,10 @@ public class SemanticHandler {
 				stmt.setTrueBlock((Block) indexed.get(1).object);
 				if (indexed.exists(2)) {
 					stmt.setFalseBlock((Block) indexed.get(2).object);
+				} else if (indexed.exists(3)) {
+					Block block = new Block();
+					block.getStmts().add((IStmt) indexed.get(3).object);
+					stmt.setFalseBlock(block);
 				}
 				return stmt;
 			}
