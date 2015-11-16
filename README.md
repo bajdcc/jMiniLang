@@ -1,23 +1,39 @@
 
-#简易解释器(Java)
+# jMiniLang - A Simple Interpreter (*Java*)
 ===========================
 
-一个完整的、简易的解释器框架。
+***jMiniLang*** is a simplified interpreter framework. Developed by ***bajdcc***.
+*PS.* ***LR Analysis*** refers to ***VFS*** developed by [*vczh*](https://github.com/vczh "Github page of vczh").
 
-#### 包括：
-	* 词法分析，自动生成NFA和DFA并匹配。
-	* 语法分析，LALR(1)文法，可加语义动作（归约动作）。
-	* 语义分析，可生定义语义动作。
-	* 语法树。
-	* 面向栈的指令设计。
-	* 变量和过程调用本地化。
-	* 提供指令页导入，变量和过程导出。
-	* 代码页可序列化。
-	*
-	* 生成简易的正则表达式结构、NFA、DFA表。
-	* 生成简易的LR分析表。
-	* 生成简易的语义分析指令。
-	* 生成简易的语法树结构。
-	* 生成简易的代码页结构。
-	* 生成简易的虚拟机指令。
-	* 生成简易的运行时环境。
+#### Features
+	
+
+1. Lexer which generates *NFA* and *DFA*.
+2. Parser which implements *LALR(1) Grammar* with optional semantic action.
+3. Customized semantic analysis.
+4. Printable syntax tree.
+5. Stack-based instruction design.
+6. Native method.
+7. Import and export of code page.
+8. Serializable code page.
+
+#### What it generates
+
+- Structures of *Regex*, *NFA* and *DFA* Table.
+- Structures of *LL*/*LR* Table.
+- Structures of semantic instructions.
+- Structures of syntax tree.
+- Structures of code page.
+- Virtual machine instructions.
+- Runtime environment.
+
+#### Manual
+[*Simplified Chinese Version*](https://raw.githubusercontent.com/bajdcc/jMiniLang/master/%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.pdf "Manual - Simplified Chinese")
+
+#### Screenshot
+
+*Screenshot 1 - Code*
+![Screenshot 1](https://bajdcc.github.io/host/screenshot/jMiniLang_1.png)
+
+*Screenshot 2 - Results*
+![Screenshot 2](https://bajdcc.github.io/host/screenshot/jMiniLang_2.png)
