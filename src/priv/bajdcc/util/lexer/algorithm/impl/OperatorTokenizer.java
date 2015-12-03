@@ -38,6 +38,8 @@ public class OperatorTokenizer extends TokenAlgorithm {
 			for (MetaType meta : metaTypes) {
 				op = op.replace(meta.getChar() + "", "\\" + meta.getChar());
 			}
+			if (type == OperatorType.ESCAPE)
+				op += op;
 			sb.append(op + "|");
 		}
 		if (sb.length() > 0) {

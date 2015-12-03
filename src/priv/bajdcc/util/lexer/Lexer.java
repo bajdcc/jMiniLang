@@ -140,10 +140,10 @@ public class Lexer extends RegexStringIterator implements
 		algorithmCollection.attach(new WhitespaceTokenizer());// 空白字符解析组件
 		algorithmCollection.attach(new CommentTokenizer());// 注释解析组件
 		algorithmCollection.attach(new MacroTokenizer());// 宏解析组件
+		algorithmCollection.attach(new OperatorTokenizer());// 操作符解析组件
 		algorithmCollection.attach(new StringTokenizer());// 字符串解析组件
 		algorithmCollection.attach(new CharacterTokenizer());// 字符解析组件
 		algorithmCollection.attach(new IdentifierTokenizer());// 标识符/关键字解析组件
-		algorithmCollection.attach(new OperatorTokenizer());// 操作符解析组件
 		algorithmCollection.attach(new NumberTokenizer());// 数字解析组件
 	}
 

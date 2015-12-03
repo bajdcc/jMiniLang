@@ -72,7 +72,7 @@ public class Token implements Cloneable {
 		StringBuilder sb = new StringBuilder();
 		sb.append(String.format("%04d,%03d:\t%s\t%s %s", position.iLine,
 				position.iColumn, kToken.getName(), object == null ? "(null)"
-						: object.toString(), toSimpleString()));
+						: object.toString(), object == null ? "(null)" : toSimpleString()));
 		return sb.toString();
 	}
 

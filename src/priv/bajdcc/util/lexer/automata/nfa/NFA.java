@@ -215,6 +215,7 @@ public class NFA implements IRegexComponentVisitor {
 			for (int i = node.iLowerBound; i < node.iUpperBound; i++) {
 				if (enfa.end != null) {
 					connect(enfa.end, subENFAList.get(i).begin);// 连接首尾
+					enfa.end = subENFAList.get(i).end;
 				} else {
 					enfa = subENFAList.get(i);
 				}

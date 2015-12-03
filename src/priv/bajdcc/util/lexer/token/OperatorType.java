@@ -6,7 +6,7 @@ package priv.bajdcc.util.lexer.token;
  * @author bajdcc
  */
 public enum OperatorType {
-	ASSIGN("="), PLUS("+"), MINUS("-"), TIMES("*"), DIVIDE("/"), QUERY("?"), MOD(
+	ASSIGN("="), PLUS("+"), MINUS("-"), TIMES("*"), DIVIDE("/"), ESCAPE("\\"), QUERY("?"), MOD(
 			"%"), BIT_AND("&"), BIT_OR("|"), BIT_NOT("~"), BIT_XOR("^"), LOGICAL_NOT("!"), LESS_THAN(
 			"<"), GREATER_THAN(">"),
 
