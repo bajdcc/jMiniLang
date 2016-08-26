@@ -37,3 +37,6 @@
 
 *Screenshot 2 - Results*
 ![Screenshot 2](https://bajdcc.github.io/host/screenshot/jMiniLang_2.png)
+
+*Screenshot 3 - Y-Combinator*
+![Screenshot 3](https://bajdcc.github.io/host/screenshot/jMiniLang_3.png)
