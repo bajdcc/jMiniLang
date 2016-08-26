@@ -114,15 +114,15 @@ public class ParsingStack implements IIndexedData {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("-------- stack begin --------");
-		sb.append(System.getProperty("line.separator"));
+		sb.append(System.lineSeparator());
 		sb.append("0: ");
 		printTokenBag(sb, mapTokenBag);
-		sb.append(System.getProperty("line.separator"));
+		sb.append(System.lineSeparator());
 		int i = 1;
 		for (HashMap<Integer, TokenBag> hashMap : stkMapTokenBags) {
 			sb.append(i + ": ");
 			printTokenBag(sb, hashMap);
-			sb.append(System.getProperty("line.separator"));
+			sb.append(System.lineSeparator());
 			i++;
 		}
 		sb.append("-------- stack end --------");

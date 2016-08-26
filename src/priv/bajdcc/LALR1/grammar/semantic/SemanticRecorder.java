@@ -35,10 +35,10 @@ public class SemanticRecorder implements ISemanticRecorder {
 	public String toString() {
 		StringBuffer sb = new StringBuffer();
 		sb.append("#### 语义错误列表 ####");
-		sb.append(System.getProperty("line.separator"));
+		sb.append(System.lineSeparator());
 		for (SemanticException error : errors) {
 			sb.append(error.toString());
-			sb.append(System.getProperty("line.separator"));
+			sb.append(System.lineSeparator());
 		}
 		return sb.toString();
 	}

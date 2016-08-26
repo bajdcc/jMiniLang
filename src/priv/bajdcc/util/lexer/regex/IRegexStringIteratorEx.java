@@ -39,4 +39,9 @@ public interface IRegexStringIteratorEx {
 	 * 获取所有单词
 	 */
 	public ArrayList<Token> tokenList();
+	
+	/**
+	 * 获取错误现场
+	 */
+	public String getErrorSnapshot(Position position);
 }

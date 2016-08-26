@@ -178,4 +178,30 @@ public class Lexer extends RegexStringIterator implements
 	public ArrayList<Token> tokenList() {
 		return null;
 	}
+	
+	@Override
+	public String getErrorSnapshot(Position position) {
+		if (position.iLine < 0 || position.iLine >= arrLinesNo.size()) {
+			return null;
+		}
+		String str;
+		int start = arrLinesNo.get(position.iLine);
+		if (position.iLine == arrLinesNo.size() - 1) {
+			str = context.substring(start, start + position.iColumn);			
+		} else {
+			str = context.substring(start, arrLinesNo.get(position.iLine + 1));
+		}
+		if (position.iColumn < 0 || position.iColumn >= str.length()) {
+			return str;
+		} else {
+			StringBuilder sb = new StringBuilder();
+			sb.append(str);
+			sb.append(System.lineSeparator());
+			for (int i = 0; i < position.iColumn - 1; i++) {
+				sb.append(' ');
+			}
+			sb.append('^');
+			return sb.toString();
+		}
+	}
 }

@@ -170,7 +170,7 @@ public class RuntimeFunc {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(System.getProperty("line.separator"));
+		sb.append(System.lineSeparator());
 		sb.append(String.format("代码页：%s，地址：%d，名称：%s，参数：%s，变量：%s，闭包：%s",
 				currentPage, currentPc, name, params, tmp, closure));
 		return sb.toString();

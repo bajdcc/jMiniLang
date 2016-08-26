@@ -46,7 +46,7 @@ public class TestGrammar2 {
 			 * BufferedReader br = new BufferedReader(new
 			 * FileReader("E:/http.c")); String line = ""; StringBuffer sb = new
 			 * StringBuffer(); while ((line = br.readLine()) != null) {
-			 * sb.append(line + System.getProperty("line.separator")); }
+			 * sb.append(line + System.lineSeparator()); }
 			 * br.close();
 			 */
 			Grammar grammar = new Grammar(exprs[exprs.length - 1]);

@@ -86,7 +86,7 @@ public class NGAToString extends BreadthFirstSearch<NGAEdge, NGAStatus> {
 	 * 添加行
 	 */
 	private void appendLine() {
-		context.append(System.getProperty("line.separator"));
+		context.append(System.lineSeparator());
 	}
 
 	@Override

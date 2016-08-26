@@ -472,11 +472,11 @@ public class DFA extends NFA {
 			/* 状态 */
 			sb.append("状态[" + i + "]" + (status.data.bFinal ? "[结束]" : "")
 					+ " => " + status.data.getStatusString(NFAStatusList)
-					+ System.getProperty("line.separator"));
+					+ System.lineSeparator());
 			/* 边 */
 			for (DFAEdge edge : status.outEdges) {
 				sb.append("\t边 => [" + DFAStatusList.indexOf(edge.end) + "]"
-						+ System.getProperty("line.separator"));// 指向边
+						+ System.lineSeparator());// 指向边
 				sb.append("\t\t类型 => " + edge.data.kAction.getName());
 				switch (edge.data.kAction)// 类型
 				{
@@ -488,7 +488,7 @@ public class DFA extends NFA {
 				default:
 					break;
 				}
-				sb.append(System.getProperty("line.separator"));
+				sb.append(System.lineSeparator());
 			}
 		}
 		return sb.toString();
@@ -504,7 +504,7 @@ public class DFA extends NFA {
 			for (int j = 0; j < transition[i].length; j++) {
 				sb.append("\t" + transition[i][j]);
 			}
-			sb.append(System.getProperty("line.separator"));
+			sb.append(System.lineSeparator());
 		}
 		return sb.toString();
 	}

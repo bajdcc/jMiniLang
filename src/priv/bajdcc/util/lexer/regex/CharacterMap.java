@@ -330,7 +330,7 @@ public class CharacterMap implements IRegexComponentVisitor {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		for (CharacterRange range : arrRanges) {
-			sb.append(range + System.getProperty("line.separator"));
+			sb.append(range + System.lineSeparator());
 		}
 		return sb.toString();
 	}

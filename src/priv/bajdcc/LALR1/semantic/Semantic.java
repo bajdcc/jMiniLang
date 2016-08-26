@@ -39,7 +39,7 @@ public class Semantic extends Syntax implements IErrorHandler {
 	/**
 	 * 单词流工厂
 	 */
-	private TokenFactory tokenFactory = null;
+	protected TokenFactory tokenFactory = null;
 
 	/**
 	 * 错误处理器
@@ -642,7 +642,7 @@ public class Semantic extends Syntax implements IErrorHandler {
 		System.err.println(tracker.npaStatus.data.label);
 		ArrayList<RuleItem> items = npa.getRuleItems();
 		StringBuffer sb = new StringBuffer();
-		sb.append(System.getProperty("line.separator"));
+		sb.append(System.lineSeparator());
 		InstructionRecord rcd = tracker.rcdInst;
 		while (rcd != null) {
 			for (Instruction inst : rcd.arrInsts) {
@@ -653,10 +653,10 @@ public class Semantic extends Syntax implements IErrorHandler {
 							+ getSingleString(item.parent.nonTerminal.name,
 									item.expression));
 				}
-				sb.append(System.getProperty("line.separator"));
+				sb.append(System.lineSeparator());
 			}
 			rcd = rcd.prev;
-			sb.append(System.getProperty("line.separator"));
+			sb.append(System.lineSeparator());
 		}
 		return sb.toString();
 	}
@@ -667,10 +667,10 @@ public class Semantic extends Syntax implements IErrorHandler {
 	public String getTokenList() {
 		StringBuffer sb = new StringBuffer();
 		sb.append("#### 单词流 ####");
-		sb.append(System.getProperty("line.separator"));
+		sb.append(System.lineSeparator());
 		for (Token token : arrTokens) {
 			sb.append(token.toString());
-			sb.append(System.getProperty("line.separator"));
+			sb.append(System.lineSeparator());
 		}
 		return sb.toString();
 	}
@@ -681,10 +681,10 @@ public class Semantic extends Syntax implements IErrorHandler {
 	public String getObject() {
 		StringBuffer sb = new StringBuffer();
 		sb.append("#### 分析结果 ####");
-		sb.append(System.getProperty("line.separator"));
+		sb.append(System.lineSeparator());
 		if (object != null) {
 			sb.append(object.toString());
-			sb.append(System.getProperty("line.separator"));
+			sb.append(System.lineSeparator());
 		}
 		return sb.toString();
 	}
@@ -696,7 +696,7 @@ public class Semantic extends Syntax implements IErrorHandler {
 		ArrayList<RuleItem> items = npa.getRuleItems();
 		StringBuffer sb = new StringBuffer();
 		sb.append("#### 指令集 ####");
-		sb.append(System.getProperty("line.separator"));
+		sb.append(System.lineSeparator());
 		for (Instruction inst : arrInsts) {
 			sb.append(inst.toString());
 			if (inst.iHandler != -1) {
@@ -705,7 +705,7 @@ public class Semantic extends Syntax implements IErrorHandler {
 						+ getSingleString(item.parent.nonTerminal.name,
 								item.expression));
 			}
-			sb.append(System.getProperty("line.separator"));
+			sb.append(System.lineSeparator());
 		}
 		return sb.toString();
 	}
@@ -716,10 +716,10 @@ public class Semantic extends Syntax implements IErrorHandler {
 	public String getTrackerError() {
 		StringBuffer sb = new StringBuffer();
 		sb.append("#### 语法错误列表 ####");
-		sb.append(System.getProperty("line.separator"));
+		sb.append(System.lineSeparator());
 		for (TrackerError error : arrErrors) {
 			sb.append(error.toString());
-			sb.append(System.getProperty("line.separator"));
+			sb.append(System.lineSeparator());
 		}
 		return sb.toString();
 	}

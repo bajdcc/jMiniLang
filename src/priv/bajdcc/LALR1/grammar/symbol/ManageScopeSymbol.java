@@ -180,13 +180,13 @@ public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
 	public String getSymbolString() {
 		StringBuffer sb = new StringBuffer();
 		sb.append("#### 符号表 ####");
-		sb.append(System.getProperty("line.separator"));
+		sb.append(System.lineSeparator());
 		int i = 0;
 		for (Object symbol : symbolList.list) {
 			sb.append(i + ": " + "["
 					+ RuntimeObject.fromObject(symbol).getName() + "] "
 					+ symbol);
-			sb.append(System.getProperty("line.separator"));
+			sb.append(System.lineSeparator());
 			i++;
 		}
 		return sb.toString();
@@ -195,14 +195,14 @@ public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
 	public String getFuncString() {
 		StringBuffer sb = new StringBuffer();
 		sb.append("#### 过程表 ####");
-		sb.append(System.getProperty("line.separator"));
+		sb.append(System.lineSeparator());
 		int i = 0;
 		for (Function func : funcMap.list) {
 			sb.append("----==== #" + i + " ====----");
-			sb.append(System.getProperty("line.separator"));
+			sb.append(System.lineSeparator());
 			sb.append(func.toString());
-			sb.append(System.getProperty("line.separator"));
-			sb.append(System.getProperty("line.separator"));
+			sb.append(System.lineSeparator());
+			sb.append(System.lineSeparator());
 			i++;
 		}
 		return sb.toString();

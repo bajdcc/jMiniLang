@@ -22,7 +22,7 @@ public class RegexToString implements IRegexComponentVisitor {
 	 */
 	private void appendPrefix() {
 		prefix.append('\t');
-		context.append(" {" + System.getProperty("line.separator"));
+		context.append(" {" + System.lineSeparator());
 	}
 
 	/**
@@ -30,14 +30,14 @@ public class RegexToString implements IRegexComponentVisitor {
 	 */
 	private void reducePrefix() {
 		prefix.deleteCharAt(0);
-		context.append(prefix + "}" + System.getProperty("line.separator"));
+		context.append(prefix + "}" + System.lineSeparator());
 	}
 
 	@Override
 	public void visitBegin(Charset node) {
 		context.append(prefix + "字符");
 		context.append((node.bReverse ? "[取反]" : "") + "\t" + node);
-		context.append(System.getProperty("line.separator"));
+		context.append(System.lineSeparator());
 	}
 
 	@Override

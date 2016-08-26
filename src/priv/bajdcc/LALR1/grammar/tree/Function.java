@@ -90,7 +90,7 @@ public class Function implements IExp {
 		StringBuilder sb = new StringBuilder();
 		for (Token token : doc) {
 			sb.append(token.object.toString());
-			sb.append(System.getProperty("line.separator"));
+			sb.append(System.lineSeparator());
 		}
 		return sb.toString();
 	}

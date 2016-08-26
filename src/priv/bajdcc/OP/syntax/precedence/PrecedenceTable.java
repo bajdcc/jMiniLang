@@ -415,18 +415,18 @@ public class PrecedenceTable extends OPTableSolver {
 		StringBuffer sb = new StringBuffer();
 		int size = arrTerminals.size();
 		sb.append("#### 算符优先关系矩阵 ####");
-		sb.append(System.getProperty("line.separator"));
+		sb.append(System.lineSeparator());
 		sb.append("\t");
 		for (int i = 0; i < size; i++) {
 			sb.append(i + "\t");
 		}
-		sb.append(System.getProperty("line.separator"));
+		sb.append(System.lineSeparator());
 		for (int i = 0; i < size; i++) {
 			sb.append(i + "\t");
 			for (int j = 0; j < size; j++) {
 				sb.append(table[i][j].getName() + "\t");
 			}
-			sb.append(System.getProperty("line.separator"));
+			sb.append(System.lineSeparator());
 		}
 		return sb.toString();
 	}

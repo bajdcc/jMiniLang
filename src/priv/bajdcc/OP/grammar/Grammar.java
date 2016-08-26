@@ -110,10 +110,10 @@ public class Grammar extends Syntax {
 	public String getTokenString() {
 		StringBuffer sb = new StringBuffer();
 		sb.append("#### 单词流 ####");
-		sb.append(System.getProperty("line.separator"));
+		sb.append(System.lineSeparator());
 		for (Token token : arrTokens) {
 			sb.append(token.toString());
-			sb.append(System.getProperty("line.separator"));
+			sb.append(System.lineSeparator());
 		}
 		return sb.toString();
 	}

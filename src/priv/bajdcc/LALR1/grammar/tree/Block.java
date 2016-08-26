@@ -60,11 +60,11 @@ public class Block implements ICommon {
 	public String print(StringBuilder prefix) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("{");
-		sb.append(System.getProperty("line.separator"));
+		sb.append(System.lineSeparator());
 		prefix.append("    ");
 		for (IStmt stmt : stmts) {
 			sb.append(stmt.print(prefix));
-			sb.append(System.getProperty("line.separator"));
+			sb.append(System.lineSeparator());
 		}
 		prefix.delete(0, 4);
 		sb.append(prefix.toString() + "}");

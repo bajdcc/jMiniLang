@@ -60,9 +60,9 @@ public class RuntimeCodePage implements Serializable {
 	public String getCodeString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("#### 目标代码 ####");
-		sb.append(System.getProperty("line.separator"));
+		sb.append(System.lineSeparator());
 		sb.append(insts);
-		sb.append(System.getProperty("line.separator"));
+		sb.append(System.lineSeparator());
 		return sb.toString();
 	}
 

@@ -302,7 +302,7 @@ public class PredictionTable extends SelectSetSolver {
 	public String getInstString() {
 		StringBuffer sb = new StringBuffer();
 		sb.append("#### 指令包 ####");
-		sb.append(System.getProperty("line.separator"));
+		sb.append(System.lineSeparator());
 		for (int i = 0; i < instList.size(); i++) {
 			sb.append(i + ": ");
 			ArrayList<PredictionInstruction> pis = instList.get(i);
@@ -319,7 +319,7 @@ public class PredictionTable extends SelectSetSolver {
 					break;
 				}
 			}
-			sb.append(System.getProperty("line.separator"));
+			sb.append(System.lineSeparator());
 		}
 		return sb.toString();
 	}
@@ -333,7 +333,7 @@ public class PredictionTable extends SelectSetSolver {
 		int Vn = arrNonTerminals.size();
 		int Vt = arrTerminals.size();
 		sb.append("#### 预测分析矩阵 ####");
-		sb.append(System.getProperty("line.separator"));
+		sb.append(System.lineSeparator());
 		for (int i = 0; i < Vn; i++) {
 			for (int j = 0; j < Vt; j++) {
 				if (table[i][j] != -1) {
@@ -343,7 +343,7 @@ public class PredictionTable extends SelectSetSolver {
 				}
 				sb.append("\t");
 			}
-			sb.append(System.getProperty("line.separator"));
+			sb.append(System.lineSeparator());
 		}
 		return sb.toString();
 	}
@@ -356,19 +356,19 @@ public class PredictionTable extends SelectSetSolver {
 		int Vn = arrNonTerminals.size();
 		int Vt = arrTerminals.size();
 		sb.append("#### 预测分析表 ####");
-		sb.append(System.getProperty("line.separator"));
+		sb.append(System.lineSeparator());
 		for (int i = 0; i < Vn; i++) {
 			sb.append("状态[" + i + "]： ");
-			sb.append(System.getProperty("line.separator"));
+			sb.append(System.lineSeparator());
 			sb.append("\t非终结符 -> " + arrNonTerminals.get(i).name);
-			sb.append(System.getProperty("line.separator"));
+			sb.append(System.lineSeparator());
 			for (int j = 0; j < Vt; j++) {
 				int idx = table[i][j];
 				if (idx != -1) {
 					sb.append("\t\t----------------");
-					sb.append(System.getProperty("line.separator"));
+					sb.append(System.lineSeparator());
 					sb.append("\t\t接受 -> " + arrTerminals.get(j).toString());
-					sb.append(System.getProperty("line.separator"));
+					sb.append(System.lineSeparator());
 					sb.append("\t\t入栈 -> ");
 					for (PredictionInstruction k : instList.get(table[i][j])) {
 						switch (k.type) {
@@ -385,7 +385,7 @@ public class PredictionTable extends SelectSetSolver {
 							break;
 						}
 					}
-					sb.append(System.getProperty("line.separator"));
+					sb.append(System.lineSeparator());
 				}
 			}
 		}

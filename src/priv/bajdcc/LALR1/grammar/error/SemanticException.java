@@ -1,5 +1,6 @@
 package priv.bajdcc.LALR1.grammar.error;
 
+import priv.bajdcc.util.lexer.regex.IRegexStringIterator;
 import priv.bajdcc.util.lexer.token.Token;
 
 /**
@@ -64,6 +65,20 @@ public class SemanticException extends Exception {
 	 */
 	public SemanticError getErrorCode() {
 		return kError;
+	}
+	
+	public String toString(IRegexStringIterator iter) {
+		String snapshot = iter.ex().getErrorSnapshot(token.position);
+		if (snapshot == null) {
+			return toString();
+		}
+		StringBuilder sb = new StringBuilder();
+		sb.append(getMessage());
+		sb.append(": ");
+		sb.append(token);
+		sb.append(System.lineSeparator());
+		sb.append(snapshot);
+		return sb.toString();
 	}
 
 	@Override

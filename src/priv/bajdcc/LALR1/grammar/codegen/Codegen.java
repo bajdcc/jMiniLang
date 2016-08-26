@@ -171,12 +171,12 @@ public class Codegen implements ICodegen, ICodegenBlock, ICodegenByteWriter {
 	public String getCodeString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("#### 中间代码 ####");
-		sb.append(System.getProperty("line.separator"));
+		sb.append(System.lineSeparator());
 		int idx = 0;
 		for (RuntimeInstBase inst : data.insts) {
 			sb.append(String.format("%03d\t%s", idx, inst.toString("\t")));
 			idx += inst.getAdvanceLength();
-			sb.append(System.getProperty("line.separator"));
+			sb.append(System.lineSeparator());
 		}
 		return sb.toString();
 	}

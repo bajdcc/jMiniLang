@@ -148,11 +148,11 @@ public class RuntimeStack {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("=========================");
-		sb.append(System.getProperty("line.separator"));
+		sb.append(System.lineSeparator());
 		sb.append("数据栈: " + stkData);
-		sb.append(System.getProperty("line.separator"));
+		sb.append(System.lineSeparator());
 		sb.append("调用栈: " + stkCall);
-		sb.append(System.getProperty("line.separator"));
+		sb.append(System.lineSeparator());
 		return sb.toString();
 	}
 }

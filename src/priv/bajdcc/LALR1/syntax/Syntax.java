@@ -745,43 +745,43 @@ public class Syntax {
 		StringBuffer sb = new StringBuffer();
 		/* 起始符号 */
 		sb.append("#### 起始符号 ####");
-		sb.append(System.getProperty("line.separator"));
+		sb.append(System.lineSeparator());
 		sb.append(strBeginRuleName);
-		sb.append(System.getProperty("line.separator"));
+		sb.append(System.lineSeparator());
 		/* 终结符 */
 		sb.append("#### 终结符 ####");
-		sb.append(System.getProperty("line.separator"));
+		sb.append(System.lineSeparator());
 		for (TokenExp exp : arrTerminals) {
 			sb.append(exp.toString());
-			sb.append(System.getProperty("line.separator"));
+			sb.append(System.lineSeparator());
 		}
 		/* 非终结符 */
 		sb.append("#### 非终结符 ####");
-		sb.append(System.getProperty("line.separator"));
+		sb.append(System.lineSeparator());
 		for (RuleExp exp : arrNonTerminals) {
 			sb.append(exp.toString());
-			sb.append(System.getProperty("line.separator"));
+			sb.append(System.lineSeparator());
 		}
 		/* 推导规则 */
 		sb.append("#### 文法产生式 ####");
-		sb.append(System.getProperty("line.separator"));
+		sb.append(System.lineSeparator());
 		for (RuleExp exp : arrNonTerminals) {
 			for (RuleItem item : exp.rule.arrRules) {
 				/* 规则正文 */
 				sb.append(getSingleString(exp.name, item.expression));
-				sb.append(System.getProperty("line.separator"));
+				sb.append(System.lineSeparator());
 				/* First集合 */
 				sb.append("\t--== 终结符First集合 ==--");
-				sb.append(System.getProperty("line.separator"));
+				sb.append(System.lineSeparator());
 				for (TokenExp token : item.setFirstSetTokens) {
 					sb.append("\t\t" + token.name);
-					sb.append(System.getProperty("line.separator"));
+					sb.append(System.lineSeparator());
 				}
 				sb.append("\t--== 非终结符First集合 ==--");
-				sb.append(System.getProperty("line.separator"));
+				sb.append(System.lineSeparator());
 				for (RuleExp rule : item.setFirstSetRules) {
 					sb.append("\t\t" + rule.name);
-					sb.append(System.getProperty("line.separator"));
+					sb.append(System.lineSeparator());
 				}
 			}
 		}
@@ -796,7 +796,7 @@ public class Syntax {
 		for (RuleExp exp : arrNonTerminals) {
 			for (RuleItem item : exp.rule.arrRules) {
 				sb.append(getSingleString(exp.name, item.expression));
-				sb.append(System.getProperty("line.separator"));
+				sb.append(System.lineSeparator());
 			}
 		}
 		return sb.toString();

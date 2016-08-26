@@ -1,5 +1,6 @@
 package priv.bajdcc.util.lexer.regex;
 
+import java.util.ArrayList;
 import java.util.Stack;
 
 import priv.bajdcc.util.Position;
@@ -40,12 +41,18 @@ public class RegexStringIterator implements IRegexStringIterator, Cloneable {
 	 * 当前的分析信息
 	 */
 	protected RegexStringIteratorData data = new RegexStringIteratorData();
+	
+	/**
+	 * 记录每行起始的位置
+	 */
+	protected ArrayList<Integer> arrLinesNo = new ArrayList<Integer>();
 
 	public RegexStringIterator() {
-
+		arrLinesNo.add(0);
 	}
 
 	public RegexStringIterator(String context) {
+		this();
 		this.context = context;
 	}
 
@@ -67,6 +74,7 @@ public class RegexStringIterator implements IRegexStringIterator, Cloneable {
 		translate();
 		position.iColumn++;
 		if (data.chCurrent == MetaType.NEW_LINE.getChar()) {
+			arrLinesNo.add(arrLinesNo.get(arrLinesNo.size() - 1) + position.iColumn + 1);
 			position.iColumn = 0;
 			position.iLine++;
 		}

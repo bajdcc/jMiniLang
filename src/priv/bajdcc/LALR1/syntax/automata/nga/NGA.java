@@ -413,10 +413,10 @@ public class NGA implements ISyntaxComponentVisitor {
 	public String getNGAString() {
 		StringBuffer sb = new StringBuffer();
 		sb.append("#### 产生式 ####");
-		sb.append(System.getProperty("line.separator"));
+		sb.append(System.lineSeparator());
 		for (NGAStatus status : mapNGA.values()) {
 			sb.append(getNGAString(status, ""));
-			sb.append(System.getProperty("line.separator"));
+			sb.append(System.lineSeparator());
 		}
 		return sb.toString();
 	}

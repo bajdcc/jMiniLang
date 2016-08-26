@@ -406,33 +406,33 @@ public class NPA extends NGA {
 		ArrayList<NPAStatus> statusList = getNPAStatusList();
 		/* 输出初始状态 */
 		sb.append("#### 初始状态 ####");
-		sb.append(System.getProperty("line.separator"));
+		sb.append(System.lineSeparator());
 		for (int i = 0; i < arrInitStatusList.size(); i++) {
 			sb.append("状态[" + i + "]： " + arrInitStatusList.get(i).data.label);
-			sb.append(System.getProperty("line.separator"));
+			sb.append(System.lineSeparator());
 		}
-		sb.append(System.getProperty("line.separator"));
+		sb.append(System.lineSeparator());
 		/* 遍历状态 */
 		sb.append("#### 状态转换图 ####");
-		sb.append(System.getProperty("line.separator"));
+		sb.append(System.lineSeparator());
 		for (int i = 0; i < statusList.size(); i++) {
 			NPAStatus status = statusList.get(i);
 			/* 输出状态标签 */
 			sb.append("状态[" + i + "]： ");
-			sb.append(System.getProperty("line.separator"));
+			sb.append(System.lineSeparator());
 			sb.append("\t项目：" + status.data.label);
-			sb.append(System.getProperty("line.separator"));
+			sb.append(System.lineSeparator());
 			sb.append("\t规则："
 					+ arrRuleItems.get(status.data.iRuleItem).parent.nonTerminal.name);
-			sb.append(System.getProperty("line.separator"));
+			sb.append(System.lineSeparator());
 			/* 输出边 */
 			for (NPAEdge edge : status.outEdges) {
 				sb.append("\t\t----------------");
-				sb.append(System.getProperty("line.separator"));
+				sb.append(System.lineSeparator());
 				/* 输出边的目标 */
 				sb.append("\t\t到达状态[" + statusList.indexOf(edge.end) + "]: "
 						+ edge.end.data.label);
-				sb.append(System.getProperty("line.separator"));
+				sb.append(System.lineSeparator());
 				/* 输出边的类型 */
 				sb.append("\t\t类型：" + edge.data.kAction.getName());
 				switch (edge.data.kAction) {
@@ -452,7 +452,7 @@ public class NPA extends NGA {
 				default:
 					break;
 				}
-				sb.append(System.getProperty("line.separator"));
+				sb.append(System.lineSeparator());
 				/* 输出边的指令 */
 				sb.append("\t\t指令：" + edge.data.inst.getName());
 				switch (edge.data.inst) {
@@ -478,17 +478,17 @@ public class NPA extends NGA {
 				default:
 					break;
 				}
-				sb.append(System.getProperty("line.separator"));
+				sb.append(System.lineSeparator());
 				/* 输出Lookahead表 */
 				if (edge.data.arrLookAhead != null) {
 					sb.append("\t\t预查：");
 					for (int id : edge.data.arrLookAhead) {
 						sb.append("[" + arrTerminals.get(id) + "]");
 					}
-					sb.append(System.getProperty("line.separator"));
+					sb.append(System.lineSeparator());
 				}
 			}
-			sb.append(System.getProperty("line.separator"));
+			sb.append(System.lineSeparator());
 		}
 		return sb.toString();
 	}
