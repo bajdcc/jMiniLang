@@ -11,12 +11,12 @@ public class TrackerResource {
 	/**
 	 * 指令记录集
 	 */
-	private ArrayList<InstructionRecord> arrInstRecords = new ArrayList<InstructionRecord>();
+	private ArrayList<InstructionRecord> arrInstRecords = new ArrayList<>();
 
 	/**
 	 * 错误记录集
 	 */
-	private ArrayList<ErrorRecord> arrErrorRecords = new ArrayList<ErrorRecord>();
+	private ArrayList<ErrorRecord> arrErrorRecords = new ArrayList<>();
 
 	/**
 	 * 跟踪器链表头

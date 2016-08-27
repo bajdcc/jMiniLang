@@ -12,7 +12,7 @@ public enum RuntimeObjectType {
 
 	private String name;
 
-	private RuntimeObjectType(String name) {
+	RuntimeObjectType(String name) {
 		this.name = name;
 	}
 

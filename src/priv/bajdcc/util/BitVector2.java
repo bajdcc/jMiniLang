@@ -7,7 +7,7 @@ import java.util.BitSet;
  *
  * @author bajdcc
  */
-public class BitVector2 {
+public class BitVector2 implements Cloneable {
 	/**
 	 * 内部一重布尔数组
 	 */
@@ -103,10 +103,15 @@ public class BitVector2 {
 
 	@Override
 	public Object clone() {
-		BitVector2 bv2 = new BitVector2();
-		bv2.nX = nX;
-		bv2.nY = nY;
-		bv2.bs = (BitSet) bs.clone();
+		BitVector2 bv2 = null;
+		try {
+			bv2 = (BitVector2) super.clone();
+			bv2.nX = nX;
+			bv2.nY = nY;
+			bv2.bs = (BitSet) bs.clone();
+		} catch (CloneNotSupportedException e) {
+			e.printStackTrace();
+		}
 		return bv2;
 	}
 }

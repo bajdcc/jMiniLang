@@ -12,5 +12,5 @@ public interface ISyntaxComponent {
 	 * @param visitor
 	 *            递归遍历算法
 	 */
-	public void visit(ISyntaxComponentVisitor visitor);
+	void visit(ISyntaxComponentVisitor visitor);
 }

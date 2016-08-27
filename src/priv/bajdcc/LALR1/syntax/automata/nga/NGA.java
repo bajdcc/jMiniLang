@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.stream.Collectors;
 
 import priv.bajdcc.LALR1.syntax.ISyntaxComponent;
 import priv.bajdcc.LALR1.syntax.ISyntaxComponentVisitor;
@@ -43,7 +44,7 @@ public class NGA implements ISyntaxComponentVisitor {
 	/**
 	 * 规则到文法自动机状态的映射
 	 */
-	protected HashMap<RuleItem, NGAStatus> mapNGA = new HashMap<RuleItem, NGAStatus>();
+	protected HashMap<RuleItem, NGAStatus> mapNGA = new HashMap<>();
 
 	/**
 	 * 保存结果的数据包
@@ -89,7 +90,7 @@ public class NGA implements ISyntaxComponentVisitor {
 	/**
 	 * 断开某个状态和所有边
 	 * 
-	 * @param begin
+	 * @param status
 	 *            某状态
 	 */
 	protected void disconnect(NGAStatus status) {
@@ -142,13 +143,13 @@ public class NGA implements ISyntaxComponentVisitor {
 	private NGAStatus deleteEpsilon(ENGA enga) {
 		/* 获取状态闭包 */
 		ArrayList<NGAStatus> NGAStatusList = getNGAStatusClosure(
-				new BreadthFirstSearch<NGAEdge, NGAStatus>(), enga.begin);
+				new BreadthFirstSearch<>(), enga.begin);
 		/* 可到达状态集合 */
-		ArrayList<NGAStatus> availableStatus = new ArrayList<NGAStatus>();
+		ArrayList<NGAStatus> availableStatus = new ArrayList<>();
 		/* 可到达标签集合 */
-		ArrayList<String> availableLabels = new ArrayList<String>();
+		ArrayList<String> availableLabels = new ArrayList<>();
 		/* 可到达标签集哈希表（用于查找） */
-		HashSet<String> availableLabelsSet = new HashSet<String>();
+		HashSet<String> availableLabelsSet = new HashSet<>();
 		/* 搜索所有有效状态 */
 		availableStatus.add(NGAStatusList.get(0));
 		availableLabels.add(NGAStatusList.get(0).data.label);
@@ -191,15 +192,14 @@ public class NGA implements ISyntaxComponentVisitor {
 					status.data.bFinal = true;
 				}
 				/* 遍历闭包中所有边 */
-				for (NGAEdge edge : epsilonStatus.outEdges) {
-					if (edge.data.kAction != NGAEdgeType.EPSILON) {
+				/* 获得索引 *//* 如果当前边不是Epsilon边，就将闭包中的有效边添加到当前状态 */
+				epsilonStatus.outEdges.stream().filter(edge -> edge.data.kAction != NGAEdgeType.EPSILON).forEach(edge -> {
 						/* 获得索引 */
-						int idx = availableLabels
-								.indexOf(edge.end.data.label);
+					int idx = availableLabels
+							.indexOf(edge.end.data.label);
 						/* 如果当前边不是Epsilon边，就将闭包中的有效边添加到当前状态 */
-						connect(status, availableStatus.get(idx)).data = edge.data;
-					}
-				}
+					connect(status, availableStatus.get(idx)).data = edge.data;
+				});
 			}
 		}
 		/* 删除Epsilon边 */
@@ -214,12 +214,7 @@ public class NGA implements ISyntaxComponentVisitor {
 			}
 		}
 		/* 删除无效状态 */
-		ArrayList<NGAStatus> unaccessiableStatus = new ArrayList<NGAStatus>();
-		for (NGAStatus status : NGAStatusList) {
-			if (!availableStatus.contains(status)) {
-				unaccessiableStatus.add(status);
-			}
-		}
+		ArrayList<NGAStatus> unaccessiableStatus = NGAStatusList.stream().filter(status -> !availableStatus.contains(status)).collect(Collectors.toCollection(ArrayList::new));
 		for (NGAStatus status : unaccessiableStatus) {
 			NGAStatusList.remove(status);// 删除无效状态
 			disconnect(status);// 删除与状态有关的所有边
@@ -247,7 +242,7 @@ public class NGA implements ISyntaxComponentVisitor {
 	 */
 	private void beginChilren() {
 		bag.childNGA = null;
-		bag.stkNGA.push(new ArrayList<ENGA>());
+		bag.stkNGA.push(new ArrayList<>());
 	}
 
 	/**
@@ -260,7 +255,7 @@ public class NGA implements ISyntaxComponentVisitor {
 	/**
 	 * 保存结果
 	 * 
-	 * @param enpa
+	 * @param enga
 	 *            EpsilonNGA
 	 */
 	private void store(ENGA enga) {
@@ -411,7 +406,7 @@ public class NGA implements ISyntaxComponentVisitor {
 	 * 非确定性文法自动机描述
 	 */
 	public String getNGAString() {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		sb.append("#### 产生式 ####");
 		sb.append(System.lineSeparator());
 		for (NGAStatus status : mapNGA.values()) {

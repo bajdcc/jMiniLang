@@ -92,13 +92,11 @@ public class ExpAssign implements IExp {
 
 	@Override
 	public String print(StringBuilder prefix) {
-		StringBuilder sb = new StringBuilder();
-		sb.append(decleared ? KeywordType.VARIABLE.getName() : KeywordType.LET
-				.getName());
-		sb.append(" " + name.toRealString());
-		sb.append(" " + OperatorType.ASSIGN.getName() + " ");
-		sb.append(exp.print(prefix));
-		return sb.toString();
+		return (decleared ? KeywordType.VARIABLE.getName() : KeywordType.LET
+				.getName()) +
+				" " + name.toRealString() +
+				" " + OperatorType.ASSIGN.getName() + " " +
+				exp.print(prefix);
 	}
 
 	@Override

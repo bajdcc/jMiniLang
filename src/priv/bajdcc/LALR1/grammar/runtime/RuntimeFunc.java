@@ -47,17 +47,17 @@ public class RuntimeFunc {
 	/**
 	 * 参数
 	 */
-	private ArrayList<RuntimeObject> params = new ArrayList<RuntimeObject>();
+	private ArrayList<RuntimeObject> params = new ArrayList<>();
 
 	/**
 	 * 临时变量
 	 */
-	private List<HashMap<Integer, RuntimeObject>> tmp = new ArrayList<HashMap<Integer, RuntimeObject>>();
+	private List<HashMap<Integer, RuntimeObject>> tmp = new ArrayList<>();
 
 	/**
 	 * 函数闭包
 	 */
-	private Map<Integer, RuntimeObject> closure = new HashMap<Integer, RuntimeObject>();
+	private Map<Integer, RuntimeObject> closure = new HashMap<>();
 
 	/**
 	 * YIELD
@@ -137,7 +137,7 @@ public class RuntimeFunc {
 	}
 
 	public void enterScope() {
-		tmp.add(0, new HashMap<Integer, RuntimeObject>());
+		tmp.add(0, new HashMap<>());
 	}
 
 	public void leaveScope() {
@@ -158,7 +158,7 @@ public class RuntimeFunc {
 
 	public void addYieldStack(String hash, RuntimeStack stack) {
 		if (yields == null) {
-			yields = new HashListMapEx2<String, RuntimeStack>();
+			yields = new HashListMapEx2<>();
 		}
 		yields.add(hash, stack);
 	}
@@ -169,10 +169,8 @@ public class RuntimeFunc {
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append(System.lineSeparator());
-		sb.append(String.format("代码页：%s，地址：%d，名称：%s，参数：%s，变量：%s，闭包：%s",
-				currentPage, currentPc, name, params, tmp, closure));
-		return sb.toString();
+		return System.lineSeparator() +
+				String.format("代码页：%s，地址：%d，名称：%s，参数：%s，变量：%s，闭包：%s",
+						currentPage, currentPc, name, params, tmp, closure);
 	}
 }

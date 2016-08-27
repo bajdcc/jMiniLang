@@ -27,12 +27,12 @@ public class RuleItem {
 	/**
 	 * First集合（终结符）
 	 */
-	public HashSet<TokenExp> setFirstSetTokens = new HashSet<TokenExp>();
+	public HashSet<TokenExp> setFirstSetTokens = new HashSet<>();
 
 	/**
 	 * First集合（非终结符）
 	 */
-	public HashSet<RuleExp> setFirstSetRules = new HashSet<RuleExp>();
+	public HashSet<RuleExp> setFirstSetRules = new HashSet<>();
 
 	/**
 	 * 父结点指针

@@ -61,13 +61,11 @@ public class StmtPort implements IStmt {
 
 	@Override
 	public String print(StringBuilder prefix) {
-		StringBuilder sb = new StringBuilder();
-		sb.append(prefix.toString());
-		sb.append(imported ? KeywordType.IMPORT.getName() : KeywordType.EXPORT
-				.getName());
-		sb.append(" " + name.toRealString());
-		sb.append(OperatorType.SEMI.getName());
-		return sb.toString();
+		return prefix.toString() +
+				(imported ? KeywordType.IMPORT.getName() : KeywordType.EXPORT
+						.getName()) +
+				" " + name.toRealString() +
+				OperatorType.SEMI.getName();
 	}
 
 	@Override

@@ -20,7 +20,7 @@ public class OperatorTokenizer extends TokenAlgorithm {
 	/**
 	 * 关键字哈希表
 	 */
-	private HashMap<String, OperatorType> hashOperator = new HashMap<String, OperatorType>();
+	private HashMap<String, OperatorType> hashOperator = new HashMap<>();
 
 	public OperatorTokenizer() throws RegexException {
 		super(getRegexString(), null);
@@ -40,7 +40,7 @@ public class OperatorTokenizer extends TokenAlgorithm {
 			}
 			if (type == OperatorType.ESCAPE)
 				op += op;
-			sb.append(op + "|");
+			sb.append(op).append("|");
 		}
 		if (sb.length() > 0) {
 			sb.deleteCharAt(sb.length() - 1);

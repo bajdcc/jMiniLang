@@ -17,7 +17,7 @@ public class TokenAlgorithmCollection implements Cloneable {
 	/**
 	 * 算法集合
 	 */
-	private ArrayList<ITokenAlgorithm> arrAlgorithms = new ArrayList<ITokenAlgorithm>();
+	private ArrayList<ITokenAlgorithm> arrAlgorithms = new ArrayList<>();
 
 	/**
 	 * 字符串迭代器

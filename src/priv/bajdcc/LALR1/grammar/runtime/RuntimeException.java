@@ -31,7 +31,7 @@ public class RuntimeException extends Exception {
 		public void setMessage(String message) {
 			this.message = message;
 		}
-	};
+	}
 
 	public RuntimeException(RuntimeError kError, int position, String info) {
 		this.position = position;

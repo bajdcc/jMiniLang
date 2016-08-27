@@ -16,7 +16,7 @@ public class DFAStatusData extends NFAStatusData {
 	/**
 	 * NFA状态集合
 	 */
-	public ArrayList<NFAStatus> nfaStatus = new ArrayList<NFAStatus>();
+	public ArrayList<NFAStatus> nfaStatus = new ArrayList<>();
 
 	/**
 	 * 获得状态编号描述（逗号分隔）
@@ -31,8 +31,8 @@ public class DFAStatusData extends NFAStatusData {
 		}
 		Arrays.sort(orders);
 		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < orders.length; i++) {
-			sb.append(orders[i] + ",");
+		for (int order : orders) {
+			sb.append(order).append(",");
 		}
 		return sb.toString();
 	}

@@ -33,7 +33,7 @@ public class SyntaxException extends Exception {
 		public void setMessage(String message) {
 			this.message = message;
 		}
-	};
+	}
 
 	public SyntaxException(SyntaxError error, Position pos, Object obj) {
 		super(error.getMessage());

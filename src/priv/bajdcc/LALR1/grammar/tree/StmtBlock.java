@@ -38,10 +38,8 @@ public class StmtBlock implements IStmt {
 
 	@Override
 	public String print(StringBuilder prefix) {
-		StringBuilder sb = new StringBuilder();
-		sb.append(prefix.toString());
-		sb.append(block.print(prefix));
-		return sb.toString();
+		return prefix.toString() +
+				block.print(prefix);
 	}
 
 	@Override

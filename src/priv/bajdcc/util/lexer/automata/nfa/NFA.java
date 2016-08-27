@@ -35,12 +35,12 @@ public class NFA implements IRegexComponentVisitor {
 	/**
 	 * NFA栈
 	 */
-	private Stack<ArrayList<ENFA>> stkNFA = new Stack<ArrayList<ENFA>>();
+	private Stack<ArrayList<ENFA>> stkNFA = new Stack<>();
 
 	/**
 	 * NFA子表
 	 */
-	private ArrayList<ENFA> childNFA = new ArrayList<ENFA>();
+	private ArrayList<ENFA> childNFA = new ArrayList<>();
 
 	/**
 	 * ENFA
@@ -129,13 +129,15 @@ public class NFA implements IRegexComponentVisitor {
 		ENFA enfa = new ENFA();
 		enfa.begin = new NFAStatus();
 		enfa.end = new NFAStatus();
-		for (CharacterRange range : chMap.getRanges()) {// 遍历所有字符区间
-			if (node.include(range.chLowerBound)) {// 若在当前结点范围内，则添加边
-				NFAEdge edge = connect(enfa.begin, enfa.end);// 连接两个状态
-				edge.data.kAction = EdgeType.CHARSET;// 字符类型
-				edge.data.param = chMap.find(range.chLowerBound);
-			}
-		}
+		// 遍历所有字符区间
+// 若在当前结点范围内，则添加边
+// 连接两个状态
+// 字符类型
+		chMap.getRanges().stream().filter(range -> node.include(range.chLowerBound)).forEach(range -> {// 若在当前结点范围内，则添加边
+			NFAEdge edge = connect(enfa.begin, enfa.end);// 连接两个状态
+			edge.data.kAction = EdgeType.CHARSET;// 字符类型
+			edge.data.param = chMap.find(range.chLowerBound);
+		});
 		storeENFA(enfa);
 	}
 
@@ -191,7 +193,7 @@ public class NFA implements IRegexComponentVisitor {
 		// 由于正则表达式的语法树结构使然，循环语句的子结点必定只有一个，
 		// 为字符集、并联或串联。
 		/* 构造子图副本 */
-		ArrayList<ENFA> subENFAList = new ArrayList<ENFA>();
+		ArrayList<ENFA> subENFAList = new ArrayList<>();
 		ENFA enfa = new ENFA();
 		enfa.begin = childNFA.get(0).begin;
 		enfa.end = childNFA.get(0).end;
@@ -291,7 +293,7 @@ public class NFA implements IRegexComponentVisitor {
 	 * 进入子结点
 	 */
 	private void enterChildren() {
-		stkNFA.push(new ArrayList<ENFA>());// 新建ENFA表
+		stkNFA.push(new ArrayList<>());// 新建ENFA表
 		childNFA = null;
 	}
 
@@ -321,10 +323,10 @@ public class NFA implements IRegexComponentVisitor {
 	 * @return 副本
 	 */
 	private ENFA copyENFA(ENFA enfa) {
-		ArrayList<NFAStatus> srcStatusList = new ArrayList<NFAStatus>();// 初态表
-		ArrayList<NFAStatus> dstStatusList = new ArrayList<NFAStatus>();// 终态表
+		ArrayList<NFAStatus> srcStatusList = new ArrayList<>();// 初态表
+		ArrayList<NFAStatus> dstStatusList = new ArrayList<>();// 终态表
 		srcStatusList.addAll(getNFAStatusClosure(
-				new BreadthFirstSearch<NFAEdge, NFAStatus>(), enfa.begin)); // 获取状态闭包
+				new BreadthFirstSearch<>(), enfa.begin)); // 获取状态闭包
 		/* 复制状态 */
 		for (NFAStatus status : srcStatusList) {
 			NFAStatus newStatus = new NFAStatus();
@@ -382,22 +384,20 @@ public class NFA implements IRegexComponentVisitor {
 	public String getNFAString() {
 		StringBuilder sb = new StringBuilder();
 		ArrayList<NFAStatus> statusList = getNFAStatusClosure(
-				new BreadthFirstSearch<NFAEdge, NFAStatus>(), nfa.begin);// 获取状态闭包
+				new BreadthFirstSearch<>(), nfa.begin);// 获取状态闭包
 		/* 生成NFA描述 */
 		for (int i = 0; i < statusList.size(); i++) {
 			NFAStatus status = statusList.get(i);
 			/* 状态 */
-			sb.append("状态[" + i + "]" + (status.data.bFinal ? "[结束]" : "")
-					+ System.lineSeparator());
+			sb.append("状态[").append(i).append("]").append(status.data.bFinal ? "[结束]" : "").append(System.lineSeparator());
 			/* 边 */
 			for (NFAEdge edge : status.outEdges) {
-				sb.append("\t边 => [" + statusList.indexOf(edge.end) + "]"
-						+ System.lineSeparator());// 指向边
-				sb.append("\t\t类型 => " + edge.data.kAction.getName());
+				sb.append("\t边 => [").append(statusList.indexOf(edge.end)).append("]").append(System.lineSeparator());// 指向边
+				sb.append("\t\t类型 => ").append(edge.data.kAction.getName());
 				switch (edge.data.kAction)// 类型
 				{
 				case CHARSET:
-					sb.append("\t" + chMap.getRanges().get(edge.data.param));// 区间
+					sb.append("\t").append(chMap.getRanges().get(edge.data.param));// 区间
 					break;
 				case EPSILON:
 					break;

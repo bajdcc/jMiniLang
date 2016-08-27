@@ -1,9 +1,6 @@
 package priv.bajdcc.LALR1.semantic.test;
 
-import java.util.Scanner;
-
 import priv.bajdcc.LALR1.semantic.Semantic;
-import priv.bajdcc.LALR1.syntax.Syntax;
 import priv.bajdcc.LALR1.syntax.handler.SyntaxException;
 import priv.bajdcc.util.lexer.error.RegexException;
 import priv.bajdcc.util.lexer.token.OperatorType;

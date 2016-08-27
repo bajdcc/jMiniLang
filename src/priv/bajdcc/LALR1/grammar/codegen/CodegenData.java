@@ -14,10 +14,10 @@ import priv.bajdcc.LALR1.grammar.runtime.RuntimeInstUnary;
  */
 public class CodegenData {
 
-	public ArrayList<RuntimeInstBase> insts = new ArrayList<RuntimeInstBase>();
-	public HashMap<String, Integer> funcEntriesMap = new HashMap<String, Integer>();
-	public ArrayList<RuntimeInstUnary> callsToWriteBack = new ArrayList<RuntimeInstUnary>();
-	private Stack<CodegenBlock> stkBlock = new Stack<CodegenBlock>();
+	public ArrayList<RuntimeInstBase> insts = new ArrayList<>();
+	public HashMap<String, Integer> funcEntriesMap = new HashMap<>();
+	public ArrayList<RuntimeInstUnary> callsToWriteBack = new ArrayList<>();
+	private Stack<CodegenBlock> stkBlock = new Stack<>();
 	private int idxCode = 0;
 
 	public void pushCode(RuntimeInstBase code) {

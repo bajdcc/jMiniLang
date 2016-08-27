@@ -17,7 +17,7 @@ public interface IQueryScopeSymbol {
 	 *            查询的符号名
 	 * @return 符号名是否存在
 	 */
-	public boolean findDeclaredSymbol(String name);
+	boolean findDeclaredSymbol(String name);
 	
 	/**
 	 * 查找变量名（当前命名空间）
@@ -26,7 +26,7 @@ public interface IQueryScopeSymbol {
 	 *            查询的符号名
 	 * @return 符号名是否存在
 	 */
-	public boolean findDeclaredSymbolDirect(String name);
+	boolean findDeclaredSymbolDirect(String name);
 
 	/**
 	 * 在当前块下是否为唯一符号（检查重复定义）
@@ -35,21 +35,21 @@ public interface IQueryScopeSymbol {
 	 *            符号名
 	 * @return 是否唯一
 	 */
-	public boolean isUniqueSymbolOfBlock(String name);
+	boolean isUniqueSymbolOfBlock(String name);
 
 	/**
 	 * 获得入口名，一般为main
 	 * 
 	 * @return 入口名
 	 */
-	public String getEntryName();
+	String getEntryName();
 
 	/**
 	 * 获得入口单词，一般为main
 	 * 
 	 * @return 入口单词
 	 */
-	public Token getEntryToken();
+	Token getEntryToken();
 
 	/**
 	 * 根据过程名查找过程对象
@@ -59,7 +59,7 @@ public interface IQueryScopeSymbol {
 	 * 
 	 * @return 过程对象
 	 */
-	public Function getFuncByName(String name);
+	Function getFuncByName(String name);
 
 	/**
 	 * 根据真实过程名查找过程对象
@@ -69,7 +69,7 @@ public interface IQueryScopeSymbol {
 	 * 
 	 * @return 过程对象
 	 */
-	public Function getFuncByRealName(String name);
+	Function getFuncByRealName(String name);
 
 	/**
 	 * 过程名是否已被占用
@@ -79,5 +79,5 @@ public interface IQueryScopeSymbol {
 	 * 
 	 * @return 是否占用
 	 */
-	public boolean isRegisteredFunc(String name);
+	boolean isRegisteredFunc(String name);
 }

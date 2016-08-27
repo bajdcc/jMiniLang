@@ -1,16 +1,8 @@
 package priv.bajdcc.LALR1.semantic.test;
 
-import java.util.Scanner;
-
-import priv.bajdcc.LALR1.grammar.symbol.IQuerySymbol;
 import priv.bajdcc.LALR1.semantic.Semantic;
-import priv.bajdcc.LALR1.semantic.token.IIndexedData;
-import priv.bajdcc.LALR1.semantic.token.ISemanticAnalyzier;
-import priv.bajdcc.LALR1.syntax.Syntax;
 import priv.bajdcc.LALR1.syntax.handler.SyntaxException;
 import priv.bajdcc.util.lexer.error.RegexException;
-import priv.bajdcc.util.lexer.token.OperatorType;
-import priv.bajdcc.util.lexer.token.Token;
 import priv.bajdcc.util.lexer.token.TokenType;
 
 @SuppressWarnings("unused")

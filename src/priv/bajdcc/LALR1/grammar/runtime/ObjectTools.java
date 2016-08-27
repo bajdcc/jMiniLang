@@ -8,7 +8,7 @@ import java.io.OutputStream;
 
 public class ObjectTools {
 	@SuppressWarnings("unchecked")
-	public static <T extends Object> T deserialize(InputStream input) {
+	public static <T> T deserialize(InputStream input) {
 		try {
 			ObjectInputStream in = new ObjectInputStream(input);
 			return (T) in.readObject();

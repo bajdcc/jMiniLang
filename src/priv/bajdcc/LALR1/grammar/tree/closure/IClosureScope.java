@@ -7,6 +7,6 @@ package priv.bajdcc.LALR1.grammar.tree.closure;
  */
 public interface IClosureScope {
 
-	public void addRef(Object obj);
-	public void addDecl(Object obj);
+	void addRef(Object obj);
+	void addDecl(Object obj);
 }

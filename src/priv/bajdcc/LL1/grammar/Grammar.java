@@ -85,7 +85,7 @@ public class Grammar extends Syntax {
 	 * 获得单词流描述
 	 */
 	public String getTokenString() {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		sb.append("#### 单词流 ####");
 		sb.append(System.lineSeparator());
 		for (Token token : arrTokens) {

@@ -35,7 +35,7 @@ public class SemanticException extends Exception {
 		public void setMessage(String message) {
 			this.message = message;
 		}
-	};
+	}
 
 	public SemanticException(SemanticError error, Token token) {
 		super(error.getMessage());
@@ -72,13 +72,8 @@ public class SemanticException extends Exception {
 		if (snapshot == null) {
 			return toString();
 		}
-		StringBuilder sb = new StringBuilder();
-		sb.append(getMessage());
-		sb.append(": ");
-		sb.append(token);
-		sb.append(System.lineSeparator());
-		sb.append(snapshot);
-		return sb.toString();
+		return getMessage() + ": " + token + System.lineSeparator() +
+				snapshot + System.lineSeparator();
 	}
 
 	@Override

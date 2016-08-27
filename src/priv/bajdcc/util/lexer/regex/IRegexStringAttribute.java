@@ -14,19 +14,19 @@ public interface IRegexStringAttribute {
 	 * @param result
 	 *            匹配结果
 	 */
-	public void setResult(String result);
+	void setResult(String result);
 
 	/**
 	 * 返回匹配结果
 	 * 
 	 * @return 匹配结果
 	 */
-	public String getResult();
+	String getResult();
 
 	/**
 	 * 返回贪婪模式
 	 * 
 	 * @return 是否为贪婪模式
 	 */
-	public boolean getGreedMode();
+	boolean getGreedMode();
 }

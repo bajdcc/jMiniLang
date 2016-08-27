@@ -12,5 +12,5 @@ public interface IRegexComponent {
 	 * @param visitor
 	 *            递归遍历算法
 	 */
-	public void visit(IRegexComponentVisitor visitor);
+	void visit(IRegexComponentVisitor visitor);
 }

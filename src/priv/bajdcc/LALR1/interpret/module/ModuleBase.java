@@ -82,18 +82,8 @@ public class ModuleBase implements IInterpreterModule {
 		Grammar grammar = new Grammar(base);
 		RuntimeCodePage page = grammar.getCodePage();
 		IRuntimeDebugInfo info = page.getInfo();
-		info.addExternalValue("g_null", new IRuntimeDebugValue() {
-			@Override
-			public RuntimeObject getRuntimeObject() {
-				return new RuntimeObject(null);
-			}
-		});
-		info.addExternalValue("g_endl", new IRuntimeDebugValue() {
-			@Override
-			public RuntimeObject getRuntimeObject() {
-				return new RuntimeObject("\n");
-			}
-		});
+		info.addExternalValue("g_null", () -> new RuntimeObject(null));
+		info.addExternalValue("g_endl", () -> new RuntimeObject("\n"));
 		info.addExternalFunc("g_is_null", new IRuntimeDebugExec() {
 			@Override
 			public String getDoc() {
@@ -235,8 +225,7 @@ public class ModuleBase implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 					IRuntimeStatus status) throws Exception {
-				return new RuntimeObject(args.get(0).getObj().getClass()
-						.getName());
+				return new RuntimeObject(args.get(0).getTypeName());
 			}
 		});
 		info.addExternalFunc("g_exit", new IRuntimeDebugExec() {
@@ -291,7 +280,7 @@ public class ModuleBase implements IInterpreterModule {
 				try {
 					BufferedReader br = new BufferedReader(new FileReader(args
 							.get(0).getObj().toString()));
-					String line = null;
+					String line;
 					while ((line = br.readLine()) != null) {
 						System.out.println(line);
 					}

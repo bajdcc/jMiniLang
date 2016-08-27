@@ -1,12 +1,6 @@
 package priv.bajdcc.LALR1.grammar.test;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 import priv.bajdcc.LALR1.grammar.Grammar;
 import priv.bajdcc.LALR1.grammar.runtime.IRuntimeDebugExec;
@@ -52,12 +46,7 @@ public class TestGrammar3 {
 			Grammar grammar2 = new Grammar(b);
 			System.out.println(grammar2.toString());
 			RuntimeCodePage page2 = grammar2.getCodePage();
-			page2.getInfo().addExternalValue("g_gk", new IRuntimeDebugValue() {
-				@Override
-				public RuntimeObject getRuntimeObject() {
-					return new RuntimeObject("abc");
-				}
-			});
+			page2.getInfo().addExternalValue("g_gk", () -> new RuntimeObject("abc"));
 			page2.getInfo().addExternalFunc("g_print", new IRuntimeDebugExec() {
 				@Override
 				public String getDoc() {

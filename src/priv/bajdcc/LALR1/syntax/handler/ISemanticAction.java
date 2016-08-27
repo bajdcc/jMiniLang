@@ -14,5 +14,5 @@ public interface ISemanticAction {
 	 * @param manage
 	 *            符号表管理接口
 	 */
-	public void handle(IManageSymbol manage);
+	void handle(IManageSymbol manage);
 }

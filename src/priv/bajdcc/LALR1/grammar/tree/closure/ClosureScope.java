@@ -9,8 +9,8 @@ import java.util.HashSet;
  */
 public class ClosureScope implements IClosureScope {
 
-	private HashSet<Object> ref = new HashSet<Object>();
-	private HashSet<Object> decl = new HashSet<Object>();
+	private HashSet<Object> ref = new HashSet<>();
+	private HashSet<Object> decl = new HashSet<>();
 
 	@Override
 	public void addRef(Object obj) {
@@ -23,7 +23,7 @@ public class ClosureScope implements IClosureScope {
 	}
 
 	protected HashSet<Object> getClosure() {
-		HashSet<Object> closure = new HashSet<Object>();
+		HashSet<Object> closure = new HashSet<>();
 		closure.addAll(ref);
 		closure.removeAll(decl);
 		return closure.isEmpty() ? null : closure;

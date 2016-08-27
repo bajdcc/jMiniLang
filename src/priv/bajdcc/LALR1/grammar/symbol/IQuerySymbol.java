@@ -10,10 +10,10 @@ public interface IQuerySymbol {
 	/**
 	 * 得到命名空间查询接口
 	 */
-	public IQueryScopeSymbol getQueryScopeService();
+	IQueryScopeSymbol getQueryScopeService();
 	
 	/**
 	 * 得到块查询接口
 	 */
-	public IQueryBlockSymbol getQueryBlockService();
+	IQueryBlockSymbol getQueryBlockService();
 }

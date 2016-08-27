@@ -75,7 +75,7 @@ public class PredictionTable extends SelectSetSolver {
 	/**
 	 * 指令包
 	 */
-	private ArrayList<ArrayList<PredictionInstruction>> instList = new ArrayList<ArrayList<PredictionInstruction>>();
+	private ArrayList<ArrayList<PredictionInstruction>> instList = new ArrayList<>();
 
 	public PredictionTable(ArrayList<RuleExp> nonTerminals,
 			ArrayList<TokenExp> terminals, Rule rule, TokenExp epsilon,
@@ -157,7 +157,7 @@ public class PredictionTable extends SelectSetSolver {
 	@Override
 	protected void addRule() {
 		indexBag++;
-		instBag = new ArrayList<PredictionInstruction>();
+		instBag = new ArrayList<>();
 		instList.add(instBag);
 	}
 
@@ -190,7 +190,7 @@ public class PredictionTable extends SelectSetSolver {
 	 */
 	public void run() throws GrammarException {
 		/* 核心堆栈 */
-		Stack<PredictionInstruction> spi = new Stack<PredictionInstruction>();
+		Stack<PredictionInstruction> spi = new Stack<>();
 		/* 结束符号进栈 */
 		spi.push(new PredictionInstruction(PredictType.TERMINAL, epsilon.id));
 		/* 起始符号进栈 */
@@ -300,20 +300,19 @@ public class PredictionTable extends SelectSetSolver {
 	 * 
 	 */
 	public String getInstString() {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		sb.append("#### 指令包 ####");
 		sb.append(System.lineSeparator());
 		for (int i = 0; i < instList.size(); i++) {
-			sb.append(i + ": ");
+			sb.append(i).append(": ");
 			ArrayList<PredictionInstruction> pis = instList.get(i);
 			for (PredictionInstruction k : pis) {
 				switch (k.type) {
 				case NONTERMINAL:
-					sb.append("[" + arrNonTerminals.get(k.inst).toString()
-							+ "]");
+					sb.append("[").append(arrNonTerminals.get(k.inst).toString()).append("]");
 					break;
 				case TERMINAL:
-					sb.append("[" + arrTerminals.get(k.inst).toString() + "]");
+					sb.append("[").append(arrTerminals.get(k.inst).toString()).append("]");
 					break;
 				default:
 					break;
@@ -329,7 +328,7 @@ public class PredictionTable extends SelectSetSolver {
 	 * 
 	 */
 	public String getMatrixString() {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		int Vn = arrNonTerminals.size();
 		int Vt = arrTerminals.size();
 		sb.append("#### 预测分析矩阵 ####");
@@ -352,34 +351,31 @@ public class PredictionTable extends SelectSetSolver {
 	 * 获得详细描述
 	 */
 	public String getTableString() {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		int Vn = arrNonTerminals.size();
 		int Vt = arrTerminals.size();
 		sb.append("#### 预测分析表 ####");
 		sb.append(System.lineSeparator());
 		for (int i = 0; i < Vn; i++) {
-			sb.append("状态[" + i + "]： ");
+			sb.append("状态[").append(i).append("]： ");
 			sb.append(System.lineSeparator());
-			sb.append("\t非终结符 -> " + arrNonTerminals.get(i).name);
+			sb.append("\t非终结符 -> ").append(arrNonTerminals.get(i).name);
 			sb.append(System.lineSeparator());
 			for (int j = 0; j < Vt; j++) {
 				int idx = table[i][j];
 				if (idx != -1) {
 					sb.append("\t\t----------------");
 					sb.append(System.lineSeparator());
-					sb.append("\t\t接受 -> " + arrTerminals.get(j).toString());
+					sb.append("\t\t接受 -> ").append(arrTerminals.get(j).toString());
 					sb.append(System.lineSeparator());
 					sb.append("\t\t入栈 -> ");
 					for (PredictionInstruction k : instList.get(table[i][j])) {
 						switch (k.type) {
 						case NONTERMINAL:
-							sb.append("["
-									+ arrNonTerminals.get(k.inst).toString()
-									+ "]");
+							sb.append("[").append(arrNonTerminals.get(k.inst).toString()).append("]");
 							break;
 						case TERMINAL:
-							sb.append("[" + arrTerminals.get(k.inst).toString()
-									+ "]");
+							sb.append("[").append(arrTerminals.get(k.inst).toString()).append("]");
 							break;
 						default:
 							break;
@@ -394,10 +390,8 @@ public class PredictionTable extends SelectSetSolver {
 
 	@Override
 	public String toString() {
-		StringBuffer sb = new StringBuffer();
-		sb.append(getTableString());
-		sb.append(getInstString());
-		sb.append(getMatrixString());
-		return sb.toString();
+		return getTableString() +
+				getInstString() +
+				getMatrixString();
 	}
 }

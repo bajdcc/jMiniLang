@@ -1,7 +1,5 @@
 package priv.bajdcc.LALR1.semantic.test;
 
-import java.util.Scanner;
-
 import priv.bajdcc.LALR1.grammar.semantic.ISemanticRecorder;
 import priv.bajdcc.LALR1.grammar.symbol.IManageSymbol;
 import priv.bajdcc.LALR1.grammar.symbol.IQuerySymbol;
@@ -10,8 +8,6 @@ import priv.bajdcc.LALR1.semantic.token.IIndexedData;
 import priv.bajdcc.LALR1.semantic.token.IRandomAccessOfTokens;
 import priv.bajdcc.LALR1.semantic.token.ISemanticAction;
 import priv.bajdcc.LALR1.semantic.token.ISemanticAnalyzier;
-import priv.bajdcc.LALR1.semantic.token.TokenBag;
-import priv.bajdcc.LALR1.syntax.Syntax;
 import priv.bajdcc.LALR1.syntax.handler.IErrorHandler;
 import priv.bajdcc.LALR1.syntax.handler.SyntaxException;
 import priv.bajdcc.util.TrackerErrorBag;
@@ -47,84 +43,48 @@ public class TestOperator {
 			semantic.addNonTerminal("E");
 			semantic.addNonTerminal("T");
 			semantic.addNonTerminal("F");
-			semantic.addActionHandler("enter_paran", new ISemanticAction() {
-				@Override
-				public void handle(IIndexedData indexed, IManageSymbol manage,
-						IRandomAccessOfTokens access, ISemanticRecorder recorder) {
-					System.out.println("enter");
-				}
-			});
-			semantic.addActionHandler("leave_paran", new ISemanticAction() {
-				@Override
-				public void handle(IIndexedData indexed, IManageSymbol manage,
-						IRandomAccessOfTokens access, ISemanticRecorder recorder) {
-					System.out.println("leave");
-				}
-			});
-			semantic.addErrorHandler("lost_exp", new IErrorHandler() {
-				@Override
-				public String handle(IRegexStringIterator iterator,
-						TrackerErrorBag bag) {
-					bag.bRead = false;
-					bag.bPass = true;
-					return "表达式不完整";
-				}
-			});
-			semantic.addErrorHandler("lost_exp_right", new IErrorHandler() {
-				@Override
-				public String handle(IRegexStringIterator iterator,
-						TrackerErrorBag bag) {
-					bag.bRead = false;
-					bag.bPass = true;
-					return "缺少右括号";
-				}
-			});
-			ISemanticAnalyzier handleCopy = new ISemanticAnalyzier() {
-				@Override
-				public Object handle(IIndexedData indexed,
-						IQuerySymbol query, ISemanticRecorder recorder) {
-					return indexed.get(0).object;
-				}
-			};
-			ISemanticAnalyzier handleBinop = new ISemanticAnalyzier() {
-				@Override
-				public Object handle(IIndexedData indexed,
-						IQuerySymbol query, ISemanticRecorder recorder) {
-					int lop = Integer
-							.parseInt(indexed.get(0).object.toString());
-					int rop = Integer
-							.parseInt(indexed.get(2).object.toString());
-					Token op = indexed.get(1).token;
-					if (op.kToken == TokenType.OPERATOR) {
-						OperatorType kop = (OperatorType) op.object;
-						switch (kop) {
-						case PLUS:
-							return lop + rop;
-						case MINUS:
-							return lop - rop;
-						case TIMES:
-							return lop * rop;
-						case DIVIDE:
-							if (rop == 0) {
-								return lop;
-							} else {
-								return lop / rop;
-							}
-						default:
-							return 0;
-						}
-					} else {
-						return 0;
-					}
-				}
-			};
-			ISemanticAnalyzier handleValue = new ISemanticAnalyzier() {
-				@Override
-				public Object handle(IIndexedData indexed,
-						IQuerySymbol query, ISemanticRecorder recorder) {
-					return indexed.get(0).token.object;
-				}
-			};
+			semantic.addActionHandler("enter_paran", (indexed, manage, access, recorder) -> System.out.println("enter"));
+			semantic.addActionHandler("leave_paran", (indexed, manage, access, recorder) -> System.out.println("leave"));
+			semantic.addErrorHandler("lost_exp", (iterator, bag) -> {
+                bag.bRead = false;
+                bag.bPass = true;
+                return "表达式不完整";
+            });
+			semantic.addErrorHandler("lost_exp_right", (iterator, bag) -> {
+                bag.bRead = false;
+                bag.bPass = true;
+                return "缺少右括号";
+            });
+			ISemanticAnalyzier handleCopy = (indexed, query, recorder) -> indexed.get(0).object;
+			ISemanticAnalyzier handleBinop = (indexed, query, recorder) -> {
+                int lop = Integer
+                        .parseInt(indexed.get(0).object.toString());
+                int rop = Integer
+                        .parseInt(indexed.get(2).object.toString());
+                Token op = indexed.get(1).token;
+                if (op.kToken == TokenType.OPERATOR) {
+                    OperatorType kop = (OperatorType) op.object;
+                    switch (kop) {
+                    case PLUS:
+                        return lop + rop;
+                    case MINUS:
+                        return lop - rop;
+                    case TIMES:
+                        return lop * rop;
+                    case DIVIDE:
+                        if (rop == 0) {
+                            return lop;
+                        } else {
+                            return lop / rop;
+                        }
+                    default:
+                        return 0;
+                    }
+                } else {
+                    return 0;
+                }
+            };
+			ISemanticAnalyzier handleValue = (indexed, query, recorder) -> indexed.get(0).token.object;
 			// syntax.infer("E -> T `PLUS`<+> E | T `MINUS`<-> E | T");
 			// syntax.infer("T -> F `TIMES`<*> T | F `DIVIDE`</> T | F");
 			// syntax.infer("F -> `LPA`<(> E `RPA`<)>  | `SYMBOL`<i>");

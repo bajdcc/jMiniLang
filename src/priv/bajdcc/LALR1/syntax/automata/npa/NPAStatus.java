@@ -16,12 +16,12 @@ public class NPAStatus {
 	/**
 	 * 出边集合
 	 */
-	public ArrayList<NPAEdge> outEdges = new ArrayList<NPAEdge>();
+	public ArrayList<NPAEdge> outEdges = new ArrayList<>();
 
 	/**
 	 * 入边集合
 	 */
-	public ArrayList<NPAEdge> inEdges = new ArrayList<NPAEdge>();
+	public ArrayList<NPAEdge> inEdges = new ArrayList<>();
 
 	/**
 	 * 数据
@@ -36,7 +36,7 @@ public class NPAStatus {
 	 */
 	public void visit(BreadthFirstSearch<NPAEdge, NPAStatus> bfs) {
 		ArrayList<NPAStatus> stack = bfs.arrStatus;
-		HashSet<NPAStatus> set = new HashSet<NPAStatus>();
+		HashSet<NPAStatus> set = new HashSet<>();
 		stack.clear();
 		set.add(this);
 		stack.add(this);
@@ -45,12 +45,12 @@ public class NPAStatus {
 			VisitBag bag = new VisitBag();
 			bfs.visitBegin(status, bag);
 			if (bag.bVisitChildren) {
-				for (NPAEdge edge : status.outEdges) {// 遍历状态的出边
-					if (!set.contains(edge.end) && bfs.testEdge(edge)) {// 边未被访问，且边类型符合要求
-						stack.add(edge.end);
-						set.add(edge.end);
-					}
-				}
+				// 遍历状态的出边
+// 边未被访问，且边类型符合要求
+				status.outEdges.stream().filter(edge -> !set.contains(edge.end) && bfs.testEdge(edge)).forEach(edge -> {// 边未被访问，且边类型符合要求
+					stack.add(edge.end);
+					set.add(edge.end);
+				});
 			}
 			if (bag.bVisitEnd) {
 				bfs.visitEnd(status);

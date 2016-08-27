@@ -14,7 +14,7 @@ public class Charset implements IRegexComponent {
 	/**
 	 * 包含的范围（正范围）
 	 */
-	public ArrayList<CharacterRange> arrPositiveBounds = new ArrayList<CharacterRange>();
+	public ArrayList<CharacterRange> arrPositiveBounds = new ArrayList<>();
 
 	/**
 	 * 是否取反

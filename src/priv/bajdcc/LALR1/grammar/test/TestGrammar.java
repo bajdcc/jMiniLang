@@ -2,9 +2,7 @@ package priv.bajdcc.LALR1.grammar.test;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Scanner;
 
 import priv.bajdcc.LALR1.grammar.Grammar;
 import priv.bajdcc.LALR1.syntax.handler.SyntaxException;
@@ -18,10 +16,10 @@ public class TestGrammar {
 			//String expr = "void main(int argc, char** argv) {return 0;}";
 			//BufferedReader br = new BufferedReader(new FileReader("E:/http.c"));
 			BufferedReader br = new BufferedReader(new FileReader("E:/a.c"));
-			String line = "";
-			StringBuffer sb = new StringBuffer();
+			String line;
+			StringBuilder sb = new StringBuilder();
 			while ((line = br.readLine()) != null) {
-				sb.append(line + System.lineSeparator());
+				sb.append(line).append(System.lineSeparator());
 			}
 			br.close();
 			Grammar grammar = new Grammar(sb.toString());

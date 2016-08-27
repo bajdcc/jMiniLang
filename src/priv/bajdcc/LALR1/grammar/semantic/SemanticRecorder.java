@@ -5,6 +5,7 @@ import java.util.List;
 
 import priv.bajdcc.LALR1.grammar.error.SemanticException;
 import priv.bajdcc.LALR1.grammar.error.SemanticException.SemanticError;
+import priv.bajdcc.util.lexer.regex.IRegexStringIterator;
 import priv.bajdcc.util.lexer.token.Token;
 
 /**
@@ -14,7 +15,7 @@ import priv.bajdcc.util.lexer.token.Token;
  */
 public class SemanticRecorder implements ISemanticRecorder {
 
-	private ArrayList<SemanticException> errors = new ArrayList<SemanticException>();
+	private ArrayList<SemanticException> errors = new ArrayList<>();
 
 	@Override
 	public void add(SemanticError error, Token token) {
@@ -31,9 +32,20 @@ public class SemanticRecorder implements ISemanticRecorder {
 		return errors.isEmpty();
 	}
 
+	public String toString(IRegexStringIterator iter) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("#### 语义错误列表 ####");
+		sb.append(System.lineSeparator());
+		for (SemanticException error : errors) {
+			sb.append(error.toString(iter));
+			sb.append(System.lineSeparator());
+		}
+		return sb.toString();
+	}
+
 	@Override
 	public String toString() {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		sb.append("#### 语义错误列表 ####");
 		sb.append(System.lineSeparator());
 		for (SemanticException error : errors) {

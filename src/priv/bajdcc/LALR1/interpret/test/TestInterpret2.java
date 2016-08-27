@@ -1,27 +1,14 @@
 package priv.bajdcc.LALR1.interpret.test;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 import priv.bajdcc.LALR1.grammar.Grammar;
-import priv.bajdcc.LALR1.grammar.runtime.IRuntimeDebugExec;
-import priv.bajdcc.LALR1.grammar.runtime.IRuntimeDebugValue;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeCodePage;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeException;
-import priv.bajdcc.LALR1.grammar.runtime.RuntimeMachine;
-import priv.bajdcc.LALR1.grammar.runtime.RuntimeObject;
-import priv.bajdcc.LALR1.grammar.runtime.RuntimeObjectType;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeException.RuntimeError;
 import priv.bajdcc.LALR1.interpret.Interpreter;
-import priv.bajdcc.LALR1.syntax.handler.SyntaxException;
 import priv.bajdcc.util.lexer.error.RegexException;
 
 @SuppressWarnings("unused")

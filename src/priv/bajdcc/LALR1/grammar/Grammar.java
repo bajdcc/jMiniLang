@@ -323,7 +323,7 @@ public class Grammar extends Semantic {
 	 * 获得语义错误描述
 	 */
 	public String getSemanticError() {
-		return recorder.toString();
+		return recorder.toString(tokenFactory);
 	}
 
 	/**

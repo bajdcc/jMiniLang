@@ -9,9 +9,9 @@ import priv.bajdcc.LALR1.grammar.runtime.RuntimeInstUnary;
  */
 public interface ICodegenBlock {
 
-	public RuntimeInstUnary genBreak();
-	public RuntimeInstUnary genContinue();
-	public void enterBlockEntry(CodegenBlock block);
-	public void leaveBlockEntry();
-	public boolean isInBlock();
+	RuntimeInstUnary genBreak();
+	RuntimeInstUnary genContinue();
+	void enterBlockEntry(CodegenBlock block);
+	void leaveBlockEntry();
+	boolean isInBlock();
 }

@@ -22,7 +22,7 @@ public class RegexToString implements IRegexComponentVisitor {
 	 */
 	private void appendPrefix() {
 		prefix.append('\t');
-		context.append(" {" + System.lineSeparator());
+		context.append(" {").append(System.lineSeparator());
 	}
 
 	/**
@@ -30,26 +30,25 @@ public class RegexToString implements IRegexComponentVisitor {
 	 */
 	private void reducePrefix() {
 		prefix.deleteCharAt(0);
-		context.append(prefix + "}" + System.lineSeparator());
+		context.append(prefix).append("}").append(System.lineSeparator());
 	}
 
 	@Override
 	public void visitBegin(Charset node) {
-		context.append(prefix + "字符");
-		context.append((node.bReverse ? "[取反]" : "") + "\t" + node);
+		context.append(prefix).append("字符");
+		context.append(node.bReverse ? "[取反]" : "").append("\t").append(node);
 		context.append(System.lineSeparator());
 	}
 
 	@Override
 	public void visitBegin(Constructure node) {
-		context.append(prefix + (node.bBranch ? "分支" : "序列"));
+		context.append(prefix).append(node.bBranch ? "分支" : "序列");
 		appendPrefix();
 	}
 
 	@Override
 	public void visitBegin(Repetition node) {
-		context.append(prefix.toString() + "循环{" + node.iLowerBound + ","
-				+ node.iUpperBound + "}");
+		context.append(prefix.toString()).append("循环{").append(node.iLowerBound).append(",").append(node.iUpperBound).append("}");
 		appendPrefix();
 	}
 

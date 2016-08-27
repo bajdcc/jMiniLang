@@ -19,7 +19,7 @@ public class IdentifierTokenizer extends TokenAlgorithm {
 	/**
 	 * 关键字的哈希表
 	 */
-	private HashMap<String, KeywordType> mapKeywords = new HashMap<String, KeywordType>();
+	private HashMap<String, KeywordType> mapKeywords = new HashMap<>();
 
 	public IdentifierTokenizer() throws RegexException {
 		super(getRegexString(), null);

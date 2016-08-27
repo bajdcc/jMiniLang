@@ -21,7 +21,7 @@ public class Block implements ICommon {
 	private List<IStmt> stmts = null;
 
 	public Block() {
-		stmts = new ArrayList<IStmt>();
+		stmts = new ArrayList<>();
 	}
 
 	public Block(List<IStmt> stmts) {
@@ -67,7 +67,7 @@ public class Block implements ICommon {
 			sb.append(System.lineSeparator());
 		}
 		prefix.delete(0, 4);
-		sb.append(prefix.toString() + "}");
+		sb.append(prefix.toString()).append("}");
 		return sb.toString();
 	}
 

@@ -14,9 +14,9 @@ import java.util.List;
  */
 public class HashListMap<T> {
 
-	public HashMap<T, Integer> map = new HashMap<T, Integer>();
+	public HashMap<T, Integer> map = new HashMap<>();
 
-	public List<T> list = new ArrayList<T>();
+	public List<T> list = new ArrayList<>();
 
 	public boolean contains(T t) {
 		return map.containsKey(t);

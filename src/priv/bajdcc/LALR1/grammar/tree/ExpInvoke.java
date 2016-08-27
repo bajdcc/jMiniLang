@@ -36,7 +36,7 @@ public class ExpInvoke implements IExp {
 	/**
 	 * 参数
 	 */
-	private ArrayList<IExp> params = new ArrayList<IExp>();
+	private ArrayList<IExp> params = new ArrayList<>();
 
 	/**
 	 * 是否为函数指针调用
@@ -103,10 +103,7 @@ public class ExpInvoke implements IExp {
 
 	@Override
 	public boolean isEnumerable() {
-		if (func != null) {
-			return func.isEnumerable();
-		}
-		return true;
+		return func == null || func.isEnumerable();
 	}
 
 	@Override
@@ -130,7 +127,7 @@ public class ExpInvoke implements IExp {
 	/**
 	 * 参数个数检查
 	 * 
-	 * @param recorder
+	 * @param recorder 错误记录
 	 */
 	private void checkArgsCount(ISemanticRecorder recorder) {
 		int invokeArgsCount = params.size();
@@ -212,7 +209,7 @@ public class ExpInvoke implements IExp {
 			sb.append(KeywordType.YIELD.getName());
 			sb.append(" ");
 		}
-		sb.append(KeywordType.CALL.getName() + " ");
+		sb.append(KeywordType.CALL.getName()).append(" ");
 		if (func != null) {
 			if (!func.getRealName().startsWith("~")) {
 				sb.append(func.getRealName());

@@ -21,55 +21,55 @@ public interface IRegexStringIterator {
 	 *            错误类型
 	 * @throws RegexException
 	 */
-	public abstract void err(RegexError error) throws RegexException;
+	void err(RegexError error) throws RegexException;
 
 	/**
 	 * 处理下一个字符
 	 */
-	public abstract void next();
+	void next();
 	
 	/**
 	 * 处理下一个字符（会丢弃字符直到获得合法字符）
 	 */
-	public abstract Token scan();
+	Token scan();
 
 	/**
 	 * 翻译当前字符
 	 */
-	public abstract void translate();
+	void translate();
 
 	/**
 	 * 判断当前位置不是末尾
 	 * 
 	 */
-	public abstract boolean available();
+	boolean available();
 
 	/**
 	 * 前进一个字符（look forward）
 	 * 
 	 */
-	public abstract void advance();
+	void advance();
 
 	/**
 	 * 获得当前字符
 	 * 
 	 */
-	public abstract char current();
+	char current();
 
 	/**
 	 * 获得字符类型
 	 */
-	public abstract MetaType meta();
+	MetaType meta();
 
 	/**
 	 * 获得当前位置
 	 */
-	public abstract int index();
+	int index();
 
 	/**
 	 * 获得当前位置
 	 */
-	public abstract Position position();
+	Position position();
 
 	/**
 	 * 确认当前字符
@@ -80,46 +80,46 @@ public interface IRegexStringIterator {
 	 *            抛出的错误
 	 * @throws RegexException
 	 */
-	public abstract void expect(MetaType meta, RegexError error)
+	void expect(MetaType meta, RegexError error)
 			throws RegexException;
 
 	/**
 	 * 保存当前位置
 	 */
-	public abstract void snapshot();
+	void snapshot();
 
 	/**
 	 * 覆盖当前位置
 	 */
-	public abstract void cover();
+	void cover();
 
 	/**
 	 * 恢复至上次位置
 	 */
-	public abstract void restore();
+	void restore();
 
 	/**
 	 * 丢弃上次位置
 	 */
-	public abstract void discard();
+	void discard();
 
 	/**
 	 * 获得解析组件
 	 */
-	public abstract RegexStringUtility utility();
+	RegexStringUtility utility();
 	
 	/**
 	 * 获得正则表达式描述
 	 */
-	public abstract String getRegexDescription();
+	String getRegexDescription();
 	
 	/**
 	 * 复制一个对象
 	 */
-	public IRegexStringIterator copy();
+	IRegexStringIterator copy();
 	
 	/**
 	 * 获取扩展接口
 	 */
-	public IRegexStringIteratorEx ex();
+	IRegexStringIteratorEx ex();
 }

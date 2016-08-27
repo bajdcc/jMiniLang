@@ -42,7 +42,7 @@ public class Regex extends RegexStringIterator {
 	/**
 	 * 终态表
 	 */
-	private HashSet<Integer> setFinalStatus = new HashSet<Integer>();
+	private HashSet<Integer> setFinalStatus = new HashSet<>();
 
 	/**
 	 * 字符区间表
@@ -58,7 +58,7 @@ public class Regex extends RegexStringIterator {
 		this.filter = filter;
 	}
 
-	private static HashMap<Character, MetaType> g_mapMeta = new HashMap<Character, MetaType>();
+	private static HashMap<Character, MetaType> g_mapMeta = new HashMap<>();
 
 	static {
 		MetaType[] metaTypes = new MetaType[] { MetaType.LPARAN,
@@ -199,7 +199,7 @@ public class Regex extends RegexStringIterator {
 					return true;
 				}
 			}
-			char local = 0;
+			char local;
 			boolean skipStore = false;// 取消存储当前字符
 			/* 获得当前字符 */
 			if (filter != null) {
@@ -314,7 +314,7 @@ public class Regex extends RegexStringIterator {
 				}
 			}
 
-			Repetition rep = null;// 循环
+			Repetition rep;// 循环
 			switch (data.kMeta) {
 			case QUERY:// '?'
 				next();

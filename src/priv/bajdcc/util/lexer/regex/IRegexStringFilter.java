@@ -11,11 +11,11 @@ public interface IRegexStringFilter {
 	/**
 	 * 过滤
 	 */
-	public RegexStringIteratorData filter(IRegexStringIterator iterator);
+	RegexStringIteratorData filter(IRegexStringIterator iterator);
 	
 	
 	/**
 	 * 返回类型过滤接口
 	 */
-	public IRegexStringFilterMeta getFilterMeta();
+	IRegexStringFilterMeta getFilterMeta();
 }

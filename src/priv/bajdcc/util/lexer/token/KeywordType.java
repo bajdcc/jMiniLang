@@ -31,4 +31,4 @@ public enum KeywordType {
 	public void setName(String name) {
 		this.name = name;
 	}
-};
+}

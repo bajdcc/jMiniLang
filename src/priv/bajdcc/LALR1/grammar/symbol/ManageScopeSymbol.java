@@ -26,12 +26,12 @@ public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
 	private static String ENTRY_NAME = "main";
 	private static String LAMBDA_PREFIX = "~lambda#";
 	private int lambdaId = 0;
-	private HashListMap<Object> symbolList = new HashListMap<Object>();
-	private HashListMapEx<String, Function> funcMap = new HashListMapEx<String, Function>();
-	private ArrayList<HashSet<String>> stkScope = new ArrayList<HashSet<String>>();
-	private HashSet<String> symbolsInFutureBlock = new HashSet<String>();
-	private HashMap<BlockType, Integer> blockLevel = new HashMap<BlockType, Integer>();
-	private Stack<BlockType> blockStack = new Stack<BlockType>();
+	private HashListMap<Object> symbolList = new HashListMap<>();
+	private HashListMapEx<String, Function> funcMap = new HashListMapEx<>();
+	private ArrayList<HashSet<String>> stkScope = new ArrayList<>();
+	private HashSet<String> symbolsInFutureBlock = new HashSet<>();
+	private HashMap<BlockType, Integer> blockLevel = new HashMap<>();
+	private Stack<BlockType> blockStack = new Stack<>();
 
 	public ManageScopeSymbol() {
 		enterScope();
@@ -43,10 +43,8 @@ public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
 
 	@Override
 	public void enterScope() {
-		stkScope.add(0, new HashSet<String>());
-		for (String name : symbolsInFutureBlock) {
-			registerSymbol(name);
-		}
+		stkScope.add(0, new HashSet<>());
+		symbolsInFutureBlock.forEach(this::registerSymbol);
 		clearFutureArgs();
 	}
 
@@ -80,10 +78,7 @@ public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
 
 	@Override
 	public boolean findDeclaredSymbolDirect(String name) {
-		if (symbolsInFutureBlock.contains(name)) {
-			return true;
-		}
-		return stkScope.get(0).contains(name);
+		return symbolsInFutureBlock.contains(name) || stkScope.get(0).contains(name);
 	}
 
 	@Override
@@ -150,10 +145,7 @@ public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
 	@Override
 	public boolean isRegisteredFunc(String name) {
 		Function func = funcMap.get(name);
-		if (func == null) {
-			return false;
-		}
-		return func.getRealName() != null;
+		return func != null && func.getRealName() != null;
 	}
 
 	@Override
@@ -178,14 +170,12 @@ public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
 	}
 
 	public String getSymbolString() {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		sb.append("#### 符号表 ####");
 		sb.append(System.lineSeparator());
 		int i = 0;
 		for (Object symbol : symbolList.list) {
-			sb.append(i + ": " + "["
-					+ RuntimeObject.fromObject(symbol).getName() + "] "
-					+ symbol);
+			sb.append(i).append(": ").append("[").append(RuntimeObject.fromObject(symbol).getName()).append("] ").append(symbol);
 			sb.append(System.lineSeparator());
 			i++;
 		}
@@ -193,12 +183,12 @@ public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
 	}
 
 	public String getFuncString() {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		sb.append("#### 过程表 ####");
 		sb.append(System.lineSeparator());
 		int i = 0;
 		for (Function func : funcMap.list) {
-			sb.append("----==== #" + i + " ====----");
+			sb.append("----==== #").append(i).append(" ====----");
 			sb.append(System.lineSeparator());
 			sb.append(func.toString());
 			sb.append(System.lineSeparator());
@@ -210,10 +200,9 @@ public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
 
 	@Override
 	public String toString() {
-		StringBuffer sb = new StringBuffer();
-		sb.append(getSymbolString());
-		sb.append(getFuncString());
-		return sb.toString();
+		String sb = getSymbolString() +
+				getFuncString();
+		return sb;
 	}
 
 	@Override
@@ -258,7 +247,7 @@ public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
 			return blockLevel.get(type) > 0;
 		case kFunc:
 		case kYield:
-			return blockStack.isEmpty() ? false : (blockStack.peek() == type);
+			return !blockStack.isEmpty() && (blockStack.peek() == type);
 		default:
 			break;
 		}

@@ -29,7 +29,7 @@ public class Function implements IExp {
 	/**
 	 * 参数
 	 */
-	private ArrayList<Token> params = new ArrayList<Token>();
+	private ArrayList<Token> params = new ArrayList<>();
 
 	/**
 	 * 函数主体Block

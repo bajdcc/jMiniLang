@@ -11,11 +11,11 @@ import java.util.HashMap;
 public class RuntimeDebugInfo implements IRuntimeDebugInfo, Serializable {
 
 	private static final long serialVersionUID = 1L;
-	private HashMap<String, Object> dataMap = new HashMap<String, Object>();
-	private HashMap<String, Integer> exports = new HashMap<String, Integer>();
-	private HashMap<Integer, String> func = new HashMap<Integer, String>();
-	private HashMap<String, IRuntimeDebugValue> externalValue = new HashMap<String, IRuntimeDebugValue>();
-	private HashMap<String, IRuntimeDebugExec> externalExec = new HashMap<String, IRuntimeDebugExec>();
+	private HashMap<String, Object> dataMap = new HashMap<>();
+	private HashMap<String, Integer> exports = new HashMap<>();
+	private HashMap<Integer, String> func = new HashMap<>();
+	private HashMap<String, IRuntimeDebugValue> externalValue = new HashMap<>();
+	private HashMap<String, IRuntimeDebugExec> externalExec = new HashMap<>();
 
 	public void addExports(String name, Integer addr) {
 		exports.put(name, addr);

@@ -14,7 +14,7 @@ public class LostHandler implements IErrorHandler {
 	/**
 	 * 错误信息
 	 */
-	private String message = "";
+	private String message;
 
 	public LostHandler(String message) {
 		this.message = message;
@@ -25,7 +25,7 @@ public class LostHandler implements IErrorHandler {
 		bag.bRead = false;
 		bag.bPass = true;
 		String def = "缺少：" + message + System.lineSeparator();
-		String snapshot = iterator.ex().getErrorSnapshot(iterator.position());
+		String snapshot = iterator.ex().getErrorSnapshot(bag.position);
 		if (snapshot != null) {
 			return def + snapshot;
 		}

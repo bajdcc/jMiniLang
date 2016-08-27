@@ -16,10 +16,10 @@ public class Main {
 		try {
 			// 读文件
 			BufferedReader br = new BufferedReader(new FileReader(filename));
-			String line = "";
-			StringBuffer sb = new StringBuffer();
+			String line;
+			StringBuilder sb = new StringBuilder();
 			while ((line = br.readLine()) != null) {
-				sb.append(line + System.lineSeparator());
+				sb.append(line).append(System.lineSeparator());
 			}
 			br.close();
 			String context = sb.toString();

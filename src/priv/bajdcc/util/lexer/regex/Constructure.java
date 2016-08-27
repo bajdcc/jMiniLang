@@ -16,7 +16,7 @@ public class Constructure implements IRegexComponent {
 	/**
 	 * 孩子结点
 	 */
-	public ArrayList<IRegexComponent> arrComponents = new ArrayList<IRegexComponent>();
+	public ArrayList<IRegexComponent> arrComponents = new ArrayList<>();
 
 	public Constructure(boolean branch) {
 		bBranch = branch;

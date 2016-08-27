@@ -23,12 +23,12 @@ public class FirstsetSolver implements ISyntaxComponentVisitor {
 	/**
 	 * 终结符表
 	 */
-	private HashSet<TokenExp> setTokens = new HashSet<TokenExp>();
+	private HashSet<TokenExp> setTokens = new HashSet<>();
 
 	/**
 	 * 非终结符表
 	 */
-	private HashSet<RuleExp> setRules = new HashSet<RuleExp>();
+	private HashSet<RuleExp> setRules = new HashSet<>();
 
 	/**
 	 * 产生式推导的串长度是否可能为零
@@ -46,8 +46,8 @@ public class FirstsetSolver implements ISyntaxComponentVisitor {
 		if (bZero) {
 			return false;
 		}
-		target.setFirstSetTokens = new HashSet<TokenExp>(setTokens);
-		target.setFirstSetRules = new HashSet<RuleExp>(setRules);
+		target.setFirstSetTokens = new HashSet<>(setTokens);
+		target.setFirstSetRules = new HashSet<>(setRules);
 		return true;
 	}
 

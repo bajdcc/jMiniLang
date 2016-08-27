@@ -7,6 +7,10 @@ package priv.bajdcc.util;
  */
 public class TrackerErrorBag {
 
+	public TrackerErrorBag(Position pos) {
+		position = pos;
+	}
+
 	/**
 	 * 若为假，则状态机不进行错误状态转移
 	 */
@@ -26,4 +30,9 @@ public class TrackerErrorBag {
 	 * 若为真，则不处理错误
 	 */
 	public boolean bGiveUp = false;
+
+	/**
+	 * 错误位置
+	 */
+	public Position position;
 }

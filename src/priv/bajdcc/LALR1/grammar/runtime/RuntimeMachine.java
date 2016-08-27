@@ -26,9 +26,9 @@ import priv.bajdcc.util.lexer.token.TokenType;
  */
 public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 
-	private HashListMapEx<String, RuntimeCodePage> pageMap = new HashListMapEx<String, RuntimeCodePage>();
-	private Map<String, ArrayList<RuntimeCodePage>> pageRefer = new HashMap<String, ArrayList<RuntimeCodePage>>();
-	private Stack<RuntimeObject> stkYieldData = new Stack<RuntimeObject>();
+	private HashListMapEx<String, RuntimeCodePage> pageMap = new HashListMapEx<>();
+	private Map<String, ArrayList<RuntimeCodePage>> pageRefer = new HashMap<>();
+	private Stack<RuntimeObject> stkYieldData = new Stack<>();
 	private RuntimeStack stack = new RuntimeStack();
 
 	private RuntimeCodePage currentPage = null;
@@ -43,7 +43,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	public void runPage(String name) throws Exception {
 		BufferedReader br = new BufferedReader(new FileReader(name));
 		StringBuilder sb = new StringBuilder();
-		String line = null;
+		String line;
 		while ((line = br.readLine()) != null) {
 			sb.append(line);
 			sb.append(System.lineSeparator());
@@ -58,7 +58,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 			throw new RuntimeException(RuntimeError.DUP_PAGENAME, -1, "请更改名称");
 		}
 		pageMap.add(name, page);
-		pageRefer.put(name, new ArrayList<RuntimeCodePage>());
+		pageRefer.put(name, new ArrayList<>());
 		pageRefer.get(name).add(page);
 		page.getInfo().getDataMap().put("name", name);
 	}
@@ -368,7 +368,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	@Override
 	public void opJumpBool(boolean bool) throws RuntimeException {
 		boolean tf = loadBool();
-		if (!(tf ^ bool)) {
+		if (tf == bool) {
 			stack.reg.execId = current();
 		} else {
 			next();
@@ -378,7 +378,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	@Override
 	public void opJumpBoolRetain(boolean bool) throws RuntimeException {
 		boolean tf = loadBoolRetain();
-		if (!(tf ^ bool)) {
+		if (tf == bool) {
 			stack.reg.execId = current();
 		} else {
 			next();
@@ -388,7 +388,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	@Override
 	public void opJumpZero(boolean bool) throws RuntimeException {
 		int val = loadInt();
-		if (!((val == 0) ^ bool)) {
+		if ((val == 0) == bool) {
 			stack.reg.execId = current();
 		} else {
 			next();
@@ -433,7 +433,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 		RuntimeObject obj = fetchFromGlobalData(idx);
 		String name = obj.getObj().toString();
 		List<RuntimeCodePage> refers = pageRefer.get(currentPage.getInfo()
-				.getDataMap().get("name"));
+				.getDataMap().get("name").toString());
 		for (RuntimeCodePage page : refers) {
 			IRuntimeDebugValue value = page.getInfo().getValueCallByName(name);
 			if (value != null) {
@@ -508,7 +508,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 						|| (types != null && types.length != argsCount)) {
 					err(RuntimeError.WRONG_ARGCOUNT);
 				}
-				List<RuntimeObject> args = new ArrayList<RuntimeObject>();
+				List<RuntimeObject> args = new ArrayList<>();
 				for (int i = 0; i < argsCount; i++) {
 					RuntimeObjectType type = types[i];
 					RuntimeObject objParam = stack.loadFuncArgs(i);

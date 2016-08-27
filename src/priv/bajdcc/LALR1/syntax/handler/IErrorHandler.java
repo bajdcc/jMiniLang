@@ -18,5 +18,5 @@ public interface IErrorHandler {
 	 *            参数信息
 	 * @return 错误信息
 	 */
-	public String handle(IRegexStringIterator iterator, TrackerErrorBag bag);
+	String handle(IRegexStringIterator iterator, TrackerErrorBag bag);
 }

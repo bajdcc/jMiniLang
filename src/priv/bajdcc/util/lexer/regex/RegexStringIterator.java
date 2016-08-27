@@ -25,7 +25,7 @@ public class RegexStringIterator implements IRegexStringIterator, Cloneable {
 	/**
 	 * 用于恢复的位置堆栈
 	 */
-	public Stack<Integer> stkIndex = new Stack<Integer>();
+	public Stack<Integer> stkIndex = new Stack<>();
 
 	/**
 	 * 位置
@@ -35,7 +35,7 @@ public class RegexStringIterator implements IRegexStringIterator, Cloneable {
 	/**
 	 * 用于恢复行列数的堆栈
 	 */
-	public Stack<Position> stkPosition = new Stack<Position>();
+	public Stack<Position> stkPosition = new Stack<>();
 
 	/**
 	 * 当前的分析信息
@@ -45,10 +45,10 @@ public class RegexStringIterator implements IRegexStringIterator, Cloneable {
 	/**
 	 * 记录每行起始的位置
 	 */
-	protected ArrayList<Integer> arrLinesNo = new ArrayList<Integer>();
+	protected ArrayList<Integer> arrLinesNo = new ArrayList<>();
 
 	public RegexStringIterator() {
-		arrLinesNo.add(0);
+		arrLinesNo.add(-1);
 	}
 
 	public RegexStringIterator(String context) {
@@ -74,7 +74,9 @@ public class RegexStringIterator implements IRegexStringIterator, Cloneable {
 		translate();
 		position.iColumn++;
 		if (data.chCurrent == MetaType.NEW_LINE.getChar()) {
-			arrLinesNo.add(arrLinesNo.get(arrLinesNo.size() - 1) + position.iColumn + 1);
+			int prev = arrLinesNo.get(arrLinesNo.size() - 1);
+			if (prev < data.iIndex)
+				arrLinesNo.add(data.iIndex);
 			position.iColumn = 0;
 			position.iLine++;
 		}

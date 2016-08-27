@@ -14,7 +14,7 @@ public class RuntimeFuncObject {
 
 	private String page = null;
 	private int addr = -1;
-	private Map<Integer, RuntimeObject> env = new HashMap<Integer, RuntimeObject>();
+	private Map<Integer, RuntimeObject> env = new HashMap<>();
 
 	public RuntimeFuncObject(String page, int addr) {
 		this.page = page;

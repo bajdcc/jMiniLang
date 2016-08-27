@@ -53,12 +53,12 @@ public class ConvertToDecimal implements ITokenConventer {
 			} catch (NumberFormatException e) {
 				token.kToken = TokenType.ERROR;
 			}
+			break;
 		case INTEGER:
 			BigInteger integer = (BigInteger) token.object;
 			return new BigDecimal(integer);
 		case DECIMAL:
-			BigDecimal decimal = (BigDecimal) token.object;
-			return decimal;
+			return (BigDecimal) token.object;
 		default:
 			break;
 		}

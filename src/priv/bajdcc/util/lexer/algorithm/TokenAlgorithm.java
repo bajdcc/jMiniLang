@@ -43,7 +43,7 @@ public abstract class TokenAlgorithm implements ITokenAlgorithm,
 	/**
 	 * 字符类型哈段表
 	 */
-	protected HashMap<Character, MetaType> mapMeta = new HashMap<Character, MetaType>();
+	protected HashMap<Character, MetaType> mapMeta = new HashMap<>();
 
 	public TokenAlgorithm(String regex, IRegexStringFilter filter)
 			throws RegexException {
@@ -52,8 +52,8 @@ public abstract class TokenAlgorithm implements ITokenAlgorithm,
 			this.filter = filter;
 			this.regex.setFilter(filter);
 			MetaType[] metaTypes = filter.getFilterMeta().getMetaTypes();
-			for (int i = 0; i < metaTypes.length; i++) {
-				mapMeta.put(metaTypes[i].getChar(), metaTypes[i]);
+			for (MetaType metaType : metaTypes) {
+				mapMeta.put(metaType.getChar(), metaType);
 			}
 		}
 	}
@@ -66,7 +66,7 @@ public abstract class TokenAlgorithm implements ITokenAlgorithm,
 		}
 		token.position = new Position(iterator.position());
 		if (regex.match(iterator, this)) {// 匹配成功
-			token = getToken(strMatch, token);// 自动转换单词
+			getToken(strMatch, token);// 自动转换单词
 			return true;
 		}
 		return false;

@@ -15,6 +15,6 @@ public interface ISemanticAction {
 	 * @param manage
 	 *            符号表管理接口
 	 */
-	public void handle(IIndexedData indexed, IManageSymbol manage,
-			IRandomAccessOfTokens access, ISemanticRecorder recorder);
+	void handle(IIndexedData indexed, IManageSymbol manage,
+				IRandomAccessOfTokens access, ISemanticRecorder recorder);
 }

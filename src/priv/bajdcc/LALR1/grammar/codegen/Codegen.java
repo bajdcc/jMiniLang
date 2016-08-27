@@ -2,6 +2,7 @@ package priv.bajdcc.LALR1.grammar.codegen;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import priv.bajdcc.LALR1.grammar.runtime.ICodegenByteWriter;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeCodePage;
@@ -23,8 +24,8 @@ import priv.bajdcc.util.HashListMapEx;
  */
 public class Codegen implements ICodegen, ICodegenBlock, ICodegenByteWriter {
 
-	private HashListMap<Object> symbolList = new HashListMap<Object>();
-	private HashListMapEx<String, Function> funcMap = new HashListMapEx<String, Function>();
+	private HashListMap<Object> symbolList = new HashListMap<>();
+	private HashListMapEx<String, Function> funcMap = new HashListMapEx<>();
 	private CodegenData data = new CodegenData();
 	private RuntimeDebugInfo info = new RuntimeDebugInfo();
 	private List<Byte> insts = null;
@@ -65,11 +66,8 @@ public class Codegen implements ICodegen, ICodegenBlock, ICodegenByteWriter {
 	 * @return 代码页
 	 */
 	public RuntimeCodePage genCodePage() {
-		List<Object> objs = new ArrayList<Object>();
-		for (Object token : symbolList.list) {
-			objs.add(token);
-		}
-		insts = new ArrayList<Byte>();
+		List<Object> objs = symbolList.list.stream().collect(Collectors.toList());
+		insts = new ArrayList<>();
 		for (RuntimeInstUnary unary : data.callsToWriteBack) {
 			unary.op1 = data.funcEntriesMap.get(funcMap.list.get(unary.op1)
 					.getRealName());

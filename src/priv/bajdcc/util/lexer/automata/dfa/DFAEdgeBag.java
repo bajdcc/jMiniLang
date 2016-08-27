@@ -14,7 +14,7 @@ public class DFAEdgeBag extends DFAEdgeData{
 	/**
 	 * NFA状态集合
 	 */
-	public HashSet<NFAStatus> nfaStatus = new HashSet<NFAStatus>();
+	public HashSet<NFAStatus> nfaStatus = new HashSet<>();
 	
 	/**
 	 * 获得状态编号描述（逗号分隔）
@@ -22,7 +22,7 @@ public class DFAEdgeBag extends DFAEdgeData{
 	public String getStatusString(ArrayList<NFAStatus> nfaStatusList) {
 		StringBuilder sb = new StringBuilder();
 		for (NFAStatus status : nfaStatus) {
-			sb.append(nfaStatusList.indexOf(status) + ",");
+			sb.append(nfaStatusList.indexOf(status)).append(",");
 		}
 		return sb.toString();
 	}

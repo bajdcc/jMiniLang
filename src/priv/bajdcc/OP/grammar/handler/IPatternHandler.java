@@ -20,12 +20,12 @@ public interface IPatternHandler {
 	 *            有序非终结符（用于存储）
 	 * @return 处理后的结果
 	 */
-	public Object handle(List<Token> tokens, List<Object> symbols);
+	Object handle(List<Token> tokens, List<Object> symbols);
 
 	/**
 	 * 获取归约动作描述
 	 * 
 	 * @return 动作描述
 	 */
-	public String getPatternName();
+	String getPatternName();
 }

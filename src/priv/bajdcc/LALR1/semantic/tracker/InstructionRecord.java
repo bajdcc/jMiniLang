@@ -12,7 +12,7 @@ public class InstructionRecord {
 	/**
 	 * 指令集
 	 */
-	public ArrayList<Instruction> arrInsts = new ArrayList<Instruction>();
+	public ArrayList<Instruction> arrInsts = new ArrayList<>();
 	
 	/**
 	 * 前向指针

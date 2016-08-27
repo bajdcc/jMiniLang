@@ -10,5 +10,5 @@ public interface IErrorHandler {
 	/**
 	 * 处理错误
 	 */
-	public void handleError();
+	void handleError();
 }

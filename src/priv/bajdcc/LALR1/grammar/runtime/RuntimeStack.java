@@ -25,12 +25,12 @@ public class RuntimeStack {
 	/**
 	 * 数据堆栈
 	 */
-	private Stack<RuntimeObject> stkData = new Stack<RuntimeObject>();
+	private Stack<RuntimeObject> stkData = new Stack<>();
 
 	/**
 	 * 调用堆栈，临时变量堆栈
 	 */
-	private ArrayList<RuntimeFunc> stkCall = new ArrayList<RuntimeFunc>();
+	private ArrayList<RuntimeFunc> stkCall = new ArrayList<>();
 
 	public RuntimeStack() {
 
@@ -146,13 +146,11 @@ public class RuntimeStack {
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("=========================");
-		sb.append(System.lineSeparator());
-		sb.append("数据栈: " + stkData);
-		sb.append(System.lineSeparator());
-		sb.append("调用栈: " + stkCall);
-		sb.append(System.lineSeparator());
-		return sb.toString();
+		return "=========================" +
+				System.lineSeparator() +
+				"数据栈: " + stkData +
+				System.lineSeparator() +
+				"调用栈: " + stkCall +
+				System.lineSeparator();
 	}
 }

@@ -14,12 +14,12 @@ public class NGABag {
 	/**
 	 * NGA栈
 	 */
-	public Stack<ArrayList<ENGA>> stkNGA = new Stack<ArrayList<ENGA>>();
+	public Stack<ArrayList<ENGA>> stkNGA = new Stack<>();
 
 	/**
 	 * NGA子表
 	 */
-	public ArrayList<ENGA> childNGA = new ArrayList<ENGA>();
+	public ArrayList<ENGA> childNGA = new ArrayList<>();
 
 	/**
 	 * 存储结果的ENGA

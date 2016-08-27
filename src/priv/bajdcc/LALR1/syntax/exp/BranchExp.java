@@ -16,7 +16,7 @@ public class BranchExp implements ISyntaxComponent, IExpCollction {
 	/**
 	 * 子表达式表
 	 */
-	public ArrayList<ISyntaxComponent> arrExpressions = new ArrayList<ISyntaxComponent>();
+	public ArrayList<ISyntaxComponent> arrExpressions = new ArrayList<>();
 
 	@Override
 	public void visit(ISyntaxComponentVisitor visitor) {

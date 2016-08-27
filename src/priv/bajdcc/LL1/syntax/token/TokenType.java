@@ -23,4 +23,4 @@ public enum TokenType {
 	public void setName(String name) {
 		this.name = name;
 	}
-};
+}

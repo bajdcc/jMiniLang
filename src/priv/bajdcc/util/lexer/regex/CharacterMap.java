@@ -25,7 +25,7 @@ public class CharacterMap implements IRegexComponentVisitor {
 	/**
 	 * 重新分组后的范围集合
 	 */
-	private ArrayList<CharacterRange> arrRanges = new ArrayList<CharacterRange>();
+	private ArrayList<CharacterRange> arrRanges = new ArrayList<>();
 
 	/**
 	 * 返回重构（规范化）的字符区间集合
@@ -115,7 +115,7 @@ public class CharacterMap implements IRegexComponentVisitor {
 	private void preceedReverse(Charset charset) {
 		charset.bReverse = false;
 		Collections.sort(charset.arrPositiveBounds, comparator);
-		ArrayList<CharacterRange> ranges = new ArrayList<CharacterRange>();
+		ArrayList<CharacterRange> ranges = new ArrayList<>();
 		CharacterRange oldRange = new CharacterRange();
 		for (CharacterRange range : charset.arrPositiveBounds) {
 			if (range.chLowerBound > oldRange.chUpperBound + 1) {// 当前下界大于之前上界，故添加
@@ -330,7 +330,7 @@ public class CharacterMap implements IRegexComponentVisitor {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		for (CharacterRange range : arrRanges) {
-			sb.append(range + System.lineSeparator());
+			sb.append(range).append(System.lineSeparator());
 		}
 		return sb.toString();
 	}

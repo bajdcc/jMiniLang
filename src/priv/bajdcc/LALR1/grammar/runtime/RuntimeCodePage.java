@@ -58,12 +58,10 @@ public class RuntimeCodePage implements Serializable {
 	}
 
 	public String getCodeString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("#### 目标代码 ####");
-		sb.append(System.lineSeparator());
-		sb.append(insts);
-		sb.append(System.lineSeparator());
-		return sb.toString();
+		return "#### 目标代码 ####" +
+				System.lineSeparator() +
+				insts +
+				System.lineSeparator();
 	}
 
 	@Override

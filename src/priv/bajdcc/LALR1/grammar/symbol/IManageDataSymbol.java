@@ -14,10 +14,10 @@ public interface IManageDataSymbol {
 	/**
 	 * @return 符号表
 	 */
-	public HashListMap<Object> getSymbolList();
+	HashListMap<Object> getSymbolList();
 
 	/**
 	 * @return 过程表
 	 */
-	public HashListMapEx<String, Function> getFuncMap();
+	HashListMapEx<String, Function> getFuncMap();
 }

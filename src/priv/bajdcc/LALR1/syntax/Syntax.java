@@ -45,40 +45,40 @@ public class Syntax {
 	/**
 	 * 终结符表
 	 */
-	protected ArrayList<TokenExp> arrTerminals = new ArrayList<TokenExp>();
+	protected ArrayList<TokenExp> arrTerminals = new ArrayList<>();
 
 	/**
 	 * 终结符映射
 	 */
-	protected HashMap<String, TokenExp> mapTerminals = new HashMap<String, TokenExp>();
+	protected HashMap<String, TokenExp> mapTerminals = new HashMap<>();
 
 	/**
 	 * 非终结符表
 	 */
-	protected ArrayList<RuleExp> arrNonTerminals = new ArrayList<RuleExp>();
+	protected ArrayList<RuleExp> arrNonTerminals = new ArrayList<>();
 
 	/**
 	 * 非终结符映射
 	 */
-	protected HashMap<String, RuleExp> mapNonTerminals = new HashMap<String, RuleExp>();
+	protected HashMap<String, RuleExp> mapNonTerminals = new HashMap<>();
 
 	/**
 	 * 错误处理表
 	 */
-	protected ArrayList<IErrorHandler> arrHandlers = new ArrayList<IErrorHandler>();
+	protected ArrayList<IErrorHandler> arrHandlers = new ArrayList<>();
 	/**
 	 * 错误处理映射
 	 */
-	protected HashMap<String, IErrorHandler> mapHandlers = new HashMap<String, IErrorHandler>();
+	protected HashMap<String, IErrorHandler> mapHandlers = new HashMap<>();
 
 	/**
 	 * 语义动作表
 	 */
-	protected ArrayList<ISemanticAction> arrActions = new ArrayList<ISemanticAction>();
+	protected ArrayList<ISemanticAction> arrActions = new ArrayList<>();
 	/**
 	 * 语义动作映射
 	 */
-	protected HashMap<String, ISemanticAction> mapActions = new HashMap<String, ISemanticAction>();
+	protected HashMap<String, ISemanticAction> mapActions = new HashMap<>();
 
 	/**
 	 * 文法起始符号
@@ -626,7 +626,7 @@ public class Syntax {
 			/* 建立处理标记表 */
 			BitSet processed = new BitSet(size);
 			processed.clear();
-			for (int i = 0; i < size; i++) {
+			for (RuleExp arrNonTerminal : arrNonTerminals) {
 				/* 找出一条无最左依赖的规则 */
 				int nodependencyRule = -1;// 最左依赖的规则索引
 				for (int j = 0; j < size; j++) {
@@ -646,7 +646,7 @@ public class Syntax {
 				}
 				if (nodependencyRule == -1) {
 					err(SyntaxError.MISS_NODEPENDENCY_RULE,
-							arrNonTerminals.get(i).name);
+							arrNonTerminal.name);
 				}
 				/* 计算该规则的终结符First集合 */
 				{
@@ -710,7 +710,7 @@ public class Syntax {
 	 */
 	public static String getSingleString(String name, ISyntaxComponent exp,
 			ISyntaxComponent focused, boolean front) {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		sb.append(name);
 		sb.append(" -> ");
 		SyntaxToString alg = new SyntaxToString(focused, front);
@@ -729,7 +729,7 @@ public class Syntax {
 	 * @return 原产生式描述
 	 */
 	public static String getSingleString(String name, ISyntaxComponent exp) {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		sb.append(name);
 		sb.append(" -> ");
 		SyntaxToString alg = new SyntaxToString();
@@ -742,7 +742,7 @@ public class Syntax {
 	 * 获得段落式描述
 	 */
 	public String getParagraphString() {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		/* 起始符号 */
 		sb.append("#### 起始符号 ####");
 		sb.append(System.lineSeparator());
@@ -774,13 +774,13 @@ public class Syntax {
 				sb.append("\t--== 终结符First集合 ==--");
 				sb.append(System.lineSeparator());
 				for (TokenExp token : item.setFirstSetTokens) {
-					sb.append("\t\t" + token.name);
+					sb.append("\t\t").append(token.name);
 					sb.append(System.lineSeparator());
 				}
 				sb.append("\t--== 非终结符First集合 ==--");
 				sb.append(System.lineSeparator());
 				for (RuleExp rule : item.setFirstSetRules) {
-					sb.append("\t\t" + rule.name);
+					sb.append("\t\t").append(rule.name);
 					sb.append(System.lineSeparator());
 				}
 			}
@@ -792,7 +792,7 @@ public class Syntax {
 	 * 获得原推导式描述
 	 */
 	public String getOriginalString() {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		for (RuleExp exp : arrNonTerminals) {
 			for (RuleItem item : exp.rule.arrRules) {
 				sb.append(getSingleString(exp.name, item.expression));

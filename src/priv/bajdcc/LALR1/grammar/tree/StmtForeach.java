@@ -98,20 +98,18 @@ public class StmtForeach implements IStmt {
 
 	@Override
 	public String print(StringBuilder prefix) {
-		StringBuilder sb = new StringBuilder();
-		sb.append(prefix.toString());
-		sb.append(KeywordType.FOREACH.getName());
-		sb.append(" ( ");
-		sb.append(KeywordType.VARIABLE.getName());
-		sb.append(" ");
-		sb.append(var.toRealString());
-		sb.append(" ");
-		sb.append(OperatorType.COLON.getName());
-		sb.append(" ");
-		sb.append(enumerator.print(prefix));
-		sb.append(" ) ");
-		sb.append(block.print(prefix));
-		return sb.toString();
+		return prefix.toString() +
+				KeywordType.FOREACH.getName() +
+				" ( " +
+				KeywordType.VARIABLE.getName() +
+				" " +
+				var.toRealString() +
+				" " +
+				OperatorType.COLON.getName() +
+				" " +
+				enumerator.print(prefix) +
+				" ) " +
+				block.print(prefix);
 	}
 
 	@Override

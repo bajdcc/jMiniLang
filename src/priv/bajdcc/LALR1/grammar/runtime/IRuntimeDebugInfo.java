@@ -11,8 +11,6 @@ public interface IRuntimeDebugInfo {
 
 	/**
 	 * 返回数据存储
-	 * 
-	 * @param name
 	 */
 	HashMap<String, Object> getDataMap();
 	
@@ -23,7 +21,7 @@ public interface IRuntimeDebugInfo {
 	 *            地址
 	 * @return 函数名
 	 */
-	public String getFuncNameByAddress(int addr);
+	String getFuncNameByAddress(int addr);
 
 	/**
 	 * 根据导出的函数名找到地址
@@ -32,7 +30,7 @@ public interface IRuntimeDebugInfo {
 	 *            函数名
 	 * @return 地址
 	 */
-	public int getAddressOfExportFunc(String name);
+	int getAddressOfExportFunc(String name);
 
 	/**
 	 * 根据自定义参数名称找到本地值导出接口
@@ -41,7 +39,7 @@ public interface IRuntimeDebugInfo {
 	 *            自定义参数名称
 	 * @return 本地值导出接口
 	 */
-	public IRuntimeDebugValue getValueCallByName(String name);
+	IRuntimeDebugValue getValueCallByName(String name);
 
 	/**
 	 * 根据自定义参数名称找到本地过程导出接口
@@ -50,7 +48,7 @@ public interface IRuntimeDebugInfo {
 	 *            自定义参数名称
 	 * @return 本地过程导出接口
 	 */
-	public IRuntimeDebugExec getExecCallByName(String name);
+	IRuntimeDebugExec getExecCallByName(String name);
 
 	/**
 	 * 添加外部变量
@@ -61,7 +59,7 @@ public interface IRuntimeDebugInfo {
 	 *            调用过程
 	 * @return 是否冲突
 	 */
-	public boolean addExternalValue(String name, IRuntimeDebugValue func);
+	boolean addExternalValue(String name, IRuntimeDebugValue func);
 
 	/**
 	 * 添加外部过程
@@ -72,5 +70,5 @@ public interface IRuntimeDebugInfo {
 	 *            调用过程
 	 * @return 是否冲突
 	 */
-	public boolean addExternalFunc(String name, IRuntimeDebugExec func);
+	boolean addExternalFunc(String name, IRuntimeDebugExec func);
 }

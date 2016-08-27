@@ -28,7 +28,7 @@ public class Tracker {
 	/**
 	 * PDA状态堆栈
 	 */
-	public Stack<NPAStatus> stkStatus = new Stack<NPAStatus>();
+	public Stack<NPAStatus> stkStatus = new Stack<>();
 	
 	/**
 	 * 单词遍历接口

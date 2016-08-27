@@ -17,7 +17,7 @@ public interface ICommon {
 	 * @param recorder
 	 *            错误记录器
 	 */
-	public void analysis(ISemanticRecorder recorder);
+	void analysis(ISemanticRecorder recorder);
 
 	/**
 	 * 生成中间代码
@@ -25,7 +25,7 @@ public interface ICommon {
 	 * @param codegen
 	 *            代码生成接口
 	 */
-	public void genCode(ICodegen codegen);
+	void genCode(ICodegen codegen);
 
 	/**
 	 * 输出
@@ -34,14 +34,13 @@ public interface ICommon {
 	 *            前缀空白
 	 * @return 结点内容
 	 */
-	public String print(StringBuilder prefix);
+	String print(StringBuilder prefix);
 	
 	/**
 	 * 求函数闭包
 	 * 
 	 * @param scope
 	 *            闭包操作接口
-	 * @return 结点内容
 	 */
-	public void addClosure(IClosureScope scope);
+	void addClosure(IClosureScope scope);
 }

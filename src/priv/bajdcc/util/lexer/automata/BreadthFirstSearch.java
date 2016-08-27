@@ -15,7 +15,7 @@ public class BreadthFirstSearch<Edge, Status> implements
 	/**
 	 * 存放状态的集合
 	 */
-	public ArrayList<Status> arrStatus = new ArrayList<Status>();
+	public ArrayList<Status> arrStatus = new ArrayList<>();
 
 	@Override
 	public boolean testEdge(Edge edge) {

@@ -13,7 +13,7 @@ public interface IQueryBlockSymbol {
 	 * @param type
 	 *            块类型
 	 */
-	public void enterBlock(BlockType type);
+	void enterBlock(BlockType type);
 
 	/**
 	 * 离开循环体
@@ -21,7 +21,7 @@ public interface IQueryBlockSymbol {
 	 * @param type
 	 *            块类型
 	 */
-	public void leaveBlock(BlockType type);
+	void leaveBlock(BlockType type);
 
 	/**
 	 * 是否在循环体内
@@ -30,5 +30,5 @@ public interface IQueryBlockSymbol {
 	 *            块类型
 	 * @return 在循环体内则为真
 	 */
-	public boolean isInBlock(BlockType type);
+	boolean isInBlock(BlockType type);
 }

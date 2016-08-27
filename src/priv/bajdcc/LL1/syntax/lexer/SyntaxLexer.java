@@ -38,7 +38,7 @@ public class SyntaxLexer extends RegexStringIterator implements
 	/**
 	 * 丢弃的类型集合
 	 */
-	private HashSet<TokenType> setDiscardToken = new HashSet<TokenType>();
+	private HashSet<TokenType> setDiscardToken = new HashSet<>();
 
 	public SyntaxLexer() throws RegexException {
 		initialize();

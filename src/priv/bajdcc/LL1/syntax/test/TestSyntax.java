@@ -1,7 +1,5 @@
 package priv.bajdcc.LL1.syntax.test;
 
-import java.util.Scanner;
-
 import priv.bajdcc.LL1.syntax.Syntax;
 import priv.bajdcc.LL1.syntax.handler.SyntaxException;
 import priv.bajdcc.util.lexer.error.RegexException;

@@ -15,5 +15,5 @@ public class DFAEdgeData extends NFAEdgeData {
 	/**
 	 * NFA边集合
 	 */
-	public ArrayList<NFAEdge> nfaEdges = new ArrayList<NFAEdge>();
+	public ArrayList<NFAEdge> nfaEdges = new ArrayList<>();
 }

@@ -21,12 +21,12 @@ public class SyntaxToString implements ISyntaxComponentVisitor {
 	/**
 	 * 存放结果的栈
 	 */
-	private Stack<ArrayList<String>> stkStringList = new Stack<ArrayList<String>>();
+	private Stack<ArrayList<String>> stkStringList = new Stack<>();
 
 	/**
 	 * 当前描述表
 	 */
-	private ArrayList<String> arrData = new ArrayList<String>();
+	private ArrayList<String> arrData = new ArrayList<>();
 
 	/**
 	 * 焦点
@@ -52,7 +52,7 @@ public class SyntaxToString implements ISyntaxComponentVisitor {
 	 */
 	private void beginChilren() {
 		arrData = null;
-		stkStringList.push(new ArrayList<String>());
+		stkStringList.push(new ArrayList<>());
 	}
 
 	/**
@@ -121,17 +121,15 @@ public class SyntaxToString implements ISyntaxComponentVisitor {
 	@Override
 	public void visitEnd(SequenceExp node) {
 		endChilren();
-		StringBuffer sb = new StringBuffer();
-		for (String string : arrData) {
-			sb.append(string);
-		}
+		StringBuilder sb = new StringBuilder();
+		arrData.forEach(sb::append);
 		store(node, sb.toString());
 	}
 
 	@Override
 	public void visitEnd(BranchExp node) {
 		endChilren();
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		sb.append(" (");
 		for (String string : arrData) {
 			sb.append(string);

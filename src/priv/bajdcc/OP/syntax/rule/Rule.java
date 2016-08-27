@@ -16,20 +16,20 @@ public class Rule {
 	/**
 	 * 规则表达式列表
 	 */
-	public ArrayList<RuleItem> arrRules = new ArrayList<RuleItem>();
+	public ArrayList<RuleItem> arrRules = new ArrayList<>();
 
 	/**
 	 * 规则起始非终结符
 	 */
 	public RuleExp nonTerminal = null;
 
-	public ArrayList<TokenExp> arrFirstVT = new ArrayList<TokenExp>();
+	public ArrayList<TokenExp> arrFirstVT = new ArrayList<>();
 	
-	public ArrayList<TokenExp> arrLastVT = new ArrayList<TokenExp>();
+	public ArrayList<TokenExp> arrLastVT = new ArrayList<>();
 	
-	public HashSet<TokenExp> setFirstVT = new HashSet<TokenExp>();
+	public HashSet<TokenExp> setFirstVT = new HashSet<>();
 	
-	public HashSet<TokenExp> setLastVT = new HashSet<TokenExp>();
+	public HashSet<TokenExp> setLastVT = new HashSet<>();
 
 	public Rule(RuleExp exp) {
 		nonTerminal = exp;

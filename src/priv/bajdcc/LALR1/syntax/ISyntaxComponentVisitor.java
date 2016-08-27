@@ -15,27 +15,27 @@ import priv.bajdcc.util.VisitBag;
  */
 public interface ISyntaxComponentVisitor {
 
-	public void visitBegin(TokenExp node, VisitBag bag);
+	void visitBegin(TokenExp node, VisitBag bag);
 	
-	public void visitBegin(RuleExp node, VisitBag bag);
+	void visitBegin(RuleExp node, VisitBag bag);
 	
-	public void visitBegin(SequenceExp node, VisitBag bag);
+	void visitBegin(SequenceExp node, VisitBag bag);
 	
-	public void visitBegin(BranchExp node, VisitBag bag);
+	void visitBegin(BranchExp node, VisitBag bag);
 	
-	public void visitBegin(OptionExp node, VisitBag bag);
+	void visitBegin(OptionExp node, VisitBag bag);
 	
-	public void visitBegin(PropertyExp node, VisitBag bag);
+	void visitBegin(PropertyExp node, VisitBag bag);
 	
-	public void visitEnd(TokenExp node);
+	void visitEnd(TokenExp node);
 	
-	public void visitEnd(RuleExp node);
+	void visitEnd(RuleExp node);
 	
-	public void visitEnd(SequenceExp node);
+	void visitEnd(SequenceExp node);
 	
-	public void visitEnd(BranchExp node);
+	void visitEnd(BranchExp node);
 	
-	public void visitEnd(OptionExp node);
+	void visitEnd(OptionExp node);
 	
-	public void visitEnd(PropertyExp node);
+	void visitEnd(PropertyExp node);
 }

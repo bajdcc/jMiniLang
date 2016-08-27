@@ -43,22 +43,22 @@ public class Syntax {
 	/**
 	 * 终结符表
 	 */
-	protected ArrayList<TokenExp> arrTerminals = new ArrayList<TokenExp>();
+	protected ArrayList<TokenExp> arrTerminals = new ArrayList<>();
 
 	/**
 	 * 终结符映射
 	 */
-	protected HashMap<String, TokenExp> mapTerminals = new HashMap<String, TokenExp>();
+	protected HashMap<String, TokenExp> mapTerminals = new HashMap<>();
 
 	/**
 	 * 非终结符表
 	 */
-	protected ArrayList<RuleExp> arrNonTerminals = new ArrayList<RuleExp>();
+	protected ArrayList<RuleExp> arrNonTerminals = new ArrayList<>();
 
 	/**
 	 * 非终结符映射
 	 */
-	protected HashMap<String, RuleExp> mapNonTerminals = new HashMap<String, RuleExp>();
+	protected HashMap<String, RuleExp> mapNonTerminals = new HashMap<>();
 
 	/**
 	 * 文法起始符号
@@ -509,13 +509,13 @@ public class Syntax {
 			}
 		}
 		/* 建立规则的依赖关系 */
-		ArrayList<Integer> nodependencyList = new ArrayList<Integer>();
+		ArrayList<Integer> nodependencyList = new ArrayList<>();
 		{
 			/* 建立处理标记表 */
 			BitSet processed = new BitSet(size);
 			processed.clear();
 			/* 寻找First集的依赖关系 */
-			for (int i = 0; i < size; i++) {
+			for (RuleExp arrNonTerminal : arrNonTerminals) {
 				/* 找出一条无最左依赖的规则 */
 				int nodependencyRule = -1;// 最左依赖的规则索引
 				for (int j = 0; j < size; j++) {
@@ -535,7 +535,7 @@ public class Syntax {
 				}
 				if (nodependencyRule == -1) {
 					err(SyntaxError.MISS_NODEPENDENCY_RULE,
-							arrNonTerminals.get(i).name);
+							arrNonTerminal.name);
 				}
 				/* 清除该规则 */
 				processed.set(nodependencyRule);
@@ -598,17 +598,13 @@ public class Syntax {
 
 	/**
 	 * 给指定终结符集合按ID排序
-	 * 
-	 * @return
+	 *
+	 * @param colletion 要排序的集合
+	 * @return 排序后的结果
 	 */
 	private ArrayList<TokenExp> sortTerminal(Collection<TokenExp> colletion) {
-		ArrayList<TokenExp> list = new ArrayList<TokenExp>(colletion);
-		Collections.sort(list, new Comparator<TokenExp>() {
-			@Override
-			public int compare(TokenExp o1, TokenExp o2) {
-				return o1.id > o2.id ? 1 : (o1.id == o2.id ? 0 : -1);
-			}
-		});
+		ArrayList<TokenExp> list = new ArrayList<>(colletion);
+		Collections.sort(list, (o1, o2) -> o1.id > o2.id ? 1 : (o1.id == o2.id ? 0 : -1));
 		return list;
 	}
 
@@ -627,7 +623,7 @@ public class Syntax {
 	 */
 	public static String getSingleString(String name, ISyntaxComponent exp,
 			ISyntaxComponent focused, boolean front) {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		sb.append(name);
 		sb.append(" -> ");
 		SyntaxToString alg = new SyntaxToString(focused, front);
@@ -646,7 +642,7 @@ public class Syntax {
 	 * @return 原产生式描述
 	 */
 	public static String getSingleString(String name, ISyntaxComponent exp) {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		sb.append(name);
 		sb.append(" -> ");
 		SyntaxToString alg = new SyntaxToString();
@@ -659,7 +655,7 @@ public class Syntax {
 	 * 获得段落式描述
 	 */
 	public String getParagraphString() {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		/* 起始符号 */
 		sb.append("#### 起始符号 ####");
 		sb.append(System.lineSeparator());
@@ -691,13 +687,13 @@ public class Syntax {
 				sb.append("\t--== First ==--");
 				sb.append(System.lineSeparator());
 				for (TokenExp token : item.arrFirstSetTokens) {
-					sb.append("\t\t" + token.toString());
+					sb.append("\t\t").append(token.toString());
 					sb.append(System.lineSeparator());
 				}
 				sb.append("\t--== Follow ==--");
 				sb.append(System.lineSeparator());
 				for (TokenExp token : item.parent.arrFollows) {
-					sb.append("\t\t" + token.toString());
+					sb.append("\t\t").append(token.toString());
 					sb.append(System.lineSeparator());
 				}
 			}
@@ -709,7 +705,7 @@ public class Syntax {
 	 * 获得原推导式描述
 	 */
 	public String getOriginalString() {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		for (RuleExp exp : arrNonTerminals) {
 			for (RuleItem item : exp.rule.arrRules) {
 				sb.append(getSingleString(exp.name, item.expression));

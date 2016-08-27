@@ -16,12 +16,12 @@ public class DFAStatus {
 	/**
 	 * 出边集合
 	 */
-	public HashSet<DFAEdge> outEdges = new HashSet<DFAEdge>();
+	public HashSet<DFAEdge> outEdges = new HashSet<>();
 
 	/**
 	 * 入边集合
 	 */
-	public HashSet<DFAEdge> inEdges = new HashSet<DFAEdge>();
+	public HashSet<DFAEdge> inEdges = new HashSet<>();
 
 	/**
 	 * 数据
@@ -36,7 +36,7 @@ public class DFAStatus {
 	 */
 	public void visit(BreadthFirstSearch<DFAEdge, DFAStatus> bfs) {
 		ArrayList<DFAStatus> stack = bfs.arrStatus;
-		HashSet<DFAStatus> set = new HashSet<DFAStatus>();
+		HashSet<DFAStatus> set = new HashSet<>();
 		stack.clear();
 		set.add(this);
 		stack.add(this);
@@ -45,12 +45,12 @@ public class DFAStatus {
 			VisitBag bag = new VisitBag();
 			bfs.visitBegin(status, bag);
 			if (bag.bVisitChildren) {
-				for (DFAEdge edge : status.outEdges) {// 遍历状态的出边
-					if (!set.contains(edge.end) && bfs.testEdge(edge)) {// 边未被访问，且边类型符合要求
-						stack.add(edge.end);
-						set.add(edge.end);
-					}
-				}
+				// 遍历状态的出边
+// 边未被访问，且边类型符合要求
+				status.outEdges.stream().filter(edge -> !set.contains(edge.end) && bfs.testEdge(edge)).forEach(edge -> {// 边未被访问，且边类型符合要求
+					stack.add(edge.end);
+					set.add(edge.end);
+				});
 			}
 			if (bag.bVisitEnd) {
 				bfs.visitEnd(status);

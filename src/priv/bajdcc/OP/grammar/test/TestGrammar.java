@@ -1,12 +1,10 @@
 package priv.bajdcc.OP.grammar.test;
 
 import java.util.List;
-import java.util.Scanner;
 
 import priv.bajdcc.OP.grammar.Grammar;
 import priv.bajdcc.OP.grammar.error.GrammarException;
 import priv.bajdcc.OP.grammar.handler.IPatternHandler;
-import priv.bajdcc.OP.syntax.Syntax;
 import priv.bajdcc.OP.syntax.handler.SyntaxException;
 import priv.bajdcc.util.lexer.error.RegexException;
 import priv.bajdcc.util.lexer.token.OperatorType;

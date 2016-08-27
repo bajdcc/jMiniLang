@@ -1,17 +1,12 @@
 package priv.bajdcc.LALR1.semantic.test;
 
-import java.util.Scanner;
-
 import priv.bajdcc.LALR1.grammar.semantic.ISemanticRecorder;
 import priv.bajdcc.LALR1.grammar.symbol.IQuerySymbol;
 import priv.bajdcc.LALR1.semantic.Semantic;
 import priv.bajdcc.LALR1.semantic.token.IIndexedData;
 import priv.bajdcc.LALR1.semantic.token.ISemanticAnalyzier;
-import priv.bajdcc.LALR1.syntax.Syntax;
 import priv.bajdcc.LALR1.syntax.handler.SyntaxException;
 import priv.bajdcc.util.lexer.error.RegexException;
-import priv.bajdcc.util.lexer.token.OperatorType;
-import priv.bajdcc.util.lexer.token.Token;
 import priv.bajdcc.util.lexer.token.TokenType;
 
 @SuppressWarnings("unused")
@@ -28,29 +23,13 @@ public class TestSemantic3 {
 			semantic.addNonTerminal("START");
 			semantic.addNonTerminal("Z");
 			semantic.addErrorHandler("sample", null);
-			ISemanticAnalyzier handleValue = new ISemanticAnalyzier() {
-				@Override
-				public Object handle(IIndexedData indexed,
-						IQuerySymbol query, ISemanticRecorder recorder) {
-					return 1;
-				}
-			};
-			ISemanticAnalyzier handleCopy = new ISemanticAnalyzier() {
-				@Override
-				public Object handle(IIndexedData indexed,
-						IQuerySymbol query, ISemanticRecorder recorder) {
-					return indexed.get(0).object;
-				}
-			};
-			ISemanticAnalyzier handleRec = new ISemanticAnalyzier() {
-				@Override
-				public Object handle(IIndexedData indexed,
-						IQuerySymbol query, ISemanticRecorder recorder) {
-					int lop = Integer
-							.parseInt(indexed.get(0).object.toString());
-					return lop + 1;
-				}
-			};
+			ISemanticAnalyzier handleValue = (indexed, query, recorder) -> 1;
+			ISemanticAnalyzier handleCopy = (indexed, query, recorder) -> indexed.get(0).object;
+			ISemanticAnalyzier handleRec = (indexed, query, recorder) -> {
+                int lop = Integer
+                        .parseInt(indexed.get(0).object.toString());
+                return lop + 1;
+            };
 			// syntax.infer("E -> T `PLUS`<+> E | T `MINUS`<-> E | T");
 			// syntax.infer("T -> F `TIMES`<*> T | F `DIVIDE`</> T | F");
 			// syntax.infer("F -> `LPA`<(> E `RPA`<)>  | `SYMBOL`<i>");

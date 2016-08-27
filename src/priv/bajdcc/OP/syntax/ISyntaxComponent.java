@@ -12,7 +12,7 @@ public interface ISyntaxComponent {
 	 * @param visitor
 	 *            递归遍历算法
 	 */
-	public void visit(ISyntaxComponentVisitor visitor);
+	void visit(ISyntaxComponentVisitor visitor);
 	
 	/**
 	 * 设定遍历方式（逆序）
@@ -20,5 +20,5 @@ public interface ISyntaxComponent {
 	 * @param visitor
 	 *            递归遍历算法
 	 */
-	public void visitReverse(ISyntaxComponentVisitor visitor);
+	void visitReverse(ISyntaxComponentVisitor visitor);
 }

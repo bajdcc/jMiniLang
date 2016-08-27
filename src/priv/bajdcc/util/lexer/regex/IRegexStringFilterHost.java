@@ -13,5 +13,5 @@ public interface IRegexStringFilterHost {
 	 * 设置字符转换算法
 	 * @param alg 字符转换算法
 	 */
-	public void setFilter(ITokenAlgorithm alg);
+	void setFilter(ITokenAlgorithm alg);
 }

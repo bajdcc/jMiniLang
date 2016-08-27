@@ -17,7 +17,7 @@ public interface IRuntimeDebugExec {
 	 * @return 过程返回值，若没有则返回空
 	 * @throws Exception
 	 */
-	public RuntimeObject ExternalProcCall(List<RuntimeObject> args, IRuntimeStatus status)
+	RuntimeObject ExternalProcCall(List<RuntimeObject> args, IRuntimeStatus status)
 			throws Exception;
 
 	/**
@@ -25,12 +25,12 @@ public interface IRuntimeDebugExec {
 	 * 
 	 * @return 若无参数则返回空
 	 */
-	public RuntimeObjectType[] getArgsType();
+	RuntimeObjectType[] getArgsType();
 
 	/**
 	 * 返回过程文档
 	 * 
 	 * @return 文档
 	 */
-	public String getDoc();
+	String getDoc();
 }

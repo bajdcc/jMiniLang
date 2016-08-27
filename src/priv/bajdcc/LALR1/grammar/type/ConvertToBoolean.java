@@ -39,8 +39,7 @@ public class ConvertToBoolean implements ITokenConventer {
 	private static boolean getBooleanValue(Token token) {
 		switch (token.kToken) {
 		case BOOL:
-			boolean bool = (boolean) token.object;
-			return bool;
+			return (boolean) token.object;
 		case CHARACTER:
 			char ch = (char) token.object;
 			return ch != 0;

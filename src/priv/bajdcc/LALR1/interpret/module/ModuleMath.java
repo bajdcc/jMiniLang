@@ -29,18 +29,8 @@ public class ModuleMath implements IInterpreterModule {
 		Grammar grammar = new Grammar(base);
 		RuntimeCodePage page = grammar.getCodePage();
 		IRuntimeDebugInfo info = page.getInfo();
-		info.addExternalValue("g_PI", new IRuntimeDebugValue() {
-			@Override
-			public RuntimeObject getRuntimeObject() {
-				return new RuntimeObject(null);
-			}
-		});
-		info.addExternalValue("g_E", new IRuntimeDebugValue() {
-			@Override
-			public RuntimeObject getRuntimeObject() {
-				return new RuntimeObject("\n");
-			}
-		});
+		info.addExternalValue("g_PI", () -> new RuntimeObject(null));
+		info.addExternalValue("g_E", () -> new RuntimeObject("\n"));
 		buildUnaryFunc(info);
 
 		return page;
@@ -55,7 +45,7 @@ public class ModuleMath implements IInterpreterModule {
 		if (number.compareTo(BigDecimal.ZERO) < 0)
 			throw new ArithmeticException("sqrt with negative");
 		BigInteger integer = number.toBigInteger();
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		String strInt = integer.toString();
 		int lenInt = strInt.length();
 		if (lenInt % 2 != 0) {

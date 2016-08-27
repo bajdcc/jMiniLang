@@ -21,7 +21,7 @@ public class ParsingStack implements IIndexedData {
 	/**
 	 * 单词包栈
 	 */
-	private Stack<HashMap<Integer, TokenBag>> stkMapTokenBags = new Stack<HashMap<Integer, TokenBag>>();
+	private Stack<HashMap<Integer, TokenBag>> stkMapTokenBags = new Stack<>();
 
 	public ParsingStack() {
 		push();
@@ -31,7 +31,7 @@ public class ParsingStack implements IIndexedData {
 	 * 放入一个索引数据，同时置当前为栈顶
 	 */
 	public void push() {
-		mapTokenBag = new HashMap<Integer, TokenBag>();
+		mapTokenBag = new HashMap<>();
 		stkMapTokenBags.push(mapTokenBag);
 	}
 
@@ -93,20 +93,20 @@ public class ParsingStack implements IIndexedData {
 
 	private static void printTokenBag(StringBuilder sb,
 			HashMap<Integer, TokenBag> bags) {
-		if (bags == null) {
-
-		} else if (bags.isEmpty()) {
-			sb.append("(empty)");
-		} else {
-			for (Entry<Integer, TokenBag> bag : bags.entrySet()) {
-				sb.append("[" + bag.getKey() + ": ");
-				if (bag.getValue().token != null) {
-					sb.append(bag.getValue().token.toString());
-				} else {
-					sb.append(bag.getValue().object.toString());
-				}
-				sb.append("]");
-			}
+		if (bags != null) {
+			if (bags.isEmpty()) {
+                sb.append("(empty)");
+            } else {
+                for (Entry<Integer, TokenBag> bag : bags.entrySet()) {
+                    sb.append("[").append(bag.getKey()).append(": ");
+                    if (bag.getValue().token != null) {
+                        sb.append(bag.getValue().token.toString());
+                    } else {
+                        sb.append(bag.getValue().object.toString());
+                    }
+                    sb.append("]");
+                }
+            }
 		}
 	}
 
@@ -120,7 +120,7 @@ public class ParsingStack implements IIndexedData {
 		sb.append(System.lineSeparator());
 		int i = 1;
 		for (HashMap<Integer, TokenBag> hashMap : stkMapTokenBags) {
-			sb.append(i + ": ");
+			sb.append(i).append(": ");
 			printTokenBag(sb, hashMap);
 			sb.append(System.lineSeparator());
 			i++;

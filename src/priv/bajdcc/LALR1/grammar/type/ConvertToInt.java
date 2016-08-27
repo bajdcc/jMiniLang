@@ -57,9 +57,9 @@ public class ConvertToInt implements ITokenConventer {
 			} catch (NumberFormatException e) {
 				token.kToken = TokenType.ERROR;
 			}
+			break;
 		case INTEGER:
-			BigInteger integer = (BigInteger) token.object;
-			return integer;
+			return (BigInteger) token.object;
 		case DECIMAL:
 			BigDecimal decimal = (BigDecimal) token.object;
 			return decimal.toBigInteger();

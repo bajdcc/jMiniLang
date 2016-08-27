@@ -15,5 +15,5 @@ public interface ITokenConventer {
 	 * @param token 操作数
 	 * @return 结果
 	 */
-	public Token convert(Token token);
+	Token convert(Token token);
 }

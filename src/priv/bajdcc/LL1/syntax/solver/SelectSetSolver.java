@@ -101,11 +101,11 @@ public abstract class SelectSetSolver implements ISyntaxComponentVisitor {
 		}
 		if (insertSymbol) {
 			if (epsilon) {
-				for (TokenExp token : node.rule.arrFirsts) {// 添加First集
-					if (token.kType != TokenType.EOF) {
-						setCellToRuleId(token.id);
-					}
-				}
+				// 添加First集
+				node.rule.arrFirsts
+						.stream()
+						.filter(token -> token.kType != TokenType.EOF)
+						.forEach(token -> setCellToRuleId(token.id));
 			}
 		}
 		addInstToRule(PredictType.NONTERMINAL, node.id);

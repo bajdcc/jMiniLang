@@ -26,8 +26,11 @@ public class PredictionInstruction {
 
 	@Override
 	public boolean equals(Object obj) {
-		PredictionInstruction pi = (PredictionInstruction) obj;
-		return type == pi.type && inst == pi.inst;
+		if (obj instanceof PredictionInstruction) {
+			PredictionInstruction pi = (PredictionInstruction) obj;
+			return type == pi.type && inst == pi.inst;
+		}
+		return false;
 	}
 
 	@Override

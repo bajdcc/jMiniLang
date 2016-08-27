@@ -43,8 +43,7 @@ public class CharacterRange {
 		if (chLowerBound == chUpperBound) {
 			sb.append(printChar(chLowerBound));
 		} else {
-			sb.append(printChar(chLowerBound) + "-"
-					+ printChar(chUpperBound));
+			sb.append(printChar(chLowerBound)).append("-").append(printChar(chUpperBound));
 		}
 		return sb.toString();
 	}

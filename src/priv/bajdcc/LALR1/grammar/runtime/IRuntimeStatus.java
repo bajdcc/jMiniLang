@@ -12,7 +12,7 @@ public interface IRuntimeStatus {
 	 * @param name 过程名
 	 * @return 文档
 	 */
-	public String getHelpString(String name);
+	String getHelpString(String name);
 
 	/**
 	 * 得到过程的地址
@@ -20,12 +20,12 @@ public interface IRuntimeStatus {
 	 * @return 地址
 	 * @throws RuntimeException 
 	 */
-	public int getFuncAddr(String name) throws RuntimeException;
+	int getFuncAddr(String name) throws RuntimeException;
 	
 	/**
 	 * 载入代码并运行
 	 * @param name 文件名
 	 * @throws RuntimeException 
 	 */
-	public void runPage(String name) throws Exception;
+	void runPage(String name) throws Exception;
 }

@@ -19,7 +19,7 @@ public interface IBreadthFirstSearch<Edge, Status> {
 	 * 
 	 * @return 测试结果
 	 */
-	public boolean testEdge(Edge edge);
+	boolean testEdge(Edge edge);
 
 	/**
 	 * 遍历开始
@@ -27,7 +27,7 @@ public interface IBreadthFirstSearch<Edge, Status> {
 	 * @param status
 	 *            状态
 	 */
-	public void visitBegin(Status status, VisitBag bag);
+	void visitBegin(Status status, VisitBag bag);
 
 	/**
 	 * 遍历结束
@@ -35,5 +35,5 @@ public interface IBreadthFirstSearch<Edge, Status> {
 	 * @param status
 	 *            状态
 	 */
-	public void visitEnd(Status status);
+	void visitEnd(Status status);
 }

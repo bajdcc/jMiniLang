@@ -17,7 +17,7 @@ public class TokenFactory extends Lexer {
 	/**
 	 * 保存当前分析的单词流
 	 */
-	private ArrayList<Token> arrTokens = new ArrayList<Token>();
+	private ArrayList<Token> arrTokens = new ArrayList<>();
 
 	public TokenFactory(String context) throws RegexException {
 		super(context);
@@ -28,7 +28,7 @@ public class TokenFactory extends Lexer {
 		TokenFactory o = null;
 		try {
 			o = (TokenFactory) super.clone();
-			o.arrTokens = new ArrayList<Token>(arrTokens);
+			o.arrTokens = new ArrayList<>(arrTokens);
 		} catch (CloneNotSupportedException e) {
 			e.printStackTrace();
 		}

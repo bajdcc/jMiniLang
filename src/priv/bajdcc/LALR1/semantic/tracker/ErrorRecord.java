@@ -12,7 +12,7 @@ public class ErrorRecord {
 	/**
 	 * 错误集
 	 */
-	public ArrayList<TrackerError> arrErrors = new ArrayList<TrackerError>();
+	public ArrayList<TrackerError> arrErrors = new ArrayList<>();
 	
 	/**
 	 * 前向指针

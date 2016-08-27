@@ -15,7 +15,7 @@ public class Rule {
 	/**
 	 * 规则表达式列表
 	 */
-	public ArrayList<RuleItem> arrRules = new ArrayList<RuleItem>();
+	public ArrayList<RuleItem> arrRules = new ArrayList<>();
 
 	/**
 	 * 规则起始非终结符
@@ -30,7 +30,7 @@ public class Rule {
 	/**
 	 * 终结符First集合
 	 */
-	public ArrayList<TokenExp> arrTokens = new ArrayList<TokenExp>();
+	public ArrayList<TokenExp> arrTokens = new ArrayList<>();
 
 	public Rule(RuleExp exp) {
 		nonTerminal = exp;

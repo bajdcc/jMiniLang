@@ -1,13 +1,9 @@
 package priv.bajdcc.LL1.grammar.test;
 
-import java.util.Scanner;
-
 import priv.bajdcc.LL1.grammar.Grammar;
 import priv.bajdcc.LL1.grammar.error.GrammarException;
-import priv.bajdcc.LL1.syntax.Syntax;
 import priv.bajdcc.LL1.syntax.handler.SyntaxException;
 import priv.bajdcc.util.lexer.error.RegexException;
-import priv.bajdcc.util.lexer.token.OperatorType;
 import priv.bajdcc.util.lexer.token.TokenType;
 
 @SuppressWarnings("unused")

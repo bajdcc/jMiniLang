@@ -18,30 +18,30 @@ public interface IRegexStringIteratorEx {
 	 * 
 	 * @see priv.bajdcc.util.lexer.token.TokenType
 	 */
-	public boolean isEOF();
+	boolean isEOF();
 
 	/**
 	 * 保存单词
 	 */
-	public void saveToken();
+	void saveToken();
 	
 	/**
 	 * 返回之前的位置
 	 */
-	public Position lastPosition();
+	Position lastPosition();
 
 	/**
 	 * 获取当前单词
 	 */
-	public Token token();
+	Token token();
 	
 	/**
 	 * 获取所有单词
 	 */
-	public ArrayList<Token> tokenList();
+	ArrayList<Token> tokenList();
 	
 	/**
 	 * 获取错误现场
 	 */
-	public String getErrorSnapshot(Position position);
+	String getErrorSnapshot(Position position);
 }

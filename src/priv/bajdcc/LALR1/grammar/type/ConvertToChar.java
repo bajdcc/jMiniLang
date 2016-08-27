@@ -39,11 +39,7 @@ public class ConvertToChar implements ITokenConventer {
 		switch (token.kToken) {
 		case STRING:
 			String str = (String) token.object;
-			if (str.isEmpty()) {
-				return '\0';
-			} else {
-				return str.charAt(0);
-			}
+			return str.isEmpty() ? '\0' : str.charAt(0);
 		case DECIMAL:
 			BigDecimal decimal = (BigDecimal) token.object;
 			return (char) decimal.intValue();

@@ -14,10 +14,10 @@ public interface IExpCollction {
 	 * @param exp
 	 *            子表达式
 	 */
-	public void add(ISyntaxComponent exp);
+	void add(ISyntaxComponent exp);
 	
 	/**
 	 * 集合是否为空
 	 */
-	public boolean isEmpty();
+	boolean isEmpty();
 }

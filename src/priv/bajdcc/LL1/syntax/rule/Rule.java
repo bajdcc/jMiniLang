@@ -16,7 +16,7 @@ public class Rule {
 	/**
 	 * 规则表达式列表
 	 */
-	public ArrayList<RuleItem> arrRules = new ArrayList<RuleItem>();
+	public ArrayList<RuleItem> arrRules = new ArrayList<>();
 
 	/**
 	 * 规则起始非终结符
@@ -31,12 +31,12 @@ public class Rule {
 	/**
 	 * 终结符First集合
 	 */
-	public ArrayList<TokenExp> arrFirsts = new ArrayList<TokenExp>();
+	public ArrayList<TokenExp> arrFirsts = new ArrayList<>();
 	
 	/**
 	 * 终结符Follow集合
 	 */
-	public HashSet<TokenExp> setFollows = new HashSet<TokenExp>();
+	public HashSet<TokenExp> setFollows = new HashSet<>();
 	
 	/**
 	 * First集合（终结符）

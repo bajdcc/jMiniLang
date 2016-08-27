@@ -38,7 +38,7 @@ public class RegexException extends Exception {
 		public void setMessage(String message) {
 			this.message = message;
 		}
-	};
+	}
 
 	public RegexException(RegexError error, Position pos) {
 		super(error.getMessage());

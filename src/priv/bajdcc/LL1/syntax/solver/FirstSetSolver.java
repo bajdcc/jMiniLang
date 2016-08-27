@@ -22,12 +22,12 @@ public class FirstSetSolver implements ISyntaxComponentVisitor {
 	/**
 	 * 终结符表
 	 */
-	private HashSet<TokenExp> setTokens = new HashSet<TokenExp>();
+	private HashSet<TokenExp> setTokens = new HashSet<>();
 
 	/**
 	 * 非终结符表
 	 */
-	private HashSet<RuleExp> setRules = new HashSet<RuleExp>();
+	private HashSet<RuleExp> setRules = new HashSet<>();
 
 	/**
 	 * 产生式推导的串长度是否可能为零
@@ -42,8 +42,8 @@ public class FirstSetSolver implements ISyntaxComponentVisitor {
 	 * @return 产生式是否合法
 	 */
 	public boolean solve(RuleItem target) {
-		target.setFirstSetTokens = new HashSet<TokenExp>(setTokens);
-		target.setFirstSetRules = new HashSet<RuleExp>(setRules);
+		target.setFirstSetTokens = new HashSet<>(setTokens);
+		target.setFirstSetRules = new HashSet<>(setRules);
 		return bZero;
 	}
 

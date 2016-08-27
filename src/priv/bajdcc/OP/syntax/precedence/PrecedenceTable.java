@@ -45,12 +45,12 @@ public class PrecedenceTable extends OPTableSolver {
 	/**
 	 * 非终结符映射
 	 */
-	protected HashMap<RuleExp, Integer> mapNonTerminals = new HashMap<RuleExp, Integer>();
+	protected HashMap<RuleExp, Integer> mapNonTerminals = new HashMap<>();
 
 	/**
 	 * 终结符映射
 	 */
-	protected HashMap<TokenExp, Integer> mapTerminals = new HashMap<TokenExp, Integer>();
+	protected HashMap<TokenExp, Integer> mapTerminals = new HashMap<>();
 
 	/**
 	 * 算符优先分析表
@@ -82,7 +82,7 @@ public class PrecedenceTable extends OPTableSolver {
 	 * 
 	 * @param error
 	 *            错误类型
-	 * @throws GrammarError
+	 * @throws GrammarException
 	 */
 	private void err(GrammarError error) throws GrammarException {
 		throw new GrammarException(error, iter.position(), iter.ex().token());
@@ -200,17 +200,13 @@ public class PrecedenceTable extends OPTableSolver {
 
 	/**
 	 * 给指定终结符集合按ID排序
-	 * 
-	 * @return
-	 */
+	 *
+	 * @param colletion 要排序的集合
+	 * @return 排序后的结果
+     */
 	private ArrayList<TokenExp> sortTerminal(Collection<TokenExp> colletion) {
-		ArrayList<TokenExp> list = new ArrayList<TokenExp>(colletion);
-		Collections.sort(list, new Comparator<TokenExp>() {
-			@Override
-			public int compare(TokenExp o1, TokenExp o2) {
-				return o1.id > o2.id ? 1 : (o1.id == o2.id ? 0 : -1);
-			}
-		});
+		ArrayList<TokenExp> list = new ArrayList<>(colletion);
+		Collections.sort(list, (o1, o2) -> o1.id > o2.id ? 1 : (o1.id == o2.id ? 0 : -1));
 		return list;
 	}
 
@@ -241,9 +237,9 @@ public class PrecedenceTable extends OPTableSolver {
 	 */
 	public void run() throws GrammarException {
 		/* 指令堆栈 */
-		Stack<PredictionInstruction> spi = new Stack<PredictionInstruction>();
+		Stack<PredictionInstruction> spi = new Stack<>();
 		/* 数据堆栈 */
-		Stack<FixedData> sobj = new Stack<FixedData>();
+		Stack<FixedData> sobj = new Stack<>();
 		/* 结束符号进栈 */
 		spi.push(new PredictionInstruction(PredictType.EPSILON, -1));
 		sobj.push(new FixedData());
@@ -312,8 +308,8 @@ public class PrecedenceTable extends OPTableSolver {
 				// head原来为最左素短语的头，从head+1到栈顶为可归约子串
 				int primePhraseCount = spi.size() - comp_top_index;
 				/* 2.保存最左素短语 */
-				ArrayList<PredictionInstruction> primeInstList = new ArrayList<PredictionInstruction>();
-				ArrayList<FixedData> primeDataList = new ArrayList<FixedData>();
+				ArrayList<PredictionInstruction> primeInstList = new ArrayList<>();
+				ArrayList<FixedData> primeDataList = new ArrayList<>();
 				for (int i = 0; i < primePhraseCount; i++) {
 					primeInstList.add(0, spi.pop());
 					primeDataList.add(0, sobj.pop());
@@ -327,8 +323,8 @@ public class PrecedenceTable extends OPTableSolver {
 					System.out.println("\t" + primeDataList.get(i));
 				}
 				/* 3.新建指令集和数据集（用于用户级回调） */
-				ArrayList<Token> tempTokenList = new ArrayList<Token>();
-				ArrayList<Object> tempObjectList = new ArrayList<Object>();
+				ArrayList<Token> tempTokenList = new ArrayList<>();
+				ArrayList<Object> tempObjectList = new ArrayList<>();
 				for (int i = 0; i < primePhraseCount; i++) {
 					PredictType pt = primeInstList.get(i).type;
 					if (pt == PredictType.TERMINAL) {
@@ -412,19 +408,19 @@ public class PrecedenceTable extends OPTableSolver {
 	 * 
 	 */
 	public String getMatrixString() {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		int size = arrTerminals.size();
 		sb.append("#### 算符优先关系矩阵 ####");
 		sb.append(System.lineSeparator());
 		sb.append("\t");
 		for (int i = 0; i < size; i++) {
-			sb.append(i + "\t");
+			sb.append(i).append("\t");
 		}
 		sb.append(System.lineSeparator());
 		for (int i = 0; i < size; i++) {
-			sb.append(i + "\t");
+			sb.append(i).append("\t");
 			for (int j = 0; j < size; j++) {
-				sb.append(table[i][j].getName() + "\t");
+				sb.append(table[i][j].getName()).append("\t");
 			}
 			sb.append(System.lineSeparator());
 		}

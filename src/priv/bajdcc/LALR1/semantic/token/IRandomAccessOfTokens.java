@@ -16,7 +16,7 @@ public interface IRandomAccessOfTokens {
 	 *            索引
 	 * @return 单词
 	 */
-	public Token relativeGet(int index);
+	Token relativeGet(int index);
 
 	/**
 	 * 设置相对位置的单词
@@ -26,7 +26,7 @@ public interface IRandomAccessOfTokens {
 	 * @param token
 	 *            单词
 	 */
-	public void relativeSet(int index, Token token);
+	void relativeSet(int index, Token token);
 
 	/**
 	 * 获取绝对位置的单词
@@ -35,7 +35,7 @@ public interface IRandomAccessOfTokens {
 	 *            索引
 	 * @return 单词
 	 */
-	public Token positiveGet(int index);
+	Token positiveGet(int index);
 
 	/**
 	 * 设置绝对位置的单词
@@ -45,5 +45,5 @@ public interface IRandomAccessOfTokens {
 	 * @param token
 	 *            单词
 	 */
-	public void positiveSet(int index, Token token);
+	void positiveSet(int index, Token token);
 }

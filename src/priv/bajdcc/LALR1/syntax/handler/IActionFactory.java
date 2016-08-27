@@ -13,5 +13,5 @@ public interface IActionFactory {
 	 * @param name
 	 *            过程名称
 	 */
-	public void invoke(String name);
+	void invoke(String name);
 }

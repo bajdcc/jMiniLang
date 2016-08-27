@@ -28,9 +28,9 @@ public class TokenTools {
 	 */
 	public static final int SCALE_NUM = 10;
 
-	private static HashMap<TokenType, ITokenConventer> mapConverter = new HashMap<TokenType, ITokenConventer>();
-	private static HashMap<OperatorType, RuntimeInst> mapOp2Ins = new HashMap<OperatorType, RuntimeInst>();
-	private static HashMap<RuntimeInst, OperatorType> mapIns2Op = new HashMap<RuntimeInst, OperatorType>();
+	private static HashMap<TokenType, ITokenConventer> mapConverter = new HashMap<>();
+	private static HashMap<OperatorType, RuntimeInst> mapOp2Ins = new HashMap<>();
+	private static HashMap<RuntimeInst, OperatorType> mapIns2Op = new HashMap<>();
 
 	static {
 		mapConverter.put(TokenType.BOOL, new ConvertToBoolean());
@@ -169,8 +169,6 @@ public class TokenTools {
 	/**
 	 * 二元运算（包含向上转换）
 	 * 
-	 * @param lop
-	 *            左操作数
 	 * @param lop
 	 *            左操作数
 	 * @param rop
@@ -496,8 +494,12 @@ public class TokenTools {
 	}
 
 	public static RuntimeInst op2ins(Token token) {
-		RuntimeInst inst = mapOp2Ins.get(token.object);
-		return inst == null ? RuntimeInst.inop : inst;
+		if (token.kToken == TokenType.OPERATOR) {
+			RuntimeInst inst = mapOp2Ins.get((OperatorType) token.object);
+			if (inst != null)
+				return inst;
+		}
+		return RuntimeInst.inop;
 	}
 
 	public static OperatorType ins2op(RuntimeInst inst) {

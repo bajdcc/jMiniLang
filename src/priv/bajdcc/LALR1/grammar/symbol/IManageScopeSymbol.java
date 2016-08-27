@@ -12,17 +12,17 @@ public interface IManageScopeSymbol {
 	/**
 	 * 创建并进入新的命名空间
 	 */
-	public void enterScope();
+	void enterScope();
 
 	/**
 	 * 删除当前命名空间，返回上层
 	 */
-	public void leaveScope();
+	void leaveScope();
 
 	/**
 	 * 删除所有预期参数
 	 */
-	public void clearFutureArgs();
+	void clearFutureArgs();
 
 	/**
 	 * 注册符号
@@ -30,7 +30,7 @@ public interface IManageScopeSymbol {
 	 * @param name
 	 *            符号名
 	 */
-	public void registerSymbol(String name);
+	void registerSymbol(String name);
 
 	/**
 	 * 注册过程
@@ -40,7 +40,7 @@ public interface IManageScopeSymbol {
 	 * @param func
 	 *            过程
 	 */
-	public void registeFunc(String name, Function func);
+	void registeFunc(String name, Function func);
 
 	/**
 	 * 注册下个块的参数表
@@ -49,5 +49,5 @@ public interface IManageScopeSymbol {
 	 *            参数名
 	 * @return 无冲突则返回真
 	 */
-	public boolean registerFutureSymbol(String name);
+	boolean registerFutureSymbol(String name);
 }

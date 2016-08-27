@@ -1,9 +1,5 @@
 package priv.bajdcc.LALR1.syntax.test;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Scanner;
-
 import priv.bajdcc.LALR1.syntax.Syntax;
 import priv.bajdcc.LALR1.syntax.handler.SyntaxException;
 import priv.bajdcc.util.lexer.error.RegexException;

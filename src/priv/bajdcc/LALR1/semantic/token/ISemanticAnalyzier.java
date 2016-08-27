@@ -21,6 +21,6 @@ public interface ISemanticAnalyzier {
 	 *            语义错误记录接口
 	 * @return 处理后的数据
 	 */
-	public Object handle(IIndexedData indexed, IQuerySymbol query,
-			ISemanticRecorder recorder);
+	Object handle(IIndexedData indexed, IQuerySymbol query,
+				  ISemanticRecorder recorder);
 }

@@ -10,9 +10,9 @@ import java.util.HashMap;
  */
 public class HashListMapEx2<K, V> {
 
-	public HashMap<K, V> map = new HashMap<K, V>();
+	public HashMap<K, V> map = new HashMap<>();
 
-	public ArrayList<K> list = new ArrayList<K>();
+	public ArrayList<K> list = new ArrayList<>();
 
 	public boolean contains(K k) {
 		return map.containsKey(k);
@@ -39,8 +39,8 @@ public class HashListMapEx2<K, V> {
 		return map.get(k);
 	}
 
-	public int indexOf(V v) {
-		return list.indexOf(v);
+	public int indexOf(K k) {
+		return list.indexOf(k);
 	}
 	
 	public void pop() {

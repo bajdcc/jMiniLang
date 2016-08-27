@@ -26,11 +26,9 @@ public class Token {
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append(String.format("%04d,%03d: %s %s", position.iLine,
+		return String.format("%04d,%03d: %s %s", position.iLine,
 				position.iColumn, kToken.getName(),
-				object == null ? "(null)" : object.toString()));
-		return sb.toString();
+				object == null ? "(null)" : object.toString());
 	}
 
 	public static Token transfer(priv.bajdcc.util.lexer.token.Token token) {

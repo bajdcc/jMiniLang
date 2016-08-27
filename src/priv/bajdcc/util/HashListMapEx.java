@@ -13,9 +13,9 @@ import java.util.HashMap;
  */
 public class HashListMapEx<K, V> {
 
-	public HashMap<K, V> map = new HashMap<K, V>();
+	public HashMap<K, V> map = new HashMap<>();
 
-	public ArrayList<V> list = new ArrayList<V>();
+	public ArrayList<V> list = new ArrayList<>();
 
 	public boolean contains(K k) {
 		return map.containsKey(k);

@@ -7,6 +7,6 @@ package priv.bajdcc.LALR1.grammar.runtime;
  */
 public interface ICodegenByteWriter {
 
-	public void genInst(RuntimeInst inst);
-	public void genOp(int op);
+	void genInst(RuntimeInst inst);
+	void genOp(int op);
 }

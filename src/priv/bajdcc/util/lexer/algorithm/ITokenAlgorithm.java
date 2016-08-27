@@ -28,12 +28,12 @@ public interface ITokenAlgorithm {
 	/**
 	 * 返回字符串过滤组件
 	 */
-	public abstract IRegexStringFilter getRegexStringFilter();
+	IRegexStringFilter getRegexStringFilter();
 
 	/**
 	 * 返回字符类型哈希映射表
 	 */
-	public abstract HashMap<Character, MetaType> getMetaHash();
+	HashMap<Character, MetaType> getMetaHash();
 
 	/**
 	 * 返回正则表达式字符串
@@ -44,11 +44,11 @@ public interface ITokenAlgorithm {
 	 *            输入的单词
 	 * @return 输出的单词
 	 */
-	public abstract Token getToken(String string, Token token);
+	Token getToken(String string, Token token);
 	
 	/**
 	 * 返回正则表达式描述
 	 * @return 正则表达式描述
 	 */
-	public abstract String getRegexDescription();
+	String getRegexDescription();
 }

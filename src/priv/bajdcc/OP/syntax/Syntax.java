@@ -36,22 +36,22 @@ public class Syntax {
 	/**
 	 * 终结符表
 	 */
-	protected ArrayList<TokenExp> arrTerminals = new ArrayList<TokenExp>();
+	protected ArrayList<TokenExp> arrTerminals = new ArrayList<>();
 
 	/**
 	 * 终结符映射
 	 */
-	protected HashMap<String, TokenExp> mapTerminals = new HashMap<String, TokenExp>();
+	protected HashMap<String, TokenExp> mapTerminals = new HashMap<>();
 
 	/**
 	 * 非终结符表
 	 */
-	protected ArrayList<RuleExp> arrNonTerminals = new ArrayList<RuleExp>();
+	protected ArrayList<RuleExp> arrNonTerminals = new ArrayList<>();
 
 	/**
 	 * 非终结符映射
 	 */
-	protected HashMap<String, RuleExp> mapNonTerminals = new HashMap<String, RuleExp>();
+	protected HashMap<String, RuleExp> mapNonTerminals = new HashMap<>();
 
 	/**
 	 * 文法起始符号
@@ -424,7 +424,7 @@ public class Syntax {
 	 */
 	public static String getSingleString(String name, ISyntaxComponent exp,
 			ISyntaxComponent focused, boolean front) {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		sb.append(name);
 		sb.append(" -> ");
 		SyntaxToString alg = new SyntaxToString(focused, front);
@@ -443,7 +443,7 @@ public class Syntax {
 	 * @return 原产生式描述
 	 */
 	public static String getSingleString(String name, ISyntaxComponent exp) {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		sb.append(name);
 		sb.append(" -> ");
 		SyntaxToString alg = new SyntaxToString();
@@ -456,7 +456,7 @@ public class Syntax {
 	 * 获得段落式描述
 	 */
 	public String getParagraphString() {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		/* 起始符号 */
 		sb.append("#### 起始符号 ####");
 		sb.append(System.lineSeparator());
@@ -488,14 +488,14 @@ public class Syntax {
 				sb.append("\t--== FirstVT ==--");
 				sb.append(System.lineSeparator());
 				for (TokenExp token : exp.rule.arrFirstVT) {
-					sb.append("\t\t" + token.toString());
+					sb.append("\t\t").append(token.toString());
 					sb.append(System.lineSeparator());
 				}
 				/* LastVT集合 */
 				sb.append("\t--== LastVT ==--");
 				sb.append(System.lineSeparator());
 				for (TokenExp token : exp.rule.arrLastVT) {
-					sb.append("\t\t" + token.toString());
+					sb.append("\t\t").append(token.toString());
 					sb.append(System.lineSeparator());
 				}
 			}
@@ -507,7 +507,7 @@ public class Syntax {
 	 * 获得原推导式描述
 	 */
 	public String getOriginalString() {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		for (RuleExp exp : arrNonTerminals) {
 			for (RuleItem item : exp.rule.arrRules) {
 				sb.append(getSingleString(exp.name, item.expression));

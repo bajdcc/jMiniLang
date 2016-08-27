@@ -7,15 +7,15 @@ package priv.bajdcc.util.lexer.regex;
  */
 public interface IRegexComponentVisitor {
 
-	public void visitBegin(Charset node);
+	void visitBegin(Charset node);
 
-	public void visitBegin(Constructure node);
+	void visitBegin(Constructure node);
 
-	public void visitBegin(Repetition node);
+	void visitBegin(Repetition node);
 
-	public void visitEnd(Charset node);
+	void visitEnd(Charset node);
 
-	public void visitEnd(Constructure node);
+	void visitEnd(Constructure node);
 
-	public void visitEnd(Repetition node);
+	void visitEnd(Repetition node);
 }

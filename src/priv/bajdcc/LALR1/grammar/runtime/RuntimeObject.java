@@ -78,6 +78,10 @@ public class RuntimeObject implements Cloneable {
 		return obj;
 	}
 
+	public String getTypeName() {
+		return fromObject(obj).getName();
+	}
+
 	public void setObj(Object obj) {
 		this.obj = obj;
 	}
@@ -162,11 +166,9 @@ public class RuntimeObject implements Cloneable {
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append(type.getName());
-		sb.append(obj == null ? "(null)" : "(" + obj.toString() + ")");
-		sb.append(readonly ? 'R' : 'r');
-		sb.append(copyable ? 'C' : 'c');
-		return sb.toString();
+		return type.getName() +
+				(obj == null ? "(null)" : "(" + obj.toString() + ")") +
+				(readonly ? 'R' : 'r') +
+				(copyable ? 'C' : 'c');
 	}
 }

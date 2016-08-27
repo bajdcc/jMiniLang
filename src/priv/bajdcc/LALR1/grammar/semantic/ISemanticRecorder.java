@@ -21,19 +21,19 @@ public interface ISemanticRecorder {
 	 * @param token
 	 *            单词
 	 */
-	public void add(SemanticError error, Token token);
+	void add(SemanticError error, Token token);
 
 	/**
 	 * 获取错误列表
 	 * 
 	 * @return 错误列表
 	 */
-	public List<SemanticException> getErrorList();
+	List<SemanticException> getErrorList();
 
 	/**
 	 * 是否没有任何错误
 	 * 
 	 * @return 没有错误则为真
 	 */
-	public boolean isCorrect();
+	boolean isCorrect();
 }
