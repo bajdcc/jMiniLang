@@ -117,7 +117,7 @@ public class Semantic extends Syntax implements IErrorHandler {
 	 *            语义分析接口
 	 * @param inferString
 	 *            文法推导式
-	 * @throws SyntaxException
+	 * @throws SyntaxException 词法错误
 	 */
 	public void infer(ISemanticAnalyzier handler, String inferString)
 			throws SyntaxException {
@@ -139,7 +139,7 @@ public class Semantic extends Syntax implements IErrorHandler {
 	 * 
 	 * @param startSymbol
 	 *            开始符号
-	 * @throws SyntaxException
+	 * @throws SyntaxException 词法错误
 	 */
 	public void initialize(String startSymbol) throws SyntaxException {
 		super.initialize(startSymbol);
@@ -662,6 +662,7 @@ public class Semantic extends Syntax implements IErrorHandler {
 
 	/**
 	 * 获取单词流描述
+	 * @return 单词流描述
 	 */
 	public String getTokenList() {
 		StringBuilder sb = new StringBuilder();
@@ -676,6 +677,7 @@ public class Semantic extends Syntax implements IErrorHandler {
 
 	/**
 	 * 获取分析结果描述
+	 * @return 分析结果描述
 	 */
 	public String getObject() {
 		StringBuilder sb = new StringBuilder();
@@ -690,6 +692,7 @@ public class Semantic extends Syntax implements IErrorHandler {
 
 	/**
 	 * 获得指令集描述
+	 * @return 指令集描述
 	 */
 	public String getInst() {
 		ArrayList<RuleItem> items = npa.getRuleItems();
@@ -710,6 +713,7 @@ public class Semantic extends Syntax implements IErrorHandler {
 
 	/**
 	 * 获得语法错误描述
+	 * @return 语法错误描述
 	 */
 	public String getTrackerError() {
 		StringBuilder sb = new StringBuilder();

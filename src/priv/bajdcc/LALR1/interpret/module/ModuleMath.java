@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import priv.bajdcc.LALR1.grammar.Grammar;
 import priv.bajdcc.LALR1.grammar.runtime.IRuntimeDebugInfo;
-import priv.bajdcc.LALR1.grammar.runtime.IRuntimeDebugValue;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeCodePage;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeObject;
 

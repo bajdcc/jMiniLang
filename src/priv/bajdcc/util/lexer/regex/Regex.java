@@ -11,8 +11,8 @@ import priv.bajdcc.util.lexer.token.MetaType;
 import priv.bajdcc.util.lexer.token.TokenUtility;
 
 /**
- * 【词法分析】## 正则表达式分析工具 ##<br/>
- * 用于生成语法树<br/>
+ * 【词法分析】## 正则表达式分析工具 ##<br>
+ * 用于生成语法树<br>
  * 语法同一般的正则表达式，只有贪婪模式，没有前/后向匹配， 没有捕获功能，仅用于匹配。
  * 
  * @author bajdcc
@@ -125,8 +125,8 @@ public class Regex extends RegexStringIterator {
 	/**
 	 * 匹配
 	 * 
-	 * @param string
-	 *            被匹配的字符串
+	 * @param string 被匹配的字符串
+	 * @param greed 是否贪婪匹配
 	 * @return 匹配结果（若不成功则返回空）
 	 */
 	public String match(String string, boolean greed) {
@@ -537,6 +537,7 @@ public class Regex extends RegexStringIterator {
 
 	/**
 	 * 获取字符区间描述
+	 * @return 字符区间描述
 	 */
 	public String getStatusString() {
 		return dfa.getStatusString();
@@ -544,6 +545,7 @@ public class Regex extends RegexStringIterator {
 
 	/**
 	 * 获取NFA描述
+	 * @return NFA描述
 	 */
 	public String getNFAString() {
 		return dfa.getNFAString();
@@ -551,6 +553,7 @@ public class Regex extends RegexStringIterator {
 
 	/**
 	 * 获取DFA描述
+	 * @return DFA描述
 	 */
 	public String getDFAString() {
 		return dfa.getDFAString();
@@ -558,6 +561,7 @@ public class Regex extends RegexStringIterator {
 
 	/**
 	 * 获取DFATable描述
+	 * @return DFATable描述
 	 */
 	public String getDFATableString() {
 		return dfa.getDFATableString();

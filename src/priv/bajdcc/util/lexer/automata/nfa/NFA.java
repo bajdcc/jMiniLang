@@ -7,7 +7,6 @@ import java.util.Stack;
 import priv.bajdcc.util.lexer.automata.BreadthFirstSearch;
 import priv.bajdcc.util.lexer.automata.EdgeType;
 import priv.bajdcc.util.lexer.regex.CharacterMap;
-import priv.bajdcc.util.lexer.regex.CharacterRange;
 import priv.bajdcc.util.lexer.regex.Charset;
 import priv.bajdcc.util.lexer.regex.Constructure;
 import priv.bajdcc.util.lexer.regex.IRegexComponent;
@@ -15,7 +14,7 @@ import priv.bajdcc.util.lexer.regex.IRegexComponentVisitor;
 import priv.bajdcc.util.lexer.regex.Repetition;
 
 /**
- * NFA构成算法（AST->NFA）
+ * NFA构成算法（AST-&gt;NFA）
  * 
  * @author bajdcc
  *
@@ -351,6 +350,7 @@ public class NFA implements IRegexComponentVisitor {
 
 	/**
 	 * 获取字符映射表
+	 * @return 字符映射表
 	 */
 	public CharacterMap getCharacterMap() {
 		return chMap;
@@ -373,6 +373,7 @@ public class NFA implements IRegexComponentVisitor {
 
 	/**
 	 * 字符区间描述
+	 * @return 字符区间描述
 	 */
 	public String getStatusString() {
 		return chMap.toString();
@@ -380,6 +381,7 @@ public class NFA implements IRegexComponentVisitor {
 
 	/**
 	 * NFA描述
+	 * @return NFA描述
 	 */
 	public String getNFAString() {
 		StringBuilder sb = new StringBuilder();

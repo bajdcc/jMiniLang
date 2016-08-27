@@ -19,7 +19,7 @@ public interface IRegexStringIterator {
 	 * 
 	 * @param error
 	 *            错误类型
-	 * @throws RegexException
+	 * @throws RegexException 正则表达式错误
 	 */
 	void err(RegexError error) throws RegexException;
 
@@ -30,6 +30,7 @@ public interface IRegexStringIterator {
 	
 	/**
 	 * 处理下一个字符（会丢弃字符直到获得合法字符）
+	 * @return 处理的字符
 	 */
 	Token scan();
 
@@ -40,34 +41,36 @@ public interface IRegexStringIterator {
 
 	/**
 	 * 判断当前位置不是末尾
-	 * 
+	 * @return 流可用
 	 */
 	boolean available();
 
 	/**
 	 * 前进一个字符（look forward）
-	 * 
 	 */
 	void advance();
 
 	/**
 	 * 获得当前字符
-	 * 
+	 * @return 当前字符
 	 */
 	char current();
 
 	/**
 	 * 获得字符类型
+	 * @return 字符类型
 	 */
 	MetaType meta();
 
 	/**
 	 * 获得当前位置
+	 * @return 当前位置
 	 */
 	int index();
 
 	/**
 	 * 获得当前位置
+	 * @return 当前位置
 	 */
 	Position position();
 
@@ -78,7 +81,7 @@ public interface IRegexStringIterator {
 	 *            类型
 	 * @param error
 	 *            抛出的错误
-	 * @throws RegexException
+	 * @throws RegexException 正则表达式错误
 	 */
 	void expect(MetaType meta, RegexError error)
 			throws RegexException;
@@ -105,21 +108,25 @@ public interface IRegexStringIterator {
 
 	/**
 	 * 获得解析组件
+	 * @return 解析组件
 	 */
 	RegexStringUtility utility();
 	
 	/**
 	 * 获得正则表达式描述
+	 * @return 正则表达式描述
 	 */
 	String getRegexDescription();
 	
 	/**
 	 * 复制一个对象
+	 * @return 返回拷贝
 	 */
 	IRegexStringIterator copy();
 	
 	/**
 	 * 获取扩展接口
+	 * @return 返回扩展接口
 	 */
 	IRegexStringIteratorEx ex();
 }

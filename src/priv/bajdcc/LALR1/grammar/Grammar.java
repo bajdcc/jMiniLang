@@ -72,7 +72,7 @@ public class Grammar extends Semantic {
 	/**
 	 * 声明终结符
 	 * 
-	 * @throws SyntaxException
+	 * @throws SyntaxException 词法错误
 	 */
 	private void declareTerminal() throws SyntaxException {
 		addTerminal("ID", TokenType.ID, null);
@@ -139,7 +139,7 @@ public class Grammar extends Semantic {
 	/**
 	 * 声明非终结符
 	 * 
-	 * @throws SyntaxException
+	 * @throws SyntaxException 词法错误
 	 */
 	private void declareNonTerminal() throws SyntaxException {
 		String[] nonTerminals = new String[] { "program", "stmt_list", "stmt",
@@ -156,7 +156,7 @@ public class Grammar extends Semantic {
 	/**
 	 * 进行推导
 	 * 
-	 * @throws SyntaxException
+	 * @throws SyntaxException 词法错误
 	 */
 	private void infer() throws SyntaxException {
 		/* 起始符号就是main函数 */
@@ -240,7 +240,7 @@ public class Grammar extends Semantic {
 	/**
 	 * 声明错误处理器
 	 * 
-	 * @throws SyntaxException
+	 * @throws SyntaxException 词法错误
 	 */
 	private void declareErrorHandler() throws SyntaxException {
 		addErrorHandler("lost_exp", new LostHandler("表达式"));
@@ -268,7 +268,7 @@ public class Grammar extends Semantic {
 	/**
 	 * 声明动作处理器
 	 * 
-	 * @throws SyntaxException
+	 * @throws SyntaxException 词法错误
 	 */
 	private void declareActionHandler() throws SyntaxException {
 		String[] actionNames = new String[] { "do_enter_scope",
@@ -282,7 +282,7 @@ public class Grammar extends Semantic {
 	/**
 	 * 语法树建成之后的详细语义检查
 	 * 
-	 * @throws SyntaxException
+	 * @throws SyntaxException 词法错误
 	 */
 	private void check() throws SyntaxException {
 		if (recorder.isCorrect()) {
@@ -321,6 +321,8 @@ public class Grammar extends Semantic {
 
 	/**
 	 * 获得语义错误描述
+	 *
+	 * @return 语义错误描述
 	 */
 	public String getSemanticError() {
 		return recorder.toString(tokenFactory);
@@ -328,6 +330,8 @@ public class Grammar extends Semantic {
 
 	/**
 	 * 获得中间代码描述
+	 *
+	 * @return 中间代码描述
 	 */
 	public String getInst() {
 		return code.toString();
@@ -336,7 +340,8 @@ public class Grammar extends Semantic {
 	/**
 	 * 生成目标代码
 	 * 
-	 * @throws SyntaxException
+	 * @throws SyntaxException 词法错误
+	 * @return 目标代码页
 	 */
 	public RuntimeCodePage getCodePage() throws SyntaxException {
 		if (!recorder.isCorrect()) {

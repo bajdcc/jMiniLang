@@ -24,10 +24,10 @@ public class RegexStringUtility {
 	/**
 	 * 处理转义字符
 	 * 
-	 * @param ch
-	 *            字符
+	 * @param ch 字符
+	 * @param error 产生的错误
 	 * @return 处理后的字符
-	 * @throws RegexException 
+	 * @throws RegexException 正则表达式错误
 	 */
 	public char fromEscape(char ch, RegexError error) throws RegexException {
 		if (ch == 'r') {
@@ -53,12 +53,11 @@ public class RegexStringUtility {
 	/**
 	 * 处理数字
 	 * 
-	 * @param base
-	 *            基数
-	 * @param count
-	 *            长度
+	 * @param base 基数
+	 * @param count 长度
+	 * @param error 产生的错误
 	 * @return 处理后的字符
-	 * @throws RegexException
+	 * @throws RegexException 正则表达式错误
 	 */
 	public char fromDigit(int base, int count, RegexError error)
 			throws RegexException {

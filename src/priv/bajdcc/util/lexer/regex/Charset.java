@@ -30,10 +30,9 @@ public class Charset implements IRegexComponent {
 	/**
 	 * 添加范围
 	 * 
-	 * @param begin
-	 *            上限
-	 * @param end
-	 *            下限
+	 * @param begin 上限
+	 * @param end 下限
+	 * @return 是否添加成功
 	 */
 	public boolean addRange(char begin, char end) {
 		if (begin > end) {
@@ -50,8 +49,8 @@ public class Charset implements IRegexComponent {
 	/**
 	 * 添加字符
 	 * 
-	 * @param ch
-	 *            字符
+	 * @param ch 字符
+	 * @return 添加是否有效
 	 */
 	public boolean addChar(char ch) {
 		return addRange(ch, ch);

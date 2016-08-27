@@ -1,9 +1,6 @@
 package priv.bajdcc.LALR1.semantic.test;
 
-import priv.bajdcc.LALR1.grammar.semantic.ISemanticRecorder;
-import priv.bajdcc.LALR1.grammar.symbol.IQuerySymbol;
 import priv.bajdcc.LALR1.semantic.Semantic;
-import priv.bajdcc.LALR1.semantic.token.IIndexedData;
 import priv.bajdcc.LALR1.semantic.token.ISemanticAnalyzier;
 import priv.bajdcc.LALR1.syntax.handler.SyntaxException;
 import priv.bajdcc.util.lexer.error.RegexException;

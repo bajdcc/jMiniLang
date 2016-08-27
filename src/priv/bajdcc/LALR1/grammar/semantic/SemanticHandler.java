@@ -6,8 +6,6 @@ import java.util.List;
 
 import priv.bajdcc.LALR1.grammar.error.SemanticException.SemanticError;
 import priv.bajdcc.LALR1.grammar.symbol.BlockType;
-import priv.bajdcc.LALR1.grammar.symbol.IManageSymbol;
-import priv.bajdcc.LALR1.grammar.symbol.IQuerySymbol;
 import priv.bajdcc.LALR1.grammar.tree.Block;
 import priv.bajdcc.LALR1.grammar.tree.ExpAssign;
 import priv.bajdcc.LALR1.grammar.tree.ExpBinop;
@@ -28,8 +26,6 @@ import priv.bajdcc.LALR1.grammar.tree.StmtIf;
 import priv.bajdcc.LALR1.grammar.tree.StmtPort;
 import priv.bajdcc.LALR1.grammar.tree.StmtReturn;
 import priv.bajdcc.LALR1.grammar.type.TokenTools;
-import priv.bajdcc.LALR1.semantic.token.IIndexedData;
-import priv.bajdcc.LALR1.semantic.token.IRandomAccessOfTokens;
 import priv.bajdcc.LALR1.semantic.token.ISemanticAction;
 import priv.bajdcc.LALR1.semantic.token.ISemanticAnalyzier;
 import priv.bajdcc.util.lexer.token.KeywordType;

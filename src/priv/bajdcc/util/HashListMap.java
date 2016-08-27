@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * 哈希表
  * <p>
- * T->id,T=list,id=list indexof T
+ * T-&gt;id,T=list,id=list indexof T
  * </p>
  * 
  * @author bajdcc

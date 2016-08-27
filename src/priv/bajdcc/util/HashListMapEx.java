@@ -6,7 +6,7 @@ import java.util.HashMap;
 /**
  * 哈希表
  * <p>
- * T->id,V=list,id= list indexof T
+ * T-&gt;id,V=list,id= list indexof T
  * </p>
  * 
  * @author bajdcc

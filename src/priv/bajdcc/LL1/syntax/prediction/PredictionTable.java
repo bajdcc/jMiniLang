@@ -185,7 +185,7 @@ public class PredictionTable extends SelectSetSolver {
 	/**
 	 * 进行分析
 	 * 
-	 * @throws GrammarException
+	 * @throws GrammarException 语法错误
 	 * 
 	 */
 	public void run() throws GrammarException {
@@ -297,7 +297,7 @@ public class PredictionTable extends SelectSetSolver {
 
 	/**
 	 * 获得指令描述
-	 * 
+	 * @return 指令描述
 	 */
 	public String getInstString() {
 		StringBuilder sb = new StringBuilder();
@@ -325,7 +325,7 @@ public class PredictionTable extends SelectSetSolver {
 
 	/**
 	 * 获得矩阵描述
-	 * 
+	 * @return 矩阵描述
 	 */
 	public String getMatrixString() {
 		StringBuilder sb = new StringBuilder();
@@ -349,6 +349,7 @@ public class PredictionTable extends SelectSetSolver {
 
 	/**
 	 * 获得详细描述
+	 * @return 详细描述
 	 */
 	public String getTableString() {
 		StringBuilder sb = new StringBuilder();

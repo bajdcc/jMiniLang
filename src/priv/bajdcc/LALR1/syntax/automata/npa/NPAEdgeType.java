@@ -4,11 +4,11 @@ package priv.bajdcc.LALR1.syntax.automata.npa;
  * <p>
  * 非确定性下推自动机边类型
  * </p>
- * Move ------------ (Start,Epsilon,[Token]) ----> (End,Epsilon)<br/>
- * Shift ----------- (Start,Epsilon,Epsilon) ----> (End,Start)<br/>
- * Reduce ---------- (Start,[Status],Epsilon) ---> (End,Epsilon)<br/>
- * Left Recursion -- (Start,Epsilon,Epsilon) ----> (End,Epsilon)<br/>
- * Finish ---------- (Start,Epsilon,Epsilon) ----> (Epsilon,Epsilon)<br/>
+ * Move ------------ (Start,Epsilon,[Token]) ----&gt; (End,Epsilon)<br>
+ * Shift ----------- (Start,Epsilon,Epsilon) ----&gt; (End,Start)<br>
+ * Reduce ---------- (Start,[Status],Epsilon) ---&gt; (End,Epsilon)<br>
+ * Left Recursion -- (Start,Epsilon,Epsilon) ----&gt; (End,Epsilon)<br>
+ * Finish ---------- (Start,Epsilon,Epsilon) ----&gt; (Epsilon,Epsilon)<br>
  * 
  * @author bajdcc
  *

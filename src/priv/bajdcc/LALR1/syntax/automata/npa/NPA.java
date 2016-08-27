@@ -385,6 +385,7 @@ public class NPA extends NGA {
 
 	/**
 	 * 获得NPA描述
+	 * @return NPA描述
 	 */
 	public String getNPAString() {
 		StringBuilder sb = new StringBuilder();

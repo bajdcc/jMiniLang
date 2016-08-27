@@ -15,7 +15,7 @@ public interface IRuntimeDebugExec {
 	 * @param args 参数表
 	 * @param status 状态接口
 	 * @return 过程返回值，若没有则返回空
-	 * @throws Exception
+	 * @throws Exception 异常
 	 */
 	RuntimeObject ExternalProcCall(List<RuntimeObject> args, IRuntimeStatus status)
 			throws Exception;

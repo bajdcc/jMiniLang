@@ -12,6 +12,7 @@ public interface IRegexStringFilterMeta {
 	
 	/**
 	 * 返回单词类型数组
+	 * @return 单词类型数组
 	 */
 	MetaType[] getMetaTypes();
 }

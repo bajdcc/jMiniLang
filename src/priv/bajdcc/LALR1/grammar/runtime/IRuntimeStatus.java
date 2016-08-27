@@ -18,14 +18,14 @@ public interface IRuntimeStatus {
 	 * 得到过程的地址
 	 * @param name 过程名
 	 * @return 地址
-	 * @throws RuntimeException 
+	 * @throws RuntimeException 运行时错误
 	 */
 	int getFuncAddr(String name) throws RuntimeException;
 	
 	/**
 	 * 载入代码并运行
 	 * @param name 文件名
-	 * @throws RuntimeException 
+	 * @throws RuntimeException 运行时错误
 	 */
 	void runPage(String name) throws Exception;
 }

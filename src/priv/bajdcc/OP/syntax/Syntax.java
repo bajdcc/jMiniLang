@@ -26,7 +26,7 @@ import priv.bajdcc.util.lexer.error.RegexException;
  * 语法示例：
  * 
  * <pre>
- * Z -> A | B | @abc &lt;comment&gt;
+ * Z -&gt; A | B | @abc &lt;comment&gt;
  * </pre>
  *
  * @author bajdcc
@@ -94,7 +94,7 @@ public class Syntax {
 	 *            单词类型
 	 * @param obj
 	 *            单词信息
-	 * @throws SyntaxException
+	 * @throws SyntaxException 词法错误
 	 */
 	public void addTerminal(String name,
 			priv.bajdcc.util.lexer.token.TokenType type, Object obj)
@@ -113,7 +113,7 @@ public class Syntax {
 	 * 
 	 * @param name
 	 *            非终结符名称
-	 * @throws SyntaxException
+	 * @throws SyntaxException 词法错误
 	 */
 	public void addNonTerminal(String name) throws SyntaxException {
 		RuleExp exp = new RuleExp(arrNonTerminals.size(), name);
@@ -128,7 +128,7 @@ public class Syntax {
 	/**
 	 * @param inferString
 	 *            文法推导式
-	 * @throws SyntaxException
+	 * @throws SyntaxException 词法错误
 	 */
 	public void infer(String inferString) throws SyntaxException {
 		syntaxLexer.setContext(inferString);
@@ -140,7 +140,7 @@ public class Syntax {
 	 * 
 	 * @param error
 	 *            错误类型
-	 * @throws SyntaxException
+	 * @throws SyntaxException 词法错误
 	 */
 	protected void err(SyntaxError error) throws SyntaxException {
 		throw new SyntaxException(error, syntaxLexer.position(), token.object);
@@ -153,7 +153,7 @@ public class Syntax {
 	 *            错误类型
 	 * @param obj
 	 *            错误信息
-	 * @throws SyntaxException
+	 * @throws SyntaxException 词法错误
 	 */
 	private void err(SyntaxError error, Object obj) throws SyntaxException {
 		throw new SyntaxException(error, new Position(), obj);
@@ -166,7 +166,7 @@ public class Syntax {
 	 *            匹配类型
 	 * @param error
 	 *            错误类型
-	 * @throws SyntaxException
+	 * @throws SyntaxException 词法错误
 	 */
 	private void expect(TokenType type, SyntaxError error)
 			throws SyntaxException {
@@ -184,7 +184,7 @@ public class Syntax {
 	 *            匹配类型
 	 * @param error
 	 *            匹配失败时抛出的异常
-	 * @throws SyntaxException
+	 * @throws SyntaxException 词法错误
 	 */
 	private void match(TokenType type, SyntaxError error)
 			throws SyntaxException {
@@ -196,7 +196,7 @@ public class Syntax {
 	/**
 	 * 匹配非终结符
 	 * 
-	 * @throws SyntaxException
+	 * @throws SyntaxException 词法错误
 	 */
 	private RuleExp matchNonTerminal() throws SyntaxException {
 		match(TokenType.NONTERMINAL, SyntaxError.SYNTAX);
@@ -209,7 +209,7 @@ public class Syntax {
 	/**
 	 * 匹配终结符
 	 * 
-	 * @throws SyntaxException
+	 * @throws SyntaxException 词法错误
 	 */
 	private TokenExp matchTerminal() throws SyntaxException {
 		match(TokenType.TERMINAL, SyntaxError.SYNTAX);
@@ -232,7 +232,7 @@ public class Syntax {
 	/**
 	 * 编译推导式（将文本表达式转换成文法树）
 	 * 
-	 * @throws SyntaxException
+	 * @throws SyntaxException 词法错误
 	 */
 	private void compile() throws SyntaxException {
 		/* 处理左端非终结符 */
@@ -244,7 +244,7 @@ public class Syntax {
 	/**
 	 * 处理左端非终结符
 	 * 
-	 * @throws SyntaxException
+	 * @throws SyntaxException 词法错误
 	 */
 	private void doHead() throws SyntaxException {
 		/* 匹配推导式左端的非终结符 */
@@ -260,7 +260,7 @@ public class Syntax {
 	/**
 	 * 处理右端表达式
 	 * 
-	 * @throws SyntaxException
+	 * @throws SyntaxException 词法错误
 	 */
 	private void doTail() throws SyntaxException {
 		/* 获得分析后的表达式根结点 */
@@ -289,7 +289,7 @@ public class Syntax {
 	 * @param obj
 	 *            结束数据
 	 * @return 表达式树根结点
-	 * @throws SyntaxException
+	 * @throws SyntaxException 词法错误
 	 */
 	private ISyntaxComponent doAnalysis(TokenType type, Object obj)
 			throws SyntaxException {
@@ -370,7 +370,7 @@ public class Syntax {
 	 * 
 	 * @param startSymbol
 	 *            开始符号
-	 * @throws SyntaxException
+	 * @throws SyntaxException 词法错误
 	 */
 	public void initialize(String startSymbol) throws SyntaxException {
 		beginRuleName = startSymbol;
@@ -381,7 +381,7 @@ public class Syntax {
 	/**
 	 * 检测起始符号合法性
 	 * 
-	 * @throws SyntaxException
+	 * @throws SyntaxException 词法错误
 	 */
 	private void checkStartSymbol() throws SyntaxException {
 		if (!mapNonTerminals.containsKey(beginRuleName)) {
@@ -392,7 +392,7 @@ public class Syntax {
 	/**
 	 * 检查产生式的合法性
 	 * 
-	 * @throws SyntaxException
+	 * @throws SyntaxException 词法错误
 	 */
 	private void checkValid() throws SyntaxException {
 		for (RuleExp exp : arrNonTerminals) {
@@ -454,6 +454,7 @@ public class Syntax {
 
 	/**
 	 * 获得段落式描述
+	 * @return 段落式描述
 	 */
 	public String getParagraphString() {
 		StringBuilder sb = new StringBuilder();
@@ -505,6 +506,7 @@ public class Syntax {
 
 	/**
 	 * 获得原推导式描述
+	 * @return 原推导式描述
 	 */
 	public String getOriginalString() {
 		StringBuilder sb = new StringBuilder();

@@ -20,14 +20,16 @@ public class DFAStatusData extends NFAStatusData {
 
 	/**
 	 * 获得状态编号描述（逗号分隔）
+	 * @param dfaStatusList 状态表
+	 * @return 状态编号描述
 	 */
-	public String getStatusString(ArrayList<NFAStatus> nfaStatusList) {
+	public String getStatusString(ArrayList<NFAStatus> dfaStatusList) {
 		if (nfaStatus.isEmpty()) {
 			return "";
 		}
 		int[] orders = new int[nfaStatus.size()];
 		for (int i = 0; i < orders.length; i++) {
-			orders[i] = nfaStatusList.indexOf(nfaStatus.get(i));
+			orders[i] = dfaStatusList.indexOf(nfaStatus.get(i));
 		}
 		Arrays.sort(orders);
 		StringBuilder sb = new StringBuilder();

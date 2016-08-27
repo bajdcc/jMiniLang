@@ -18,11 +18,13 @@ public class DFAEdgeBag extends DFAEdgeData{
 	
 	/**
 	 * 获得状态编号描述（逗号分隔）
+	 * @param dfaStatusList 状态表
+	 * @return 状态编号描述
 	 */
-	public String getStatusString(ArrayList<NFAStatus> nfaStatusList) {
+	public String getStatusString(ArrayList<NFAStatus> dfaStatusList) {
 		StringBuilder sb = new StringBuilder();
 		for (NFAStatus status : nfaStatus) {
-			sb.append(nfaStatusList.indexOf(status)).append(",");
+			sb.append(dfaStatusList.indexOf(status)).append(",");
 		}
 		return sb.toString();
 	}

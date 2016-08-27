@@ -18,6 +18,7 @@ public interface IInterpreterModule {
 	/**
 	 * 返回代码页
 	 * @return 代码页
+	 * @throws Exception 异常
 	 */
 	RuntimeCodePage getCodePage() throws Exception;
 }

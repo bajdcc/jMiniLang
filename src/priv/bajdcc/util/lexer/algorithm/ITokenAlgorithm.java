@@ -27,11 +27,13 @@ public interface ITokenAlgorithm {
 
 	/**
 	 * 返回字符串过滤组件
+	 * @return 字符串过滤组件
 	 */
 	IRegexStringFilter getRegexStringFilter();
 
 	/**
 	 * 返回字符类型哈希映射表
+	 * @return 字符类型哈希映射表
 	 */
 	HashMap<Character, MetaType> getMetaHash();
 

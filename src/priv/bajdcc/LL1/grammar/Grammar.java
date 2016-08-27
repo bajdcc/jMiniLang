@@ -48,7 +48,7 @@ public class Grammar extends Syntax {
 	 * 
 	 * @param startSymbol
 	 *            开始符号
-	 * @throws SyntaxException
+	 * @throws SyntaxException 词法错误
 	 */
 	public void initialize(String startSymbol) throws SyntaxException {
 		super.initialize(startSymbol);
@@ -67,7 +67,7 @@ public class Grammar extends Syntax {
 	/**
 	 * 进行语法分析
 	 * 
-	 * @throws GrammarException
+	 * @throws GrammarException 语法错误
 	 */
 	public void run() throws GrammarException {
 		table.run();
@@ -76,6 +76,7 @@ public class Grammar extends Syntax {
 
 	/**
 	 * 获得预测分析表描述
+	 * @return 预测分析表描述
 	 */
 	public String getPredictionString() {
 		return table.toString();
@@ -83,6 +84,7 @@ public class Grammar extends Syntax {
 
 	/**
 	 * 获得单词流描述
+	 * @return 单词流描述
 	 */
 	public String getTokenString() {
 		StringBuilder sb = new StringBuilder();

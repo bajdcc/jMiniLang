@@ -56,7 +56,7 @@ public class Grammar extends Syntax {
 	 * 
 	 * @param startSymbol
 	 *            开始符号
-	 * @throws SyntaxException
+	 * @throws SyntaxException 词法错误
 	 */
 	public void initialize(String startSymbol) throws SyntaxException {
 		super.initialize(startSymbol);
@@ -70,7 +70,7 @@ public class Grammar extends Syntax {
 	 *            模式串（由0和1组成，0=Vn，1=Vt）
 	 * @param handler
 	 *            处理器
-	 * @throws SyntaxException
+	 * @throws SyntaxException 词法错误
 	 */
 	public void addPatternHandler(String pattern, IPatternHandler handler)
 			throws SyntaxException {
@@ -90,7 +90,7 @@ public class Grammar extends Syntax {
 	/**
 	 * 进行语法分析
 	 * 
-	 * @throws GrammarException
+	 * @throws GrammarException 语法错误
 	 */
 	public void run() throws GrammarException {
 		table.run();
@@ -99,6 +99,7 @@ public class Grammar extends Syntax {
 
 	/**
 	 * 获得算符优先关系描述
+	 * @return 算符优先关系描述
 	 */
 	public String getPrecedenceString() {
 		return table.toString();
@@ -106,6 +107,7 @@ public class Grammar extends Syntax {
 
 	/**
 	 * 获得单词流描述
+	 * @return 单词流描述
 	 */
 	public String getTokenString() {
 		StringBuilder sb = new StringBuilder();

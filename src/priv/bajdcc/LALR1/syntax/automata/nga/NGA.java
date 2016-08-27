@@ -22,7 +22,7 @@ import priv.bajdcc.util.lexer.automata.BreadthFirstSearch;
 
 /**
  * <p>
- * <strong>非确定性文法自动机</strong>（<b>NGA</b>）构成算法（<b>AST->NGA</b>）
+ * <strong>非确定性文法自动机</strong>（<b>NGA</b>）构成算法（<b>AST-&gt;NGA</b>）
  * </p>
  * <i>功能：进行LR项目集的计算</i>
  * 
@@ -404,6 +404,8 @@ public class NGA implements ISyntaxComponentVisitor {
 
 	/**
 	 * 非确定性文法自动机描述
+	 *
+	 * @return 非确定性文法自动机描述
 	 */
 	public String getNGAString() {
 		StringBuilder sb = new StringBuilder();

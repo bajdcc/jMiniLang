@@ -35,11 +35,15 @@ public abstract class SelectSetSolver implements ISyntaxComponentVisitor {
 
 	/**
 	 * 当前产生式规则是否可以推导出空串
+	 *
+	 * @return 是否可以推导出空串
 	 */
 	protected abstract boolean isEpsilon();
 
 	/**
 	 * 获得当前产生式左部的Follow集
+	 *
+	 * @return Follow集
 	 */
 	protected abstract Collection<TokenExp> getFollow();
 

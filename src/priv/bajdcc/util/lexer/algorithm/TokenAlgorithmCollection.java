@@ -44,8 +44,7 @@ public class TokenAlgorithmCollection implements Cloneable {
 	/**
 	 * 添加解析组件
 	 * 
-	 * @param alg
-	 *            解析组件
+	 * @param alg 解析组件
 	 */
 	public void attach(ITokenAlgorithm alg) {
 		arrAlgorithms.add(alg);
@@ -54,8 +53,7 @@ public class TokenAlgorithmCollection implements Cloneable {
 	/**
 	 * 删除解析组件
 	 * 
-	 * @param alg
-	 *            解析组件
+	 * @param alg 解析组件
 	 */
 	public void detach(ITokenAlgorithm alg) {
 		arrAlgorithms.remove(alg);
@@ -93,7 +91,7 @@ public class TokenAlgorithmCollection implements Cloneable {
 	 * @param filter
 	 *            过滤器
 	 * @return 拷贝
-	 * @throws CloneNotSupportedException
+	 * @throws CloneNotSupportedException 不支持拷贝
 	 */
 	public TokenAlgorithmCollection copy(IRegexStringIterator iter,
 			IRegexStringFilterHost filter) throws CloneNotSupportedException {

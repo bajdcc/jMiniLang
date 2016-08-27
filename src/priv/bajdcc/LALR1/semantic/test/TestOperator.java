@@ -1,18 +1,9 @@
 package priv.bajdcc.LALR1.semantic.test;
 
-import priv.bajdcc.LALR1.grammar.semantic.ISemanticRecorder;
-import priv.bajdcc.LALR1.grammar.symbol.IManageSymbol;
-import priv.bajdcc.LALR1.grammar.symbol.IQuerySymbol;
 import priv.bajdcc.LALR1.semantic.Semantic;
-import priv.bajdcc.LALR1.semantic.token.IIndexedData;
-import priv.bajdcc.LALR1.semantic.token.IRandomAccessOfTokens;
-import priv.bajdcc.LALR1.semantic.token.ISemanticAction;
 import priv.bajdcc.LALR1.semantic.token.ISemanticAnalyzier;
-import priv.bajdcc.LALR1.syntax.handler.IErrorHandler;
 import priv.bajdcc.LALR1.syntax.handler.SyntaxException;
-import priv.bajdcc.util.TrackerErrorBag;
 import priv.bajdcc.util.lexer.error.RegexException;
-import priv.bajdcc.util.lexer.regex.IRegexStringIterator;
 import priv.bajdcc.util.lexer.token.OperatorType;
 import priv.bajdcc.util.lexer.token.Token;
 import priv.bajdcc.util.lexer.token.TokenType;

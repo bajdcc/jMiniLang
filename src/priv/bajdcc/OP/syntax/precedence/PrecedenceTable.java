@@ -3,7 +3,6 @@ package priv.bajdcc.OP.syntax.precedence;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Stack;
 
@@ -106,7 +105,7 @@ public class PrecedenceTable extends OPTableSolver {
 	 *            模式串（由0和1组成，0=Vn，1=Vt）
 	 * @param handler
 	 *            处理器
-	 * @throws SyntaxException
+	 * @throws SyntaxException 词法错误
 	 */
 	public void addPatternHandler(String pattern, IPatternHandler handler)
 			throws SyntaxException {
@@ -232,7 +231,7 @@ public class PrecedenceTable extends OPTableSolver {
 	/**
 	 * 进行分析
 	 * 
-	 * @throws GrammarException
+	 * @throws GrammarException 语法错误
 	 * 
 	 */
 	public void run() throws GrammarException {
@@ -405,7 +404,7 @@ public class PrecedenceTable extends OPTableSolver {
 
 	/**
 	 * 获得矩阵描述
-	 * 
+	 * @return 矩阵描述
 	 */
 	public String getMatrixString() {
 		StringBuilder sb = new StringBuilder();

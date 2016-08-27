@@ -9,6 +9,8 @@ public interface IRuntimeDebugValue {
 
 	/**
 	 * 获取外部化对象
+	 *
+	 * @return 外部化对象
 	 */
 	RuntimeObject getRuntimeObject();
 }

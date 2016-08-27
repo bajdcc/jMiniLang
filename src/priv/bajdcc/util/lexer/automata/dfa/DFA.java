@@ -127,6 +127,7 @@ public class DFA extends NFA {
 
 	/**
 	 * 获得DFA状态转换矩阵
+	 * @return DFA状态转换矩阵
 	 */
 	public ArrayList<DFAStatus> getDFATable() {
 		return getDFAStatusClosure(
@@ -453,6 +454,7 @@ public class DFA extends NFA {
 
 	/**
 	 * 提供DFA描述
+	 * @return DFA描述
 	 */
 	public String getDFAString() {
 		/* 取得NFA所有状态 */
@@ -489,6 +491,7 @@ public class DFA extends NFA {
 
 	/**
 	 * 获取状态转移矩阵描述
+	 * @return 状态转移矩阵描述
 	 */
 	public String getDFATableString() {
 		int[][] transition = buildTransition(new ArrayList<>());

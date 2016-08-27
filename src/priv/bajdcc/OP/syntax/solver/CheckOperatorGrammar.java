@@ -26,6 +26,7 @@ public class CheckOperatorGrammar implements ISyntaxComponentVisitor {
 
 	/**
 	 * 检查是否合法
+	 * @return 名称是否合法
 	 */
 	public boolean isValid() {
 		return invalidName == null;
@@ -33,6 +34,7 @@ public class CheckOperatorGrammar implements ISyntaxComponentVisitor {
 
 	/**
 	 * 重复的非终结符名称
+	 * @return 重复的非终结符名称
 	 */
 	public String getInvalidName() {
 		return invalidName;

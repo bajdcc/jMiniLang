@@ -11,6 +11,8 @@ public interface IRuntimeDebugInfo {
 
 	/**
 	 * 返回数据存储
+	 *
+	 * @return 数据存储
 	 */
 	HashMap<String, Object> getDataMap();
 	

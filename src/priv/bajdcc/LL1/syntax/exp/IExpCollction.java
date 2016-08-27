@@ -11,13 +11,14 @@ public interface IExpCollction {
 	/**
 	 * 添加孩子结点
 	 * 
-	 * @param exp
-	 *            子表达式
+	 * @param exp 子表达式
 	 */
 	void add(ISyntaxComponent exp);
 	
 	/**
 	 * 集合是否为空
+	 *
+	 * @return 集合是否为空
 	 */
 	boolean isEmpty();
 }
