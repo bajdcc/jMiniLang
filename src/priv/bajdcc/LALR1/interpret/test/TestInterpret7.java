@@ -24,8 +24,7 @@ public class TestInterpret7 {
 
 					"import \"sys.base\";\n" +
 							"var move = func ~(i, x, y) {\n" +
-							"    call g_printn(call g_to_string(i) + \": \" + \n" +
-							"        call g_to_string(x) + \" -> \" + call g_to_string(y));\n" +
+							"    call g_printn(\"\" + i + \": \" + x + \" -> \" + y);\n" +
 							"};\n" +
 							"var hanoi = func ~(f) {\n" +
 							"    var fk = func ~(i, a, b, c) {\n" +

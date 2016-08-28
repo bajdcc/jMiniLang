@@ -90,7 +90,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 		nextInst();
 		if (op != null) {
 			if (!RuntimeTools.calcOp(stack.reg, inst, this)) {
-				err(RuntimeError.WRONG_OPERTAOR);
+				err(RuntimeError.UNDEFINED_CONVERT);
 			}
 		} else {
 			if (!RuntimeTools.calcData(stack.reg, inst, this)) {
@@ -523,7 +523,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 								err(RuntimeError.WRONG_ARGTYPE);
 							}
 							if (!TokenTools.promote(objTokenType, token)) {
-								err(RuntimeError.WRONG_ARGTYPE);
+								err(RuntimeError.UNDEFINED_CONVERT);
 							} else {
 								objParam.setObj(token.object);
 							}

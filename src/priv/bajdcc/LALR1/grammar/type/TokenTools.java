@@ -37,6 +37,7 @@ public class TokenTools {
 		mapConverter.put(TokenType.CHARACTER, new ConvertToChar());
 		mapConverter.put(TokenType.INTEGER, new ConvertToInt());
 		mapConverter.put(TokenType.DECIMAL, new ConvertToDecimal());
+		mapConverter.put(TokenType.STRING, new ConvertToString());
 	}
 
 	static {
