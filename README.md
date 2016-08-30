@@ -70,13 +70,51 @@ call h(3, 'A', 'B', 'C');
 ```
 
 *Result:*
-> 1: A -> C
-> 2: A -> B
-> 1: C -> B
-> 3: A -> C
-> 1: B -> A
-> 2: B -> C
-> 1: A -> C
+
+```c
+1: A -> C
+2: A -> B
+1: C -> B
+3: A -> C
+1: B -> A
+2: B -> C
+1: A -> C
+```
+
+**Lambda: Trampoline**
+
+*Code:*
+
+```javascript
+import "sys.base";
+call g_printn("Trampoline example:");
+var repeat = func ~(operation, count) {
+    var repeat0 = func ~() {
+        if (count <= 0) { return; }
+        call operation(count);
+        return call repeat(operation, --count);
+    };
+    return repeat0;
+};
+var print = func ~(n) -> call g_printn("n: " + n);
+var tfun = func ~() -> call repeat(print, 5);
+call(func ~(f) {
+    while (!(call g_is_null(f)) && (call g_get_type(f) == "函数")) {
+        let f = call f(); // Trampoline, like CPS.
+    }
+})(tfun);
+```
+
+*Result:*
+
+```c
+Trampoline example:
+n: 5
+n: 4
+n: 3
+n: 2
+n: 1
+```
 
 #### Screenshot
 

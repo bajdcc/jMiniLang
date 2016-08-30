@@ -7,7 +7,7 @@ import priv.bajdcc.LALR1.grammar.symbol.IManageSymbol;
 import priv.bajdcc.LALR1.grammar.symbol.IQuerySymbol;
 import priv.bajdcc.LALR1.semantic.token.IRandomAccessOfTokens;
 import priv.bajdcc.LALR1.semantic.token.ISemanticAction;
-import priv.bajdcc.LALR1.semantic.token.ISemanticAnalyzier;
+import priv.bajdcc.LALR1.semantic.token.ISemanticAnalyzer;
 import priv.bajdcc.LALR1.semantic.token.ParsingStack;
 import priv.bajdcc.LALR1.semantic.tracker.Instruction;
 import priv.bajdcc.LALR1.syntax.rule.RuleItem;
@@ -33,7 +33,7 @@ public class SemanticMachine implements IRandomAccessOfTokens {
 	/**
 	 * 语义处理接口
 	 */
-	private ISemanticAnalyzier handler = null;
+	private ISemanticAnalyzer handler = null;
 
 	/**
 	 * 规则集合

@@ -6,28 +6,10 @@ import java.util.List;
 
 import priv.bajdcc.LALR1.grammar.error.SemanticException.SemanticError;
 import priv.bajdcc.LALR1.grammar.symbol.BlockType;
-import priv.bajdcc.LALR1.grammar.tree.Block;
-import priv.bajdcc.LALR1.grammar.tree.ExpAssign;
-import priv.bajdcc.LALR1.grammar.tree.ExpBinop;
-import priv.bajdcc.LALR1.grammar.tree.ExpCycleCtrl;
-import priv.bajdcc.LALR1.grammar.tree.ExpFunc;
-import priv.bajdcc.LALR1.grammar.tree.ExpInvoke;
-import priv.bajdcc.LALR1.grammar.tree.ExpSinop;
-import priv.bajdcc.LALR1.grammar.tree.ExpTriop;
-import priv.bajdcc.LALR1.grammar.tree.ExpValue;
-import priv.bajdcc.LALR1.grammar.tree.Function;
-import priv.bajdcc.LALR1.grammar.tree.IExp;
-import priv.bajdcc.LALR1.grammar.tree.IStmt;
-import priv.bajdcc.LALR1.grammar.tree.StmtBlock;
-import priv.bajdcc.LALR1.grammar.tree.StmtExp;
-import priv.bajdcc.LALR1.grammar.tree.StmtFor;
-import priv.bajdcc.LALR1.grammar.tree.StmtForeach;
-import priv.bajdcc.LALR1.grammar.tree.StmtIf;
-import priv.bajdcc.LALR1.grammar.tree.StmtPort;
-import priv.bajdcc.LALR1.grammar.tree.StmtReturn;
+import priv.bajdcc.LALR1.grammar.tree.*;
 import priv.bajdcc.LALR1.grammar.type.TokenTools;
 import priv.bajdcc.LALR1.semantic.token.ISemanticAction;
-import priv.bajdcc.LALR1.semantic.token.ISemanticAnalyzier;
+import priv.bajdcc.LALR1.semantic.token.ISemanticAnalyzer;
 import priv.bajdcc.util.lexer.token.KeywordType;
 import priv.bajdcc.util.lexer.token.Token;
 import priv.bajdcc.util.lexer.token.TokenType;
@@ -42,7 +24,7 @@ public class SemanticHandler {
 	/**
 	 * 语义分析动作映射表
 	 */
-	private HashMap<String, ISemanticAnalyzier> mapSemanticAnalyzier = new HashMap<>();
+	private HashMap<String, ISemanticAnalyzer> mapSemanticAnalyzier = new HashMap<>();
 
 	/**
 	 * 语义执行动作映射表
@@ -395,6 +377,13 @@ public class SemanticHandler {
             stmt.setBlock((Block) indexed.get(3).object);
             return stmt;
         });
+		mapSemanticAnalyzier.put("while", (indexed, query, recorder) -> {
+            query.getQueryBlockService().leaveBlock(BlockType.kCycle);
+            StmtWhile stmt = new StmtWhile();
+            stmt.setCond((IExp) indexed.get(0).object);
+            stmt.setBlock((Block) indexed.get(1).object);
+            return stmt;
+        });
 		mapSemanticAnalyzier.put("foreach", (indexed, query, recorder) -> {
             query.getQueryBlockService().leaveBlock(BlockType.kCycle);
             StmtForeach stmt = new StmtForeach();
@@ -433,8 +422,8 @@ public class SemanticHandler {
 	 *            语义分析动作名称
 	 * @return 语义分析动作
 	 */
-	public ISemanticAnalyzier getSemanticHandler(String name) {
-		ISemanticAnalyzier obj = mapSemanticAnalyzier.get(name);
+	public ISemanticAnalyzer getSemanticHandler(String name) {
+		ISemanticAnalyzer obj = mapSemanticAnalyzier.get(name);
 		if (obj == null) {
 			throw new NullPointerException(name);
 		}

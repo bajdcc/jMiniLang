@@ -1,7 +1,7 @@
 package priv.bajdcc.LALR1.semantic.test;
 
 import priv.bajdcc.LALR1.semantic.Semantic;
-import priv.bajdcc.LALR1.semantic.token.ISemanticAnalyzier;
+import priv.bajdcc.LALR1.semantic.token.ISemanticAnalyzer;
 import priv.bajdcc.LALR1.syntax.handler.SyntaxException;
 import priv.bajdcc.util.lexer.error.RegexException;
 import priv.bajdcc.util.lexer.token.TokenType;
@@ -20,9 +20,9 @@ public class TestSemantic3 {
 			semantic.addNonTerminal("START");
 			semantic.addNonTerminal("Z");
 			semantic.addErrorHandler("sample", null);
-			ISemanticAnalyzier handleValue = (indexed, query, recorder) -> 1;
-			ISemanticAnalyzier handleCopy = (indexed, query, recorder) -> indexed.get(0).object;
-			ISemanticAnalyzier handleRec = (indexed, query, recorder) -> {
+			ISemanticAnalyzer handleValue = (indexed, query, recorder) -> 1;
+			ISemanticAnalyzer handleCopy = (indexed, query, recorder) -> indexed.get(0).object;
+			ISemanticAnalyzer handleRec = (indexed, query, recorder) -> {
                 int lop = Integer
                         .parseInt(indexed.get(0).object.toString());
                 return lop + 1;

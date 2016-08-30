@@ -182,222 +182,226 @@ public class TokenTools {
 			boolean init) {
 		if (init) {
 			switch (type) {
-			case LOGICAL_AND:
-			case LOGICAL_OR:
-				ITokenConventer bool = mapConverter.get(TokenType.BOOL);
-				bool.convert(lop);
-				bool.convert(rop);
-				break;
-			case BIT_AND:
-			case BIT_OR:
-			case BIT_XOR:
-				ITokenConventer integer = mapConverter.get(TokenType.INTEGER);
-				integer.convert(lop);
-				integer.convert(rop);
-				break;
-			case LEFT_SHIFT:
-			case RIGHT_SHIFT:
-				integer = mapConverter.get(TokenType.INTEGER);
-				integer.convert(rop);
-			default:
-				break;
+				case LOGICAL_AND:
+				case LOGICAL_OR:
+					ITokenConventer bool = mapConverter.get(TokenType.BOOL);
+					bool.convert(lop);
+					bool.convert(rop);
+					break;
+				case BIT_AND:
+				case BIT_OR:
+				case BIT_XOR:
+					ITokenConventer integer = mapConverter.get(TokenType.INTEGER);
+					integer.convert(lop);
+					integer.convert(rop);
+					break;
+				case LEFT_SHIFT:
+				case RIGHT_SHIFT:
+					integer = mapConverter.get(TokenType.INTEGER);
+					integer.convert(rop);
+				default:
+					break;
 			}
 		}
 		if (lop.kToken == rop.kToken) {// 操作数类型相同
 			switch (lop.kToken) {
-			case BOOL:
-				boolean lbo = (boolean) lop.object;
-				boolean rbo = (boolean) rop.object;
-				switch (type) {
-				case PLUS:
-				case LOGICAL_OR:
-					lop.object = lbo || rbo;
-					break;
-				case MINUS:
-				case DIVIDE:
-					lop.object = lbo && !rbo;
-					break;
-				case TIMES:
-				case LOGICAL_AND:
-					lop.object = lbo && rbo;
-					break;
+				case BOOL:
+					boolean lbo = (boolean) lop.object;
+					boolean rbo = (boolean) rop.object;
+					switch (type) {
+						case PLUS:
+						case LOGICAL_OR:
+							lop.object = lbo || rbo;
+							break;
+						case MINUS:
+						case DIVIDE:
+							lop.object = lbo && !rbo;
+							break;
+						case TIMES:
+						case LOGICAL_AND:
+							lop.object = lbo && rbo;
+							break;
+						default:
+							return false;
+					}
+					return true;
+				case CHARACTER:
+					char lch = (char) lop.object;
+					char rch = (char) rop.object;
+					switch (type) {
+						case PLUS:
+							lop.object = (char) (lch + rch);
+							break;
+						case MINUS:
+							lop.object = (char) (lch - rch);
+							break;
+						case TIMES:
+							lop.object = (char) (lch * rch);
+							break;
+						case DIVIDE:
+							lop.object = (char) (lch / rch);
+							break;
+						case MOD:
+							lop.object = (char) (lch % rch);
+							break;
+						case LESS_THAN:
+							lop.kToken = TokenType.BOOL;
+							lop.object = lch < rch;
+							break;
+						case LESS_THAN_OR_EQUAL:
+							lop.kToken = TokenType.BOOL;
+							lop.object = lch <= rch;
+							break;
+						case GREATER_THAN:
+							lop.kToken = TokenType.BOOL;
+							lop.object = lch > rch;
+							break;
+						case GREATER_THAN_OR_EQUAL:
+							lop.kToken = TokenType.BOOL;
+							lop.object = lch >= rch;
+							break;
+						case EQUAL:
+							lop.kToken = TokenType.BOOL;
+							lop.object = lch == rch;
+							break;
+						case NOT_EQUAL:
+							lop.kToken = TokenType.BOOL;
+							lop.object = lch != rch;
+							break;
+						default:
+							return false;
+					}
+					return true;
+				case STRING:
+					String lstr = (String) lop.object;
+					String rstr = (String) rop.object;
+					switch (type) {
+						case PLUS:
+							lop.object = lstr + rstr;
+							break;
+						case EQUAL:
+							lop.object = lstr.equals(rstr);
+							lop.kToken = TokenType.BOOL;
+							break;
+						default:
+							return false;
+					}
+					return true;
+				case DECIMAL:
+					BigDecimal ldec = (BigDecimal) lop.object;
+					BigDecimal rdec = (BigDecimal) rop.object;
+					switch (type) {
+						case PLUS:
+							lop.object = ldec.add(rdec);
+							break;
+						case MINUS:
+							lop.object = ldec.subtract(rdec);
+							break;
+						case TIMES:
+							lop.object = ldec.multiply(rdec);
+							break;
+						case DIVIDE:
+							lop.object = ldec.divide(rdec, SCALE_NUM,
+									BigDecimal.ROUND_HALF_UP);
+							break;
+						case LEFT_SHIFT:
+							lop.object = ldec.movePointLeft(rdec.intValue());
+							break;
+						case RIGHT_SHIFT:
+							lop.object = ldec.movePointRight(rdec.intValue());
+							break;
+						case LESS_THAN:
+							lop.kToken = TokenType.BOOL;
+							lop.object = ldec.compareTo(rdec) < 0;
+							break;
+						case LESS_THAN_OR_EQUAL:
+							lop.kToken = TokenType.BOOL;
+							lop.object = ldec.compareTo(rdec) <= 0;
+							break;
+						case GREATER_THAN:
+							lop.kToken = TokenType.BOOL;
+							lop.object = ldec.compareTo(rdec) > 0;
+							break;
+						case GREATER_THAN_OR_EQUAL:
+							lop.kToken = TokenType.BOOL;
+							lop.object = ldec.compareTo(rdec) >= 0;
+							break;
+						case EQUAL:
+							lop.kToken = TokenType.BOOL;
+							lop.object = ldec.compareTo(rdec) == 0;
+							break;
+						case NOT_EQUAL:
+							lop.kToken = TokenType.BOOL;
+							lop.object = ldec.compareTo(rdec) != 0;
+							break;
+						default:
+							return false;
+					}
+					return true;
+				case INTEGER:
+					BigInteger lint = (BigInteger) lop.object;
+					BigInteger rint = (BigInteger) rop.object;
+					switch (type) {
+						case PLUS:
+							lop.object = lint.add(rint);
+							break;
+						case MINUS:
+							lop.object = lint.subtract(rint);
+							break;
+						case TIMES:
+							lop.object = lint.multiply(rint);
+							break;
+						case DIVIDE:
+							lop.object = lint.divide(rint);
+							break;
+						case MOD:
+							lop.object = lint.mod(rint);
+							break;
+						case LEFT_SHIFT:
+							lop.object = lint.shiftLeft(rint.intValue());
+							break;
+						case RIGHT_SHIFT:
+							lop.object = lint.shiftRight(rint.intValue());
+							break;
+						case BIT_AND:
+							lop.object = lint.and(rint);
+							break;
+						case BIT_OR:
+							lop.object = lint.or(rint);
+							break;
+						case BIT_XOR:
+							lop.object = lint.xor(rint);
+							break;
+						case LESS_THAN:
+							lop.kToken = TokenType.BOOL;
+							lop.object = lint.compareTo(rint) < 0;
+							break;
+						case LESS_THAN_OR_EQUAL:
+							lop.kToken = TokenType.BOOL;
+							lop.object = lint.compareTo(rint) <= 0;
+							break;
+						case GREATER_THAN:
+							lop.kToken = TokenType.BOOL;
+							lop.object = lint.compareTo(rint) > 0;
+							break;
+						case GREATER_THAN_OR_EQUAL:
+							lop.kToken = TokenType.BOOL;
+							lop.object = lint.compareTo(rint) >= 0;
+							break;
+						case EQUAL:
+							lop.kToken = TokenType.BOOL;
+							lop.object = lint.compareTo(rint) == 0;
+							break;
+						case NOT_EQUAL:
+							lop.kToken = TokenType.BOOL;
+							lop.object = lint.compareTo(rint) != 0;
+							break;
+						default:
+							return false;
+					}
+					return true;
 				default:
-					return false;
-				}
-				return true;
-			case CHARACTER:
-				char lch = (char) lop.object;
-				char rch = (char) rop.object;
-				switch (type) {
-				case PLUS:
-					lop.object = (char) (lch + rch);
 					break;
-				case MINUS:
-					lop.object = (char) (lch - rch);
-					break;
-				case TIMES:
-					lop.object = (char) (lch * rch);
-					break;
-				case DIVIDE:
-					lop.object = (char) (lch / rch);
-					break;
-				case MOD:
-					lop.object = (char) (lch % rch);
-					break;
-				case LESS_THAN:
-					lop.kToken = TokenType.BOOL;
-					lop.object = lch < rch;
-					break;
-				case LESS_THAN_OR_EQUAL:
-					lop.kToken = TokenType.BOOL;
-					lop.object = lch <= rch;
-					break;
-				case GREATER_THAN:
-					lop.kToken = TokenType.BOOL;
-					lop.object = lch > rch;
-					break;
-				case GREATER_THAN_OR_EQUAL:
-					lop.kToken = TokenType.BOOL;
-					lop.object = lch >= rch;
-					break;
-				case EQUAL:
-					lop.kToken = TokenType.BOOL;
-					lop.object = lch == rch;
-					break;
-				case NOT_EQUAL:
-					lop.kToken = TokenType.BOOL;
-					lop.object = lch != rch;
-					break;
-				default:
-					return false;
-				}
-				return true;
-			case STRING:
-				String lstr = (String) lop.object;
-				String rstr = (String) rop.object;
-				switch (type) {
-				case PLUS:
-					lop.object = lstr + rstr;
-					break;
-				default:
-					return false;
-				}
-				return true;
-			case DECIMAL:
-				BigDecimal ldec = (BigDecimal) lop.object;
-				BigDecimal rdec = (BigDecimal) rop.object;
-				switch (type) {
-				case PLUS:
-					lop.object = ldec.add(rdec);
-					break;
-				case MINUS:
-					lop.object = ldec.subtract(rdec);
-					break;
-				case TIMES:
-					lop.object = ldec.multiply(rdec);
-					break;
-				case DIVIDE:
-					lop.object = ldec.divide(rdec, SCALE_NUM,
-							BigDecimal.ROUND_HALF_UP);
-					break;
-				case LEFT_SHIFT:
-					lop.object = ldec.movePointLeft(rdec.intValue());
-					break;
-				case RIGHT_SHIFT:
-					lop.object = ldec.movePointRight(rdec.intValue());
-					break;
-				case LESS_THAN:
-					lop.kToken = TokenType.BOOL;
-					lop.object = ldec.compareTo(rdec) < 0;
-					break;
-				case LESS_THAN_OR_EQUAL:
-					lop.kToken = TokenType.BOOL;
-					lop.object = ldec.compareTo(rdec) <= 0;
-					break;
-				case GREATER_THAN:
-					lop.kToken = TokenType.BOOL;
-					lop.object = ldec.compareTo(rdec) > 0;
-					break;
-				case GREATER_THAN_OR_EQUAL:
-					lop.kToken = TokenType.BOOL;
-					lop.object = ldec.compareTo(rdec) >= 0;
-					break;
-				case EQUAL:
-					lop.kToken = TokenType.BOOL;
-					lop.object = ldec.compareTo(rdec) == 0;
-					break;
-				case NOT_EQUAL:
-					lop.kToken = TokenType.BOOL;
-					lop.object = ldec.compareTo(rdec) != 0;
-					break;
-				default:
-					return false;
-				}
-				return true;
-			case INTEGER:
-				BigInteger lint = (BigInteger) lop.object;
-				BigInteger rint = (BigInteger) rop.object;
-				switch (type) {
-				case PLUS:
-					lop.object = lint.add(rint);
-					break;
-				case MINUS:
-					lop.object = lint.subtract(rint);
-					break;
-				case TIMES:
-					lop.object = lint.multiply(rint);
-					break;
-				case DIVIDE:
-					lop.object = lint.divide(rint);
-					break;
-				case MOD:
-					lop.object = lint.mod(rint);
-					break;
-				case LEFT_SHIFT:
-					lop.object = lint.shiftLeft(rint.intValue());
-					break;
-				case RIGHT_SHIFT:
-					lop.object = lint.shiftRight(rint.intValue());
-					break;
-				case BIT_AND:
-					lop.object = lint.and(rint);
-					break;
-				case BIT_OR:
-					lop.object = lint.or(rint);
-					break;
-				case BIT_XOR:
-					lop.object = lint.xor(rint);
-					break;
-				case LESS_THAN:
-					lop.kToken = TokenType.BOOL;
-					lop.object = lint.compareTo(rint) < 0;
-					break;
-				case LESS_THAN_OR_EQUAL:
-					lop.kToken = TokenType.BOOL;
-					lop.object = lint.compareTo(rint) <= 0;
-					break;
-				case GREATER_THAN:
-					lop.kToken = TokenType.BOOL;
-					lop.object = lint.compareTo(rint) > 0;
-					break;
-				case GREATER_THAN_OR_EQUAL:
-					lop.kToken = TokenType.BOOL;
-					lop.object = lint.compareTo(rint) >= 0;
-					break;
-				case EQUAL:
-					lop.kToken = TokenType.BOOL;
-					lop.object = lint.compareTo(rint) == 0;
-					break;
-				case NOT_EQUAL:
-					lop.kToken = TokenType.BOOL;
-					lop.object = lint.compareTo(rint) != 0;
-					break;
-				default:
-					return false;
-				}
-				return true;
-			default:
-				break;
 			}
 		} else {// 操作数类型不同，需要提升
 			if (promote(lop, rop)) {

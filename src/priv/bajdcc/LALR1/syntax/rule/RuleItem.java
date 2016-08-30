@@ -2,7 +2,7 @@ package priv.bajdcc.LALR1.syntax.rule;
 
 import java.util.HashSet;
 
-import priv.bajdcc.LALR1.semantic.token.ISemanticAnalyzier;
+import priv.bajdcc.LALR1.semantic.token.ISemanticAnalyzer;
 import priv.bajdcc.LALR1.syntax.ISyntaxComponent;
 import priv.bajdcc.LALR1.syntax.exp.RuleExp;
 import priv.bajdcc.LALR1.syntax.exp.TokenExp;
@@ -22,7 +22,7 @@ public class RuleItem {
 	/**
 	 * 规则对应的语义分析接口
 	 */
-	public ISemanticAnalyzier handler = null;
+	public ISemanticAnalyzer handler = null;
 
 	/**
 	 * First集合（终结符）

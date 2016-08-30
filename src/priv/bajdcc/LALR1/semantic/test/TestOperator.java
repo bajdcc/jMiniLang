@@ -1,7 +1,7 @@
 package priv.bajdcc.LALR1.semantic.test;
 
 import priv.bajdcc.LALR1.semantic.Semantic;
-import priv.bajdcc.LALR1.semantic.token.ISemanticAnalyzier;
+import priv.bajdcc.LALR1.semantic.token.ISemanticAnalyzer;
 import priv.bajdcc.LALR1.syntax.handler.SyntaxException;
 import priv.bajdcc.util.lexer.error.RegexException;
 import priv.bajdcc.util.lexer.token.OperatorType;
@@ -46,8 +46,8 @@ public class TestOperator {
                 bag.bPass = true;
                 return "缺少右括号";
             });
-			ISemanticAnalyzier handleCopy = (indexed, query, recorder) -> indexed.get(0).object;
-			ISemanticAnalyzier handleBinop = (indexed, query, recorder) -> {
+			ISemanticAnalyzer handleCopy = (indexed, query, recorder) -> indexed.get(0).object;
+			ISemanticAnalyzer handleBinop = (indexed, query, recorder) -> {
                 int lop = Integer
                         .parseInt(indexed.get(0).object.toString());
                 int rop = Integer
@@ -75,7 +75,7 @@ public class TestOperator {
                     return 0;
                 }
             };
-			ISemanticAnalyzier handleValue = (indexed, query, recorder) -> indexed.get(0).token.object;
+			ISemanticAnalyzer handleValue = (indexed, query, recorder) -> indexed.get(0).token.object;
 			// syntax.infer("E -> T `PLUS`<+> E | T `MINUS`<-> E | T");
 			// syntax.infer("T -> F `TIMES`<*> T | F `DIVIDE`</> T | F");
 			// syntax.infer("F -> `LPA`<(> E `RPA`<)>  | `SYMBOL`<i>");

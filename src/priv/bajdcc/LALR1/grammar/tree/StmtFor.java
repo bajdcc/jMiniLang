@@ -86,8 +86,8 @@ public class StmtFor implements IStmt {
 	public void genCode(ICodegen codegen) {
 		if (var != null) {
 			var.genCode(codegen);
+			codegen.genCode(RuntimeInst.ipop);
 		}
-		codegen.genCode(RuntimeInst.ipop);
 		CodegenBlock cb = new CodegenBlock();
 		RuntimeInstUnary start = codegen.genCode(RuntimeInst.ijmp, -1);
 		cb.breakId = codegen.getCodeIndex();

@@ -8,7 +8,7 @@ import priv.bajdcc.LALR1.grammar.symbol.IManageSymbol;
 import priv.bajdcc.LALR1.grammar.symbol.IQuerySymbol;
 import priv.bajdcc.LALR1.grammar.tree.Function;
 import priv.bajdcc.LALR1.semantic.lexer.TokenFactory;
-import priv.bajdcc.LALR1.semantic.token.ISemanticAnalyzier;
+import priv.bajdcc.LALR1.semantic.token.ISemanticAnalyzer;
 import priv.bajdcc.LALR1.semantic.tracker.ErrorRecord;
 import priv.bajdcc.LALR1.semantic.tracker.Instruction;
 import priv.bajdcc.LALR1.semantic.tracker.InstructionRecord;
@@ -65,7 +65,7 @@ public class Semantic extends Syntax implements IErrorHandler {
 	/**
 	 * 当前的语义接口
 	 */
-	private ISemanticAnalyzier semanticHandler = null;
+	private ISemanticAnalyzer semanticHandler = null;
 
 	/**
 	 * 语义分析结果
@@ -119,7 +119,7 @@ public class Semantic extends Syntax implements IErrorHandler {
 	 *            文法推导式
 	 * @throws SyntaxException 词法错误
 	 */
-	public void infer(ISemanticAnalyzier handler, String inferString)
+	public void infer(ISemanticAnalyzer handler, String inferString)
 			throws SyntaxException {
 		if (handler == null) {
 			throw new NullPointerException("handler");

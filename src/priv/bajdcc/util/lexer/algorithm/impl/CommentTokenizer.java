@@ -18,7 +18,12 @@ public class CommentTokenizer extends TokenAlgorithm {
 	}
 
 	public static String getRegexString() {
-		return "((//[^\\r\\n]*[\\r\\n]{1,2})|(/\\*.*\\*/))";
+		return "((//[^\\r\\n]*[\\r\\n]{0,2})|(/\\*.*\\*/))";
+	}
+
+	@Override
+	public boolean getGreedMode() {
+		return true;
 	}
 
 	/*

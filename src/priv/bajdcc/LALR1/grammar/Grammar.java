@@ -10,7 +10,7 @@ import priv.bajdcc.LALR1.grammar.symbol.IManageSymbol;
 import priv.bajdcc.LALR1.grammar.symbol.IQuerySymbol;
 import priv.bajdcc.LALR1.grammar.symbol.SymbolTable;
 import priv.bajdcc.LALR1.semantic.Semantic;
-import priv.bajdcc.LALR1.semantic.token.ISemanticAnalyzier;
+import priv.bajdcc.LALR1.semantic.token.ISemanticAnalyzer;
 import priv.bajdcc.LALR1.syntax.handler.SyntaxException;
 import priv.bajdcc.LALR1.syntax.handler.SyntaxException.SyntaxError;
 import priv.bajdcc.util.Position;
@@ -147,7 +147,7 @@ public class Grammar extends Semantic {
 				"var_list", "exp_list", "exp", "exp0", "exp1", "exp2", "exp3",
 				"exp4", "exp5", "exp6", "exp7", "exp8", "exp9", "type",
 				"block", "call_exp", "call", "ret", "doc_list", "port", "if",
-				"for", "foreach", "cycle_ctrl", "block_stmt" };
+				"for", "while", "foreach", "cycle_ctrl", "block_stmt" };
 		for (String string : nonTerminals) {
 			addNonTerminal(string);
 		}
@@ -178,7 +178,7 @@ public class Grammar extends Semantic {
 		infer(handler.getSemanticHandler("stmt_exp"),
 				"stmt_stmt -> [stmt_exp[0]] @SEMI{lost_semi}");
 		infer(handler.getSemanticHandler("copy"),
-				"stmt_ctrl -> ret[0] | port[0] | if[0] | for[0] | foreach[0]");
+				"stmt_ctrl -> ret[0] | port[0] | if[0] | for[0] | foreach[0] | while[0]");
 		/* 返回语句 */
 		infer(handler.getSemanticHandler("return"),
 				"ret -> (@YIELD[1] | @RETURN) [exp[0]] @SEMI{lost_semi}");
@@ -189,7 +189,7 @@ public class Grammar extends Semantic {
 		infer(handler.getSemanticHandler("port"),
 				"port -> (@IMPORT[1] | @EXPORT[2]) @LITERAL[0]{lost_string} @SEMI{lost_semi}");
 		/* 表达式（算符文法） */
-		ISemanticAnalyzier exp_handler = handler.getSemanticHandler("exp");
+		ISemanticAnalyzer exp_handler = handler.getSemanticHandler("exp");
 		infer(exp_handler, "exp -> exp0[0]");
 		infer(exp_handler,
 				"exp0 -> exp1[0] [@QUERY[4] exp0[6] @COLON[5]{lost_colon} exp0[7]]");
@@ -228,6 +228,8 @@ public class Grammar extends Semantic {
 		/* 循环语句 */
 		infer(handler.getSemanticHandler("for"),
 				"for -> @FOR#do_enter_cycle# @LPA{lost_lpa} [var[0]] @SEMI{lost_semi} [exp[1]] @SEMI{lost_semi} [exp[2] | var[2]] @RPA{lost_rpa} block[3]{lost_block}");
+		infer(handler.getSemanticHandler("while"),
+				"while -> @WHILE#do_enter_cycle# @LPA{lost_lpa} exp[0] @RPA{lost_rpa} block[1]{lost_block}");
 		/* 循环语句 */
 		infer(handler.getSemanticHandler("foreach"),
 				"foreach -> @FOREACH#do_enter_cycle# @LPA{lost_lpa} @VARIABLE{lost_var} @ID[0]#declear_variable#{lost_token} @COLON{lost_colon} exp[1]{lost_exp} @RPA{lost_rpa} block[2]{lost_block}");
