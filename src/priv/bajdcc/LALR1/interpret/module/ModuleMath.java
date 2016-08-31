@@ -8,7 +8,7 @@ import priv.bajdcc.LALR1.grammar.runtime.RuntimeCodePage;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeObject;
 
 /**
- * 【模块】基本模块
+ * 【模块】数学模块
  *
  * @author bajdcc
  */
@@ -28,8 +28,8 @@ public class ModuleMath implements IInterpreterModule {
 		Grammar grammar = new Grammar(base);
 		RuntimeCodePage page = grammar.getCodePage();
 		IRuntimeDebugInfo info = page.getInfo();
-		info.addExternalValue("g_PI", () -> new RuntimeObject(null));
-		info.addExternalValue("g_E", () -> new RuntimeObject("\n"));
+		info.addExternalValue("g_PI", () -> new RuntimeObject(Math.PI));
+		info.addExternalValue("g_E", () -> new RuntimeObject(Math.E));
 		buildUnaryFunc(info);
 
 		return page;

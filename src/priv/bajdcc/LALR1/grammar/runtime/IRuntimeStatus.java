@@ -28,4 +28,19 @@ public interface IRuntimeStatus {
 	 * @throws RuntimeException 运行时错误
 	 */
 	void runPage(String name) throws Exception;
+
+	/**
+	 * 运行时错误
+	 * @param type 错误类型
+	 * @throws RuntimeException 运行时异常
+     */
+	void err(RuntimeException.RuntimeError type) throws RuntimeException;
+
+	/**
+	 * 运行时错误
+	 * @param type 错误类型
+	 * @param message 补充信息
+	 * @throws RuntimeException 运行时异常
+     */
+	void err(RuntimeException.RuntimeError type, String message) throws RuntimeException;
 }

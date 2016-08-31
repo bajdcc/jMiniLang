@@ -116,6 +116,52 @@ n: 2
 n: 1
 ```
 
+**List: LinkedList**
+
+*Code:*
+
+```javascript
+import "sys.base";
+import "sys.list";
+var create_node = func ~(data) {
+    var new_node = g_new_map;
+    call g_map_put(new_node, "data", data);
+    call g_map_put(new_node, "prev", g_null);
+    call g_map_put(new_node, "next", g_null);
+    return new_node;
+};
+var append = func ~(head, obj) {
+    var new_node = call create_node(obj);
+    call g_map_put(new_node, "next", head);
+    call g_map_put(head, "prev", new_node);
+    return new_node;};
+var head = call create_node(0);
+foreach (var i : call g_range(1, 10)) {
+    let head = call append(head, i);
+}
+var p = head;
+while (!call g_is_null(p)) {
+    call g_printn(call g_map_get(p, "data"));
+    let p = call g_map_get(p, "next");
+}
+```
+
+*Result:*
+
+```c
+10
+9
+8
+7
+6
+5
+4
+3
+2
+1
+0
+```
+
 #### Screenshot
 
 *Screenshot 1 - Code*

@@ -407,12 +407,16 @@ public class SemanticHandler {
             }
             return exp;
         });
-		/* BLOCK语句 */
+		/* 块语句 */
 		mapSemanticAnalyzier.put("block_stmt", (indexed, query, recorder) -> {
             StmtBlock block = new StmtBlock();
             block.setBlock((Block) indexed.get(0).object);
             return block;
         });
+		/* 数组 */
+		mapSemanticAnalyzier.put("array", (indexed, query, recorder) -> new ExpArray());
+		/* 字典 */
+		mapSemanticAnalyzier.put("map", (indexed, query, recorder) -> new ExpMap());
 	}
 
 	/**

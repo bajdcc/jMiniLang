@@ -206,6 +206,12 @@ public class RuntimeTools {
 		case iscpo:
 			stk.opScope(false);
 			break;
+		case iarr:
+			stk.opArr();
+			break;
+		case imap:
+			stk.opMap();
+			break;
 		default:
 			return false;
 		}

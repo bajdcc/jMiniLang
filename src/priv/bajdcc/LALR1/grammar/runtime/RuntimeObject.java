@@ -3,7 +3,9 @@ package priv.bajdcc.LALR1.grammar.runtime;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+import priv.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
 import priv.bajdcc.LALR1.grammar.runtime.data.RuntimeFuncObject;
+import priv.bajdcc.LALR1.grammar.runtime.data.RuntimeMap;
 import priv.bajdcc.util.lexer.token.TokenType;
 
 /**
@@ -82,6 +84,10 @@ public class RuntimeObject implements Cloneable {
 		return fromObject(obj).getName();
 	}
 
+	public String getTypeString() {
+		return fromObject(obj).toString();
+	}
+
 	public void setObj(Object obj) {
 		this.obj = obj;
 	}
@@ -99,6 +105,11 @@ public class RuntimeObject implements Cloneable {
 	}
 
 	public void setReadonly(boolean readonly) {
+		switch (this.type) {
+			case kArray:
+			case kMap:
+				return;
+		}
 		this.readonly = readonly;
 	}
 
@@ -134,6 +145,12 @@ public class RuntimeObject implements Cloneable {
 		}
 		if (obj instanceof RuntimeFuncObject) {
 			return RuntimeObjectType.kFunc;
+		}
+		if (obj instanceof RuntimeArray) {
+			return RuntimeObjectType.kArray;
+		}
+		if (obj instanceof RuntimeMap) {
+			return RuntimeObjectType.kMap;
 		}
 		return RuntimeObjectType.kNull;
 	}

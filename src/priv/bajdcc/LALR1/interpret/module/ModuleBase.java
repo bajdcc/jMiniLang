@@ -227,6 +227,23 @@ public class ModuleBase implements IInterpreterModule {
 				return new RuntimeObject(args.get(0).getTypeName());
 			}
 		});
+		info.addExternalFunc("g_type", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "获取类型";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[] { RuntimeObjectType.kObject };
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+												  IRuntimeStatus status) throws Exception {
+				return new RuntimeObject(args.get(0).getTypeString());
+			}
+		});
 		info.addExternalFunc("g_exit", new IRuntimeDebugExec() {
 			@Override
 			public String getDoc() {

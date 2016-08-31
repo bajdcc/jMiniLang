@@ -12,7 +12,9 @@ import java.util.Stack;
 
 import priv.bajdcc.LALR1.grammar.Grammar;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeException.RuntimeError;
+import priv.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
 import priv.bajdcc.LALR1.grammar.runtime.data.RuntimeFuncObject;
+import priv.bajdcc.LALR1.grammar.runtime.data.RuntimeMap;
 import priv.bajdcc.LALR1.grammar.type.TokenTools;
 import priv.bajdcc.util.HashListMapEx;
 import priv.bajdcc.util.lexer.token.OperatorType;
@@ -90,12 +92,12 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 		nextInst();
 		if (op != null) {
 			if (!RuntimeTools.calcOp(stack.reg, inst, this)) {
-				err(RuntimeError.UNDEFINED_CONVERT);
+				err(RuntimeError.UNDEFINED_CONVERT, op.getName());
 			}
 		} else {
 			if (!RuntimeTools.calcData(stack.reg, inst, this)) {
 				if (!RuntimeTools.calcJump(stack.reg, inst, this)) {
-					err(RuntimeError.WRONG_INST);
+					err(RuntimeError.WRONG_INST, inst.toString());
 				}
 			}
 		}
@@ -143,7 +145,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	private int loadInt() throws RuntimeException {
 		RuntimeObject obj = load();
 		if (!(obj.getObj() instanceof Integer)) {
-			err(RuntimeError.WRONG_OPERTAOR);
+			err(RuntimeError.WRONG_OPERATOR, RuntimeObjectType.kInt.getName() + " " + obj.toString());
 		}
 		return (int) obj.getObj();
 	}
@@ -151,7 +153,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	private boolean loadBool() throws RuntimeException {
 		RuntimeObject obj = load();
 		if (!(obj.getObj() instanceof Boolean)) {
-			err(RuntimeError.WRONG_OPERTAOR);
+			err(RuntimeError.WRONG_OPERATOR, RuntimeObjectType.kBool.getName() + " " + obj.toString());
 		}
 		return (boolean) obj.getObj();
 	}
@@ -159,7 +161,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	private boolean loadBoolRetain() throws RuntimeException {
 		RuntimeObject obj = top();
 		if (!(obj.getObj() instanceof Boolean)) {
-			err(RuntimeError.WRONG_OPERTAOR);
+			err(RuntimeError.WRONG_OPERATOR, RuntimeObjectType.kBool.getName() + " " + obj.toString());
 		}
 		return (boolean) obj.getObj();
 	}
@@ -197,9 +199,16 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 		}
 	}
 
-	private void err(RuntimeError type) throws RuntimeException {
+	@Override
+	public void err(RuntimeError type) throws RuntimeException {
 		// System.err.println(stack);
 		throw new RuntimeException(type, stack.reg.execId, type.getMessage());
+	}
+
+	@Override
+	public void err(RuntimeError type, String message) throws RuntimeException {
+		// System.err.println(stack);
+		throw new RuntimeException(type, stack.reg.execId, type.getMessage() + " " + message);
 	}
 
 	private void switchPage() throws RuntimeException {
@@ -215,7 +224,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	private Byte getInst(int pc) throws RuntimeException {
 		List<Byte> code = currentPage.getInsts();
 		if (pc < 0 || pc >= code.size()) {
-			err(RuntimeError.WRONG_INST);
+			err(RuntimeError.WRONG_INST, String.valueOf(pc));
 		}
 		return code.get(pc);
 	}
@@ -246,7 +255,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	private RuntimeObject fetchFromGlobalData(int index)
 			throws RuntimeException {
 		if (index < 0 || index >= currentPage.getData().size()) {
-			err(RuntimeError.WRONG_OPERTAOR);
+			err(RuntimeError.WRONG_OPERATOR, String.valueOf(index));
 		}
 		return new RuntimeObject(currentPage.getData().get(index));
 	}
@@ -277,10 +286,10 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 		RuntimeObject obj = load();
 		RuntimeObject target = stack.findVariable(idx);
 		if (target == null) {
-			err(RuntimeError.WRONG_OPERTAOR);
+			err(RuntimeError.WRONG_OPERATOR);
 		}
 		if (target.isReadonly()) {
-			err(RuntimeError.READONLY_VAR);
+			err(RuntimeError.READONLY_VAR, target.toString());
 		}
 		target.copyFrom(obj);
 		store(target);
@@ -307,7 +316,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 		int idx = current();
 		next();
 		if (idx < 0 || idx >= stack.getFuncArgsCount()) {
-			err(RuntimeError.WRONG_OPERTAOR);
+			err(RuntimeError.WRONG_OPERATOR, String.valueOf(idx));
 		}
 		store(stack.loadFuncArgs(idx));
 	}
@@ -317,7 +326,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 		RuntimeObject obj = load();
 		obj.setReadonly(true);
 		if (!stack.pushFuncArgs(obj)) {
-			err(RuntimeError.ARG_OVERFLOW);
+			err(RuntimeError.ARG_OVERFLOW, obj.toString());
 		}
 	}
 
@@ -422,7 +431,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 		RuntimeObject obj = fetchFromGlobalData(idx);
 		RuntimeCodePage page = pageMap.get(obj.getObj().toString());
 		if (page == null) {
-			err(RuntimeError.WRONG_IMPORT);
+			err(RuntimeError.WRONG_IMPORT, obj.toString());
 		}
 		pageRefer.get(pageName).add(page);
 	}
@@ -441,7 +450,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 				return;
 			}
 		}
-		err(RuntimeError.WRONG_LOAD_EXTERN);
+		err(RuntimeError.WRONG_LOAD_EXTERN, name);
 	}
 
 	@Override
@@ -456,7 +465,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 				itStack = itStack.prev;
 			}
 			if (obj == null) {
-				err(RuntimeError.WRONG_LOAD_EXTERN);
+				err(RuntimeError.WRONG_LOAD_EXTERN, String.valueOf(idx));
 			}
 			if (obj.getType() == RuntimeObjectType.kFunc) {
 				RuntimeFuncObject func = (RuntimeFuncObject) obj.getObj();
@@ -479,7 +488,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 			} else if (obj.getType() == RuntimeObjectType.kString) {
 				name = obj.getObj().toString();
 			} else {
-				err(RuntimeError.WRONG_LOAD_EXTERN);
+				err(RuntimeError.WRONG_LOAD_EXTERN, obj.toString());
 			}
 		} else {
 			RuntimeObject obj = fetchFromGlobalData(idx);
@@ -506,7 +515,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 				RuntimeObjectType[] types = exec.getArgsType();
 				if ((types == null && argsCount != 0)
 						|| (types != null && types.length != argsCount)) {
-					err(RuntimeError.WRONG_ARGCOUNT);
+					err(RuntimeError.WRONG_ARGCOUNT, String.valueOf(argsCount));
 				}
 				List<RuntimeObject> args = new ArrayList<>();
 				for (int i = 0; i < argsCount; i++) {
@@ -520,10 +529,10 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 							TokenType objTokenType = RuntimeObject
 									.toTokenType(type);
 							if (objTokenType == TokenType.ERROR) {
-								err(RuntimeError.WRONG_ARGTYPE);
+								err(RuntimeError.WRONG_ARGTYPE, name + " " + objTokenType.getName());
 							}
 							if (!TokenTools.promote(objTokenType, token)) {
-								err(RuntimeError.UNDEFINED_CONVERT);
+								err(RuntimeError.UNDEFINED_CONVERT, name + " " + token.toString() + " " + objTokenType.getName());
 							} else {
 								objParam.setObj(token.object);
 							}
@@ -543,7 +552,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 				return;
 			}
 		}
-		err(RuntimeError.WRONG_LOAD_EXTERN);
+		err(RuntimeError.WRONG_LOAD_EXTERN, name);
 	}
 
 	@Override
@@ -568,7 +577,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 				return address;
 			}
 		}
-		err(RuntimeError.WRONG_FUNCNAME);
+		err(RuntimeError.WRONG_FUNCNAME, name);
 		return -1;
 	}
 
@@ -592,7 +601,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 			if (newStack != null) {
 				stack = newStack;
 			} else {
-				err(RuntimeError.WRONG_COROUTINE);
+				err(RuntimeError.WRONG_COROUTINE, hash);
 			}
 		} else {
 			if (stack.prev == null) {
@@ -657,5 +666,15 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 		} else {
 			stack.leaveScope();
 		}
+	}
+
+	@Override
+	public void opArr() {
+		stack.pushData(new RuntimeObject(new RuntimeArray()));
+	}
+
+	@Override
+	public void opMap() {
+		stack.pushData(new RuntimeObject(new RuntimeMap()));
 	}
 }
