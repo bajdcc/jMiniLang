@@ -134,7 +134,8 @@ var append = func ~(head, obj) {
     var new_node = call create_node(obj);
     call g_map_put(new_node, "next", head);
     call g_map_put(head, "prev", new_node);
-    return new_node;};
+    return new_node;
+};
 var head = call create_node(0);
 foreach (var i : call g_range(1, 10)) {
     let head = call append(head, i);

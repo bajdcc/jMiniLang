@@ -4,6 +4,7 @@ import priv.bajdcc.LALR1.grammar.runtime.RuntimeObject;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 【运行时】运行时数组
@@ -12,7 +13,7 @@ import java.util.ArrayList;
  */
 public class RuntimeArray implements Cloneable {
 
-	private ArrayList<RuntimeObject> array;
+	private List<RuntimeObject> array;
 
 	public RuntimeArray() {
 	}

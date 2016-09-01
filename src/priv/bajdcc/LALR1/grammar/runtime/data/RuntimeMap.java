@@ -5,6 +5,7 @@ import priv.bajdcc.LALR1.grammar.runtime.RuntimeObject;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 【运行时】运行时数组
@@ -13,7 +14,7 @@ import java.util.HashMap;
  */
 public class RuntimeMap implements Cloneable {
 
-	private HashMap<String, RuntimeObject> map;
+	private Map<String, RuntimeObject> map;
 
 	public RuntimeMap() {
 	}

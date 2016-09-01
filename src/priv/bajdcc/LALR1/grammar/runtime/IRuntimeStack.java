@@ -23,6 +23,7 @@ public interface IRuntimeStack {
 	void opPushNull();
 	void opPushZero();
 	void opPushNan();
+	void opPushPtr(int pc);
 	void opLoadVar() throws RuntimeException;
 	void opJump() throws RuntimeException;
 	void opJumpBool(boolean bool) throws RuntimeException;

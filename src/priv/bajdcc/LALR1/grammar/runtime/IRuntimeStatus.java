@@ -1,5 +1,9 @@
 package priv.bajdcc.LALR1.grammar.runtime;
 
+import priv.bajdcc.LALR1.grammar.runtime.data.RuntimeFuncObject;
+
+import java.util.List;
+
 /**
  * 【运行时】运行时状态查询
  *
@@ -43,4 +47,29 @@ public interface IRuntimeStatus {
 	 * @throws RuntimeException 运行时异常
      */
 	void err(RuntimeException.RuntimeError type, String message) throws RuntimeException;
+
+	/**
+	 * 创建进程
+	 * @param func 函数
+	 * @throws Exception 运行时异常
+	 */
+	void createProcess(RuntimeFuncObject func) throws Exception;
+
+	/**
+	 * 获取页引用
+	 * @param page 页名
+	 */
+	List<RuntimeCodePage> getPageRefers(String page);
+
+	/**
+	 * 得到进程ID
+	 * @return PID
+	 */
+	int getPid();
+
+	/**
+	 * 得到进程优先级
+	 * @return 优先级
+	 */
+	int getPriority();
 }

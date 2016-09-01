@@ -16,7 +16,8 @@ public class RuntimeException extends Exception {
 				"导入模块名错误"), WRONG_EXPORT("导出模块名错误"), WRONG_LOAD_EXTERN(
 				"导入外部符号错误"), WRONG_ARGCOUNT("参数个数不一致"), WRONG_ARGTYPE("参数类型不一致"), NULL_OPERATOR(
 				"空值运算"), WRONG_FUNCNAME("过程不存在"), STACK_OVERFLOW("堆栈溢出"), ARG_OVERFLOW(
-				"参数过多"), UNDEFINED_CONVERT("未定义的强制转换"), INVALID_INDEX("索引无效");
+				"参数过多"), UNDEFINED_CONVERT("未定义的强制转换"), INVALID_INDEX("索引无效"),
+				PROCESS_OVERFLOW("进程数量已达最大值"), EMPTY_CALLSTACK("调用栈为空");
 
 		private String message;
 

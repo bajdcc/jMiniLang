@@ -16,6 +16,7 @@ import priv.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
 import priv.bajdcc.LALR1.grammar.runtime.data.RuntimeFuncObject;
 import priv.bajdcc.LALR1.grammar.runtime.data.RuntimeMap;
 import priv.bajdcc.LALR1.grammar.type.TokenTools;
+import priv.bajdcc.LALR1.interpret.module.*;
 import priv.bajdcc.util.HashListMapEx;
 import priv.bajdcc.util.lexer.token.OperatorType;
 import priv.bajdcc.util.lexer.token.Token;
@@ -32,10 +33,30 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	private Map<String, ArrayList<RuntimeCodePage>> pageRefer = new HashMap<>();
 	private Stack<RuntimeObject> stkYieldData = new Stack<>();
 	private RuntimeStack stack = new RuntimeStack();
+	private RuntimeCodePage currentPage;
+	private String pageName;
+	private RuntimeProcess process;
+	private int pid;
+	private boolean debug = false;
 
-	private RuntimeCodePage currentPage = null;
-	private String pageName = null;
-	protected boolean debug = false;
+	public RuntimeMachine() throws Exception {
+		IInterpreterModule[] modules = new IInterpreterModule[] {
+				new ModuleBase(),
+				new ModuleMath(),
+				new ModuleList(),
+				new ModuleProc()
+		};
+
+		for (IInterpreterModule module : modules) {
+			run(module.getModuleName(), module.getCodePage());
+		}
+	}
+
+	public RuntimeMachine(int id, RuntimeProcess process) throws Exception {
+		this();
+		this.pid = id;
+		this.process = process;
+	}
 
 	public void run(String name, InputStream input) throws Exception {
 		run(name, RuntimeCodePage.importFromStream(input));
@@ -75,8 +96,28 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	}
 
 	private void runInsts() throws Exception {
-		while (runByStep())
-			;
+		while (runByStep());
+	}
+
+	public void initStep(String name, RuntimeCodePage page, List<RuntimeCodePage> refers, int pc) throws Exception {
+		add(name, page);
+		currentPage = page;
+		stack.reg.pageId = name;
+		stack.reg.execId = -1;
+		switchPage();
+		pageRefer.get(pageName).addAll(refers);
+		opOpenFunc();
+		opPushPtr(pc);
+		opCall();
+	}
+
+	public int runStep() throws Exception {
+		RuntimeInst inst = RuntimeInst.values()[currentInst()];
+		if (inst == RuntimeInst.ihalt) {
+			process.destroyProcess(pid);
+			return 2;
+		}
+		return runByStep() ? 0 : 1;
 	}
 
 	private boolean runByStep() throws Exception {
@@ -211,11 +252,30 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 		throw new RuntimeException(type, stack.reg.execId, type.getMessage() + " " + message);
 	}
 
+	@Override
+	public void createProcess(RuntimeFuncObject func) throws Exception {
+		process.createProcess(pid, func.getPage(), func.getAddr());
+	}
+
+	@Override
+	public List<RuntimeCodePage> getPageRefers(String page) {
+		return pageRefer.get(page);
+	}
+
+	@Override
+	public int getPid() {
+		return pid;
+	}
+
+	@Override
+	public int getPriority() {
+		return process.getPriority(pid);
+	}
+
 	private void switchPage() throws RuntimeException {
 		if (!stack.reg.pageId.isEmpty()) {
 			currentPage = pageMap.get(stack.reg.pageId);
-			pageName = currentPage.getInfo().getDataMap().get("name")
-					.toString();
+			pageName = currentPage.getInfo().getDataMap().get("name").toString();
 		} else {
 			err(RuntimeError.WRONG_CODEPAGE);
 		}
@@ -361,6 +421,11 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	@Override
 	public void opPushNan() {
 		store(new RuntimeObject(null, RuntimeObjectType.kNan, true, false));
+	}
+
+	@Override
+	public void opPushPtr(int pc) {
+		store(new RuntimeObject(pc));
 	}
 
 	@Override
@@ -661,6 +726,8 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 
 	@Override
 	public void opScope(boolean enter) throws RuntimeException {
+		if (stack.getFuncLevel() == 0)
+			err(RuntimeError.EMPTY_CALLSTACK);
 		if (enter) {
 			stack.enterScope();
 		} else {
