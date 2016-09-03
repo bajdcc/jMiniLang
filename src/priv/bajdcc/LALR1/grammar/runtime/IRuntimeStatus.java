@@ -1,6 +1,7 @@
 package priv.bajdcc.LALR1.grammar.runtime;
 
 import priv.bajdcc.LALR1.grammar.runtime.data.RuntimeFuncObject;
+import priv.bajdcc.LALR1.grammar.runtime.service.IRuntimeService;
 
 import java.util.List;
 
@@ -52,8 +53,9 @@ public interface IRuntimeStatus {
 	 * 创建进程
 	 * @param func 函数
 	 * @throws Exception 运行时异常
+	 * @return 进程ID
 	 */
-	void createProcess(RuntimeFuncObject func) throws Exception;
+	int createProcess(RuntimeFuncObject func) throws Exception;
 
 	/**
 	 * 获取页引用
@@ -72,4 +74,10 @@ public interface IRuntimeStatus {
 	 * @return 优先级
 	 */
 	int getPriority();
+
+	/**
+	 * 得到服务接口
+	 * @return 运行时服务接口
+	 */
+	IRuntimeService getService();
 }

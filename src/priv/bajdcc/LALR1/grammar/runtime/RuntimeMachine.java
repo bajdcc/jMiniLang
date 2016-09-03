@@ -15,6 +15,7 @@ import priv.bajdcc.LALR1.grammar.runtime.RuntimeException.RuntimeError;
 import priv.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
 import priv.bajdcc.LALR1.grammar.runtime.data.RuntimeFuncObject;
 import priv.bajdcc.LALR1.grammar.runtime.data.RuntimeMap;
+import priv.bajdcc.LALR1.grammar.runtime.service.IRuntimeService;
 import priv.bajdcc.LALR1.grammar.type.TokenTools;
 import priv.bajdcc.LALR1.interpret.module.*;
 import priv.bajdcc.util.HashListMapEx;
@@ -253,8 +254,8 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	}
 
 	@Override
-	public void createProcess(RuntimeFuncObject func) throws Exception {
-		process.createProcess(pid, func.getPage(), func.getAddr());
+	public int createProcess(RuntimeFuncObject func) throws Exception {
+		return process.createProcess(pid, func.getPage(), func.getAddr());
 	}
 
 	@Override
@@ -270,6 +271,11 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	@Override
 	public int getPriority() {
 		return process.getPriority(pid);
+	}
+
+	@Override
+	public IRuntimeService getService() {
+		return process.getService();
 	}
 
 	private void switchPage() throws RuntimeException {

@@ -163,6 +163,181 @@ while (!call g_is_null(p)) {
 0
 ```
 
+**Multi-Process: Pipe**
+
+*Code:*
+
+```javascript
+import "sys.base";
+import "sys.proc";
+var proc = func ~() {
+    var handle = call g_create_pipe("test");
+    var print = func ~(ch) -> call g_print(ch);
+    var pid = call g_get_pid();
+    if (pid == 0) {
+        foreach (var i : call g_range(1, 10)) {
+            call g_printn("[" + call g_get_pid() + "] Hello world!");
+            call g_write_pipe(handle, "" + i);
+        }
+        call g_destroy_pipe(handle);
+    } else {
+        call g_printn("[" + call g_get_pid() + "] Hello world!");
+        call g_read_pipe(handle, print);
+    }
+};
+call g_create_process(proc);
+call proc();
+```
+
+*Result:*
+
+```c
+[1] Hello world!
+[0] Hello world!
+1[0] Hello world!
+2[0] Hello world!
+3[0] Hello world!
+[0] Hello world!
+4[0] Hello world!
+5[0] Hello world!
+6[0] Hello world!
+7[0] Hello world!
+8[0] Hello world!
+91
+```
+
+**Multi-Process: Consumer-Producer Model**
+
+*Code:*
+
+```javascript
+import "sys.base";
+import "sys.list";
+import "sys.proc";
+
+var goods = [];
+call g_start_share("goods", goods);
+var index = 0;
+call g_start_share("index", index);
+var consumer = func ~() {
+    for (;;) {
+        var goods = call g_query_share("goods");
+        if (call g_is_null(goods)) {
+            break;        }
+        var g = call g_array_pop(goods);
+        if (!call g_is_null(g)) {
+            call g_printn("Consumer#" + call g_get_pid() + " ---- get " + g);        }
+    }
+    call g_printn("Consumer#" + call g_get_pid() + " exit");
+};
+var producer = func ~() {
+    foreach (var i : call g_range(1, 5)) {
+        var goods = call g_reference_share("goods");
+        call g_lock_share("index");
+        var index = call g_reference_share("index");
+        call g_printn("Producer#" + call g_get_pid() + " ++++ put " + index);
+        index++;
+        call g_array_add(goods, index);
+        call g_stop_share("index");
+        call g_unlock_share("index");
+        call g_stop_share("goods");
+    }
+    call g_printn("Producer#" + call g_get_pid() + " exit");
+};
+var create_consumer = func ~(n) {
+    var handles = [];
+    foreach (var i : call g_range(1, n)) {
+        var h = call g_create_process(consumer);
+        call g_array_add(handles, h);
+        call g_printn("[" + i + "] Create consumer: #" + h);
+    }
+    return handles;
+};
+var create_producer = func ~(n) {
+    var handles = [];
+    foreach (var i : call g_range(1, n)) {
+        var h = call g_create_process(producer);
+        call g_array_add(handles, h);
+        call g_printn("[" + i + "] Create producer: #" + h);
+    }
+    return handles;
+};
+
+var consumers = call create_consumer(3);
+var producers = call create_producer(4);
+call g_printn("Waiting for producers to exit...");
+call g_join_process_array(producers);
+call g_printn("Producers exit");
+call g_printn("Waiting for consumers to exit...");
+call g_stop_share("index");
+call g_stop_share("goods");
+call g_join_process_array(consumers);
+call g_printn("Consumers exit");
+```
+
+*Result:*
+
+```c
+[1] Create consumer: #1
+[2] Create consumer: #2
+[3] Create consumer: #3
+[1] Create producer: #4
+[2] Create producer: #5
+Producer#4 ++++ put 0
+[3] Create producer: #6
+Consumer#1 ---- get 1
+Producer#5 ++++ put 1
+[4] Create producer: #7
+Producer#4 ++++ put 2
+Consumer#3 ---- get 2
+Waiting for producers to exit...
+Consumer#2 ---- get 3
+Producer#7 ++++ put 3
+Consumer#1 ---- get 4
+Producer#7 ++++ put 4
+Consumer#3 ---- get 5
+Producer#5 ++++ put 5
+Consumer#2 ---- get 6
+Producer#5 ++++ put 6
+Consumer#3 ---- get 7
+Producer#7 ++++ put 7
+Consumer#3 ---- get 8
+Producer#6 ++++ put 8
+Consumer#1 ---- get 9
+Producer#5 ++++ put 9
+Consumer#3 ---- get 10
+Producer#7 ++++ put 10
+Consumer#3 ---- get 11
+Producer#4 ++++ put 11
+Consumer#1 ---- get 12
+Producer#5 ++++ put 12
+Consumer#3 ---- get 13
+Producer#5 exit
+Producer#6 ++++ put 13
+Consumer#1 ---- get 14
+Producer#4 ++++ put 14
+Consumer#3 ---- get 15
+Producer#7 ++++ put 15
+Consumer#1 ---- get 16
+Producer#7 exit
+Producer#6 ++++ put 16
+Consumer#1 ---- get 17
+Producer#4 ++++ put 17
+Consumer#2 ---- get 18
+Producer#4 exit
+Producer#6 ++++ put 18
+Consumer#3 ---- get 19
+Producer#6 ++++ put 19
+Consumer#1 ---- get 20
+Producer#6 exit
+Producers exit
+Waiting for consumers to exit...
+Consumer#2 exit
+Consumer#1 exit
+Consumer#3 exit
+Consumers exit
+```
+
 #### Screenshot
 
 *Screenshot 1 - Code*

@@ -123,7 +123,7 @@ public class Lexer extends RegexStringIterator implements
 	/**
 	 * 初始化（添加组件）
 	 * 
-	 * @throws RegexException
+	 * @throws RegexException 正则表达式异常
 	 */
 	private void initialize() throws RegexException {
 		//
