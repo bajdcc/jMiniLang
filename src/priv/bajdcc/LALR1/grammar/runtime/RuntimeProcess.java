@@ -127,13 +127,14 @@ public class RuntimeProcess implements IRuntimeProcessService {
 	/**
 	 * 创建进程
 	 * @param creatorId 创建者ID
+	 * @param name 页名
 	 * @param page 页
 	 * @param pc 起始指令
 	 * @param obj 参数
 	 * @return 进程ID
 	 * @throws Exception 运行时异常
 	 */
-	public int createProcess(int creatorId, String page, int pc, RuntimeObject obj) throws Exception {
+	public int createProcess(int creatorId, String name, RuntimeCodePage page, int pc, RuntimeObject obj) throws Exception {
 		if (setProcessId.size() >= MAX_PROCESS) {
 			arrProcess[creatorId].machine.err(
 					RuntimeException.RuntimeError.PROCESS_OVERFLOW, String.valueOf(page));
@@ -142,7 +143,7 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		for (;;) {
 			if (arrProcess[cyclePtr] == null && !destroyedProcess.contains(cyclePtr)) {
 				RuntimeMachine machine = new RuntimeMachine(cyclePtr, this);
-				machine.initStep(name, codePage, arrProcess[creatorId].machine.getPageRefers(page), pc, obj);
+				machine.initStep(name, page, arrProcess[creatorId].machine.getPageRefers(name), pc, obj);
 				setProcessId.add(cyclePtr);
 				pid = cyclePtr;
 				arrProcess[cyclePtr++] = new SchdProcess(machine);

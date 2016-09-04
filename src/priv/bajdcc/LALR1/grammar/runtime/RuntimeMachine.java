@@ -77,6 +77,20 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 		run(name, grammar.getCodePage());
 	}
 
+	@Override
+	public void runProcess(String name) throws Exception {
+		BufferedReader br = new BufferedReader(new FileReader(name));
+		StringBuilder sb = new StringBuilder();
+		String line;
+		while ((line = br.readLine()) != null) {
+			sb.append(line);
+			sb.append(System.lineSeparator());
+		}
+		br.close();
+		Grammar grammar = new Grammar(sb.toString());
+		process.createProcess(pid, name, grammar.getCodePage(), 0, null);
+	}
+
 	public void add(String name, RuntimeCodePage page) throws Exception {
 		if (pageMap.contains(name)) {
 			throw new RuntimeException(RuntimeError.DUP_PAGENAME, -1, "请更改名称");
@@ -106,7 +120,8 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 		stack.reg.pageId = name;
 		stack.reg.execId = -1;
 		switchPage();
-		pageRefer.get(pageName).addAll(refers);
+		if (refers != null)
+			pageRefer.get(pageName).addAll(refers);
 		opOpenFunc();
 		if (obj != null) {
 			opPushObj(obj);
@@ -259,12 +274,12 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 
 	@Override
 	public int createProcess(RuntimeFuncObject func) throws Exception {
-		return process.createProcess(pid, func.getPage(), func.getAddr(), null);
+		return process.createProcess(pid, func.getPage(), pageMap.get(func.getPage()), func.getAddr(), null);
 	}
 
 	@Override
 	public int createProcess(RuntimeFuncObject func, RuntimeObject obj) throws Exception {
-		return process.createProcess(pid, func.getPage(), func.getAddr(), obj);
+		return process.createProcess(pid, func.getPage(), pageMap.get(func.getPage()), func.getAddr(), obj);
 	}
 
 	@Override

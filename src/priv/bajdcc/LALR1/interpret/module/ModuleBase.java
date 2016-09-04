@@ -283,7 +283,7 @@ public class ModuleBase implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 					IRuntimeStatus status) throws Exception {
-				status.runPage(args.get(0).getObj().toString());
+				status.runProcess(args.get(0).getObj().toString());
 				return null;
 			}
 		});

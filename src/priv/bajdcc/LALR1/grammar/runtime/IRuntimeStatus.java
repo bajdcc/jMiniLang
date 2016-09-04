@@ -35,6 +35,13 @@ public interface IRuntimeStatus {
 	void runPage(String name) throws Exception;
 
 	/**
+	 * 载入代码并运行于新进程
+	 * @param name 文件名
+	 * @throws RuntimeException 运行时错误
+	 */
+	void runProcess(String name) throws Exception;
+
+	/**
 	 * 运行时错误
 	 * @param type 错误类型
 	 * @throws RuntimeException 运行时异常
