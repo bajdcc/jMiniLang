@@ -68,7 +68,9 @@ public class ModuleProc implements IInterpreterModule {
 				"        call g_write_pipe_char(handle, ch);\n" +
 				"    }\n" +
 				"};\n" +
-				"export \"g_write_pipe\";\n";
+				"export \"g_write_pipe\";\n" +
+				"var g_load_sync = func ~(fn) -> call g_join_process(call g_load(fn));\n" +
+				"export \"g_load_sync\";";
 
 		Grammar grammar = new Grammar(base);
 		RuntimeCodePage page = grammar.getCodePage();

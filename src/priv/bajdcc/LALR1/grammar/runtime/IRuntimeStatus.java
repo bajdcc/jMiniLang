@@ -39,7 +39,7 @@ public interface IRuntimeStatus {
 	 * @param name 文件名
 	 * @throws RuntimeException 运行时错误
 	 */
-	void runProcess(String name) throws Exception;
+	int runProcess(String name) throws Exception;
 
 	/**
 	 * 运行时错误

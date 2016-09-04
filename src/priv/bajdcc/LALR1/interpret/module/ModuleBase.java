@@ -283,8 +283,7 @@ public class ModuleBase implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 					IRuntimeStatus status) throws Exception {
-				status.runProcess(args.get(0).getObj().toString());
-				return null;
+				return new RuntimeObject(BigInteger.valueOf(status.runProcess(args.get(0).getObj().toString())));
 			}
 		});
 		info.addExternalFunc("g_print_file", new IRuntimeDebugExec() {

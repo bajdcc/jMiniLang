@@ -78,7 +78,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	}
 
 	@Override
-	public void runProcess(String name) throws Exception {
+	public int runProcess(String name) throws Exception {
 		BufferedReader br = new BufferedReader(new FileReader(name));
 		StringBuilder sb = new StringBuilder();
 		String line;
@@ -88,7 +88,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 		}
 		br.close();
 		Grammar grammar = new Grammar(sb.toString());
-		process.createProcess(pid, name, grammar.getCodePage(), 0, null);
+		return process.createProcess(pid, name, grammar.getCodePage(), 0, null);
 	}
 
 	public void add(String name, RuntimeCodePage page) throws Exception {

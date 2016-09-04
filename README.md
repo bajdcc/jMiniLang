@@ -19,6 +19,7 @@
 10. Display grammar and semantic errors.
 11. **Pipe**.
 12. **Multiple process**.
+13. Load file with Sync/Async.
 
 #### What it generates
 
@@ -36,7 +37,7 @@
 
 #### Example
 
-**Lambda: Y Combinator of Hanoi**
+#####**Lambda: Y Combinator of Hanoi**
 
 *Code:*
 
@@ -83,7 +84,7 @@ call h(3, 'A', 'B', 'C');
 1: A -> C
 ```
 
-**Lambda: Trampoline**
+#####**Lambda: Trampoline**
 
 *Code:*
 
@@ -118,7 +119,7 @@ n: 2
 n: 1
 ```
 
-**List: LinkedList**
+#####**List: LinkedList**
 
 *Code:*
 
@@ -165,7 +166,7 @@ while (!call g_is_null(p)) {
 0
 ```
 
-**Multi-Process: Pipe**
+#####**Multi-Process: Pipe**
 
 *Code:*
 
@@ -208,7 +209,7 @@ call proc();
 91
 ```
 
-**Multi-Process: Consumer-Producer Model**
+#####**Multi-Process: Consumer-Producer Model**
 
 *Code:*
 
@@ -342,7 +343,7 @@ Consumer#2 exit
 Consumers exit
 ```
 
-**Multi-Process: PC and Router**
+#####**Multi-Process: PC and Router**
 
 *Code:*
 
