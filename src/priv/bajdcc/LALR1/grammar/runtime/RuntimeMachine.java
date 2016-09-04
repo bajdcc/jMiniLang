@@ -100,7 +100,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 		while (runByStep());
 	}
 
-	public void initStep(String name, RuntimeCodePage page, List<RuntimeCodePage> refers, int pc) throws Exception {
+	public void initStep(String name, RuntimeCodePage page, List<RuntimeCodePage> refers, int pc, RuntimeObject obj) throws Exception {
 		add(name, page);
 		currentPage = page;
 		stack.reg.pageId = name;
@@ -108,6 +108,10 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 		switchPage();
 		pageRefer.get(pageName).addAll(refers);
 		opOpenFunc();
+		if (obj != null) {
+			opPushObj(obj);
+			opPushArgs();
+		}
 		opPushPtr(pc);
 		opCall();
 	}
@@ -255,7 +259,12 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 
 	@Override
 	public int createProcess(RuntimeFuncObject func) throws Exception {
-		return process.createProcess(pid, func.getPage(), func.getAddr());
+		return process.createProcess(pid, func.getPage(), func.getAddr(), null);
+	}
+
+	@Override
+	public int createProcess(RuntimeFuncObject func, RuntimeObject obj) throws Exception {
+		return process.createProcess(pid, func.getPage(), func.getAddr(), obj);
 	}
 
 	@Override
@@ -432,6 +441,11 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	@Override
 	public void opPushPtr(int pc) {
 		store(new RuntimeObject(pc));
+	}
+
+	@Override
+	public void opPushObj(RuntimeObject obj) {
+		store(obj);
 	}
 
 	@Override

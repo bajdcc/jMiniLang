@@ -95,6 +95,8 @@ public class Token implements Cloneable {
 			token.kToken = TokenType.DECIMAL;
 		} else if (object instanceof Boolean) {
 			token.kToken = TokenType.BOOL;
+		} else if (object instanceof Integer) {
+			token.kToken = TokenType.POINTER;
 		} else {
 			token.kToken = TokenType.ERROR;
 			return token;

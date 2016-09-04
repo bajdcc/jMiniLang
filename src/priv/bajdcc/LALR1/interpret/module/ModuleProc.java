@@ -99,6 +99,25 @@ public class ModuleProc implements IInterpreterModule {
 				return new RuntimeObject(BigInteger.valueOf(status.createProcess(func)));
 			}
 		});
+		info.addExternalFunc("g_create_process_args", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "创建进程带参数";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[] { RuntimeObjectType.kFunc, RuntimeObjectType.kObject };
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				RuntimeFuncObject func = (RuntimeFuncObject) args.get(0).getObj();
+				RuntimeObject obj = args.get(1);
+				return new RuntimeObject(BigInteger.valueOf(status.createProcess(func, obj)));
+			}
+		});
 		info.addExternalFunc("g_get_pid", new IRuntimeDebugExec() {
 			@Override
 			public String getDoc() {
@@ -150,6 +169,26 @@ public class ModuleProc implements IInterpreterModule {
 				BigInteger pid = (BigInteger) args.get(0).getObj();
 				return new RuntimeObject(BigInteger.valueOf(
 						status.getService().getProcessService().join(pid.intValue(), status.getPid(), JOIN_TIME)));
+			}
+		});
+		info.addExternalFunc("g_sleep", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "进程睡眠";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[] { RuntimeObjectType.kInt };
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				BigInteger turn = (BigInteger) args.get(0).getObj();
+				int time = turn.intValue();
+				return new RuntimeObject(BigInteger.valueOf(
+						status.getService().getProcessService().sleep(status.getPid(), time > 0 ? time : 0)));
 			}
 		});
 	}

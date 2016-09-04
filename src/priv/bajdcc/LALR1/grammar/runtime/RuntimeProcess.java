@@ -119,12 +119,21 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		this.destroyedProcess = new HashSet<>();
 		this.service = new RuntimeService(this);
 		RuntimeMachine machine = new RuntimeMachine(cyclePtr, this);
-		machine.initStep(name, codePage, Collections.emptyList(), 0);
+		machine.initStep(name, codePage, Collections.emptyList(), 0, null);
 		setProcessId.add(cyclePtr);
 		arrProcess[cyclePtr++] = new SchdProcess(machine);
 	}
 
-	public int createProcess(int creatorId, String page, int pc) throws Exception {
+	/**
+	 * 创建进程
+	 * @param creatorId 创建者ID
+	 * @param page 页
+	 * @param pc 起始指令
+	 * @param obj 参数
+	 * @return 进程ID
+	 * @throws Exception 运行时异常
+	 */
+	public int createProcess(int creatorId, String page, int pc, RuntimeObject obj) throws Exception {
 		if (setProcessId.size() >= MAX_PROCESS) {
 			arrProcess[creatorId].machine.err(
 					RuntimeException.RuntimeError.PROCESS_OVERFLOW, String.valueOf(page));
@@ -133,7 +142,7 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		for (;;) {
 			if (arrProcess[cyclePtr] == null && !destroyedProcess.contains(cyclePtr)) {
 				RuntimeMachine machine = new RuntimeMachine(cyclePtr, this);
-				machine.initStep(name, codePage, arrProcess[creatorId].machine.getPageRefers(page), pc);
+				machine.initStep(name, codePage, arrProcess[creatorId].machine.getPageRefers(page), pc, obj);
 				setProcessId.add(cyclePtr);
 				pid = cyclePtr;
 				arrProcess[cyclePtr++] = new SchdProcess(machine);

@@ -58,6 +58,15 @@ public interface IRuntimeStatus {
 	int createProcess(RuntimeFuncObject func) throws Exception;
 
 	/**
+	 * 创建进程
+	 * @param func 函数
+	 * @param obj 参数
+	 * @throws Exception 运行时异常
+	 * @return 进程ID
+	 */
+	int createProcess(RuntimeFuncObject func, RuntimeObject obj) throws Exception;
+
+	/**
 	 * 获取页引用
 	 * @param page 页名
 	 */

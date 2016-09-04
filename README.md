@@ -17,6 +17,8 @@
 8. Serializable code page.
 9. **Lambda functions and Closure**.
 10. Display grammar and semantic errors.
+11. **Pipe**.
+12. **Multiple process**.
 
 #### What it generates
 
@@ -217,16 +219,18 @@ import "sys.proc";
 
 var goods = [];
 call g_start_share("goods", goods);
-var index = 0;
+var index = 1;
 call g_start_share("index", index);
 var consumer = func ~() {
     for (;;) {
         var goods = call g_query_share("goods");
         if (call g_is_null(goods)) {
-            break;        }
+            break;
+        }
         var g = call g_array_pop(goods);
         if (!call g_is_null(g)) {
-            call g_printn("Consumer#" + call g_get_pid() + " ---- get " + g);        }
+            call g_printn("Consumer#" + call g_get_pid() + " ---- get " + g);
+        }
     }
     call g_printn("Consumer#" + call g_get_pid() + " exit");
 };
@@ -236,8 +240,8 @@ var producer = func ~() {
         call g_lock_share("index");
         var index = call g_reference_share("index");
         call g_printn("Producer#" + call g_get_pid() + " ++++ put " + index);
-        index++;
         call g_array_add(goods, index);
+        index++;
         call g_stop_share("index");
         call g_unlock_share("index");
         call g_stop_share("goods");
@@ -283,59 +287,241 @@ call g_printn("Consumers exit");
 [3] Create consumer: #3
 [1] Create producer: #4
 [2] Create producer: #5
-Producer#4 ++++ put 0
+Producer#4 ++++ put 1
+Consumer#3 ---- get 1
 [3] Create producer: #6
-Consumer#1 ---- get 1
-Producer#5 ++++ put 1
+Producer#5 ++++ put 2
 [4] Create producer: #7
-Producer#4 ++++ put 2
-Consumer#3 ---- get 2
+Consumer#2 ---- get 2
+Producer#4 ++++ put 3
 Waiting for producers to exit...
-Consumer#2 ---- get 3
-Producer#7 ++++ put 3
-Consumer#1 ---- get 4
+Consumer#1 ---- get 3
 Producer#7 ++++ put 4
+Consumer#2 ---- get 4
+Producer#7 ++++ put 5
 Consumer#3 ---- get 5
-Producer#5 ++++ put 5
-Consumer#2 ---- get 6
 Producer#5 ++++ put 6
-Consumer#3 ---- get 7
-Producer#7 ++++ put 7
+Consumer#2 ---- get 6
+Producer#5 ++++ put 7
+Consumer#1 ---- get 7
+Producer#7 ++++ put 8
 Consumer#3 ---- get 8
-Producer#6 ++++ put 8
-Consumer#1 ---- get 9
-Producer#5 ++++ put 9
-Consumer#3 ---- get 10
-Producer#7 ++++ put 10
-Consumer#3 ---- get 11
-Producer#4 ++++ put 11
-Consumer#1 ---- get 12
-Producer#5 ++++ put 12
-Consumer#3 ---- get 13
+Producer#6 ++++ put 9
+Consumer#3 ---- get 9
+Producer#5 ++++ put 10
+Consumer#2 ---- get 10
+Producer#7 ++++ put 11
+Consumer#1 ---- get 11
+Producer#4 ++++ put 12
+Consumer#3 ---- get 12
+Producer#5 ++++ put 13
+Consumer#1 ---- get 13
 Producer#5 exit
-Producer#6 ++++ put 13
-Consumer#1 ---- get 14
-Producer#4 ++++ put 14
+Producer#6 ++++ put 14
+Consumer#2 ---- get 14
+Producer#4 ++++ put 15
 Consumer#3 ---- get 15
-Producer#7 ++++ put 15
-Consumer#1 ---- get 16
+Producer#7 ++++ put 16
+Consumer#2 ---- get 16
 Producer#7 exit
-Producer#6 ++++ put 16
+Producer#6 ++++ put 17
 Consumer#1 ---- get 17
-Producer#4 ++++ put 17
-Consumer#2 ---- get 18
+Producer#4 ++++ put 18
+Consumer#1 ---- get 18
 Producer#4 exit
-Producer#6 ++++ put 18
-Consumer#3 ---- get 19
 Producer#6 ++++ put 19
-Consumer#1 ---- get 20
+Consumer#1 ---- get 19
+Producer#6 ++++ put 20
+Consumer#3 ---- get 20
 Producer#6 exit
 Producers exit
 Waiting for consumers to exit...
-Consumer#2 exit
-Consumer#1 exit
 Consumer#3 exit
+Consumer#1 exit
+Consumer#2 exit
 Consumers exit
+```
+
+**Multi-Process: PC and Router**
+
+*Code:*
+
+```javascript
+import "sys.base";
+import "sys.list";
+import "sys.proc";
+
+var pc_router = 5;
+call g_start_share("pc_router", pc_router);
+
+var pc = func ~(index) {
+    var pc_router = call g_query_share("pc_router");
+    var name = "pc_" + index;
+    var router = index / pc_router;
+    var display = "PC #" + index;
+    call g_printn(display + " started");
+    call g_sleep(50);
+    var handle = call g_create_pipe(name);
+    call g_printn(display + " connecting...");
+    var router_connection = "router#" + router;
+    for (;;) {
+        call g_sleep(100);
+        call g_lock_share(router_connection);
+        var connection = call g_query_share(router_connection);
+        if (call g_is_null(connection)) {
+            call g_unlock_share(router_connection);
+            continue;
+        }
+        call g_printn(display + " connecting to #" + router);
+        call g_array_add(connection, index);
+        call g_unlock_share(router_connection);
+        break;
+    }
+    var get_id = func ~(ch) {
+        if (ch == '@') {
+            call g_printn(display + " connected to router #" + router);
+        }
+    };
+    call g_read_pipe(handle, get_id);
+    call g_sleep(1000);
+    call g_printn(display + " stopped");
+};
+
+var router = func ~(index) {
+    var pc_router = call g_query_share("pc_router");
+    var name = "router_" + index;
+    var display = "Router #" + index;
+    call g_printn(display + " started");
+    var router_connection = "router#" + index;
+    var connection = [];
+    var list = [];
+    call g_start_share(router_connection, connection);
+    var connected = 0;
+    var handle_pc = func ~(args) {
+        var connected = call g_array_get(args, 0);
+        var pc_router = call g_array_get(args, 1);
+        var router_connection = call g_array_get(args, 2);
+        var display = call g_array_get(args, 3);
+        var list = call g_array_get(args, 4);
+        for (;;) {
+            call g_sleep(100);
+            call g_lock_share(router_connection);
+            var connection = call g_query_share(router_connection);
+            var new_pc = call g_array_pop(connection);
+            if (call g_is_null(new_pc)) {
+                call g_unlock_share(router_connection);
+                continue;
+            }
+            connected++;
+            call g_array_add(list, new_pc);
+            call g_printn(display + " connecting to pc #" + new_pc);
+            call g_unlock_share(router_connection);
+            var name = "pc_" + new_pc;
+            var handle = call g_create_pipe(name);
+            call g_destroy_pipe(handle);
+            call g_printn(display + " connected to #" + new_pc);
+            if (connected == pc_router) { break; }
+        }
+    };
+    var args = [];
+    call g_array_add(args, connected);
+    call g_array_add(args, pc_router);
+    call g_array_add(args, router_connection);
+    call g_array_add(args, display);
+    call g_array_add(args, list);
+    call g_join_process(call g_create_process_args(handle_pc, args));
+    var stop_pc = func ~(args) {
+        var display = call g_array_get(args, 3);
+        var list = call g_array_get(args, 4);
+        var size = call g_array_size(list);
+        for (var i = 0; i < size; i++) {
+            call g_sleep(10);
+            var name = "pc_" + call g_array_get(list, i);
+            var handle = call g_create_pipe(name);
+            call g_write_pipe(handle, "!");
+            call g_printn(display + " disconnected with #" + i);
+        }
+    };
+    call g_sleep(100);
+    call g_join_process(call g_create_process_args(stop_pc, args));
+    call g_printn(display + " stopped");
+};
+
+var create_pc = func ~(n) {
+    var handles = [];
+    foreach (var i : call g_range(0, n - 1)) {
+        var h = call g_create_process_args(pc, i);
+        call g_array_add(handles, h);
+        call g_printn("Create pc: #" + i);
+    }
+    return handles;
+};
+var create_router = func ~(n) {
+    var handles = [];
+    foreach (var i : call g_range(0, n - 1)) {
+        var h = call g_create_process_args(router, i);
+        call g_array_add(handles, h);
+        call g_printn("Create router: #" + i);
+    }
+    return handles;
+};
+
+call g_printn("Starting pc...");
+var pcs = call create_pc(5);
+call g_printn("Starting router...");
+var routers = call create_router(1);
+call g_join_process_array(pcs);
+call g_join_process_array(routers);
+```
+
+*Result:*
+
+```c
+Starting pc...
+Create pc: #0
+PC #0 started
+Create pc: #1
+PC #1 started
+Create pc: #2
+PC #2 started
+Create pc: #3
+PC #3 started
+Create pc: #4
+PC #4 started
+Starting router...
+Create router: #0
+Router #0 started
+PC #0 connecting...
+PC #1 connecting...
+PC #2 connecting...
+PC #3 connecting...
+PC #4 connecting...
+PC #0 connecting to #0
+PC #1 connecting to #0
+PC #2 connecting to #0
+PC #3 connecting to #0
+PC #4 connecting to #0
+Router #0 connecting to pc #4
+Router #0 connected to #4
+Router #0 connecting to pc #3
+Router #0 connected to #3
+Router #0 connecting to pc #2
+Router #0 connected to #2
+Router #0 connecting to pc #1
+Router #0 connected to #1
+Router #0 connecting to pc #0
+Router #0 connected to #0
+Router #0 disconnected with #0
+Router #0 disconnected with #1
+Router #0 disconnected with #2
+Router #0 disconnected with #3
+Router #0 disconnected with #4
+Router #0 stopped
+PC #4 stopped
+PC #3 stopped
+PC #2 stopped
+PC #1 stopped
+PC #0 stopped
 ```
 
 #### Screenshot

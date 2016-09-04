@@ -53,17 +53,17 @@ public class TestInterpret9 {
 							"\n" +
 							"var goods = [];\n" +
 							"call g_start_share(\"goods\", goods);\n" +
-							"var index = 0;\n" +
+							"var index = 1;\n" +
 							"call g_start_share(\"index\", index);\n" +
 							"var consumer = func ~() {\n" +
 							"    for (;;) {\n" +
 							"        var goods = call g_query_share(\"goods\");\n" +
 							"        if (call g_is_null(goods)) {\n" +
-							"            break;" +
+							"            break;\n" +
 							"        }\n" +
 							"        var g = call g_array_pop(goods);\n" +
 							"        if (!call g_is_null(g)) {\n" +
-							"            call g_printn(\"Consumer#\" + call g_get_pid() + \" ---- get \" + g);" +
+							"            call g_printn(\"Consumer#\" + call g_get_pid() + \" ---- get \" + g);\n" +
 							"        }\n" +
 							"    }\n" +
 							"    call g_printn(\"Consumer#\" + call g_get_pid() + \" exit\");\n" +
@@ -74,8 +74,8 @@ public class TestInterpret9 {
 							"        call g_lock_share(\"index\");\n" +
 							"        var index = call g_reference_share(\"index\");\n" +
 							"        call g_printn(\"Producer#\" + call g_get_pid() + \" ++++ put \" + index);\n" +
-							"        index++;\n" +
 							"        call g_array_add(goods, index);\n" +
+							"        index++;\n" +
 							"        call g_stop_share(\"index\");\n" +
 							"        call g_unlock_share(\"index\");\n" +
 							"        call g_stop_share(\"goods\");\n" +
