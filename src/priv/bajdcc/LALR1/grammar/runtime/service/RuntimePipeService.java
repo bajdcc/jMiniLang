@@ -19,7 +19,7 @@ public class RuntimePipeService implements IRuntimePipeService {
 		}
 	}
 
-	private static final int MAX_PIPE = 100;
+	private static final int MAX_PIPE = 1000;
 	private PipeStruct arrPipes[];
 	private Set<Integer> setPipeId;
 	private Map<String, Integer> mapPipeNames;

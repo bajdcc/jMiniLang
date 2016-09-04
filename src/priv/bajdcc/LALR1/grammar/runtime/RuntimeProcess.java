@@ -44,7 +44,7 @@ public class RuntimeProcess implements IRuntimeProcessService {
 	}
 
 	private static final int SLEEP_TURN = 10;
-	private static final int MAX_PROCESS = 100;
+	private static final int MAX_PROCESS = 1000;
 	private static final int PER_CYCLE = 10;
 	private int cyclePtr = 0;
 	private String name;
@@ -78,8 +78,10 @@ public class RuntimeProcess implements IRuntimeProcessService {
 	private boolean schd() {
 		if (setProcessId.isEmpty())
 			return false;
-		queue.addAll(setProcessId.stream().map(id ->
-				new SchdParticle(id, PER_CYCLE, arrProcess[id].priority)).collect(Collectors.toList()));
+		List<SchdParticle> parts = setProcessId.stream().map(id ->
+				new SchdParticle(id, PER_CYCLE, arrProcess[id].priority)).collect(Collectors.toList());
+		Collections.shuffle(parts);
+		queue.addAll(parts);
 		return true;
 	}
 
