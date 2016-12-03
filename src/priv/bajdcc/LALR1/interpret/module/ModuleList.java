@@ -23,7 +23,14 @@ public class ModuleList implements IInterpreterModule {
 
 	@Override
 	public RuntimeCodePage getCodePage() throws Exception {
-		String base = ";";
+		String base = "import \"sys.base\";\n" +
+				"var g_range_array = yield ~(a) {\n" +
+				"    var size = call g_array_size(a);\n" +
+				"    for (var i = 0; i < size; i++) {\n" +
+				"        yield call g_array_get(a, i);\n" +
+				"    }\n" +
+				"};\n" +
+				"export \"g_range_array\";\n";
 
 		Grammar grammar = new Grammar(base);
 		RuntimeCodePage page = grammar.getCodePage();

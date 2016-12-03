@@ -30,41 +30,63 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		public RuntimeMachine machine;
 		public int priority;
 		public int sleep;
+		public boolean kernel;
 
-		public SchdProcess(RuntimeMachine machine) {
+		private SchdProcess(RuntimeMachine machine) {
 			this.machine = machine;
-			this.priority = 0;
+			this.priority = 128;
 			this.sleep = 0;
+			this.kernel = true;
 		}
 
-		public SchdProcess(RuntimeMachine machine, int priority) {
+		public SchdProcess(RuntimeMachine machine, boolean kernel) {
 			this(machine);
-			this.priority = priority;
+			this.kernel = kernel;
 		}
 	}
 
 	private static final int SLEEP_TURN = 10;
 	private static final int MAX_PROCESS = 1000;
 	private static final int PER_CYCLE = 10;
+	private static final int USR_PER_CYCLE = 5;
 	private int cyclePtr = 0;
 	private String name;
 	private RuntimeCodePage codePage;
+	private Map<String, String> arrCodes;
 	private SchdProcess arrProcess[];
 	private Set<Integer> setProcessId;
 	private Queue<SchdParticle> queue;
 	private Set<Integer> destroyedProcess;
 	private RuntimeService service;
+	private List<Integer> arrActiveUsrProcs;
 
 	public RuntimeProcess(String name, InputStream input) throws Exception {
 		runMainProcess(name, input);
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public String getCode(String name) {
+		return arrCodes.get(name);
 	}
 
 	public int getPriority(int pid) {
 		return arrProcess[pid].priority;
 	}
 
+	public boolean setPriority(int pid, int priority) {
+		arrProcess[pid].priority = priority;
+		return true;
+	}
+
 	public RuntimeService getService() {
 		return service;
+	}
+
+	public List<Integer> getUsrProcs() {
+		return setProcessId.stream().filter(id -> !arrProcess[id].kernel).collect(Collectors.toList());
 	}
 
 	public void run() throws Exception {
@@ -75,13 +97,24 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		initMainProcess(name, input);
 	}
 
+	public int stepUsrProcess(int pid) {
+		arrActiveUsrProcs.add(pid);
+		return pid;
+	}
+
 	private boolean schd() {
 		if (setProcessId.isEmpty())
 			return false;
-		List<SchdParticle> parts = setProcessId.stream().map(id ->
+		List<SchdParticle> parts = setProcessId.stream().filter(id -> arrProcess[id].kernel).map(id ->
 				new SchdParticle(id, PER_CYCLE, arrProcess[id].priority)).collect(Collectors.toList());
-		Collections.shuffle(parts);
 		queue.addAll(parts);
+		for (Integer pid : arrActiveUsrProcs) {
+			if (setProcessId.contains(pid)) {
+				queue.add(new SchdParticle(pid, USR_PER_CYCLE, arrProcess[pid].priority));
+			}
+		}
+		if (!arrActiveUsrProcs.isEmpty())
+			arrActiveUsrProcs.clear();
 		return true;
 	}
 
@@ -116,10 +149,12 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		this.arrProcess = new SchdProcess[MAX_PROCESS];
 		this.name = name;
 		this.codePage = RuntimeCodePage.importFromStream(input);
+		this.arrCodes = new HashMap<>();
 		this.setProcessId = new HashSet<>();
 		this.queue = new PriorityQueue<>((a, b) -> a.priority - b.priority);
 		this.destroyedProcess = new HashSet<>();
 		this.service = new RuntimeService(this);
+		this.arrActiveUsrProcs = new ArrayList<>();
 		RuntimeMachine machine = new RuntimeMachine(cyclePtr, this);
 		machine.initStep(name, codePage, Collections.emptyList(), 0, null);
 		setProcessId.add(cyclePtr);
@@ -129,6 +164,7 @@ public class RuntimeProcess implements IRuntimeProcessService {
 	/**
 	 * 创建进程
 	 * @param creatorId 创建者ID
+	 * @param kernel 是否为内核进程
 	 * @param name 页名
 	 * @param page 页
 	 * @param pc 起始指令
@@ -136,7 +172,7 @@ public class RuntimeProcess implements IRuntimeProcessService {
 	 * @return 进程ID
 	 * @throws Exception 运行时异常
 	 */
-	public int createProcess(int creatorId, String name, RuntimeCodePage page, int pc, RuntimeObject obj) throws Exception {
+	public int createProcess(int creatorId, boolean kernel, String name, RuntimeCodePage page, int pc, RuntimeObject obj) throws Exception {
 		if (setProcessId.size() >= MAX_PROCESS) {
 			arrProcess[creatorId].machine.err(
 					RuntimeException.RuntimeError.PROCESS_OVERFLOW, String.valueOf(page));
@@ -148,7 +184,7 @@ public class RuntimeProcess implements IRuntimeProcessService {
 				machine.initStep(name, page, arrProcess[creatorId].machine.getPageRefers(name), pc, obj);
 				setProcessId.add(cyclePtr);
 				pid = cyclePtr;
-				arrProcess[cyclePtr++] = new SchdProcess(machine);
+				arrProcess[cyclePtr++] = new SchdProcess(machine, kernel);
 				if (cyclePtr >= MAX_PROCESS) {
 					cyclePtr -= MAX_PROCESS;
 				}
@@ -190,5 +226,14 @@ public class RuntimeProcess implements IRuntimeProcessService {
 			turn = 0;
 		arrProcess[pid].sleep += turn;
 		return arrProcess[pid].sleep;
+	}
+
+	@Override
+	public boolean addCodePage(String name, String code) {
+		if (arrCodes.containsKey(name)) {
+			return false;
+		}
+		arrCodes.put(name, code);
+		return true;
 	}
 }

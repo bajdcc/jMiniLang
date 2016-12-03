@@ -25,4 +25,12 @@ public interface IRuntimeProcessService {
 	 * @return 总休眠趟数
 	 */
 	int join(int joined, int pid, int turn);
+
+	/**
+	 * 添加代码页
+	 * @param name 页名
+	 * @param code 代码
+	 * @return 是否成功
+	 */
+	boolean addCodePage(String name, String code);
 }

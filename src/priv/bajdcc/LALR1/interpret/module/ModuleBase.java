@@ -286,6 +286,57 @@ public class ModuleBase implements IInterpreterModule {
 				return new RuntimeObject(BigInteger.valueOf(status.runProcess(args.get(0).getObj().toString())));
 			}
 		});
+		info.addExternalFunc("g_load_x", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "载入并运行程序";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[] { RuntimeObjectType.kString };
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				return new RuntimeObject(BigInteger.valueOf(status.runProcessX(args.get(0).getObj().toString())));
+			}
+		});
+		info.addExternalFunc("g_load_user", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "载入并运行用户态程序";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[] { RuntimeObjectType.kString };
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				return new RuntimeObject(BigInteger.valueOf(status.runUsrProcess(args.get(0).getObj().toString())));
+			}
+		});
+		info.addExternalFunc("g_load_user_x", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "载入并运行用户态程序";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[] { RuntimeObjectType.kString };
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				return new RuntimeObject(BigInteger.valueOf(status.runUsrProcessX(args.get(0).getObj().toString())));
+			}
+		});
 		info.addExternalFunc("g_print_file", new IRuntimeDebugExec() {
 			@Override
 			public String getDoc() {

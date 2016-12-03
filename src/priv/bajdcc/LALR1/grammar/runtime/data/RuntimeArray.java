@@ -16,6 +16,7 @@ public class RuntimeArray implements Cloneable {
 	private List<RuntimeObject> array;
 
 	public RuntimeArray() {
+		array = new ArrayList<>();
 	}
 
 	public RuntimeArray(RuntimeArray obj) {
@@ -23,9 +24,6 @@ public class RuntimeArray implements Cloneable {
 	}
 
 	public void add(RuntimeObject obj) {
-		if (array == null) {
-			array = new ArrayList<>();
-		}
 		array.add(obj);
 	}
 

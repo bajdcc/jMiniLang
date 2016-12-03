@@ -37,9 +37,34 @@ public interface IRuntimeStatus {
 	/**
 	 * 载入代码并运行于新进程
 	 * @param name 文件名
+	 * @return 进程ID
 	 * @throws RuntimeException 运行时错误
 	 */
 	int runProcess(String name) throws Exception;
+
+	/**
+	 * 载入代码并运行于新进程
+	 * @param name 页名
+	 * @return 进程ID
+	 * @throws RuntimeException 运行时错误
+	 */
+	int runProcessX(String name) throws Exception;
+
+	/**
+	 * 载入代码并运行于新用户态进程
+	 * @param name 文件名
+	 * @return 进程ID
+	 * @throws RuntimeException 运行时错误
+	 */
+	int runUsrProcess(String name) throws Exception;
+
+	/**
+	 * 载入代码并运行于新用户态进程
+	 * @param name 页名
+	 * @return 进程ID
+	 * @throws RuntimeException 运行时错误
+	 */
+	int runUsrProcessX(String name) throws Exception;
 
 	/**
 	 * 运行时错误
@@ -74,6 +99,23 @@ public interface IRuntimeStatus {
 	int createProcess(RuntimeFuncObject func, RuntimeObject obj) throws Exception;
 
 	/**
+	 * 创建用户态进程
+	 * @param func 函数
+	 * @throws Exception 运行时异常
+	 * @return 进程ID
+	 */
+	int createUsrProcess(RuntimeFuncObject func) throws Exception;
+
+	/**
+	 * 创建用户态进程
+	 * @param func 函数
+	 * @param obj 参数
+	 * @throws Exception 运行时异常
+	 * @return 进程ID
+	 */
+	int createUsrProcess(RuntimeFuncObject func, RuntimeObject obj) throws Exception;
+
+	/**
 	 * 获取页引用
 	 * @param page 页名
 	 */
@@ -92,8 +134,34 @@ public interface IRuntimeStatus {
 	int getPriority();
 
 	/**
+	 * 设置进程优先级
+	 * @param priority 优先级
+	 * @return 是否设置成功
+	 */
+	boolean setPriority(int priority);
+
+	/**
 	 * 得到服务接口
 	 * @return 运行时服务接口
 	 */
 	IRuntimeService getService();
+
+	/**
+	 * 进程休眠
+	 * @return 进程ID
+	 */
+	int sleep();
+
+	/**
+	 * 获取用户态进程列表
+	 * @return 进程ID列表
+	 */
+	List<Integer> getUsrProcs();
+
+	/**
+	 * 运行用户态进程
+	 * @param pid 进程ID
+	 * @return 进程ID
+	 */
+	int stepUsrProcess(int pid);
 }

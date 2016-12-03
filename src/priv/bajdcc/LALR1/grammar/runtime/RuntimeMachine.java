@@ -88,7 +88,41 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 		}
 		br.close();
 		Grammar grammar = new Grammar(sb.toString());
-		return process.createProcess(pid, name, grammar.getCodePage(), 0, null);
+		return process.createProcess(pid, true, name, grammar.getCodePage(), 0, null);
+	}
+
+	@Override
+	public int runProcessX(String name) throws Exception {
+		String code = process.getCode(name);
+		if (code == null) {
+			return -1;
+		}
+		Grammar grammar = new Grammar(code);
+		return process.createProcess(pid, true, name, grammar.getCodePage(), 0, null);
+	}
+
+	@Override
+	public int runUsrProcess(String name) throws Exception {
+		BufferedReader br = new BufferedReader(new FileReader(name));
+		StringBuilder sb = new StringBuilder();
+		String line;
+		while ((line = br.readLine()) != null) {
+			sb.append(line);
+			sb.append(System.lineSeparator());
+		}
+		br.close();
+		Grammar grammar = new Grammar(sb.toString());
+		return process.createProcess(pid, false, name, grammar.getCodePage(), 0, null);
+	}
+
+	@Override
+	public int runUsrProcessX(String name) throws Exception {
+		String code = process.getCode(name);
+		if (code == null) {
+			return -1;
+		}
+		Grammar grammar = new Grammar(code);
+		return process.createProcess(pid, false, name, grammar.getCodePage(), 0, null);
 	}
 
 	public void add(String name, RuntimeCodePage page) throws Exception {
@@ -274,12 +308,22 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 
 	@Override
 	public int createProcess(RuntimeFuncObject func) throws Exception {
-		return process.createProcess(pid, func.getPage(), pageMap.get(func.getPage()), func.getAddr(), null);
+		return process.createProcess(pid, true, func.getPage(), pageMap.get(func.getPage()), func.getAddr(), null);
 	}
 
 	@Override
 	public int createProcess(RuntimeFuncObject func, RuntimeObject obj) throws Exception {
-		return process.createProcess(pid, func.getPage(), pageMap.get(func.getPage()), func.getAddr(), obj);
+		return process.createProcess(pid, true, func.getPage(), pageMap.get(func.getPage()), func.getAddr(), obj);
+	}
+
+	@Override
+	public int createUsrProcess(RuntimeFuncObject func) throws Exception {
+		return process.createProcess(pid, false, func.getPage(), pageMap.get(func.getPage()), func.getAddr(), null);
+	}
+
+	@Override
+	public int createUsrProcess(RuntimeFuncObject func, RuntimeObject obj) throws Exception {
+		return process.createProcess(pid, false, func.getPage(), pageMap.get(func.getPage()), func.getAddr(), obj);
 	}
 
 	@Override
@@ -298,8 +342,28 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	}
 
 	@Override
+	public boolean setPriority(int priority) {
+		return process.setPriority(pid, priority);
+	}
+
+	@Override
 	public IRuntimeService getService() {
 		return process.getService();
+	}
+
+	@Override
+	public int sleep() {
+		return 0;
+	}
+
+	@Override
+	public List<Integer> getUsrProcs() {
+		return process.getUsrProcs();
+	}
+
+	@Override
+	public int stepUsrProcess(int pid) {
+		return process.stepUsrProcess(pid);
 	}
 
 	private void switchPage() throws RuntimeException {

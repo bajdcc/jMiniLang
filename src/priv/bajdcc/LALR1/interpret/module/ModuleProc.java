@@ -70,7 +70,10 @@ public class ModuleProc implements IInterpreterModule {
 				"};\n" +
 				"export \"g_write_pipe\";\n" +
 				"var g_load_sync = func ~(fn) -> call g_join_process(call g_load(fn));\n" +
-				"export \"g_load_sync\";";
+				"export \"g_load_sync\";\n" +
+				"var g_load_sync_x = func ~(fn) -> call g_join_process(call g_load_x(fn));\n" +
+				"export \"g_load_sync_x\";\n" +
+				"";
 
 		Grammar grammar = new Grammar(base);
 		RuntimeCodePage page = grammar.getCodePage();
@@ -120,6 +123,83 @@ public class ModuleProc implements IInterpreterModule {
 				return new RuntimeObject(BigInteger.valueOf(status.createProcess(func, obj)));
 			}
 		});
+		info.addExternalFunc("g_create_user_process", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "创建用户态进程";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[] { RuntimeObjectType.kFunc };
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				RuntimeFuncObject func = (RuntimeFuncObject) args.get(0).getObj();
+				return new RuntimeObject(BigInteger.valueOf(status.createUsrProcess(func)));
+			}
+		});
+		info.addExternalFunc("g_create_user_process_args", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "创建用户态进程带参数";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[] { RuntimeObjectType.kFunc, RuntimeObjectType.kObject };
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				RuntimeFuncObject func = (RuntimeFuncObject) args.get(0).getObj();
+				RuntimeObject obj = args.get(1);
+				return new RuntimeObject(BigInteger.valueOf(status.createUsrProcess(func, obj)));
+			}
+		});
+		info.addExternalFunc("g_get_user_procs", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "获取用户态进程ID列表";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return null;
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				RuntimeArray arr = new RuntimeArray();
+				List<Integer> list = status.getUsrProcs();
+				for (Integer pid : list) {
+					arr.add(new RuntimeObject(pid));
+				}
+				return new RuntimeObject(arr);
+			}
+		});
+		info.addExternalFunc("g_run_user", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "运行用户态进程";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[] { RuntimeObjectType.kPtr };
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				int pid = (int) args.get(0).getObj();
+				return new RuntimeObject(BigInteger.valueOf(status.stepUsrProcess(pid)));
+			}
+		});
 		info.addExternalFunc("g_get_pid", new IRuntimeDebugExec() {
 			@Override
 			public String getDoc() {
@@ -152,6 +232,24 @@ public class ModuleProc implements IInterpreterModule {
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) throws Exception {
 				return new RuntimeObject(BigInteger.valueOf(status.getPriority()));
+			}
+		});
+		info.addExternalFunc("g_set_process_priority", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "设置进程优先级";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[] { RuntimeObjectType.kInt };
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				BigInteger priority = (BigInteger) args.get(0).getObj();
+				return new RuntimeObject(status.setPriority(priority.intValue()));
 			}
 		});
 		info.addExternalFunc("g_join_process_once", new IRuntimeDebugExec() {
