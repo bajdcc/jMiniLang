@@ -8,6 +8,7 @@ import priv.bajdcc.LALR1.interpret.os.kern.OSEntry;
 import priv.bajdcc.LALR1.interpret.os.kern.OSIrq;
 import priv.bajdcc.LALR1.interpret.os.proc.OSSchd;
 import priv.bajdcc.LALR1.interpret.os.user.UserMain;
+import priv.bajdcc.LALR1.interpret.os.user.routine.URDup;
 import priv.bajdcc.LALR1.interpret.os.user.routine.UREcho;
 import priv.bajdcc.LALR1.interpret.os.user.routine.URPipe;
 import priv.bajdcc.LALR1.interpret.os.user.routine.URShell;
@@ -36,6 +37,7 @@ public class OSMain {
 				new URShell(),
 				new UREcho(),
 				new URPipe(),
+				new URDup(),
 		};
 
 		try {

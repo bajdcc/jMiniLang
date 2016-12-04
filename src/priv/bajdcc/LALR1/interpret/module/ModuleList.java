@@ -75,6 +75,7 @@ public class ModuleList implements IInterpreterModule {
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 												  IRuntimeStatus status) throws Exception {
 				RuntimeArray array = (RuntimeArray) args.get(0).getObj();
+				args.get(1).setReadonly(false);
 				array.add(args.get(1));
 				return null;
 			}
@@ -95,6 +96,7 @@ public class ModuleList implements IInterpreterModule {
 												  IRuntimeStatus status) throws Exception {
 				RuntimeArray array = (RuntimeArray) args.get(0).getObj();
 				BigInteger index = (BigInteger) args.get(1).getObj();
+				args.get(2).setReadonly(false);
 				if (!array.set(index.intValue(), args.get(2))) {
 					status.err(RuntimeException.RuntimeError.INVALID_INDEX);
 				}
@@ -117,6 +119,25 @@ public class ModuleList implements IInterpreterModule {
 												  IRuntimeStatus status) throws Exception {
 				RuntimeArray array = (RuntimeArray) args.get(0).getObj();
 				return new RuntimeObject(array.pop());
+			}
+		});
+		info.addExternalFunc("g_array_clear", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "数组清除元素";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[] { RuntimeObjectType.kArray };
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				RuntimeArray array = (RuntimeArray) args.get(0).getObj();
+				array.clear();
+				return new RuntimeObject(array);
 			}
 		});
 		info.addExternalFunc("g_array_reverse", new IRuntimeDebugExec() {

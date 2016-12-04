@@ -100,6 +100,19 @@ public class ModuleProc implements IInterpreterModule {
 				"    }\n" +
 				"};\n" +
 				"export \"g_wait_share\";\n" +
+				"var g_wait_pipe = func ~(handle) {\n" +
+				"    for (;;) {\n" +
+				"        var pipe = call g_query_pipe(handle);\n" +
+				"        if (pipe) { return call g_create_pipe(handle); }\n" +
+				"        call g_sleep(10);\n" +
+				"    }\n" +
+				"};\n" +
+				"export \"g_wait_pipe\";\n" +
+				"var g_destroy_pipe = func ~(handle) {\n" +
+				"    while (call g_wait_pipe_empty(handle)) {}\n" +
+				"    call g_destroy_pipe_once(handle);\n" +
+				"};\n" +
+				"export \"g_destroy_pipe\";\n" +
 				"";
 
 		Grammar grammar = new Grammar(base);
@@ -359,7 +372,25 @@ public class ModuleProc implements IInterpreterModule {
 				return new RuntimeObject(handle);
 			}
 		});
-		info.addExternalFunc("g_destroy_pipe", new IRuntimeDebugExec() {
+		info.addExternalFunc("g_query_pipe", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "查询管道";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[] { RuntimeObjectType.kString };
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+												  IRuntimeStatus status) throws Exception {
+				String name = args.get(0).getObj().toString();
+				return new RuntimeObject(status.getService().getPipeService().query(name));
+			}
+		});
+		info.addExternalFunc("g_destroy_pipe_once", new IRuntimeDebugExec() {
 			@Override
 			public String getDoc() {
 				return "销毁管道";
@@ -375,6 +406,25 @@ public class ModuleProc implements IInterpreterModule {
 												  IRuntimeStatus status) throws Exception {
 				int handle = (int) args.get(0).getObj();
 				return new RuntimeObject(status.getService().getPipeService().destroy(handle));
+			}
+		});
+		info.addExternalFunc("g_wait_pipe_empty", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "等待管道为空";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[] { RuntimeObjectType.kPtr };
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+												  IRuntimeStatus status) throws Exception {
+				int handle = (int) args.get(0).getObj();
+				status.getService().getProcessService().sleep(status.getPid(), PIPE_READ_TIME);
+				return new RuntimeObject(!status.getService().getPipeService().isEmpty(handle));
 			}
 		});
 		info.addExternalFunc("g_read_pipe_char", new IRuntimeDebugExec() {

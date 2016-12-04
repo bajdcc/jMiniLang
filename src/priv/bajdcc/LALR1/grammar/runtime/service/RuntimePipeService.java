@@ -86,4 +86,14 @@ public class RuntimePipeService implements IRuntimePipeService {
 	public boolean write(int handle, char ch) {
 		return setPipeId.contains(handle) && arrPipes[handle].queue.add(ch);
 	}
+
+	@Override
+	public boolean isEmpty(int handle) {
+		return setPipeId.contains(handle) && arrPipes[handle].queue.isEmpty();
+	}
+
+	@Override
+	public boolean query(String name) {
+		return mapPipeNames.containsKey(name);
+	}
 }

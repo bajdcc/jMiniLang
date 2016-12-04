@@ -41,4 +41,18 @@ public interface IRuntimePipeService {
 	 * @return 是否成功
 	 */
 	boolean write(int handle, char ch);
+
+	/**
+	 * 管道是否为空
+	 * @param handle 管道句柄
+	 * @return 是否为空
+	 */
+	boolean isEmpty(int handle);
+
+	/**
+	 * 查询管道是否存在
+	 * @param name 管理名
+	 * @return 是否存在
+	 */
+	boolean query(String name);
 }

@@ -19,7 +19,6 @@ public class URPipe implements IOSCodePage {
 				"import \"sys.proc\";\n" +
 				"\n" +
 				"var pipe = func [\"PIPE\"] ~(ch, out) {\n" +
-				"    call g_printn(ch);" +
 				"    call g_write_pipe(out, ch);\n" +
 				"};\n" +
 				"\n" +

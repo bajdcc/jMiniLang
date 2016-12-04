@@ -39,7 +39,7 @@ public class URShell implements IOSCodePage {
 				"    var parse = call g_map_get(arg, \"parse\");\n" +
 				"    var cmd = call g_map_get(arg, \"args\");\n" +
 				"    var parent = call g_map_get(arg, \"parent\");\n" +
-				"    var exe = call g_array_get(cmd, 0);\n" +
+				"    var exe = call g_array_pop(cmd);\n" +
 				"    let exe = call g_string_trim(exe);\n" +
 				"    var args = call g_string_split(exe, \" \");\n" +
 				"    var exec = call g_array_get(args, 0);\n" +
@@ -50,15 +50,14 @@ public class URShell implements IOSCodePage {
 				"    var child = call g_load_user_x(path);\n" +
 				"    call g_start_share(\"PID#\" + child, share);\n" +
 				"    if (child+1 == 0) {\n" +
-				"        call g_printn(\"Cannot execute '\"+path+\"'.\");" +
-				"        var p = call g_create_pipe(\"PIPEOUT#\" + parent);\n" +
+				"        call g_printn(\"Cannot execute '\"+path+\"'.\");\n" +
+				"        var p = call g_wait_pipe(\"PIPEIN#\" + parent);\n" +
 				"        call g_sleep(50);\n" +
 				"        call g_destroy_pipe(p);\n" +
 				"        return;\n" +
 				"    }\n" +
 				"    call g_map_put(share, \"child\", child);\n" +
-				"    if (call g_array_size(cmd) > 1) {\n" +
-				"        call g_array_remove(cmd, 0);\n" +
+				"    if (call g_array_size(cmd) > 0) {\n" +
 				"        var _args_ = {};\n" +
 				"        call g_map_put(_args_, \"parse\", parse);\n" +
 				"        call g_map_put(_args_, \"args\", cmd);\n" +
@@ -67,16 +66,16 @@ public class URShell implements IOSCodePage {
 				"    }\n" +
 				"    var in = call g_create_pipe(\"PIPEIN#\" + parent);\n" +
 				"    var out = call g_create_pipe(\"PIPEOUT#\" + child);\n" +
-				"    var f = func ~(ch) {\n" +
+				"    var f1 = func ~(ch, in) {\n" +
 				"        call g_write_pipe(in, ch);\n" +
 				"    };\n" +
-				"    call g_read_pipe(out, f);\n" +
+				"    call g_read_pipe_args(out, f1, in);\n" +
 				"    call g_destroy_pipe(in);\n" +
 				"};\n" +
 				"\n" +
 				"var parse_cmd = func [\"PARSE\"] ~(cmd, parse) {\n" +
 				"    var pid = call g_get_pid();\n" +
-				"    var exe = call g_array_get(cmd, 0);\n" +
+				"    var exe = call g_array_pop(cmd);\n" +
 				"    let exe = call g_string_trim(exe);\n" +
 				"    var args = call g_string_split(exe, \" \");\n" +
 				"    var exec = call g_array_get(args, 0);\n" +
@@ -86,12 +85,11 @@ public class URShell implements IOSCodePage {
 				"    var path = \"/usr/p/\" + exec;\n" +
 				"    var child = call g_load_user_x(path);\n" +
 				"    if (child+1 == 0) {\n" +
-				"        call g_printn(\"Cannot execute '\"+path+\"'.\");" +
+				"        call g_printn(\"Cannot execute '\"+path+\"'.\");\n" +
 				"        return;\n" +
 				"    }\n" +
 				"    call g_start_share(\"PID#\" + child, share);\n" +
-				"    if (call g_array_size(cmd) > 1) {\n" +
-				"        call g_array_remove(cmd, 0);\n" +
+				"    if (call g_array_size(cmd) > 0) {\n" +
 				"        var _args_ = {};\n" +
 				"        call g_map_put(_args_, \"parse\", parse);\n" +
 				"        call g_map_put(_args_, \"args\", cmd);\n" +
@@ -114,9 +112,12 @@ public class URShell implements IOSCodePage {
 				"        call g_printn(\"Error: no cmd\");\n" +
 				"        return;\n" +
 				"    }\n" +
-				"    if (cmd == \"exit\") { return; }\n" +
+				"    if (cmd == \"exit\") {\n" +
+				"        var handle = call g_create_pipe(\"int#10\");\n" +
+				"        call g_write_pipe(handle, 'E');\n" +
+				"        return;\n" +
+				"    }\n" +
 				"    let cmd = call g_string_split(cmd, \"\\\\|\");\n" +
-				"    call g_array_reverse(cmd);\n" +
 				"    call parse_cmd(cmd, parse);\n" +
 				"    call g_create_user_process_args(this, arg);\n" +
 				"};\n" +
