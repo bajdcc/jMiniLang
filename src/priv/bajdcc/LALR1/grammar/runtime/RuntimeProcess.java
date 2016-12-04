@@ -1,7 +1,10 @@
 package priv.bajdcc.LALR1.grammar.runtime;
 
+import priv.bajdcc.LALR1.grammar.Grammar;
 import priv.bajdcc.LALR1.grammar.runtime.service.IRuntimeProcessService;
 import priv.bajdcc.LALR1.grammar.runtime.service.RuntimeService;
+import priv.bajdcc.LALR1.syntax.handler.SyntaxException;
+import priv.bajdcc.util.lexer.error.RegexException;
 
 import java.io.InputStream;
 import java.util.*;
@@ -53,6 +56,7 @@ public class RuntimeProcess implements IRuntimeProcessService {
 	private String name;
 	private RuntimeCodePage codePage;
 	private Map<String, String> arrCodes;
+	private Map<String, RuntimeCodePage> arrPages;
 	private SchdProcess arrProcess[];
 	private Set<Integer> setProcessId;
 	private Queue<SchdParticle> queue;
@@ -66,10 +70,6 @@ public class RuntimeProcess implements IRuntimeProcessService {
 
 	public String getName() {
 		return name;
-	}
-
-	public String getCode(String name) {
-		return arrCodes.get(name);
 	}
 
 	public int getPriority(int pid) {
@@ -87,6 +87,21 @@ public class RuntimeProcess implements IRuntimeProcessService {
 
 	public List<Integer> getUsrProcs() {
 		return setProcessId.stream().filter(id -> !arrProcess[id].kernel).collect(Collectors.toList());
+	}
+
+	public RuntimeCodePage getPage(String name) throws Exception {
+		if (arrCodes.containsKey(name)) {
+			String code = arrCodes.get(name);
+			if (arrPages.containsKey(code)) {
+				return arrPages.get(code);
+			} else {
+				Grammar grammar = new Grammar(code);
+				RuntimeCodePage page = grammar.getCodePage();
+				arrPages.put(name, page);
+				return page;
+			}
+		}
+		return null;
 	}
 
 	public void run() throws Exception {
@@ -150,12 +165,13 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		this.name = name;
 		this.codePage = RuntimeCodePage.importFromStream(input);
 		this.arrCodes = new HashMap<>();
+		this.arrPages = new HashMap<>();
 		this.setProcessId = new HashSet<>();
 		this.queue = new PriorityQueue<>((a, b) -> a.priority - b.priority);
 		this.destroyedProcess = new HashSet<>();
 		this.service = new RuntimeService(this);
 		this.arrActiveUsrProcs = new ArrayList<>();
-		RuntimeMachine machine = new RuntimeMachine(cyclePtr, this);
+		RuntimeMachine machine = new RuntimeMachine(cyclePtr, -1, this);
 		machine.initStep(name, codePage, Collections.emptyList(), 0, null);
 		setProcessId.add(cyclePtr);
 		arrProcess[cyclePtr++] = new SchdProcess(machine);
@@ -177,10 +193,14 @@ public class RuntimeProcess implements IRuntimeProcessService {
 			arrProcess[creatorId].machine.err(
 					RuntimeException.RuntimeError.PROCESS_OVERFLOW, String.valueOf(page));
 		}
+		if (!arrProcess[creatorId].kernel && kernel) {
+			arrProcess[creatorId].machine.err(
+					RuntimeException.RuntimeError.ACCESS_FORBIDDEN, String.valueOf(page));
+		}
 		int pid;
 		for (;;) {
 			if (arrProcess[cyclePtr] == null && !destroyedProcess.contains(cyclePtr)) {
-				RuntimeMachine machine = new RuntimeMachine(cyclePtr, this);
+				RuntimeMachine machine = new RuntimeMachine(cyclePtr, creatorId,this);
 				machine.initStep(name, page, arrProcess[creatorId].machine.getPageRefers(name), pc, obj);
 				setProcessId.add(cyclePtr);
 				pid = cyclePtr;

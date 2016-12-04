@@ -36,7 +36,8 @@ public class RuntimeException extends Exception {
 		MAX_HANDLE("句柄不足"),
 		DUP_SHARE_NAME("共享名重复"),
 		INVALID_SHARE_NAME("共享名不存在"),
-		INVALID_REFERENCE("引用计数异常");
+		INVALID_REFERENCE("引用计数异常"),
+		ACCESS_FORBIDDEN("越权访问"),;
 
 		private String message;
 

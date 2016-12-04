@@ -49,9 +49,6 @@ public class StmtReturn implements IStmt {
 			} else {
 				codegen.genCode(RuntimeInst.ipushx);
 			}
-			if (codegen.getBlockService().isInBlock()) {
-				codegen.genCode(RuntimeInst.iyldx);
-			}
 			codegen.genCode(RuntimeInst.iret);
 		} else {
 			if (exp != null) {

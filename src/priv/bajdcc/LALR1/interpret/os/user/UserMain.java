@@ -18,9 +18,6 @@ public class UserMain implements IOSCodePage {
 		return "// USER MAIN BY BAJDCC\n" +
 				"import \"sys.base\";\n" +
 				"import \"sys.proc\";\n" +
-				"for (var i = 1;; i++) {\n" +
-				"    call g_printn(\"TIME: \" + i);\n" +
-				"    call g_sleep(1000);" +
-				"}\n";
+				"call g_load_user_x(\"/usr/p/sh\");\n";
 	}
 }

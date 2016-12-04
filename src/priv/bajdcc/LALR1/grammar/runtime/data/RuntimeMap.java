@@ -67,6 +67,6 @@ public class RuntimeMap implements Cloneable {
 
 	@Override
 	public String toString() {
-		return String.valueOf(map.size());
+		return map == null ? "NULL" : String.valueOf(map.size());
 	}
 }

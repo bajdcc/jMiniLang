@@ -8,6 +8,8 @@ import priv.bajdcc.LALR1.interpret.os.kern.OSEntry;
 import priv.bajdcc.LALR1.interpret.os.kern.OSIrq;
 import priv.bajdcc.LALR1.interpret.os.proc.OSSchd;
 import priv.bajdcc.LALR1.interpret.os.user.UserMain;
+import priv.bajdcc.LALR1.interpret.os.user.routine.UREcho;
+import priv.bajdcc.LALR1.interpret.os.user.routine.URShell;
 import priv.bajdcc.LALR1.syntax.handler.SyntaxException;
 import priv.bajdcc.util.lexer.error.RegexException;
 
@@ -29,12 +31,13 @@ public class OSMain {
 				new OSSchd(),
 				// USER
 				new UserMain(),
+				// USER ROUTINE
+				new URShell(),
+				new UREcho(),
 		};
 
 		try {
-			String code =
-
-					"import \"sys.base\";\n" +
+			String code =	"import \"sys.base\";\n" +
 							"import \"sys.proc\";\n" +
 							"call g_load_sync_x(\"/kern/entry\");\n";
 

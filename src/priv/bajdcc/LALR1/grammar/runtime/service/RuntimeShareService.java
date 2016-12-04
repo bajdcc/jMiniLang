@@ -50,7 +50,7 @@ public class RuntimeShareService implements IRuntimeShareService {
 				ss.reference++;
 			return ss.obj;
 		}
-		return null;
+		return new RuntimeObject(null);
 	}
 
 	@Override

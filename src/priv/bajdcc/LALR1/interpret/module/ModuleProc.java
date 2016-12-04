@@ -17,6 +17,12 @@ import java.util.List;
  */
 public class ModuleProc implements IInterpreterModule {
 
+	private static ModuleProc instance = new ModuleProc();
+
+	public static ModuleProc getInstance() {
+		return instance;
+	}
+
 	private static final int JOIN_TIME = 20;
 	private static final int LOCK_TIME = 20;
 	private static final int PIPE_READ_TIME = 10;
@@ -73,6 +79,14 @@ public class ModuleProc implements IInterpreterModule {
 				"export \"g_load_sync\";\n" +
 				"var g_load_sync_x = func ~(fn) -> call g_join_process(call g_load_x(fn));\n" +
 				"export \"g_load_sync_x\";\n" +
+				"var g_wait_share = func ~(handle) {\n" +
+				"    for (;;) {\n" +
+				"        var share = call g_query_share(handle);\n" +
+				"        if (call g_is_null(share)) { call g_sleep(10); continue; }\n" +
+				"        return share;\n" +
+				"    }\n" +
+				"};\n" +
+				"export \"g_wait_share\";\n" +
 				"";
 
 		Grammar grammar = new Grammar(base);
@@ -215,6 +229,23 @@ public class ModuleProc implements IInterpreterModule {
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) throws Exception {
 				return new RuntimeObject(BigInteger.valueOf(status.getPid()));
+			}
+		});
+		info.addExternalFunc("g_get_parent_pid", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "获取父进程ID";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return null;
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				return new RuntimeObject(BigInteger.valueOf(status.getParentPid()));
 			}
 		});
 		info.addExternalFunc("g_get_process_priority", new IRuntimeDebugExec() {

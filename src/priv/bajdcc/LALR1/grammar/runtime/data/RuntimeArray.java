@@ -4,6 +4,7 @@ import priv.bajdcc.LALR1.grammar.runtime.RuntimeObject;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -64,6 +65,10 @@ public class RuntimeArray implements Cloneable {
 			return array.remove(index);
 		}
 		return null;
+	}
+
+	public void reverse() {
+		Collections.reverse(array);
 	}
 
 	public void copyFrom(RuntimeArray obj) {

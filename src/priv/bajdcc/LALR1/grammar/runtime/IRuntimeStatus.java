@@ -128,6 +128,12 @@ public interface IRuntimeStatus {
 	int getPid();
 
 	/**
+	 * 得到父进程ID
+	 * @return PID
+	 */
+	int getParentPid();
+
+	/**
 	 * 得到进程优先级
 	 * @return 优先级
 	 */

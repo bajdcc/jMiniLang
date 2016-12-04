@@ -30,6 +30,8 @@ import priv.bajdcc.util.lexer.token.TokenType;
  */
 public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 
+	private static IInterpreterModule[] modules;
+
 	private HashListMapEx<String, RuntimeCodePage> pageMap = new HashListMapEx<>();
 	private Map<String, ArrayList<RuntimeCodePage>> pageRefer = new HashMap<>();
 	private Stack<RuntimeObject> stkYieldData = new Stack<>();
@@ -38,24 +40,29 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	private String pageName;
 	private RuntimeProcess process;
 	private int pid;
+	private int parentId;
 	private boolean debug = false;
 
 	public RuntimeMachine() throws Exception {
-		IInterpreterModule[] modules = new IInterpreterModule[] {
-				new ModuleBase(),
-				new ModuleMath(),
-				new ModuleList(),
-				new ModuleProc()
-		};
+		if (modules == null) {
+			modules = new IInterpreterModule[]{
+					ModuleBase.getInstance(),
+					ModuleMath.getInstance(),
+					ModuleList.getInstance(),
+					ModuleString.getInstance(),
+					ModuleProc.getInstance(),
+			};
+		}
 
 		for (IInterpreterModule module : modules) {
 			run(module.getModuleName(), module.getCodePage());
 		}
 	}
 
-	public RuntimeMachine(int id, RuntimeProcess process) throws Exception {
+	public RuntimeMachine(int id, int parentId, RuntimeProcess process) throws Exception {
 		this();
 		this.pid = id;
+		this.parentId = parentId;
 		this.process = process;
 	}
 
@@ -93,12 +100,11 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 
 	@Override
 	public int runProcessX(String name) throws Exception {
-		String code = process.getCode(name);
-		if (code == null) {
+		RuntimeCodePage page = process.getPage(name);
+		if (page == null) {
 			return -1;
 		}
-		Grammar grammar = new Grammar(code);
-		return process.createProcess(pid, true, name, grammar.getCodePage(), 0, null);
+		return process.createProcess(pid, true, name, page, 0, null);
 	}
 
 	@Override
@@ -117,12 +123,11 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 
 	@Override
 	public int runUsrProcessX(String name) throws Exception {
-		String code = process.getCode(name);
-		if (code == null) {
+		RuntimeCodePage page = process.getPage(name);
+		if (page == null) {
 			return -1;
 		}
-		Grammar grammar = new Grammar(code);
-		return process.createProcess(pid, false, name, grammar.getCodePage(), 0, null);
+		return process.createProcess(pid, false, name, page, 0, null);
 	}
 
 	public void add(String name, RuntimeCodePage page) throws Exception {
@@ -334,6 +339,11 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	@Override
 	public int getPid() {
 		return pid;
+	}
+
+	@Override
+	public int getParentPid() {
+		return parentId;
 	}
 
 	@Override

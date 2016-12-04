@@ -22,6 +22,12 @@ import priv.bajdcc.LALR1.grammar.runtime.RuntimeObjectType;
  */
 public class ModuleBase implements IInterpreterModule {
 
+	private static ModuleBase instance = new ModuleBase();
+
+	public static ModuleBase getInstance() {
+		return instance;
+	}
+
 	@Override
 	public String getModuleName() {
 		return "sys.base";

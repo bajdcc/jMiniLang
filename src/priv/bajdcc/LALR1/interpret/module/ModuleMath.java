@@ -14,6 +14,12 @@ import priv.bajdcc.LALR1.grammar.runtime.RuntimeObject;
  */
 public class ModuleMath implements IInterpreterModule {
 
+	private static ModuleMath instance = new ModuleMath();
+
+	public static ModuleMath getInstance() {
+		return instance;
+	}
+
 	final static BigInteger HUNDRED = BigInteger.valueOf(100);
 
 	@Override

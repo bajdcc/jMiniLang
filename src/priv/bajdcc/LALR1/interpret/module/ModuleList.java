@@ -16,6 +16,12 @@ import java.util.List;
  */
 public class ModuleList implements IInterpreterModule {
 
+	private static ModuleList instance = new ModuleList();
+
+	public static ModuleList getInstance() {
+		return instance;
+	}
+
 	@Override
 	public String getModuleName() {
 		return "sys.list";
@@ -111,6 +117,25 @@ public class ModuleList implements IInterpreterModule {
 												  IRuntimeStatus status) throws Exception {
 				RuntimeArray array = (RuntimeArray) args.get(0).getObj();
 				return new RuntimeObject(array.pop());
+			}
+		});
+		info.addExternalFunc("g_array_reverse", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "数组反转";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[] { RuntimeObjectType.kArray };
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				RuntimeArray array = (RuntimeArray) args.get(0).getObj();
+				array.reverse();
+				return new RuntimeObject(array);
 			}
 		});
 		info.addExternalFunc("g_array_get", new IRuntimeDebugExec() {
