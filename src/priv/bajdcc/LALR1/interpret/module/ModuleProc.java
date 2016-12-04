@@ -69,6 +69,19 @@ public class ModuleProc implements IInterpreterModule {
 				"    }\n" +
 				"};\n" +
 				"export \"g_read_pipe\";\n" +
+				"var g_read_pipe_args = func ~(handle, callback, args) {\n" +
+				"    var data = '\\0';" +
+				"    for (;;) {\n" +
+				"        let data = call g_read_pipe_char(handle);\n" +
+				"        if (data == '\\uffff') {\n" +
+				"            break;\n" +
+				"        }\n" +
+				"        if (data != '\\ufffe') {\n" +
+				"            call callback(data, args);\n" +
+				"        }\n" +
+				"    }\n" +
+				"};\n" +
+				"export \"g_read_pipe_args\";\n" +
 				"var g_write_pipe = func ~(handle, data) {\n" +
 				"    foreach (var ch : call g_range_string(data)) {\n" +
 				"        call g_write_pipe_char(handle, ch);\n" +

@@ -66,9 +66,6 @@ public class RuntimeObject implements Cloneable {
 	}
 
 	public static RuntimeObject createObject(RuntimeObject obj) {
-		if (obj == null) {
-			return null;
-		}
 		return new RuntimeObject(obj);
 	}
 

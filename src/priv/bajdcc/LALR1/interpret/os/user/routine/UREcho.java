@@ -23,8 +23,6 @@ public class UREcho implements IOSCodePage {
 				"var share = call g_wait_share(\"PID#\" + pid);\n" +
 				"call g_stop_share(\"PID#\" + pid);\n" +
 				"var args = call g_map_get(share, \"args\");\n" +
-				"var parent = call g_map_get(share, \"parent\");\n" +
-				"var child = call g_map_get(share, \"child\");\n" +
 				"\n" +
 				"var out = call g_create_pipe(\"PIPEOUT#\" + pid);\n" +
 				"\n" +

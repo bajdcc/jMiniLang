@@ -36,6 +36,7 @@ public class URShell implements IOSCodePage {
 				"\n" +
 				"var parse_cmd_1 = func [\"PARSE\"] ~(arg) {\n" +
 				"    var pid = call g_get_pid();\n" +
+				"    var parse = call g_map_get(arg, \"parse\");\n" +
 				"    var cmd = call g_map_get(arg, \"args\");\n" +
 				"    var parent = call g_map_get(arg, \"parent\");\n" +
 				"    var exe = call g_array_get(cmd, 0);\n" +
@@ -45,31 +46,35 @@ public class URShell implements IOSCodePage {
 				"    call g_array_remove(args, 0);\n" +
 				"    var share = {};\n" +
 				"    call g_map_put(share, \"args\", args);\n" +
-				"    call g_map_put(share, \"parent\", parent);\n" +
-				"    call g_start_share(\"PID#\" + pid, share);\n" +
 				"    var path = \"/usr/p/\" + exec;\n" +
 				"    var child = call g_load_user_x(path);\n" +
+				"    call g_start_share(\"PID#\" + child, share);\n" +
 				"    if (child+1 == 0) {\n" +
 				"        call g_printn(\"Cannot execute '\"+path+\"'.\");" +
+				"        var p = call g_create_pipe(\"PIPEOUT#\" + parent);\n" +
+				"        call g_sleep(50);\n" +
+				"        call g_destroy_pipe(p);\n" +
 				"        return;\n" +
 				"    }\n" +
 				"    call g_map_put(share, \"child\", child);\n" +
 				"    if (call g_array_size(cmd) > 1) {\n" +
 				"        call g_array_remove(cmd, 0);\n" +
 				"        var _args_ = {};\n" +
+				"        call g_map_put(_args_, \"parse\", parse);\n" +
 				"        call g_map_put(_args_, \"args\", cmd);\n" +
 				"        call g_map_put(_args_, \"parent\", child);\n" +
-				"        call g_create_user_process_args(parse_cmd_1, _args_);\n" +
+				"        call g_create_user_process_args(parse, _args_);\n" +
 				"    }\n" +
 				"    var in = call g_create_pipe(\"PIPEIN#\" + parent);\n" +
-				"    var out = call g_create_pipe(\"PIPEOUT#\" + pid);\n" +
+				"    var out = call g_create_pipe(\"PIPEOUT#\" + child);\n" +
 				"    var f = func ~(ch) {\n" +
 				"        call g_write_pipe(in, ch);\n" +
 				"    };\n" +
 				"    call g_read_pipe(out, f);\n" +
+				"    call g_destroy_pipe(in);\n" +
 				"};\n" +
 				"\n" +
-				"var parse_cmd = func [\"PARSE\"] ~(cmd) {\n" +
+				"var parse_cmd = func [\"PARSE\"] ~(cmd, parse) {\n" +
 				"    var pid = call g_get_pid();\n" +
 				"    var exe = call g_array_get(cmd, 0);\n" +
 				"    let exe = call g_string_trim(exe);\n" +
@@ -78,7 +83,6 @@ public class URShell implements IOSCodePage {
 				"    call g_array_remove(args, 0);\n" +
 				"    var share = {};\n" +
 				"    call g_map_put(share, \"args\", args);\n" +
-				"    call g_map_put(share, \"parent\", pid);\n" +
 				"    var path = \"/usr/p/\" + exec;\n" +
 				"    var child = call g_load_user_x(path);\n" +
 				"    if (child+1 == 0) {\n" +
@@ -89,9 +93,10 @@ public class URShell implements IOSCodePage {
 				"    if (call g_array_size(cmd) > 1) {\n" +
 				"        call g_array_remove(cmd, 0);\n" +
 				"        var _args_ = {};\n" +
+				"        call g_map_put(_args_, \"parse\", parse);\n" +
 				"        call g_map_put(_args_, \"args\", cmd);\n" +
 				"        call g_map_put(_args_, \"parent\", child);\n" +
-				"        call g_create_user_process_args(parse_cmd_1, _args_);\n" +
+				"        call g_create_user_process_args(parse, _args_);\n" +
 				"    }\n" +
 				"    var f = func ~(ch) -> call g_print(ch);\n" +
 				"    var out = call g_create_pipe(\"PIPEOUT#\" + child);\n" +
@@ -99,7 +104,9 @@ public class URShell implements IOSCodePage {
 				"};\n" +
 				"\n" +
 				"// GET STDIO cmd\n" +
-				"var get_input = func [\"INPUT\"] ~(this) {\n" +
+				"var get_input = func [\"INPUT\"] ~(arg) {\n" +
+				"    var this = call g_array_get(arg, 0);\n" +
+				"    var parse = call g_array_get(arg, 1);\n" +
 				"    call g_print(\"$ \");\n" +
 				"    var cmd = call g_stdin_read_line();\n" +
 				"    let cmd = call g_string_trim(cmd);\n" +
@@ -107,11 +114,15 @@ public class URShell implements IOSCodePage {
 				"        call g_printn(\"Error: no cmd\");\n" +
 				"        return;\n" +
 				"    }\n" +
+				"    if (cmd == \"exit\") { return; }\n" +
 				"    let cmd = call g_string_split(cmd, \"\\\\|\");\n" +
 				"    call g_array_reverse(cmd);\n" +
-				"    call parse_cmd(cmd);\n" +
-				"    call g_create_user_process_args(this, this);\n" +
+				"    call parse_cmd(cmd, parse);\n" +
+				"    call g_create_user_process_args(this, arg);\n" +
 				"};\n" +
-				"call g_create_user_process_args(get_input, get_input);\n";
+				"var _args_ = [];\n" +
+				"call g_array_add(_args_, get_input);\n" +
+				"call g_array_add(_args_, parse_cmd_1);\n" +
+				"call g_create_user_process_args(get_input, _args_);\n";
 	}
 }
