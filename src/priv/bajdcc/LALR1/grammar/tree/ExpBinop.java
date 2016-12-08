@@ -93,9 +93,11 @@ public class ExpBinop implements IExp {
 		RuntimeInstUnary jmp = null;
 		switch (inst) {
 		case iand:
+		case iandl:
 			jmp = codegen.genCode(RuntimeInst.ijfx, -1);
 			break;
 		case ior:
+		case iorl:
 			jmp = codegen.genCode(RuntimeInst.ijtx, -1);
 			break;
 		default:

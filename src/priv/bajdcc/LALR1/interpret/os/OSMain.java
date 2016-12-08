@@ -8,10 +8,7 @@ import priv.bajdcc.LALR1.interpret.os.kern.OSEntry;
 import priv.bajdcc.LALR1.interpret.os.kern.OSIrq;
 import priv.bajdcc.LALR1.interpret.os.proc.OSSchd;
 import priv.bajdcc.LALR1.interpret.os.user.UserMain;
-import priv.bajdcc.LALR1.interpret.os.user.routine.URDup;
-import priv.bajdcc.LALR1.interpret.os.user.routine.UREcho;
-import priv.bajdcc.LALR1.interpret.os.user.routine.URPipe;
-import priv.bajdcc.LALR1.interpret.os.user.routine.URShell;
+import priv.bajdcc.LALR1.interpret.os.user.routine.*;
 import priv.bajdcc.LALR1.syntax.handler.SyntaxException;
 import priv.bajdcc.util.lexer.error.RegexException;
 
@@ -38,6 +35,7 @@ public class OSMain {
 				new UREcho(),
 				new URPipe(),
 				new URDup(),
+				new URGrep(),
 		};
 
 		try {

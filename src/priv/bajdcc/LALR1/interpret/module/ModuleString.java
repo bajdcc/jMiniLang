@@ -6,9 +6,11 @@ import priv.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
 import priv.bajdcc.LALR1.grammar.runtime.data.RuntimeFuncObject;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * 【模块】字符串模块
@@ -172,6 +174,28 @@ public class ModuleString implements IInterpreterModule {
 					arr.add(new RuntimeObject(m.group()));
 				}
 				return new RuntimeObject(arr);
+			}
+		});
+		info.addExternalFunc("g_string_build", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "从字节数组构造字符串";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[] { RuntimeObjectType.kArray };
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				RuntimeArray array = (RuntimeArray) args.get(0).getObj();
+				StringBuilder sb =  new StringBuilder();
+				for (Object obj : array.toList()) {
+					sb.append(obj);
+				}
+				return new RuntimeObject(sb.toString());
 			}
 		});
 	}

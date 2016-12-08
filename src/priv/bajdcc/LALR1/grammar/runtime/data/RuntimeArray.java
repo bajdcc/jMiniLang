@@ -6,6 +6,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 【运行时】运行时数组
@@ -77,6 +78,10 @@ public class RuntimeArray implements Cloneable {
 
 	public void copyFrom(RuntimeArray obj) {
 		array = new ArrayList<>(obj.array);
+	}
+
+	public List<Object> toList() {
+		return array.stream().map(a -> a.getObj()).collect(Collectors.toList());
 	}
 
 	public RuntimeArray clone() {
