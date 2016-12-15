@@ -20,6 +20,7 @@
 11. **Pipe**.
 12. **Multiple process**.
 13. Load file with Sync/Async.
+14. **Virtual machine**.
 
 #### What it generates
 
@@ -30,6 +31,16 @@
 - Structures of code page.
 - Virtual machine instructions.
 - Runtime environment.
+
+#### Virtual Machine OS
+
+An OS running on *jMiniLang* interpreter.
+
+Now has commands:
+- echo
+- dup
+- pipe
+- grep
 
 #### Manual
 
