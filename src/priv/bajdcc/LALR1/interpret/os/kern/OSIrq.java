@@ -21,6 +21,7 @@ public class OSIrq implements IOSCodePage {
 		return "import \"sys.base\";\n" +
 				"import \"sys.list\";\n" +
 				"import \"sys.proc\";\n" +
+				"import \"sys.ui\";\n" +
 				"var interrupt_num = " + INT_NUM + ";\n" +
 				"var int_table = [];\n" +
 				"foreach (var i : call g_range(0, interrupt_num - 1)) {\n" +
@@ -74,6 +75,10 @@ public class OSIrq implements IOSCodePage {
 				"    }\n" +
 				"};\n" +
 				"call add_int_proc(10, schd_handler);\n" +
+				"var print_handler = func ~(ch) {\n" +
+				"    call g_ui_print_internal(ch);\n" +
+				"};\n" +
+				"call add_int_proc(12, print_handler);\n" +
 				"";
 	}
 }

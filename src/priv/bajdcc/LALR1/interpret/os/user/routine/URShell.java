@@ -19,18 +19,19 @@ public class URShell implements IOSCodePage {
 				"import \"sys.list\";\n" +
 				"import \"sys.string\";\n" +
 				"import \"sys.proc\";\n" +
+				"import \"sys.ui\";\n" +
 				"\n" +
 				"// PRINT WELCOME\n" +
 				"var welcome = func [\"WELCOME\"] ~() {\n" +
-				"    call g_println();\n" +
-				"    call g_printn(\" ________  ________        ___  ________  ________  ________     \");\n" +
-				"    call g_printn(\"|\\\\   __  \\\\|\\\\   __  \\\\      |\\\\  \\\\|\\\\   ___ \\\\|\\\\   ____\\\\|\\\\   ____\\\\    \");\n" +
-				"    call g_printn(\"\\\\ \\\\  \\\\|\\\\ /\\\\ \\\\  \\\\|\\\\  \\\\     \\\\ \\\\  \\\\ \\\\  \\\\_|\\\\ \\\\ \\\\  \\\\___|\\\\ \\\\  \\\\___|    \");\n" +
-				"    call g_printn(\" \\\\ \\\\   __  \\\\ \\\\   __  \\\\  __ \\\\ \\\\  \\\\ \\\\  \\\\ \\\\\\\\ \\\\ \\\\  \\\\    \\\\ \\\\  \\\\       \");\n" +
-				"    call g_printn(\"  \\\\ \\\\  \\\\|\\\\  \\\\ \\\\  \\\\ \\\\  \\\\|\\\\  \\\\\\\\_\\\\  \\\\ \\\\  \\\\_\\\\\\\\ \\\\ \\\\  \\\\____\\\\ \\\\  \\\\____  \");\n" +
-				"    call g_printn(\"   \\\\ \\\\_______\\\\ \\\\__\\\\ \\\\__\\\\ \\\\________\\\\ \\\\_______\\\\ \\\\_______\\\\ \\\\_______\\\\\");\n" +
-				"    call g_printn(\"    \\\\|_______|\\\\|__|\\\\|__|\\\\|________|\\\\|_______|\\\\|_______|\\\\|_______|\");\n" +
-				"    call g_println();\n" +
+				"    call g_ui_println();\n" +
+				"    call g_ui_printn(\" ________  ________        ___  ________  ________  ________     \");\n" +
+				"    call g_ui_printn(\"|\\\\   __  \\\\|\\\\   __  \\\\      |\\\\  \\\\|\\\\   ___ \\\\|\\\\   ____\\\\|\\\\   ____\\\\    \");\n" +
+				"    call g_ui_printn(\"\\\\ \\\\  \\\\|\\\\ /\\\\ \\\\  \\\\|\\\\  \\\\     \\\\ \\\\  \\\\ \\\\  \\\\_|\\\\ \\\\ \\\\  \\\\___|\\\\ \\\\  \\\\___|    \");\n" +
+				"    call g_ui_printn(\" \\\\ \\\\   __  \\\\ \\\\   __  \\\\  __ \\\\ \\\\  \\\\ \\\\  \\\\ \\\\\\\\ \\\\ \\\\  \\\\    \\\\ \\\\  \\\\       \");\n" +
+				"    call g_ui_printn(\"  \\\\ \\\\  \\\\|\\\\  \\\\ \\\\  \\\\ \\\\  \\\\|\\\\  \\\\\\\\_\\\\  \\\\ \\\\  \\\\_\\\\\\\\ \\\\ \\\\  \\\\____\\\\ \\\\  \\\\____  \");\n" +
+				"    call g_ui_printn(\"   \\\\ \\\\_______\\\\ \\\\__\\\\ \\\\__\\\\ \\\\________\\\\ \\\\_______\\\\ \\\\_______\\\\ \\\\_______\\\\\");\n" +
+				"    call g_ui_printn(\"    \\\\|_______|\\\\|__|\\\\|__|\\\\|________|\\\\|_______|\\\\|_______|\\\\|_______|\");\n" +
+				"    call g_ui_println();\n" +
 				"};\n" +
 				"call g_join_process(call g_create_user_process(welcome));\n" +
 				"\n" +
@@ -50,7 +51,7 @@ public class URShell implements IOSCodePage {
 				"    var child = call g_load_user_x(path);\n" +
 				"    call g_start_share(\"PID#\" + child, share);\n" +
 				"    if (child+1 == 0) {\n" +
-				"        call g_printn(\"Cannot execute '\"+path+\"'.\");\n" +
+				"        call g_ui_printn(\"Cannot execute '\"+path+\"'.\");\n" +
 				"        var p = call g_wait_pipe(\"PIPEIN#\" + parent);\n" +
 				"        call g_sleep(50);\n" +
 				"        call g_destroy_pipe(p);\n" +
@@ -85,7 +86,7 @@ public class URShell implements IOSCodePage {
 				"    var path = \"/usr/p/\" + exec;\n" +
 				"    var child = call g_load_user_x(path);\n" +
 				"    if (child+1 == 0) {\n" +
-				"        call g_printn(\"Cannot execute '\"+path+\"'.\");\n" +
+				"        call g_ui_printn(\"Cannot execute '\"+path+\"'.\");\n" +
 				"        return;\n" +
 				"    }\n" +
 				"    call g_start_share(\"PID#\" + child, share);\n" +
@@ -96,7 +97,7 @@ public class URShell implements IOSCodePage {
 				"        call g_map_put(_args_, \"parent\", child);\n" +
 				"        call g_create_user_process_args(parse, _args_);\n" +
 				"    }\n" +
-				"    var f = func ~(ch) -> call g_print(ch);\n" +
+				"    var f = func ~(ch) -> call g_ui_print(ch);\n" +
 				"    var out = call g_create_pipe(\"PIPEOUT#\" + child);\n" +
 				"    call g_read_pipe(out, f);\n" +
 				"};\n" +
@@ -105,11 +106,11 @@ public class URShell implements IOSCodePage {
 				"var get_input = func [\"INPUT\"] ~(arg) {\n" +
 				"    var this = call g_array_get(arg, 0);\n" +
 				"    var parse = call g_array_get(arg, 1);\n" +
-				"    call g_print(\"$ \");\n" +
-				"    var cmd = call g_stdin_read_line();\n" +
+				"    call g_ui_print(\"$ \");\n" +
+				"    var cmd = call g_ui_input();\n" +
 				"    let cmd = call g_string_trim(cmd);\n" +
 				"    if (call g_string_length(cmd) == 0) {\n" +
-				"        call g_printn(\"Error: no cmd\");\n" +
+				"        call g_ui_printn(\"Error: no cmd\");\n" +
 				"        return;\n" +
 				"    }\n" +
 				"    if (cmd == \"exit\") {\n" +

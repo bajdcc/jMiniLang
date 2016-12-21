@@ -1,15 +1,5 @@
 package priv.bajdcc.LALR1.grammar.runtime;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Stack;
-
 import priv.bajdcc.LALR1.grammar.Grammar;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeException.RuntimeError;
 import priv.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
@@ -22,6 +12,12 @@ import priv.bajdcc.util.HashListMapEx;
 import priv.bajdcc.util.lexer.token.OperatorType;
 import priv.bajdcc.util.lexer.token.Token;
 import priv.bajdcc.util.lexer.token.TokenType;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.InputStream;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * 【虚拟机】运行时自动机
@@ -51,6 +47,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 					ModuleList.getInstance(),
 					ModuleString.getInstance(),
 					ModuleProc.getInstance(),
+					ModuleUI.getInstance(),
 			};
 		}
 
