@@ -43,6 +43,7 @@ public class ModuleUI implements IInterpreterModule {
 	@Override
 	public RuntimeCodePage getCodePage() throws Exception {
 		String base = "import \"sys.base\";\n" +
+				"import \"sys.list\";\n" +
 				"import \"sys.proc\";\n" +
 				"import \"sys.string\";\n" +
 				"var g_ui_print = func ~(str) {\n" +
@@ -63,16 +64,25 @@ public class ModuleUI implements IInterpreterModule {
 				"export \"g_ui_println\";\n" +
 				"var g_ui_input = func ~() {\n" +
 				"    call g_ui_caret(true);\n" +
+				"    var h = call g_query_share(\"cmd#histroy\");\n" +
 				"    for (;;) {\n" +
 				"        var s = call g_ui_input_internal();\n" +
 				"        if (!call g_is_null(s)) {\n" +
 				"            while (!call g_ui_caret(false)) {};\n" +
 				"            call g_ui_println();\n" +
+				"            call g_array_add(h, s);\n" +
 				"            return s;\n" +
 				"        }\n" +
 				"        var c = call g_ui_print_input();\n" +
 				"        if (!call g_is_null(c)) {\n" +
-				"            call g_ui_print(c);\n" +
+				"            if (c == '\\ufff0') {\n" +
+				"                if (!call g_array_empty(h)) {\n" +
+				"                    var old = call g_array_pop(h);\n" +
+				"                    call g_ui_input_queue(old);\n" +
+				"                }\n" +
+				"            } else {\n" +
+				"                call g_ui_print(c);\n" +
+				"            }\n" +
 				"        }\n" +
 				"    }\n" +
 				"};\n" +
@@ -130,8 +140,33 @@ public class ModuleUI implements IInterpreterModule {
 					queueDisplay.clear();
 					return new RuntimeObject(str);
 				} else {
+					if (c < '\ufff0') {
+						sb.append(c);
+					}
 					queueDisplay.add(c);
-					sb.append(c);
+				}
+				return null;
+			}
+		});
+		info.addExternalFunc("g_ui_input_queue", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "显示输入缓冲";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kString};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				status.getService().getProcessService().sleep(status.getPid(), INPUT_TIME);
+				String str = String.valueOf(args.get(0).getObj());
+				sb.append(str);
+				for (char c : str.toCharArray()) {
+					queueDisplay.add(c);
 				}
 				return null;
 			}

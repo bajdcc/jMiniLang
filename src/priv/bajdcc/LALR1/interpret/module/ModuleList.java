@@ -215,6 +215,24 @@ public class ModuleList implements IInterpreterModule {
 				return new RuntimeObject(array.remove(index.intValue()));
 			}
 		});
+		info.addExternalFunc("g_array_empty", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "数组为空";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kArray};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				RuntimeArray array = (RuntimeArray) args.get(0).getObj();
+				return new RuntimeObject(array.isEmpty());
+			}
+		});
 	}
 
 	/**
@@ -315,6 +333,43 @@ public class ModuleList implements IInterpreterModule {
 				RuntimeMap map = (RuntimeMap) args.get(0).getObj();
 				String key = args.get(1).getObj().toString();
 				return new RuntimeObject(map.remove(key));
+			}
+		});
+		info.addExternalFunc("g_map_clear", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "字典清除元素";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kMap};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				RuntimeMap map = (RuntimeMap) args.get(0).getObj();
+				map.clear();
+				return new RuntimeObject(map);
+			}
+		});
+		info.addExternalFunc("g_map_empty", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "字典为空";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kMap};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				RuntimeMap map = (RuntimeMap) args.get(0).getObj();
+				return new RuntimeObject(map.isEmpty());
 			}
 		});
 	}

@@ -3,7 +3,6 @@ package priv.bajdcc.LALR1.grammar.runtime.data;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeObject;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,6 +49,14 @@ public class RuntimeMap implements Cloneable {
 			return map.remove(key);
 		}
 		return null;
+	}
+
+	public void clear() {
+		map.clear();
+	}
+
+	public boolean isEmpty() {
+		return map.isEmpty();
 	}
 
 	public void copyFrom(RuntimeMap obj) {

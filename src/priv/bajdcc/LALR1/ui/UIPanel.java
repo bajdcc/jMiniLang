@@ -25,8 +25,15 @@ public class UIPanel extends JPanel {
 		moduleUI.setGraphics(this.graphics);
 		this.setFocusable(true);
 		this.addKeyListener(new KeyAdapter() {
-			public void keyTyped(KeyEvent e) {
-				moduleUI.addInputChar(e.getKeyChar());
+			public void keyPressed(KeyEvent e) {
+				switch (e.getKeyCode()) {
+					case KeyEvent.VK_UP:
+						moduleUI.addInputChar('\ufff0');
+						break;
+					default:
+						moduleUI.addInputChar(e.getKeyChar());
+						break;
+				}
 			}
 		});
 	}

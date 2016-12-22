@@ -34,6 +34,7 @@ public class URShell implements IOSCodePage {
 				"    call g_ui_println();\n" +
 				"};\n" +
 				"call g_join_process(call g_create_user_process(welcome));\n" +
+				"call g_start_share(\"cmd#histroy\", g_new_array);\n" +
 				"\n" +
 				"var parse_cmd_1 = func [\"PARSE\"] ~(arg) {\n" +
 				"    var pid = call g_get_pid();\n" +

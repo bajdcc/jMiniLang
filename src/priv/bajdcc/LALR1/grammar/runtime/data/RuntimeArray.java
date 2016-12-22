@@ -76,6 +76,10 @@ public class RuntimeArray implements Cloneable {
 		array.clear();
 	}
 
+	public boolean isEmpty() {
+		return array.isEmpty();
+	}
+
 	public void copyFrom(RuntimeArray obj) {
 		array = new ArrayList<>(obj.array);
 	}
