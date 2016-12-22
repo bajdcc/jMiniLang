@@ -20,7 +20,7 @@ public class UIPanel extends JPanel {
 	private ModuleUI moduleUI;
 
 	public UIPanel() {
-		this.graphics = new UIGraphics(800, 600, 72, 23, 11, 25, 1);
+		this.graphics = new UIGraphics(800, 600, 70, 23, 11, 25, 1);
 		moduleUI = ModuleUI.getInstance();
 		moduleUI.setGraphics(this.graphics);
 		this.setFocusable(true);

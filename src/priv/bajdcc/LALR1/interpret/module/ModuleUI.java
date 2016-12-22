@@ -62,9 +62,11 @@ public class ModuleUI implements IInterpreterModule {
 				"};\n" +
 				"export \"g_ui_println\";\n" +
 				"var g_ui_input = func ~() {\n" +
+				"    call g_ui_caret(true);\n" +
 				"    for (;;) {\n" +
 				"        var s = call g_ui_input_internal();\n" +
 				"        if (!call g_is_null(s)) {\n" +
+				"            while (!call g_ui_caret(false)) {};\n" +
 				"            call g_ui_println();\n" +
 				"            return s;\n" +
 				"        }\n" +
@@ -149,6 +151,31 @@ public class ModuleUI implements IInterpreterModule {
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) throws Exception {
 				return new RuntimeObject(queueDisplay.poll());
+			}
+		});
+		info.addExternalFunc("g_ui_caret", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "设置光标闪烁";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kBool};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				boolean caret = (boolean) args.get(0).getObj();
+				if (caret) {
+					graphics.setCaret(caret);
+					return null;
+				} else {
+					graphics.setCaret(caret);
+					status.getService().getProcessService().sleep(status.getPid(), INPUT_TIME);
+					return new RuntimeObject(graphics.isHideCaret());
+				}
 			}
 		});
 	}

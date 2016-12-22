@@ -12,12 +12,17 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class UIGraphics {
 
+	private static final int CARET_TIME = 20;
 	private int w, h, cols, rows, width, height, zoom, size;
 	private char[] data;
 	private int ptr_x, ptr_y;
 	private Queue<Character> queue;
 	private UIFontImage fontImage;
 	private Image image;
+	private boolean caret;
+	private boolean caretPrev;
+	private boolean caretState;
+	private int caretTime;
 
 	public UIGraphics(int w, int h, int cols, int rows, int width, int height, int zoom) {
 		this.w = w;
@@ -39,40 +44,79 @@ public class UIGraphics {
 	}
 
 	public void paint(Graphics2D g) {
+		int len = 0;
 		for (; ; ) {
 			Character c = this.queue.poll();
 			if (c == null)
 				break;
 			draw(g, c);
+			len++;
+		}
+		if (len > 0 && caretTime > 0) {
+			caretTime = 0;
+		}
+		if (caret != caretPrev) {
+			if (caretPrev && caretState) {
+				hideCaret();
+				caretTime = 0;
+				caretState = false;
+			}
+			caretPrev = caret;
+		} else if (caret) {
+			if (caretState) {
+				showCaret(g);
+			} else {
+				hideCaret();
+			}
+			if (caretTime++ >= CARET_TIME) {
+				caretState = !caretState;
+				caretTime = 0;
+			}
 		}
 		g.drawImage(image, 0, 0, null);
 	}
 
+	private void showCaret(Graphics2D g) {
+		if (ptr_x == cols) {
+			ptr_x = 0;
+			if (ptr_y == rows) {
+				clear(g);
+			} else {
+				ptr_y++;
+			}
+		}
+		drawChar('_');
+	}
+
+	private void hideCaret() {
+		drawChar('\0');
+	}
+
 	private void draw(Graphics2D g, char c) {
 		if (c == '\n') {
-			if (ptr_y == rows) {
+			if (ptr_y == rows - 1) {
 				clear(g);
 			} else {
 				ptr_x = 0;
 				ptr_y++;
 			}
-		} else if (ptr_x == cols) {
-			if (ptr_y == rows) {
+		} else if (ptr_x == cols - 1) {
+			if (ptr_y == rows - 1) {
 				clear(g);
-				drawChar(g, c);
+				drawChar(c);
 				ptr_x++;
 			} else {
-				drawChar(g, c);
+				drawChar(c);
 				ptr_x = 0;
 				ptr_y++;
 			}
 		} else {
-			drawChar(g, c);
+			drawChar(c);
 			ptr_x++;
 		}
 	}
 
-	private void drawChar(Graphics2D g, char c) {
+	private void drawChar(char c) {
 		this.data[ptr_y * rows + ptr_x] = c;
 		image.getGraphics().drawImage(fontImage.getImage(c),
 				ptr_x * width, ptr_y * height, null);
@@ -91,5 +135,14 @@ public class UIGraphics {
 
 	public void drawText(char c) {
 		this.queue.add(c);
+	}
+
+	public void setCaret(boolean caret) {
+		if (this.caret != caret)
+			this.caret = caret;
+	}
+
+	public boolean isHideCaret() {
+		return !this.caretState && !this.caret;
 	}
 }
