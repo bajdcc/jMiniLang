@@ -111,7 +111,8 @@ public class URShell implements IOSCodePage {
 				"    let cmd = call g_string_trim(cmd);\n" +
 				"    if (call g_string_length(cmd) == 0) {\n" +
 				"        call g_ui_printn(\"Error: no cmd\");\n" +
-				"        return;\n" +
+                "        call g_create_user_process_args(this, arg);\n" +
+                "        return;\n" +
 				"    }\n" +
 				"    if (cmd == \"exit\") {\n" +
 				"        var handle = call g_create_pipe(\"int#10\");\n" +
