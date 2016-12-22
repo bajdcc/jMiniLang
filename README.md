@@ -547,3 +547,6 @@ PC #0 stopped
 
 *Screenshot 3 - Y-Combinator*
 ![Screenshot 3](https://bajdcc.github.io/host/screenshot/jMiniLang_3.png)
+
+*Screenshot 4 - OS Virtual Machine with GUI*
+![Screenshot 4](https://bajdcc.github.io/host/screenshot/jMiniLang_4.png)
