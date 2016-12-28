@@ -3,8 +3,6 @@ package priv.bajdcc.LALR1.grammar.runtime;
 import priv.bajdcc.LALR1.grammar.Grammar;
 import priv.bajdcc.LALR1.grammar.runtime.service.IRuntimeProcessService;
 import priv.bajdcc.LALR1.grammar.runtime.service.RuntimeService;
-import priv.bajdcc.LALR1.syntax.handler.SyntaxException;
-import priv.bajdcc.util.lexer.error.RegexException;
 
 import java.io.InputStream;
 import java.util.*;
@@ -215,6 +213,7 @@ public class RuntimeProcess implements IRuntimeProcessService {
 				cyclePtr -= MAX_PROCESS;
 			}
 		}
+		System.out.println((kernel ? "Kernel" : "User") + " process #" + pid + " '" + name + "' created");
 		return pid;
 	}
 
@@ -222,6 +221,7 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		arrProcess[processId] = null;
 		destroyedProcess.add(processId);
 		setProcessId.remove(processId);
+		System.out.println("Process #" + processId + " exit");
 	}
 
 	@Override
@@ -246,6 +246,11 @@ public class RuntimeProcess implements IRuntimeProcessService {
 			turn = 0;
 		arrProcess[pid].sleep += turn;
 		return arrProcess[pid].sleep;
+	}
+
+	@Override
+	public boolean live(int pid) {
+		return setProcessId.contains(pid);
 	}
 
 	@Override

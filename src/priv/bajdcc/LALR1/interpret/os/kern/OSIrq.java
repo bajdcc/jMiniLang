@@ -48,14 +48,14 @@ public class OSIrq implements IOSCodePage {
 				"        var on = call g_array_get(_state_, 0);\n" +
 				"        if (!on) { break; }\n" +
 				"    }\n" +
-				"    //call g_printn(\"int_proc: #\" + no + \" exit\");\n" +
+				"    call g_printn(\"int_proc: #\" + no + \" exit\");\n" +
 				"};\n" +
 				"foreach (var j : call g_range(0, interrupt_num - 1)) {\n" +
 				"    var args = {};\n" +
 				"    call g_map_put(args, \"no\", j);\n" +
 				"    call g_map_put(args, \"table\", int_table);\n" +
 				"    call g_create_process_args(int_proc, args);\n" +
-				"    //call g_printn(\"Create int_proc: #\" + j);\n" +
+				"    call g_printn(\"Create int_proc: #\" + j);\n" +
 				"}\n" +
 				"\n" +
 				"var destroy_int = func ~() {\n" +
@@ -72,6 +72,7 @@ public class OSIrq implements IOSCodePage {
 				"        var _state_ = call g_query_share(\"SCHD#ON\");\n" +
 				"        call g_array_set(_state_, 0, false);\n" +
 				"        call g_create_process(destroy_int);\n" +
+				"        call g_printn(\"*** System halt!\");\n" +
 				"    }\n" +
 				"};\n" +
 				"call add_int_proc(10, schd_handler);\n" +

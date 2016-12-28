@@ -39,7 +39,7 @@ public class OSSchd implements IOSCodePage {
 				"        call g_sleep(1);\n" +
 				"    }\n" +
 				"}\n" +
-				"//call g_printn(\"schd exit\");\n" +
+				"call g_printn(\"schd exit\");\n" +
 				"";
 	}
 }

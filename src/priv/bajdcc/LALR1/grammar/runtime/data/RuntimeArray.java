@@ -1,5 +1,7 @@
 package priv.bajdcc.LALR1.grammar.runtime.data;
 
+import priv.bajdcc.LALR1.grammar.runtime.IRuntimeStatus;
+import priv.bajdcc.LALR1.grammar.runtime.RuntimeException;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeObject;
 
 import java.math.BigInteger;
@@ -54,6 +56,14 @@ public class RuntimeArray implements Cloneable {
 		if (index >= 0 && index < array.size()) {
 			return array.get(index);
 		}
+		return null;
+	}
+
+	public RuntimeObject get(int index, IRuntimeStatus status) throws RuntimeException {
+		if (index >= 0 && index < array.size()) {
+			return array.get(index);
+		}
+		status.err(RuntimeException.RuntimeError.INVALID_INDEX, "array.get");
 		return null;
 	}
 

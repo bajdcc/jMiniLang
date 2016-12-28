@@ -24,6 +24,7 @@ public class UREcho implements IOSCodePage {
 				"call g_stop_share(\"PID#\" + pid);\n" +
 				"var args = call g_map_get(share, \"args\");\n" +
 				"\n" +
+				"var in = call g_create_pipe(\"PIPEIN#\" + pid);\n" +
 				"var out = call g_create_pipe(\"PIPEOUT#\" + pid);\n" +
 				"\n" +
 				"foreach (var i : call g_range_array(args)) {\n" +
@@ -33,6 +34,7 @@ public class UREcho implements IOSCodePage {
 				"    call g_write_pipe(out, '\\n');\n" +
 				"}\n" +
 				"\n" +
-				"call g_destroy_pipe(out);\n";
+				"call g_destroy_pipe(out);\n" +
+				"call g_destroy_pipe(in);\n";
 	}
 }

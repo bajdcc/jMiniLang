@@ -98,7 +98,7 @@ public class ModuleList implements IInterpreterModule {
 				BigInteger index = (BigInteger) args.get(1).getObj();
 				args.get(2).setReadonly(false);
 				if (!array.set(index.intValue(), args.get(2))) {
-					status.err(RuntimeException.RuntimeError.INVALID_INDEX);
+					status.err(RuntimeException.RuntimeError.INVALID_INDEX, "array.set");
 				}
 				return null;
 			}
@@ -172,10 +172,29 @@ public class ModuleList implements IInterpreterModule {
 
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
-												  IRuntimeStatus status) throws Exception {
+			                                      IRuntimeStatus status) throws Exception {
 				RuntimeArray array = (RuntimeArray) args.get(0).getObj();
 				BigInteger index = (BigInteger) args.get(1).getObj();
 				return new RuntimeObject(array.get(index.intValue()));
+			}
+		});
+		info.addExternalFunc("g_array_get_ex", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "数组查询";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kArray, RuntimeObjectType.kInt};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				RuntimeArray array = (RuntimeArray) args.get(0).getObj();
+				BigInteger index = (BigInteger) args.get(1).getObj();
+				return new RuntimeObject(array.get(index.intValue(), status));
 			}
 		});
 		info.addExternalFunc("g_array_size", new IRuntimeDebugExec() {

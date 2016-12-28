@@ -18,6 +18,15 @@ public interface IRuntimeShareService {
 	int startSharing(String name, RuntimeObject obj);
 
 	/**
+	 * 创建共享（可覆盖）
+	 *
+	 * @param name 共享名称
+	 * @param obj  变量
+	 * @return 操作状态
+	 */
+	int createSharing(String name, RuntimeObject obj);
+
+	/**
 	 * 查询共享
 	 * @param name 变量名称
 	 * @param reference 是否引用

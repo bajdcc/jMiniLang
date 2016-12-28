@@ -304,7 +304,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 
 	@Override
 	public void err(RuntimeError type, String message) throws RuntimeException {
-		// System.err.println(stack);
+		System.err.println(stack);
 		throw new RuntimeException(type, stack.reg.execId, type.getMessage() + " " + message);
 	}
 

@@ -31,7 +31,15 @@ public class UIPanel extends JPanel {
 						moduleUI.addInputChar('\ufff0');
 						break;
 					default:
-						moduleUI.addInputChar(e.getKeyChar());
+						if (e.isControlDown()) {
+							switch (e.getKeyCode()) {
+								case KeyEvent.VK_C:
+									moduleUI.addDisplayChar('\uffee');
+									break;
+							}
+						} else {
+							moduleUI.addInputChar(e.getKeyChar());
+						}
 						break;
 				}
 			}

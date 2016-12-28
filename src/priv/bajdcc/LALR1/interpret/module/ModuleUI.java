@@ -31,6 +31,10 @@ public class ModuleUI implements IInterpreterModule {
 		queue.add(c);
 	}
 
+	public void addDisplayChar(char c) {
+		queueDisplay.add(c);
+	}
+
 	public static ModuleUI getInstance() {
 		return instance;
 	}
@@ -80,13 +84,30 @@ public class ModuleUI implements IInterpreterModule {
 				"                    var old = call g_array_pop(h);\n" +
 				"                    call g_ui_input_queue(old);\n" +
 				"                }\n" +
+				"            } else if (c == '\\uffee') {\n" +
+				"                call g_ui_println();\n" +
+				"                return call g_ui_input_im();\n" +
 				"            } else {\n" +
 				"                call g_ui_print(c);\n" +
 				"            }\n" +
 				"        }\n" +
 				"    }\n" +
 				"};\n" +
-				"export \"g_ui_input\";\n";
+				"export \"g_ui_input\";\n" +
+				"var g_ui_inputd = func ~(callback, arr) {\n" +
+				"    var handle = call g_wait_pipe(callback);\n" +
+				"    while (call g_array_size(arr) == 0) {\n" +
+				"        var c = call g_ui_print_input();\n" +
+				"        if (!call g_is_null(c)) {\n" +
+				"            if (c == '\\uffee') {\n" +
+				"                call g_array_add(arr, 'C');\n" +
+				"                break;\n" +
+				"            }\n" +
+				"        }\n" +
+				"    }\n" +
+				"    call g_write_pipe(handle, call g_array_get(arr, 0));\n" +
+				"};\n" +
+				"export \"g_ui_inputd\";\n";
 
 		Grammar grammar = new Grammar(base);
 		RuntimeCodePage page = grammar.getCodePage();
@@ -146,6 +167,27 @@ public class ModuleUI implements IInterpreterModule {
 					queueDisplay.add(c);
 				}
 				return null;
+			}
+		});
+		info.addExternalFunc("g_ui_input_im", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "立即显示输入";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return null;
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				status.getService().getProcessService().sleep(status.getPid(), INPUT_TIME);
+				String str = sb.toString();
+				sb = new StringBuilder();
+				queueDisplay.clear();
+				return new RuntimeObject(str);
 			}
 		});
 		info.addExternalFunc("g_ui_input_queue", new IRuntimeDebugExec() {

@@ -2,7 +2,8 @@ package priv.bajdcc.LALR1.grammar.runtime.service;
 
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeObject;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 【运行时】运行时共享服务
@@ -39,6 +40,16 @@ public class RuntimeShareService implements IRuntimeShareService {
 		if (mapShares.containsKey(name))
 			return 0;
 		mapShares.put(name, new ShareStruct(name, obj));
+		System.out.println("Sharing '" + name + "' created");
+		return 1;
+	}
+
+	@Override
+	public int createSharing(String name, RuntimeObject obj) {
+		if (mapShares.size() >= MAX_SHARING)
+			return -1;
+		mapShares.put(name, new ShareStruct(name, obj));
+		System.out.println("Sharing '" + name + "' created");
 		return 1;
 	}
 

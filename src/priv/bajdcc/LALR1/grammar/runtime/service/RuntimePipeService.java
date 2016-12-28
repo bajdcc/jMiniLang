@@ -56,6 +56,7 @@ public class RuntimePipeService implements IRuntimePipeService {
 				cyclePtr -= MAX_PIPE;
 			}
 		}
+		System.out.println("Pipe #" + handle + " '" + name + "' created");
 		return handle;
 	}
 
@@ -64,10 +65,19 @@ public class RuntimePipeService implements IRuntimePipeService {
 		if (!setPipeId.contains(handle)) {
 			return false;
 		}
+		System.out.println("Pipe #" + handle + " '" + arrPipes[handle].name + "' destroyed");
 		mapPipeNames.remove(arrPipes[handle].name);
 		arrPipes[handle] = null;
 		setPipeId.remove(handle);
 		return true;
+	}
+
+	@Override
+	public boolean destroyByName(String name) {
+		if (!mapPipeNames.containsKey(name)) {
+			return false;
+		}
+		return destroy(mapPipeNames.get(name));
 	}
 
 	@Override
@@ -89,7 +99,7 @@ public class RuntimePipeService implements IRuntimePipeService {
 
 	@Override
 	public boolean isEmpty(int handle) {
-		return setPipeId.contains(handle) && arrPipes[handle].queue.isEmpty();
+		return !setPipeId.contains(handle) || arrPipes[handle].queue.isEmpty();
 	}
 
 	@Override

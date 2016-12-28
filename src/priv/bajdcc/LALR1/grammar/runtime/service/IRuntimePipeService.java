@@ -1,11 +1,5 @@
 package priv.bajdcc.LALR1.grammar.runtime.service;
 
-import priv.bajdcc.LALR1.grammar.runtime.RuntimeCodePage;
-import priv.bajdcc.LALR1.grammar.runtime.RuntimeException;
-import priv.bajdcc.LALR1.grammar.runtime.data.RuntimeFuncObject;
-
-import java.util.List;
-
 /**
  * 【运行时】运行时管道服务接口
  *
@@ -26,6 +20,14 @@ public interface IRuntimePipeService {
 	 * @return 是否成功
 	 */
 	boolean destroy(int handle);
+
+	/**
+	 * 销毁管道
+	 *
+	 * @param name 管道名称
+	 * @return 是否成功
+	 */
+	boolean destroyByName(String name);
 
 	/**
 	 * 管道读

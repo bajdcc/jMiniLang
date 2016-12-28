@@ -1,7 +1,5 @@
 package priv.bajdcc.LALR1.grammar.runtime.service;
 
-import priv.bajdcc.LALR1.grammar.runtime.RuntimeObject;
-
 /**
  * 【运行时】运行时进程服务接口
  *
@@ -25,6 +23,14 @@ public interface IRuntimeProcessService {
 	 * @return 总休眠趟数
 	 */
 	int join(int joined, int pid, int turn);
+
+	/**
+	 * 进行存活
+	 *
+	 * @param pid 页名
+	 * @return 是否存活
+	 */
+	boolean live(int pid);
 
 	/**
 	 * 添加代码页
