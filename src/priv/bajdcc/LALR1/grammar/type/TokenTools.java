@@ -1,10 +1,5 @@
 package priv.bajdcc.LALR1.grammar.type;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.Map.Entry;
-
 import priv.bajdcc.LALR1.grammar.error.SemanticException.SemanticError;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeInst;
 import priv.bajdcc.LALR1.grammar.semantic.ISemanticRecorder;
@@ -15,6 +10,11 @@ import priv.bajdcc.LALR1.grammar.tree.ExpValue;
 import priv.bajdcc.util.lexer.token.OperatorType;
 import priv.bajdcc.util.lexer.token.Token;
 import priv.bajdcc.util.lexer.token.TokenType;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.HashMap;
+import java.util.Map.Entry;
 
 /**
  * 【语义分析】一元表达式辅助计算工具
@@ -281,6 +281,10 @@ public class TokenTools {
 							break;
 						case EQUAL:
 							lop.object = lstr.equals(rstr);
+							lop.kToken = TokenType.BOOL;
+							break;
+						case NOT_EQUAL:
+							lop.object = !lstr.equals(rstr);
 							lop.kToken = TokenType.BOOL;
 							break;
 						default:

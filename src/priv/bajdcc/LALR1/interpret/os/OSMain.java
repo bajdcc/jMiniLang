@@ -36,6 +36,8 @@ public class OSMain {
 				new URPipe(),
 				new URDup(),
 				new URGrep(),
+				new URRange(),
+				new URProc(),
 		};
 
 		try {

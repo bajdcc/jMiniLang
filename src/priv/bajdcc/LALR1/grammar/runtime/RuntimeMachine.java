@@ -369,6 +369,21 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	}
 
 	@Override
+	public List<Integer> getSysProcs() {
+		return process.getSysProcs();
+	}
+
+	@Override
+	public String getProcName() {
+		return pageName;
+	}
+
+	@Override
+	public String getProcNameById(int id) {
+		return process.getProcNameById(id);
+	}
+
+	@Override
 	public int stepUsrProcess(int pid) {
 		return process.stepUsrProcess(pid);
 	}

@@ -71,6 +71,8 @@ public class UIMainFrame extends JFrame {
 				new URPipe(),
 				new URDup(),
 				new URGrep(),
+				new URRange(),
+				new URProc(),
 		};
 
 		try {

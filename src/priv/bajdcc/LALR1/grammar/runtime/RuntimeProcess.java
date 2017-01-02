@@ -87,6 +87,17 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		return setProcessId.stream().filter(id -> !arrProcess[id].kernel).collect(Collectors.toList());
 	}
 
+	public List<Integer> getSysProcs() {
+		return setProcessId.stream().filter(id -> arrProcess[id].kernel).collect(Collectors.toList());
+	}
+
+	public String getProcNameById(int id) {
+		if (!setProcessId.contains(id)) {
+			return "Invalid Proc";
+		}
+		return arrProcess[id].machine.getProcName();
+	}
+
 	public RuntimeCodePage getPage(String name) throws Exception {
 		if (arrCodes.containsKey(name)) {
 			String code = arrCodes.get(name);

@@ -397,6 +397,50 @@ public class ModuleProc implements IInterpreterModule {
 						status.getService().getProcessService().sleep(status.getPid(), time > 0 ? time : 0)));
 			}
 		});
+		info.addExternalFunc("g_query_usr_proc", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "枚举用户态进程";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return null;
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				RuntimeArray array = new RuntimeArray();
+				for (int pid : status.getUsrProcs()) {
+					array.add(new RuntimeObject(String.format("%5s   %-15s",
+							String.valueOf(pid), status.getProcNameById(pid))));
+				}
+				return new RuntimeObject(array);
+			}
+		});
+		info.addExternalFunc("g_query_sys_proc", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "枚举内核态进程";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return null;
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				RuntimeArray array = new RuntimeArray();
+				for (int pid : status.getSysProcs()) {
+					array.add(new RuntimeObject(String.format("%5s   %-15s",
+							String.valueOf(pid), status.getProcNameById(pid))));
+				}
+				return new RuntimeObject(array);
+			}
+		});
 	}
 
 	private void buildPipeMethod(IRuntimeDebugInfo info) {

@@ -165,6 +165,28 @@ public interface IRuntimeStatus {
 	List<Integer> getUsrProcs();
 
 	/**
+	 * 获取内核态进程列表
+	 *
+	 * @return 进程ID列表
+	 */
+	List<Integer> getSysProcs();
+
+	/**
+	 * 获取进程名
+	 *
+	 * @param id 进程ID
+	 * @return 进程名
+	 */
+	String getProcNameById(int id);
+
+	/**
+	 * 获取当前进程名
+	 *
+	 * @return 进程名
+	 */
+	String getProcName();
+
+	/**
 	 * 运行用户态进程
 	 * @param pid 进程ID
 	 * @return 进程ID
