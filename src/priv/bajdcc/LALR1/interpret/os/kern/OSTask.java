@@ -3,14 +3,14 @@ package priv.bajdcc.LALR1.interpret.os.kern;
 import priv.bajdcc.LALR1.interpret.os.IOSCodePage;
 
 /**
- * 【内核】入口
+ * 【内核】服务
  *
  * @author bajdcc
  */
-public class OSEntry implements IOSCodePage {
+public class OSTask implements IOSCodePage {
 	@Override
 	public String getName() {
-		return "/kern/entry";
+		return "/kern/task";
 	}
 
 	@Override
@@ -18,10 +18,7 @@ public class OSEntry implements IOSCodePage {
 		return "// KERNEL ENTRY BY BAJDCC\n" +
 				"import \"sys.base\";\n" +
 				"import \"sys.proc\";\n" +
-				"call g_load_sync_x(\"/kern/irq\");\n" +
-				"call g_load_x(\"/kern/task\");\n" +
-				"call g_load_x(\"/proc/schd\");\n" +
-				"call g_load_user_x(\"/usr/main\");\n" +
+				"call g_load_x(\"/task/time\");\n" +
 				"";
 	}
 }

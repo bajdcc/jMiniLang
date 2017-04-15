@@ -48,8 +48,8 @@ public class RuntimeProcess implements IRuntimeProcessService {
 
 	private static final int SLEEP_TURN = 10;
 	private static final int MAX_PROCESS = 1000;
-	private static final int PER_CYCLE = 10;
-	private static final int USR_PER_CYCLE = 5;
+	private static final int PER_CYCLE = 50;
+	private static final int USR_PER_CYCLE = 200;
 	private int cyclePtr = 0;
 	private String name;
 	private RuntimeCodePage codePage;
@@ -180,7 +180,7 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		this.destroyedProcess = new HashSet<>();
 		this.service = new RuntimeService(this);
 		this.arrActiveUsrProcs = new ArrayList<>();
-		RuntimeMachine machine = new RuntimeMachine(cyclePtr, -1, this);
+		RuntimeMachine machine = new RuntimeMachine(name, cyclePtr, -1, this);
 		machine.initStep(name, codePage, Collections.emptyList(), 0, null);
 		setProcessId.add(cyclePtr);
 		arrProcess[cyclePtr++] = new SchdProcess(machine);
@@ -209,7 +209,7 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		int pid;
 		for (;;) {
 			if (arrProcess[cyclePtr] == null && !destroyedProcess.contains(cyclePtr)) {
-				RuntimeMachine machine = new RuntimeMachine(cyclePtr, creatorId,this);
+				RuntimeMachine machine = new RuntimeMachine(name, cyclePtr, creatorId,this);
 				machine.initStep(name, page, arrProcess[creatorId].machine.getPageRefers(name), pc, obj);
 				setProcessId.add(cyclePtr);
 				pid = cyclePtr;

@@ -3,14 +3,11 @@ package priv.bajdcc.LALR1.interpret.module;
 import priv.bajdcc.LALR1.grammar.Grammar;
 import priv.bajdcc.LALR1.grammar.runtime.*;
 import priv.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
-import priv.bajdcc.LALR1.grammar.runtime.data.RuntimeFuncObject;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  * 【模块】字符串模块
@@ -196,6 +193,29 @@ public class ModuleString implements IInterpreterModule {
 					sb.append(obj);
 				}
 				return new RuntimeObject(sb.toString());
+			}
+		});
+		info.addExternalFunc("g_string_atoi", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "字符串转换成数字";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[] { RuntimeObjectType.kString };
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				String str = (String) args.get(0).getObj();
+				try	{
+					BigInteger bi = new BigInteger(str);
+					return new RuntimeObject(new BigInteger(str));
+				} catch (NumberFormatException e) {
+					return new RuntimeObject(BigInteger.valueOf(-1));
+				}
 			}
 		});
 	}

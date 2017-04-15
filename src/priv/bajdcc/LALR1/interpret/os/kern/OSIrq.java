@@ -1,5 +1,6 @@
 package priv.bajdcc.LALR1.interpret.os.kern;
 
+import priv.bajdcc.LALR1.interpret.module.ModuleTask;
 import priv.bajdcc.LALR1.interpret.os.IOSCodePage;
 
 /**
@@ -21,6 +22,7 @@ public class OSIrq implements IOSCodePage {
 		return "import \"sys.base\";\n" +
 				"import \"sys.list\";\n" +
 				"import \"sys.proc\";\n" +
+				"import \"sys.task\";\n" +
 				"import \"sys.ui\";\n" +
 				"var interrupt_num = " + INT_NUM + ";\n" +
 				"var int_table = [];\n" +
@@ -59,6 +61,13 @@ public class OSIrq implements IOSCodePage {
 				"}\n" +
 				"\n" +
 				"var destroy_int = func ~() {\n" +
+				"    var tt = call g_query_share(\"TASK#TABLE\");\n" +
+				"    foreach (var i : call g_range(0, " + ModuleTask.TASK_NUM + " - 1)) {\n" +
+				"        if (!call g_is_null(call g_array_get(tt, i))) {\n" +
+				"           var handle = call g_create_pipe(\"TASKSEND#\" + i);\n" +
+				"           call g_write_pipe(handle, 'E');\n" +
+				"        }\n" +
+				"    }\n" +
 				"    foreach (var i : call g_range(0, " + INT_NUM + " - 1)) {\n" +
 				"        var _state_ = call g_query_share(\"IRQ#ON.\" + i);\n" +
 				"        call g_array_set(_state_, 0, false);\n" +
@@ -80,6 +89,11 @@ public class OSIrq implements IOSCodePage {
 				"    call g_ui_print_internal(ch);\n" +
 				"};\n" +
 				"call add_int_proc(12, print_handler);\n" +
+				"var task_handler = func ~(ch) {\n" +
+				"    call g_task_handler(ch);\n" +
+				"};\n" +
+				"call g_task_init();\n" +
+				"call add_int_proc(9, task_handler);\n" +
 				"";
 	}
 }

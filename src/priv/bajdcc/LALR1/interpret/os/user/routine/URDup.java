@@ -18,6 +18,7 @@ public class URDup implements IOSCodePage {
 		return "import \"sys.base\";\n" +
 				"import \"sys.list\";\n" +
 				"import \"sys.proc\";\n" +
+				"import \"sys.string\";\n" +
 				"\n" +
 				"var pid = call g_get_pid();\n" +
 				"var share = call g_wait_share(\"PID#\" + pid);\n" +
@@ -25,8 +26,9 @@ public class URDup implements IOSCodePage {
 				"var args = call g_map_get(share, \"args\");\n" +
 				"var count = call g_array_get(args, 0);\n" +
 				"if (call g_is_null(count)) {\n" +
-				"    let count = 2;\n" +
+				"    let count = \"2\";\n" +
 				"}\n" +
+				"let count = call g_string_atoi(count);\n" +
 				"\n" +
 				"var buf = [];\n" +
 				"var pipe = func [\"PIPE\"] ~(ch, out) {\n" +

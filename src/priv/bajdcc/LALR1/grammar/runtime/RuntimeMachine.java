@@ -34,6 +34,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	private RuntimeStack stack = new RuntimeStack();
 	private RuntimeCodePage currentPage;
 	private String pageName;
+	private String name;
 	private RuntimeProcess process;
 	private int pid;
 	private int parentId;
@@ -48,6 +49,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 					ModuleString.getInstance(),
 					ModuleProc.getInstance(),
 					ModuleUI.getInstance(),
+					ModuleTask.getInstance(),
 			};
 		}
 
@@ -56,8 +58,9 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 		}
 	}
 
-	public RuntimeMachine(int id, int parentId, RuntimeProcess process) throws Exception {
+	public RuntimeMachine(String name, int id, int parentId, RuntimeProcess process) throws Exception {
 		this();
+		this.name = name;
 		this.pid = id;
 		this.parentId = parentId;
 		this.process = process;
@@ -298,7 +301,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 
 	@Override
 	public void err(RuntimeError type) throws RuntimeException {
-		// System.err.println(stack);
+		System.err.println(stack);
 		throw new RuntimeException(type, stack.reg.execId, type.getMessage());
 	}
 
@@ -375,7 +378,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 
 	@Override
 	public String getProcName() {
-		return pageName;
+		return name;
 	}
 
 	@Override
