@@ -3,6 +3,7 @@ package priv.bajdcc.LALR1.interpret.module;
 import priv.bajdcc.LALR1.grammar.Grammar;
 import priv.bajdcc.LALR1.grammar.runtime.*;
 
+import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -74,6 +75,37 @@ public class ModuleTask implements IInterpreterModule {
 				"};\n" +
 				"export \"g_task_get\";\n" +
 				"\n" +
+				"var g_task_get_fast = func ~(tid, id) {\n" +
+				"    var arg = [];\n" +
+				"    call g_array_add(arg, tid);\n" +
+				"    call g_array_add(arg, id);\n" +
+				"    \n" +
+				"    var msg = {};\n" +
+				"    call g_map_put(msg, \"id\", tid);\n" +
+				"    call g_map_put(msg, \"arg\", arg);\n" +
+				"    return call g_task_get(tid, msg);\n" +
+				"};\n" +
+				"export \"g_task_get_fast\";\n" +
+				"var g_task_get_fast_arg = func ~(tid, id, a) {\n" +
+				"    var arg = [];\n" +
+				"    call g_array_add(arg, tid);\n" +
+				"    call g_array_add(arg, id);\n" +
+				"    call g_array_add(arg, a);\n" +
+				"    \n" +
+				"    var msg = {};\n" +
+				"    call g_map_put(msg, \"id\", id);\n" +
+				"    call g_map_put(msg, \"arg\", arg);\n" +
+				"    call g_task_get(tid, msg);\n" +
+				"    var error = call g_map_get(msg, \"error\");\n" +
+				"    var val = call g_map_get(msg, \"val\");\n" +
+				"    if (error == 1) {\n" +
+				"        return g_null;\n" +
+				"    } else {\n" +
+				"        return val;\n" +
+				"    }\n" +
+				"};\n" +
+				"export \"g_task_get_fast_arg\";\n" +
+				"\n" +
 				"var task_handler = func ~(ch) {\n" +
 				"    var waiting_list = call g_query_share(\"TASK#LIST\");\n" +
 				"    var task_table = call g_query_share(\"TASK#TABLE\");\n" +
@@ -144,6 +176,23 @@ public class ModuleTask implements IInterpreterModule {
 			                                      IRuntimeStatus status) throws Exception {
 				String format = String.valueOf(args.get(0).getObj());
 				return new RuntimeObject(new SimpleDateFormat(format).format(new Date()));
+			}
+		});
+		info.addExternalFunc("g_task_get_timestamp", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "获取当前时间戳";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return null;
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				return new RuntimeObject(BigInteger.valueOf(System.currentTimeMillis()));
 			}
 		});
 	}

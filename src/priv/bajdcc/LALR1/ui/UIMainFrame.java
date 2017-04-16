@@ -79,6 +79,7 @@ public class UIMainFrame extends JFrame {
 				new URRange(),
 				new URProc(),
 				new URTask(),
+				new URSleep(),
 		};
 
 		try {

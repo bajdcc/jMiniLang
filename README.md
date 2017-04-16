@@ -45,6 +45,7 @@ Now has commands:
 - proc
 - range
 - task
+- sleep
 
 Implemented IPC, usage:
 - `task system now` -> Get system time

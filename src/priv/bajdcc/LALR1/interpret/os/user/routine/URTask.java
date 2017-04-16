@@ -39,15 +39,10 @@ public class URTask implements IOSCodePage {
 				"\n" +
 				"var tid = call g_array_get(args, 0);\n" +
 				"var id = call g_array_get(args, 1);\n" +
-				"var arg = [];\n" +
-				"\n" +
-				"foreach (var i : call g_range_array(args)) {\n" +
-				"    call g_array_add(arg, i);\n" +
-				"}\n" +
 				"\n" +
 				"var msg = {};\n" +
 				"call g_map_put(msg, \"id\", id);\n" +
-				"call g_map_put(msg, \"arg\", arg);\n" +
+				"call g_map_put(msg, \"arg\", args);\n" +
 				"call g_task_get(tid, msg);\n" +
 				"\n" +
 				"var error = call g_map_get(msg, \"error\");\n" +

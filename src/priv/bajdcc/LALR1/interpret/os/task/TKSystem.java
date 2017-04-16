@@ -34,7 +34,14 @@ public class TKSystem implements IOSCodePage {
 				"        return;\n" +
 				"    }\n" +
 				"    if (id == \"now\") {\n" +
-				"        var val = call g_task_get_time(\"yyyy-MM-dd HH:mm:ss\");\n" +
+				"        var val = \"\";\n" +
+				"        var arg = call g_map_get(msg, \"arg\");\n" +
+				"        var ts = call g_array_get(arg, 2);\n" +
+				"        if (!call g_is_null(ts) && ts == \"timestamp\") {\n" +
+				"           let val = call g_task_get_timestamp();\n" +
+				"        } else {\n" +
+				"           let val = call g_task_get_time(\"yyyy-MM-dd HH:mm:ss\");\n" +
+				"        }\n" +
 				"        call g_map_put(msg, \"val\", val);\n" +
 				"    }\n" +
 				"};\n" +
