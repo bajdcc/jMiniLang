@@ -394,6 +394,8 @@ public class PrecedenceTable extends OPTableSolver {
 			}
 		}
 		println();
+		if (sobj.peek().obj == null)
+			return sobj.peek().token.object;
 		return sobj.peek().obj;
 	}
 
