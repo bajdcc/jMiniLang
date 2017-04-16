@@ -66,7 +66,12 @@ public class ModuleUI implements IInterpreterModule {
 				"    call g_ui_print(g_endl);\n" +
 				"};\n" +
 				"export \"g_ui_println\";\n" +
+				"var ui_input_mark = func ~() {\n" +
+				"    call g_empty_pipe(\"int#2\");\n" +
+				"    call g_ui_input_mark();\n" +
+				"};\n" +
 				"var g_ui_input = func ~() {\n" +
+				"    call ui_input_mark();\n" +
 				"    call g_ui_caret(true);\n" +
 				"    var h = call g_query_share(\"cmd#histroy\");\n" +
 				"    for (;;) {\n" +
@@ -82,6 +87,7 @@ public class ModuleUI implements IInterpreterModule {
 				"            if (c == '\\ufff0') {\n" +
 				"                if (!call g_array_empty(h)) {\n" +
 				"                    var old = call g_array_pop(h);\n" +
+				"                    call g_ui_fallback();\n" +
 				"                    call g_ui_input_queue(old);\n" +
 				"                }\n" +
 				"            } else if (c == '\\uffee') {\n" +
@@ -160,6 +166,11 @@ public class ModuleUI implements IInterpreterModule {
 					sb = new StringBuilder();
 					queueDisplay.clear();
 					return new RuntimeObject(str);
+				} else if (c.equals('\b')) {
+					if (sb.length() > 0)
+						sb.deleteCharAt(sb.length() - 1);
+					graphics.drawText('\b');
+					return null;
 				} else {
 					if (c < '\ufff0') {
 						sb.append(c);
@@ -246,13 +257,50 @@ public class ModuleUI implements IInterpreterModule {
 			                                      IRuntimeStatus status) throws Exception {
 				boolean caret = (boolean) args.get(0).getObj();
 				if (caret) {
-					graphics.setCaret(caret);
+					graphics.setCaret(true);
 					return null;
 				} else {
-					graphics.setCaret(caret);
+					graphics.setCaret(false);
 					status.getService().getProcessService().sleep(status.getPid(), INPUT_TIME);
 					return new RuntimeObject(graphics.isHideCaret());
 				}
+			}
+		});
+		info.addExternalFunc("g_ui_input_mark", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "标记输入位置";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return null;
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				graphics.markInput();
+				return null;
+			}
+		});
+		info.addExternalFunc("g_ui_fallback", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "撤销上次输入";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return null;
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				sb = new StringBuilder();
+				graphics.fallback();
+				return null;
 			}
 		});
 	}

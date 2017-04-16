@@ -170,6 +170,7 @@ public class URShell implements IOSCodePage {
 				"    var this = call g_array_get(arg, 0);\n" +
 				"    var parse = call g_array_get(arg, 1);\n" +
 				"    call g_ui_print(\"$ \");\n" +
+				"    call g_sleep(400);\n" +
 				"    var cmd = call g_ui_input();\n" +
 				"    let cmd = call g_string_trim(cmd);\n" +
 				"    if (call g_string_length(cmd) == 0) {\n" +

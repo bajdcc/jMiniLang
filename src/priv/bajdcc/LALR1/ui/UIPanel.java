@@ -30,6 +30,9 @@ public class UIPanel extends JPanel {
 					case KeyEvent.VK_UP:
 						moduleUI.addInputChar('\ufff0');
 						break;
+					case KeyEvent.VK_BACK_SPACE:
+						moduleUI.addInputChar('\b');
+						break;
 					default:
 						if (e.isControlDown()) {
 							switch (e.getKeyCode()) {

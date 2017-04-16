@@ -16,6 +16,7 @@ public class UIGraphics {
 	private int w, h, cols, rows, width, height, zoom, size;
 	private char[] data;
 	private int ptr_x, ptr_y;
+	private int ptr_mx, ptr_my;
 	private Queue<Character> queue;
 	private UIFontImage fontImage;
 	private Image image;
@@ -36,6 +37,8 @@ public class UIGraphics {
 		this.data = new char[cols * rows];
 		this.ptr_x = 0;
 		this.ptr_y = 0;
+		this.ptr_mx = 0;
+		this.ptr_my = 0;
 		this.queue = new LinkedBlockingQueue<>(1024);
 		this.fontImage = new UIFontImage(this.width, this.height);
 		this.image = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
@@ -100,6 +103,24 @@ public class UIGraphics {
 				ptr_x = 0;
 				ptr_y++;
 			}
+		} else if (c == '\b') {
+			if (ptr_mx + ptr_my * cols < ptr_x + ptr_y * cols) {
+				if (ptr_y == 0) {
+					if (ptr_x != 0) {
+						drawChar('\0');
+						ptr_x--;
+					}
+				} else {
+					if (ptr_x != 0) {
+						drawChar('\0');
+						ptr_x--;
+					} else {
+						drawChar('\0');
+						ptr_x = cols - 1;
+						ptr_y--;
+					}
+				}
+			}
 		} else if (ptr_x == cols - 1) {
 			if (ptr_y == rows - 1) {
 				clear(g);
@@ -144,5 +165,26 @@ public class UIGraphics {
 
 	public boolean isHideCaret() {
 		return !this.caretState && !this.caret;
+	}
+
+	public void markInput() {
+		ptr_mx = ptr_x;
+		ptr_my = ptr_y;
+	}
+
+	public void fallback() {
+		int x = ptr_x, y = ptr_y;
+		while (ptr_mx + ptr_my * cols < x + y * cols) {
+			if (x == 0) {
+				x = cols - 1;
+				y--;
+			}
+			this.data[y * rows + x] = '\0';
+			image.getGraphics().drawImage(fontImage.getImage('\0'),
+					x * width, y * height, null);
+			x--;
+		}
+		ptr_x = x;
+		ptr_y = y;
 	}
 }

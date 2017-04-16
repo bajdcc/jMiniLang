@@ -127,16 +127,11 @@ public class ModuleProc implements IInterpreterModule {
 				"    call g_printn(\"Waiting pipe: PID#\" + call g_get_pid() + \" -> \" + handle + \" ok\");\n" +
 				"};\n" +
 				"export \"g_wait_pipe\";\n" +
-				"var g_wait_pipe_ex = func ~(handle) {\n" +
-				"    call g_printn(\"Waiting pipe: PID#\" + call g_get_pid() + \" -> \" + handle);\n" +
-				"    for (;;) {\n" +
-				"        var pipe = call g_query_pipe(handle);\n" +
-				"        if (pipe) { return call g_create_pipe(handle); }\n" +
-				"        call g_sleep(10);\n" +
-				"    }\n" +
-				"    call g_printn(\"Waiting pipe: PID#\" + call g_get_pid() + \" -> \" + handle + \" ok\");\n" +
+				"var g_empty_pipe = func ~(handle) {\n" +
+				"    var pipe = call g_wait_pipe(handle);\n" +
+				"    while (call g_wait_pipe_empty(pipe)) {}\n" +
 				"};\n" +
-				"export \"g_wait_pipe_ex\";\n" +
+				"export \"g_empty_pipe\";\n" +
 				"var g_destroy_pipe = func ~(handle) {\n" +
 				"    call g_printn(\"Destroy pipe: PID#\" + call g_get_pid() + \" -> \" + handle);\n" +
 				"    while (call g_wait_pipe_empty(handle)) {}\n" +
