@@ -19,6 +19,8 @@ public class URProc implements IOSCodePage {
 				"import \"sys.list\";\n" +
 				"import \"sys.string\";\n" +
 				"import \"sys.proc\";\n" +
+				"\n" +
+				"call g_set_process_desc(\"proc routinue\");\n" +
 				"var pid = call g_get_pid();\n" +
 				"var share = call g_wait_share(\"PID#\" + pid);\n" +
 				"call g_stop_share(\"PID#\" + pid);\n" +

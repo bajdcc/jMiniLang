@@ -63,7 +63,7 @@ public class ModuleTask implements IInterpreterModule {
 				"    call g_lock_share(\"TASK#LIST\");\n" +
 				"    call g_array_add(waiting_list, pid);\n" +
 				"    call g_unlock_share(\"TASK#LIST\");\n" +
-				"    var handle = call g_create_pipe(\"int#9\");\n" +
+				"    var handle = call g_create_pipe(\"int#1\");\n" +
 				"    call g_write_pipe(handle, '@');\n" +
 				"    var h = call g_wait_pipe(\"IPC#\" + pid);\n" +
 				"    var f = func ~(ch) {" +
@@ -83,11 +83,12 @@ public class ModuleTask implements IInterpreterModule {
 				"    call g_unlock_share(\"TASK#LIST\");\n" +
 				"    var m = call g_query_share(\"MSG#\" + pid);\n" +
 				"    var tid = call g_map_get(m, \"tid\");\n" +
+				"    let tid = call g_task_get_id_by_name(tid);\n" +
 				"    var msg = call g_map_get(m, \"msg\");\n" +
 				"    var data = call g_array_get(task_table, tid);\n" +
 				"    if (call g_is_null(data)) {\n" +
 				"        call g_map_put(msg, \"error\", 1);\n" +
-				"        call g_map_put(msg, \"val\", \"invalid task id\");\n" +
+				"        call g_map_put(msg, \"val\", \"invalid task name\");\n" +
 				"    } else {\n" +
 				"        call g_map_put(msg, \"error\", 0);\n" +
 				"        call g_start_share(\"TASKDATA#\" + tid, msg);\n" +
@@ -104,7 +105,19 @@ public class ModuleTask implements IInterpreterModule {
 				"};\n" +
 				"\n" +
 				"var g_task_handler = func ~(ch) -> call task_handler(ch);\n" +
-				"export \"g_task_handler\";\n";
+				"export \"g_task_handler\";\n" +
+				"" +
+				"var g_task_get_id_by_name = func ~(name) {\n" +
+				"    var task_name_table = call g_query_share(\"TASK#NAMELIST\");\n" +
+				"    foreach (var i : call g_range(0, " + TASK_NUM + " - 1)) {\n" +
+				"        var t = call g_array_get(task_name_table, i);\n" +
+				"        if (!call g_is_null(t) && t == name) {\n" +
+				"            return i;\n" +
+				"        }\n" +
+				"    }\n" +
+				"    return g_null;\n" +
+				"};\n" +
+				"export \"g_task_get_id_by_name\";\n";
 
 		Grammar grammar = new Grammar(base);
 		RuntimeCodePage page = grammar.getCodePage();

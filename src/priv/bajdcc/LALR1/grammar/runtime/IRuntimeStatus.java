@@ -172,19 +172,26 @@ public interface IRuntimeStatus {
 	List<Integer> getSysProcs();
 
 	/**
-	 * 获取进程名
+	 * 获取进程信息
 	 *
 	 * @param id 进程ID
-	 * @return 进程名
+	 * @return 进程信息
 	 */
-	String getProcNameById(int id);
+	Object[] getProcInfoById(int id);
 
 	/**
-	 * 获取当前进程名
+	 * 获取当前进程信息
 	 *
-	 * @return 进程名
+	 * @return 进程信息
 	 */
-	String getProcName();
+	Object[] getProcInfo();
+
+	/**
+	 * 设置进程说明
+	 *
+	 * @param desc 说明信息
+	 */
+	void setProcDesc(String desc);
 
 	/**
 	 * 运行用户态进程

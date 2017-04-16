@@ -7,10 +7,10 @@ import priv.bajdcc.LALR1.interpret.os.IOSCodePage;
  *
  * @author bajdcc
  */
-public class TKTime implements IOSCodePage {
+public class TKSystem implements IOSCodePage {
 	@Override
 	public String getName() {
-		return "/task/time";
+		return "/task/system";
 	}
 
 	@Override
@@ -19,6 +19,9 @@ public class TKTime implements IOSCodePage {
 				"import \"sys.list\";\n" +
 				"import \"sys.proc\";\n" +
 				"import \"sys.task\";\n" +
+				"\n" +
+				"call g_set_process_desc(\"system service\");\n" +
+				"call g_set_process_priority(72);\n" +
 				"\n" +
 				"var tid = 1;\n" +
 				"var handle = call g_create_pipe(\"TASKSEND#\" + tid);\n" +

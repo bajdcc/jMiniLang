@@ -51,7 +51,7 @@ public class ModuleUI implements IInterpreterModule {
 				"import \"sys.proc\";\n" +
 				"import \"sys.string\";\n" +
 				"var g_ui_print = func ~(str) {\n" +
-				"    var ui_int = call g_create_pipe(\"int#12\");\n" +
+				"    var ui_int = call g_create_pipe(\"int#2\");\n" +
 				"    foreach (var c : call g_range_string(str)) {\n" +
 				"        call g_write_pipe(ui_int, c);\n" +
 				"    }\n" +

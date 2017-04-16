@@ -411,12 +411,7 @@ public class ModuleProc implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) throws Exception {
-				RuntimeArray array = new RuntimeArray();
-				for (int pid : status.getUsrProcs()) {
-					array.add(new RuntimeObject(String.format("%5s   %-15s",
-							String.valueOf(pid), status.getProcNameById(pid))));
-				}
-				return new RuntimeObject(array);
+				return new RuntimeObject(getProcInfo(status, status.getUsrProcs()));
 			}
 		});
 		info.addExternalFunc("g_query_sys_proc", new IRuntimeDebugExec() {
@@ -433,12 +428,25 @@ public class ModuleProc implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) throws Exception {
-				RuntimeArray array = new RuntimeArray();
-				for (int pid : status.getSysProcs()) {
-					array.add(new RuntimeObject(String.format("%5s   %-15s",
-							String.valueOf(pid), status.getProcNameById(pid))));
-				}
-				return new RuntimeObject(array);
+				return new RuntimeObject(getProcInfo(status, status.getSysProcs()));
+			}
+		});
+		info.addExternalFunc("g_set_process_desc", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "设置进程说明";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kString};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				status.setProcDesc(String.valueOf(args.get(0).getObj()));
+				return null;
 			}
 		});
 	}
@@ -729,5 +737,17 @@ public class ModuleProc implements IInterpreterModule {
 				return new RuntimeObject(false);
 			}
 		});
+	}
+
+	private static RuntimeArray getProcInfo(IRuntimeStatus status, List<Integer> pids) {
+		RuntimeArray array = new RuntimeArray();
+		array.add(new RuntimeObject(String.format("   %-5s   %-15s   %-20s   %s",
+				"Pid", "Name", "Function", "Description")));
+		for (int pid : pids) {
+			Object[] objs = status.getProcInfoById(pid);
+			array.add(new RuntimeObject(String.format("   %-5s   %-15s   %-20s   %s",
+					String.valueOf(pid), objs[0], objs[1], objs[2])));
+		}
+		return array;
 	}
 }

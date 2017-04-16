@@ -35,6 +35,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	private RuntimeCodePage currentPage;
 	private String pageName;
 	private String name;
+	private String description;
 	private RuntimeProcess process;
 	private int pid;
 	private int parentId;
@@ -61,6 +62,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	public RuntimeMachine(String name, int id, int parentId, RuntimeProcess process) throws Exception {
 		this();
 		this.name = name;
+		this.description = "none";
 		this.pid = id;
 		this.parentId = parentId;
 		this.process = process;
@@ -377,13 +379,22 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	}
 
 	@Override
-	public String getProcName() {
-		return name;
+	public Object[] getProcInfo() {
+		return new Object[]{
+				name,
+				stack.getFuncName(),
+				description,
+		};
 	}
 
 	@Override
-	public String getProcNameById(int id) {
-		return process.getProcNameById(id);
+	public void setProcDesc(String desc) {
+		description = desc;
+	}
+
+	@Override
+	public Object[] getProcInfoById(int id) {
+		return process.getProcInfoById(id);
 	}
 
 	@Override
@@ -704,7 +715,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 				RuntimeObjectType[] types = exec.getArgsType();
 				if ((types == null && argsCount != 0)
 						|| (types != null && types.length != argsCount)) {
-					err(RuntimeError.WRONG_ARGCOUNT, String.valueOf(argsCount));
+					err(RuntimeError.WRONG_ARGCOUNT, name + " " + String.valueOf(argsCount));
 				}
 				List<RuntimeObject> args = new ArrayList<>();
 				for (int i = 0; i < argsCount; i++) {

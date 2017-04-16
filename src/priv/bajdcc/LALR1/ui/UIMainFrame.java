@@ -9,7 +9,7 @@ import priv.bajdcc.LALR1.interpret.os.kern.OSEntry;
 import priv.bajdcc.LALR1.interpret.os.kern.OSIrq;
 import priv.bajdcc.LALR1.interpret.os.kern.OSTask;
 import priv.bajdcc.LALR1.interpret.os.proc.OSSchd;
-import priv.bajdcc.LALR1.interpret.os.task.TKTime;
+import priv.bajdcc.LALR1.interpret.os.task.TKSystem;
 import priv.bajdcc.LALR1.interpret.os.user.UserMain;
 import priv.bajdcc.LALR1.interpret.os.user.routine.*;
 import priv.bajdcc.LALR1.syntax.handler.SyntaxException;
@@ -67,7 +67,7 @@ public class UIMainFrame extends JFrame {
 				new OSSchd(),
 				new OSTask(),
 				// TASK
-				new TKTime(),
+				new TKSystem(),
 				// USER
 				new UserMain(),
 				// USER ROUTINE

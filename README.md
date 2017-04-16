@@ -42,6 +42,12 @@ Now has commands:
 - dup
 - pipe
 - grep
+- proc
+- range
+- task
+
+Implemented IPC, usage:
+- `task system now` -> Get system time
 
 #### Manual
 

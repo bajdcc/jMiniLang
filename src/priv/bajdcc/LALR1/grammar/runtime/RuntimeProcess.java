@@ -46,7 +46,6 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		}
 	}
 
-	private static final int SLEEP_TURN = 10;
 	private static final int MAX_PROCESS = 1000;
 	private static final int PER_CYCLE = 50;
 	private static final int USR_PER_CYCLE = 200;
@@ -91,11 +90,11 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		return setProcessId.stream().filter(id -> arrProcess[id].kernel).collect(Collectors.toList());
 	}
 
-	public String getProcNameById(int id) {
+	public Object[] getProcInfoById(int id) {
 		if (!setProcessId.contains(id)) {
-			return "Invalid Proc";
+			return null;
 		}
-		return arrProcess[id].machine.getProcName();
+		return arrProcess[id].machine.getProcInfo();
 	}
 
 	public RuntimeCodePage getPage(String name) throws Exception {
@@ -143,28 +142,22 @@ public class RuntimeProcess implements IRuntimeProcessService {
 	}
 
 	private boolean step() throws Exception {
-		int n = setProcessId.size();
 		while (!queue.isEmpty()) {
 			SchdParticle part = queue.poll();
+			SchdProcess process = arrProcess[part.processId];
 			CYCLE_FOR:
 			for (int i = 0; i < part.cycle; i++) {
-				SchdProcess process = arrProcess[part.processId];
 				if (process.sleep > 0) {
 					process.sleep--;
-					n--;
 					break;
 				}
 				switch (arrProcess[part.processId].machine.runStep()) {
 					case 1:
 						return false;
 					case 2:
-						n--;
 						break CYCLE_FOR;
 				}
 			}
-		}
-		if (n == 0) {
-			Thread.sleep(SLEEP_TURN);
 		}
 		return true;
 	}

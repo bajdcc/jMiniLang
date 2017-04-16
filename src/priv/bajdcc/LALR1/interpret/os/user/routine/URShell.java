@@ -49,6 +49,7 @@ public class URShell implements IOSCodePage {
 				"    call g_array_remove(args, 0);\n" +
 				"    var share = {};\n" +
 				"    call g_map_put(share, \"args\", args);\n" +
+				"    call g_set_process_desc(\"host: \" + exec);\n" +
 				"    var path = \"/usr/p/\" + exec;\n" +
 				"    var child = call g_load_user_x(path);\n" +
 				"    call g_start_share(\"PID#\" + child, share);\n" +
@@ -101,6 +102,7 @@ public class URShell implements IOSCodePage {
 				"    call g_array_remove(args, 0);\n" +
 				"    var share = {};\n" +
 				"    call g_map_put(share, \"args\", args);\n" +
+				"    call g_set_process_desc(\"host: \" + exec);\n" +
 				"    var path = \"/usr/p/\" + exec;\n" +
 				"    var child = call g_load_user_x(path);\n" +
 				"    if (child+1 == 0) {\n" +
@@ -164,6 +166,7 @@ public class URShell implements IOSCodePage {
 				"\n" +
 				"// GET STDIO cmd\n" +
 				"var get_input = func [\"INPUT\"] ~(arg) {\n" +
+				"    call g_set_process_desc(\"shell routinue\");\n" +
 				"    var this = call g_array_get(arg, 0);\n" +
 				"    var parse = call g_array_get(arg, 1);\n" +
 				"    call g_ui_print(\"$ \");\n" +
@@ -175,7 +178,7 @@ public class URShell implements IOSCodePage {
                 "        return;\n" +
 				"    }\n" +
 				"    if (cmd == \"exit\") {\n" +
-				"        var handle = call g_create_pipe(\"int#10\");\n" +
+				"        var handle = call g_create_pipe(\"int#3\");\n" +
 				"        call g_write_pipe(handle, 'E');\n" +
 				"        return;\n" +
 				"    }\n" +

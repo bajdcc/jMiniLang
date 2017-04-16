@@ -20,6 +20,7 @@ public class URGrep implements IOSCodePage {
 				"import \"sys.proc\";\n" +
 				"import \"sys.string\";\n" +
 				"\n" +
+				"call g_set_process_desc(\"grep routinue\");\n" +
 				"// USE KMP ALGORITHM.\n" +
 				"var pid = call g_get_pid();\n" +
 				"var share = call g_wait_share(\"PID#\" + pid);\n" +

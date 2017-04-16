@@ -18,6 +18,8 @@ public class OSSchd implements IOSCodePage {
 		return "import \"sys.base\";\n" +
 				"import \"sys.list\";\n" +
 				"import \"sys.proc\";\n" +
+				"\n" +
+				"call g_set_process_desc(\"scheduler\");\n" +
 				"call g_set_process_priority(64);\n" +
 				"var state = [];\n" +
 				"call g_array_add(state, true);\n" +

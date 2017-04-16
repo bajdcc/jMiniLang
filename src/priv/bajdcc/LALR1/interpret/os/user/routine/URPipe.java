@@ -18,6 +18,7 @@ public class URPipe implements IOSCodePage {
 		return "import \"sys.base\";\n" +
 				"import \"sys.proc\";\n" +
 				"\n" +
+				"call g_set_process_desc(\"pipe routinue\");\n" +
 				"var pipe = func [\"PIPE\"] ~(ch, out) {\n" +
 				"    call g_write_pipe(out, ch);\n" +
 				"};\n" +

@@ -1,10 +1,6 @@
 package priv.bajdcc.LALR1.grammar.runtime;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 
 /**
  * 【运行时】运行时堆栈
@@ -119,6 +115,10 @@ public class RuntimeStack {
 
 	public int getFuncLevel() {
 		return stkCall.size();
+	}
+
+	public String getFuncName() {
+		return stkCall.get(0).getName();
 	}
 
 	public RuntimeStack getYieldStack(String hash) {

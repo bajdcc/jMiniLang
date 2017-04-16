@@ -21,6 +21,7 @@ public class URTask implements IOSCodePage {
 				"import \"sys.proc\";\n" +
 				"import \"sys.task\";\n" +
 				"\n" +
+				"call g_set_process_desc(\"task routinue\");\n" +
 				"var pid = call g_get_pid();\n" +
 				"var share = call g_wait_share(\"PID#\" + pid);\n" +
 				"call g_stop_share(\"PID#\" + pid);\n" +
@@ -37,7 +38,6 @@ public class URTask implements IOSCodePage {
 				"}\n" +
 				"\n" +
 				"var tid = call g_array_get(args, 0);\n" +
-				"let tid = call g_string_atoi(tid);\n" +
 				"var id = call g_array_get(args, 1);\n" +
 				"var arg = [];\n" +
 				"\n" +
