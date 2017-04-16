@@ -31,7 +31,6 @@ public class URGrep implements IOSCodePage {
 				"    var _pipe = func [\"PIPE\"] ~(ch, out) {\n" +
 				"        call g_write_pipe(out, ch);\n" +
 				"    };\n" +
-				"\n" +
 				"    var _in = call g_create_pipe(\"PIPEIN#\" + pid);\n" +
 				"    var _out = call g_create_pipe(\"PIPEOUT#\" + pid);\n" +
 				"    call g_read_pipe_args(_in, _pipe, _out);\n" +
@@ -52,7 +51,7 @@ public class URGrep implements IOSCodePage {
 				"    }\n" +
 				"    while (u < patlen - 1)\n" +
 				"    {\n" +
-				"        if (v == m1 || (call g_array_get(str, u) == call g_array_get(str, v)))\n" +
+				"        if (v == m1 || (call g_string_get(str, u) == call g_string_get(str, v)))\n" +
 				"        {\n" +
 				"            u++;\n" +
 				"            v++;\n" +
