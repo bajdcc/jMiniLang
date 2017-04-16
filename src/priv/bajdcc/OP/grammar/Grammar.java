@@ -1,8 +1,5 @@
 package priv.bajdcc.OP.grammar;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import priv.bajdcc.LALR1.semantic.lexer.TokenFactory;
 import priv.bajdcc.OP.grammar.error.GrammarException;
 import priv.bajdcc.OP.grammar.handler.IPatternHandler;
@@ -13,6 +10,9 @@ import priv.bajdcc.OP.syntax.precedence.PrecedenceTable;
 import priv.bajdcc.util.lexer.error.RegexException;
 import priv.bajdcc.util.lexer.token.Token;
 import priv.bajdcc.util.lexer.token.TokenType;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * 【语法分析】语法分析
@@ -89,12 +89,14 @@ public class Grammar extends Syntax {
 
 	/**
 	 * 进行语法分析
-	 * 
+	 *
+	 * @return 计算后的值
 	 * @throws GrammarException 语法错误
 	 */
-	public void run() throws GrammarException {
-		table.run();
+	public Object run() throws GrammarException {
+		Object obj = table.run();
 		arrTokens = tokenFactory.tokenList();
+		return obj;
 	}
 
 	/**

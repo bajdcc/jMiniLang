@@ -49,6 +49,7 @@ Now has commands:
 
 Implemented IPC, usage:
 - `task system now` -> Get system time
+- `task util calc 1+2*3` -> Val = 7
 
 #### Manual
 

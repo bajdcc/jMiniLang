@@ -31,6 +31,7 @@ public class OSTask implements IOSCodePage {
 				"}\n" +
 				"\n" +
 				"call g_array_set(task_name_table, 1, \"system\");\n" +
+				"call g_array_set(task_name_table, 2, \"util\");\n" +
 				"\n" +
 				"foreach (var j : call g_range(0, task_num - 1)) {\n" +
 				"    var t = call g_array_get(task_name_table, j);\n" +

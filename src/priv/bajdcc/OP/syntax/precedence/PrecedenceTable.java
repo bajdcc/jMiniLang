@@ -1,11 +1,5 @@
 package priv.bajdcc.OP.syntax.precedence;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Stack;
-
 import priv.bajdcc.LL1.syntax.prediction.PredictionInstruction;
 import priv.bajdcc.LL1.syntax.token.PredictType;
 import priv.bajdcc.OP.grammar.error.GrammarException;
@@ -23,6 +17,8 @@ import priv.bajdcc.OP.syntax.token.PrecedenceType;
 import priv.bajdcc.util.lexer.regex.IRegexStringIterator;
 import priv.bajdcc.util.lexer.token.Token;
 import priv.bajdcc.util.lexer.token.TokenType;
+
+import java.util.*;
 
 /**
  * 【算法优先分析】算法优先关系表
@@ -65,6 +61,8 @@ public class PrecedenceTable extends OPTableSolver {
 	 * 字符串迭代器
 	 */
 	private IRegexStringIterator iter = null;
+
+	private static boolean debug = false;
 
 	public PrecedenceTable(ArrayList<RuleExp> nonTerminals,
 			ArrayList<TokenExp> terminals,
@@ -228,13 +226,24 @@ public class PrecedenceTable extends OPTableSolver {
 		return -1;
 	}
 
+	private void println() {
+		if (debug)
+			System.out.println();
+	}
+
+	private void println(String str) {
+		if (debug)
+			System.out.println(str);
+	}
+
 	/**
 	 * 进行分析
-	 * 
+	 *
+	 * @return 计算后的值
 	 * @throws GrammarException 语法错误
 	 * 
 	 */
-	public void run() throws GrammarException {
+	public Object run() throws GrammarException {
 		/* 指令堆栈 */
 		Stack<PredictionInstruction> spi = new Stack<>();
 		/* 数据堆栈 */
@@ -252,8 +261,8 @@ public class PrecedenceTable extends OPTableSolver {
 		int topIndex = -1;
 		while (!(spi.size() == 2 && input == -2)) {// 栈层为2且输入为#，退出
 			index++;
-			System.out.println("步骤[" + index + "]");
-			System.out.println("\t----------------");
+			println("步骤[" + index + "]");
+			println("\t----------------");
 			if (input == -1) {// 没有找到，非法字符
 				err(GrammarError.UNDECLARED);
 			}
@@ -261,7 +270,7 @@ public class PrecedenceTable extends OPTableSolver {
 				err(GrammarError.NULL);
 			}
 			Token token = iter.ex().token();
-			System.out.println("\t输入：" + "[" + token + "]");
+			println("\t输入：" + "[" + token + "]");
 			if (top != -1 && input != -2
 					&& table[top][input] == PrecedenceType.NULL) {
 				err(GrammarError.MISS_PRECEDENCE);
@@ -269,7 +278,7 @@ public class PrecedenceTable extends OPTableSolver {
 			if (top == -1
 					|| (input != -2 && table[top][input] != PrecedenceType.GT)) {
 				/* 栈顶为#，或者top<=input，则直接移进 */
-				System.out.println("\t移进：[" + token + "]");
+				println("\t移进：[" + token + "]");
 				/* 1.指令进栈 */
 				spi.push(new PredictionInstruction(PredictType.TERMINAL, input));
 				/* 2.数据进栈 */
@@ -313,13 +322,13 @@ public class PrecedenceTable extends OPTableSolver {
 					primeInstList.add(0, spi.pop());
 					primeDataList.add(0, sobj.pop());
 				}
-				System.out.println("\t----==== 最左素短语模式 ====----");
+				println("\t----==== 最左素短语模式 ====----");
 				String pattern = getPattern(primeInstList);
-				System.out.println("\t" + pattern + ": "
+				println("\t" + pattern + ": "
 						+ pattern.replace("0", "[op]").replace("1", "[tok]"));
-				System.out.println("\t----==== 最左素短语 ====----");
+				println("\t----==== 最左素短语 ====----");
 				for (int i = 0; i < primePhraseCount; i++) {
-					System.out.println("\t" + primeDataList.get(i));
+					println("\t" + primeDataList.get(i));
 				}
 				/* 3.新建指令集和数据集（用于用户级回调） */
 				ArrayList<Token> tempTokenList = new ArrayList<>();
@@ -339,42 +348,42 @@ public class PrecedenceTable extends OPTableSolver {
 							+ pattern.replace("0", "[op]").replace("1", "[tok]"));
 					err(GrammarError.MISS_HANDLER);
 				}
-				System.out.println("\t----==== 处理模式名称 ====----");
-				System.out.println("\t" + handler.getPatternName());
+				println("\t----==== 处理模式名称 ====----");
+				println("\t" + handler.getPatternName());
 				/* 5.归约处理 */
 				Object result = handler.handle(tempTokenList, tempObjectList);
-				System.out.println("\t----==== 处理结果 ====----");
-				System.out.println("\t" + result);
+				println("\t----==== 处理结果 ====----");
+				println("\t" + result);
 				/* 将结果压栈 */
 				/* 6.指令进栈（非终结符进栈） */
 				spi.push(new PredictionInstruction(PredictType.NONTERMINAL, -1));
 				/* 7.数据进栈（结果进栈） */
 				sobj.push(new FixedData(result));
 			}
-			System.out.println("\t----==== 指令堆栈 ====----");
+			println("\t----==== 指令堆栈 ====----");
 			for (int i = spi.size() - 1; i >= 0; i--) {
 				PredictionInstruction pi = spi.get(i);
 				switch (pi.type) {
 				case NONTERMINAL:
-					System.out.println("\t" + i + ": [数据]");
+					println("\t" + i + ": [数据]");
 					break;
 				case TERMINAL:
-					System.out.println("\t" + i + ": ["
+					println("\t" + i + ": ["
 							+ arrTerminals.get(pi.inst).toString() + "]");
 					break;
 				case EPSILON:
-					System.out.println("\t" + i + ": ["
+					println("\t" + i + ": ["
 							+ TokenType.EOF.getName() + "]");
 					break;
 				default:
 					break;
 				}
 			}
-			System.out.println("\t----==== 数据堆栈 ====----");
+			println("\t----==== 数据堆栈 ====----");
 			for (int i = sobj.size() - 1; i >= 0; i--) {
-				System.out.println("\t" + i + ": [" + sobj.get(i) + "]");
+				println("\t" + i + ": [" + sobj.get(i) + "]");
 			}
-			System.out.println();
+			println();
 			/* 更新栈顶终结符索引 */
 			if (spi.peek().type == PredictType.TERMINAL) {
 				top = spi.peek().inst;
@@ -384,7 +393,8 @@ public class PrecedenceTable extends OPTableSolver {
 				topIndex = spi.size() - 2;
 			}
 		}
-		System.out.println();
+		println();
+		return sobj.peek().obj;
 	}
 
 	/**

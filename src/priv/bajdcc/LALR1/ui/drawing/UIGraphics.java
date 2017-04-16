@@ -52,6 +52,8 @@ public class UIGraphics {
 			Character c = this.queue.poll();
 			if (c == null)
 				break;
+			if (c == '\t')
+				c = ' ';
 			draw(g, c);
 			len++;
 		}
