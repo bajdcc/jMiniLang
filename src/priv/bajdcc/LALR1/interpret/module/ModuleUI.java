@@ -71,7 +71,6 @@ public class ModuleUI implements IInterpreterModule {
 				"    call g_ui_input_mark();\n" +
 				"};\n" +
 				"var g_ui_input = func ~() {\n" +
-				"    call ui_input_mark();\n" +
 				"    call g_ui_caret(true);\n" +
 				"    var h = call g_query_share(\"cmd#histroy\");\n" +
 				"    for (;;) {\n" +
@@ -264,24 +263,6 @@ public class ModuleUI implements IInterpreterModule {
 					status.getService().getProcessService().sleep(status.getPid(), INPUT_TIME);
 					return new RuntimeObject(graphics.isHideCaret());
 				}
-			}
-		});
-		info.addExternalFunc("g_ui_input_mark", new IRuntimeDebugExec() {
-			@Override
-			public String getDoc() {
-				return "标记输入位置";
-			}
-
-			@Override
-			public RuntimeObjectType[] getArgsType() {
-				return null;
-			}
-
-			@Override
-			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
-			                                      IRuntimeStatus status) throws Exception {
-				graphics.markInput();
-				return null;
 			}
 		});
 		info.addExternalFunc("g_ui_fallback", new IRuntimeDebugExec() {

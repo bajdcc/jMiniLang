@@ -3,14 +3,14 @@ package priv.bajdcc.LALR1.interpret.os.user.routine;
 import priv.bajdcc.LALR1.interpret.os.IOSCodePage;
 
 /**
- * 【用户态】休眠
+ * 【用户态】时间
  *
  * @author bajdcc
  */
-public class URSleep implements IOSCodePage {
+public class URTime implements IOSCodePage {
 	@Override
 	public String getName() {
-		return "/usr/p/sleep";
+		return "/usr/p/time";
 	}
 
 	@Override
@@ -21,7 +21,7 @@ public class URSleep implements IOSCodePage {
 				"import \"sys.task\";\n" +
 				"import \"sys.string\";\n" +
 				"\n" +
-				"call g_set_process_desc(\"sleep routinue\");\n" +
+				"call g_set_process_desc(\"time routinue\");\n" +
 				"var pid = call g_get_pid();\n" +
 				"var share = call g_wait_share(\"PID#\" + pid);\n" +
 				"call g_stop_share(\"PID#\" + pid);\n" +
@@ -33,25 +33,16 @@ public class URSleep implements IOSCodePage {
 				"var signal = \"PIDSIG#\" + pid;\n" +
 				"call g_start_share(signal, true);\n" +
 				"\n" +
-				"var second = call g_array_get(args, 0);\n" +
-				"if (call g_is_null(second)) {\n" +
-				"    let second = \"0\";\n" +
+				"var get_time = func ~() -> call g_task_get_fast(\"system\", \"now\");\n" +
+				"for (; call g_query_share(signal);) {\n" +
+				"    call g_write_pipe(out, \"\" + call get_time() + \"\\r\");\n" +
+				"    call g_task_sleep(1);\n" +
 				"}\n" +
-				"let second = call g_string_atoi(second);\n" +
-				"\n" +
-				"//var get_tick = func ~() -> call g_task_get_fast_arg(\"system\", \"now\", \"timestamp\");\n" +
-				"var begin = call g_task_get_timestamp();\n" +
-				"var end = begin + second * 1000;\n" +
-				"while (begin < end && call g_query_share(signal)) {\n" +
-				"    let begin = call g_task_get_timestamp();\n" +
-				"    call g_sleep(50);\n" +
-				"}\n" +
+				"call g_write_pipe(out, \"\\n\");\n" +
 				"\n" +
 				"call g_stop_share(signal);\n" +
-				"var pipe = func [\"PIPE\"] ~(ch, out) {\n" +
-				"    call g_write_pipe(out, ch);\n" +
-				"};\n" +
-				"call g_read_pipe_args(in, pipe, out);\n" +
-				"call g_destroy_pipe(out);\n";
+				"\n" +
+				"call g_destroy_pipe(out);\n" +
+				"call g_destroy_pipe(in);\n";
 	}
 }

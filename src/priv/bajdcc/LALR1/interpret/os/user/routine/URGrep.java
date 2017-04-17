@@ -91,7 +91,7 @@ public class URGrep implements IOSCodePage {
 				"\n" +
 				"var buf = [];\n" +
 				"var pipe = func [\"PIPE\"] ~(ch, out) {\n" +
-				"    if (ch == '\\n') {\n" +
+				"    if (ch == '\\n' || ch == '\\r') {\n" +
 				"        var str = call g_string_build(buf);\n" +
 				"        var idx = call find(str, nextarr);\n" +
 				"        if (idx != m1) {\n" +

@@ -52,10 +52,14 @@ public class UIGraphics {
 			Character c = this.queue.poll();
 			if (c == null)
 				break;
-			if (c == '\t')
-				c = ' ';
-			draw(g, c);
-			len++;
+			if (c == '\uffef') {
+				markInput();
+			} else {
+				if (c == '\t')
+					c = ' ';
+				draw(g, c);
+				len++;
+			}
 		}
 		if (len > 0 && caretTime > 0) {
 			caretTime = 0;
@@ -123,6 +127,8 @@ public class UIGraphics {
 					}
 				}
 			}
+		} else if (c == '\r') {
+			ptr_x = 0;
 		} else if (ptr_x == cols - 1) {
 			if (ptr_y == rows - 1) {
 				clear(g);
@@ -169,7 +175,7 @@ public class UIGraphics {
 		return !this.caretState && !this.caret;
 	}
 
-	public void markInput() {
+	private void markInput() {
 		ptr_mx = ptr_x;
 		ptr_my = ptr_y;
 	}

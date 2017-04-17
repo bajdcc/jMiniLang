@@ -88,9 +88,16 @@ public class ModuleTask implements IInterpreterModule {
 				"    call g_array_add(arg, id);\n" +
 				"    \n" +
 				"    var msg = {};\n" +
-				"    call g_map_put(msg, \"id\", tid);\n" +
+				"    call g_map_put(msg, \"id\", id);\n" +
 				"    call g_map_put(msg, \"arg\", arg);\n" +
-				"    return call g_task_get(tid, msg);\n" +
+				"    call g_task_get(tid, msg);\n" +
+				"    var error = call g_map_get(msg, \"error\");\n" +
+				"    var val = call g_map_get(msg, \"val\");\n" +
+				"    if (error == 1) {\n" +
+				"        return g_null;\n" +
+				"    } else {\n" +
+				"        return val;\n" +
+				"    }\n" +
 				"};\n" +
 				"export \"g_task_get_fast\";\n" +
 				"var g_task_get_fast_arg = func ~(tid, id, a) {\n" +
@@ -156,7 +163,17 @@ public class ModuleTask implements IInterpreterModule {
 				"    }\n" +
 				"    return g_null;\n" +
 				"};\n" +
-				"export \"g_task_get_id_by_name\";\n";
+				"export \"g_task_get_id_by_name\";\n" +
+				"var g_task_sleep = func ~(second) {\n" +
+				"    if (second < 1) { return; }\n" +
+				"    var begin = call g_task_get_timestamp();\n" +
+				"    var end = begin + second * 1000;\n" +
+				"    while (begin < end) {\n" +
+				"        let begin = call g_task_get_timestamp();\n" +
+				"        call g_sleep(50);\n" +
+				"    }\n" +
+				"};\n" +
+				"export \"g_task_sleep\";\n";
 
 		Grammar grammar = new Grammar(base);
 		RuntimeCodePage page = grammar.getCodePage();

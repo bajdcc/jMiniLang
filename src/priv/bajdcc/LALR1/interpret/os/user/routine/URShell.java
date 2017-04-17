@@ -127,6 +127,8 @@ public class URShell implements IOSCodePage {
 				"    var ctrl = func ~() {\n" +
 				"        var fn = func ~(ch) {\n" +
 				"            var hs = call g_query_share(\"PIPE#HANDLE\");\n" +
+				"            var kill = false;\n" +
+				"            if (ch == 'C') { let kill = true; }\n" +
 				"            if (ch == 'A' && !call g_live_process_array(hs)) {\n" +
 				"                let ch = 'C';\n" +
 				"            }\n" +
@@ -134,6 +136,7 @@ public class URShell implements IOSCodePage {
 				"                call g_printn(\"#\" + call g_get_pid() + \" Force kill!\");\n" +
 				"                foreach (var hh : call g_range_array(hs)) {\n" +
 				"                    call g_destroy_pipe_by_name_once(\"PIPEIN#\" + hh);\n" +
+				"                    if (kill) { call g_create_share(\"PIDSIG#\" + hh, false); }\n" +
 				"                }\n" +
 				"                call g_join_process_array(hs);\n" +
 				"                var pp = call g_wait_pipe(\"SYS#INPUT\");\n" +
@@ -169,7 +172,7 @@ public class URShell implements IOSCodePage {
 				"    call g_set_process_desc(\"shell routinue\");\n" +
 				"    var this = call g_array_get(arg, 0);\n" +
 				"    var parse = call g_array_get(arg, 1);\n" +
-				"    call g_ui_print(\"$ \");\n" +
+				"    call g_ui_print(\"$ \\uffef\");\n" +
 				"    call g_sleep(400);\n" +
 				"    var cmd = call g_ui_input();\n" +
 				"    let cmd = call g_string_trim(cmd);\n" +

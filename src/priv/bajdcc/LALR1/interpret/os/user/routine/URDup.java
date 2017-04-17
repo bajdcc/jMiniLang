@@ -33,7 +33,7 @@ public class URDup implements IOSCodePage {
 				"\n" +
 				"var buf = [];\n" +
 				"var pipe = func [\"PIPE\"] ~(ch, out) {\n" +
-				"    if (ch == '\\n') {\n" +
+				"    if (ch == '\\n' || ch == '\\r') {\n" +
 				"        foreach (var i : call g_range(1, count)) {\n" +
 				"            foreach (var j : call g_range_array(buf)) {\n" +
 				"                call g_write_pipe(out, j);\n" +

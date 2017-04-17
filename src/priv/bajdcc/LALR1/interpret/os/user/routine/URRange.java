@@ -29,6 +29,15 @@ public class URRange implements IOSCodePage {
 				"var in = call g_create_pipe(\"PIPEIN#\" + pid);\n" +
 				"var out = call g_create_pipe(\"PIPEOUT#\" + pid);\n" +
 				"\n" +
+				"var signal = \"PIDSIG#\" + pid;\n" +
+				"call g_start_share(signal, true);\n" +
+				"\n" +
+				"if (call g_array_size(args) < 2) {\n" +
+				"    call g_write_pipe(out, \"Error: missing arguments.\\n\");\n" +
+				"    call g_destroy_pipe(out);\n" +
+				"    call g_destroy_pipe(in);\n" +
+				"    return;\n" +
+				"}\n" +
 				"var lower = 0 + call g_array_get(args, 0);\n" +
 				"if (call g_is_null(lower)) {\n" +
 				"    let lower = 1;\n" +
@@ -38,12 +47,13 @@ public class URRange implements IOSCodePage {
 				"    let upper = lower;\n" +
 				"    let lower = 1;\n" +
 				"}\n" +
-				"foreach (var i : call g_range(lower, upper)) {\n" +
+				"for (var i = lower; i <= upper && call g_query_share(signal); i++) {\n" +
 				"    foreach (var j : call g_range_string(call g_to_string(i))) {\n" +
 				"        call g_write_pipe(out, j);\n" +
 				"    }\n" +
 				"    call g_write_pipe(out, '\\n');\n" +
 				"}\n" +
+				"call g_stop_share(signal);\n" +
 				"\n" +
 				"call g_destroy_pipe(out);\n" +
 				"call g_destroy_pipe(in);\n";
