@@ -90,4 +90,9 @@ public class RuntimeShareService implements IRuntimeShareService {
 		if (mapShares.containsKey(name))
 			mapShares.get(name).locked = lock;
 	}
+
+	@Override
+	public long size() {
+		return mapShares.size();
+	}
 }

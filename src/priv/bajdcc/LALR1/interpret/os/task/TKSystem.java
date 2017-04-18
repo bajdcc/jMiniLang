@@ -43,6 +43,12 @@ public class TKSystem implements IOSCodePage {
 				"           let val = call g_task_get_time(\"yyyy-MM-dd HH:mm:ss\");\n" +
 				"        }\n" +
 				"        call g_map_put(msg, \"val\", val);\n" +
+				"    } else if (id == \"pipe\") {\n" +
+				"        var val = call g_task_get_pipe_count();\n" +
+				"        call g_map_put(msg, \"val\", val);\n" +
+				"    } else if (id == \"share\") {\n" +
+				"        var val = call g_task_get_share_count();\n" +
+				"        call g_map_put(msg, \"val\", val);\n" +
 				"    }\n" +
 				"};\n" +
 				"\n" +

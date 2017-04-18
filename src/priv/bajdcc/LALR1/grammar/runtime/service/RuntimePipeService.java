@@ -106,4 +106,9 @@ public class RuntimePipeService implements IRuntimePipeService {
 	public boolean query(String name) {
 		return mapPipeNames.containsKey(name);
 	}
+
+	@Override
+	public long size() {
+		return setPipeId.size();
+	}
 }

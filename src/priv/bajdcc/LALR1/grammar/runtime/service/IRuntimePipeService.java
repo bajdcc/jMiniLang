@@ -57,4 +57,11 @@ public interface IRuntimePipeService {
 	 * @return 是否存在
 	 */
 	boolean query(String name);
+
+	/**
+	 * 获取管道数量
+	 *
+	 * @return 管道数量
+	 */
+	long size();
 }

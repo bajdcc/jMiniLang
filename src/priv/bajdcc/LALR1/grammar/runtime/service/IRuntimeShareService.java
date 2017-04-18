@@ -54,4 +54,11 @@ public interface IRuntimeShareService {
 	 * @param lock 是否锁定
 	 */
 	void setLocked(String name, boolean lock);
+
+	/**
+	 * 获取共享数量
+	 *
+	 * @return 共享数量
+	 */
+	long size();
 }

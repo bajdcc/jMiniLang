@@ -38,8 +38,8 @@ public class URRange implements IOSCodePage {
 				"    call g_destroy_pipe(in);\n" +
 				"    return;\n" +
 				"}\n" +
-				"var lower = 0 + call g_array_get(args, 0);\n" +
-				"var upper = 0 + call g_array_get(args, 1);\n" +
+				"var lower = call g_string_atoi(call g_array_get(args, 0));\n" +
+				"var upper = call g_string_atoi(call g_array_get(args, 1));\n" +
 				"if (lower > upper) {\n" +
 				"    for (var i = lower; i >= upper && call g_query_share(signal); i--) {\n" +
 				"        foreach (var j : call g_range_string(call g_to_string(i))) {\n" +

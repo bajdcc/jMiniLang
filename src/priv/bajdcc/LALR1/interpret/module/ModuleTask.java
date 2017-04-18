@@ -220,6 +220,57 @@ public class ModuleTask implements IInterpreterModule {
 				return new RuntimeObject(BigInteger.valueOf(System.currentTimeMillis()));
 			}
 		});
+		info.addExternalFunc("g_task_get_timestamp", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "获取当前时间戳";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return null;
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				return new RuntimeObject(BigInteger.valueOf(System.currentTimeMillis()));
+			}
+		});
+		info.addExternalFunc("g_task_get_pipe_count", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "获取管道数量";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return null;
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				return new RuntimeObject(BigInteger.valueOf(status.getService().getPipeService().size()));
+			}
+		});
+		info.addExternalFunc("g_task_get_share_count", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "获取共享数量";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return null;
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				return new RuntimeObject(BigInteger.valueOf(status.getService().getShareService().size()));
+			}
+		});
 	}
 
 	private void buildUtilMethod(IRuntimeDebugInfo info) {

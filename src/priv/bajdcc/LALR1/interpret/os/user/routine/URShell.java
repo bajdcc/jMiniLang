@@ -44,7 +44,14 @@ public class URShell implements IOSCodePage {
 				"    var parent = call g_map_get(arg, \"parent\");\n" +
 				"    var exe = call g_array_pop(cmd);\n" +
 				"    let exe = call g_string_trim(exe);\n" +
-				"    var args = call g_string_split(exe, \" \");\n" +
+				"    var _args = call g_string_split(exe, \" \");\n" +
+				"    var args = [];\n" +
+				"    foreach (var s :call g_range_array(_args)) {\n" +
+				"        var ss = call g_string_trim(s);\n" +
+				"        if (!call g_string_empty(ss)) {\n" +
+				"            call g_array_add(args, ss);\n" +
+				"        }\n" +
+				"    }\n" +
 				"    var exec = call g_array_get(args, 0);\n" +
 				"    call g_array_remove(args, 0);\n" +
 				"    var share = {};\n" +
@@ -97,7 +104,14 @@ public class URShell implements IOSCodePage {
 				"    var pid = call g_get_pid();\n" +
 				"    var exe = call g_array_pop(cmd);\n" +
 				"    let exe = call g_string_trim(exe);\n" +
-				"    var args = call g_string_split(exe, \" \");\n" +
+				"    var _args = call g_string_split(exe, \" \");\n" +
+				"    var args = [];\n" +
+				"    foreach (var s :call g_range_array(_args)) {\n" +
+				"        var ss = call g_string_trim(s);\n" +
+				"        if (!call g_string_empty(ss)) {\n" +
+				"            call g_array_add(args, ss);\n" +
+				"        }\n" +
+				"    }\n" +
 				"    var exec = call g_array_get(args, 0);\n" +
 				"    call g_array_remove(args, 0);\n" +
 				"    var share = {};\n" +
