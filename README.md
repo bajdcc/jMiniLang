@@ -47,6 +47,7 @@ Now has commands:
 - task
 - sleep
 - time
+- count
 
 Implemented IPC, usage:
 - `task system now` -> Get system time

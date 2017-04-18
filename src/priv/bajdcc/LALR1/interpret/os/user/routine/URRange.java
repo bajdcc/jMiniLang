@@ -39,19 +39,21 @@ public class URRange implements IOSCodePage {
 				"    return;\n" +
 				"}\n" +
 				"var lower = 0 + call g_array_get(args, 0);\n" +
-				"if (call g_is_null(lower)) {\n" +
-				"    let lower = 1;\n" +
-				"}\n" +
 				"var upper = 0 + call g_array_get(args, 1);\n" +
-				"if (call g_is_null(upper)) {\n" +
-				"    let upper = lower;\n" +
-				"    let lower = 1;\n" +
-				"}\n" +
-				"for (var i = lower; i <= upper && call g_query_share(signal); i++) {\n" +
-				"    foreach (var j : call g_range_string(call g_to_string(i))) {\n" +
-				"        call g_write_pipe(out, j);\n" +
+				"if (lower > upper) {\n" +
+				"    for (var i = lower; i >= upper && call g_query_share(signal); i--) {\n" +
+				"        foreach (var j : call g_range_string(call g_to_string(i))) {\n" +
+				"            call g_write_pipe(out, j);\n" +
+				"        }\n" +
+				"        call g_write_pipe(out, '\\n');\n" +
 				"    }\n" +
-				"    call g_write_pipe(out, '\\n');\n" +
+				"} else {\n" +
+				"    for (var i = lower; i <= upper && call g_query_share(signal); i++) {\n" +
+				"        foreach (var j : call g_range_string(call g_to_string(i))) {\n" +
+				"            call g_write_pipe(out, j);\n" +
+				"        }\n" +
+				"        call g_write_pipe(out, '\\n');\n" +
+				"    }\n" +
 				"}\n" +
 				"call g_stop_share(signal);\n" +
 				"\n" +

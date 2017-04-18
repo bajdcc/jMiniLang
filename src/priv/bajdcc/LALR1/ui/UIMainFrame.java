@@ -83,6 +83,7 @@ public class UIMainFrame extends JFrame {
 				new URTask(),
 				new URSleep(),
 				new URTime(),
+				new URCount(),
 		};
 
 		try {
