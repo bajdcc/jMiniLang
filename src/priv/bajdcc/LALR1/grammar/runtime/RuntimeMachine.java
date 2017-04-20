@@ -51,6 +51,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 					ModuleProc.getInstance(),
 					ModuleUI.getInstance(),
 					ModuleTask.getInstance(),
+					ModuleRemote.getInstance(),
 			};
 		}
 
@@ -186,10 +187,10 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 		if (inst == RuntimeInst.ihalt) {
 			return false;
 		}
-		if (debug) {
-			System.err.println();
-			System.err.print(stack.reg.execId + ": " + inst.toString());
-		}
+//		if (debug) {
+//			System.err.println();
+//			System.err.print(stack.reg.execId + ": " + inst.toString());
+//		}
 		OperatorType op = TokenTools.ins2op(inst);
 		nextInst();
 		if (op != null) {
@@ -203,13 +204,13 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 				}
 			}
 		}
-		if (debug) {
-			System.err.println();
-			System.err.print(stack.toString());
-			System.err.print("协程栈：");
-			System.err.print(stkYieldData.toString());
-			System.err.println();
-		}
+//		if (debug) {
+//			System.err.println();
+//			System.err.print(stack.toString());
+//			System.err.print("协程栈：");
+//			System.err.print(stkYieldData.toString());
+//			System.err.println();
+//		}
 		return true;
 	}
 

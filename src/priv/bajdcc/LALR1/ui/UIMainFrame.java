@@ -10,6 +10,7 @@ import priv.bajdcc.LALR1.interpret.os.kern.OSIrq;
 import priv.bajdcc.LALR1.interpret.os.kern.OSTask;
 import priv.bajdcc.LALR1.interpret.os.proc.OSSchd;
 import priv.bajdcc.LALR1.interpret.os.task.TKSystem;
+import priv.bajdcc.LALR1.interpret.os.task.TKUI;
 import priv.bajdcc.LALR1.interpret.os.task.TKUtil;
 import priv.bajdcc.LALR1.interpret.os.user.UserMain;
 import priv.bajdcc.LALR1.interpret.os.user.routine.*;
@@ -37,7 +38,7 @@ public class UIMainFrame extends JFrame {
 
 	public UIMainFrame() {
 		panel = new UIPanel();
-		this.setTitle("jMiniLang OS Window");
+		this.setTitle("jMiniLang Command Window");
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setPreferredSize(new Dimension(800, 600));
 		this.setContentPane(panel);
@@ -70,6 +71,7 @@ public class UIMainFrame extends JFrame {
 				// TASK
 				new TKSystem(),
 				new TKUtil(),
+				new TKUI(),
 				// USER
 				new UserMain(),
 				// USER ROUTINE

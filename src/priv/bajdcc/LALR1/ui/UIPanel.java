@@ -16,7 +16,6 @@ import java.awt.event.KeyEvent;
 public class UIPanel extends JPanel {
 
 	private UIGraphics graphics;
-	private JTextField input;
 	private ModuleUI moduleUI;
 
 	public UIPanel() {

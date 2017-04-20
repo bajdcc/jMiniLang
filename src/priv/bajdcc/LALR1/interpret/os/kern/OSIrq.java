@@ -24,6 +24,7 @@ public class OSIrq implements IOSCodePage {
 				"import \"sys.proc\";\n" +
 				"import \"sys.task\";\n" +
 				"import \"sys.ui\";\n" +
+				"import \"sys.remote\";\n" +
 				"var interrupt_num = " + INT_NUM + ";\n" +
 				"var int_table = [];\n" +
 				"var desc_table = [];\n" +
@@ -31,6 +32,7 @@ public class OSIrq implements IOSCodePage {
 				"    call g_array_add(int_table, g_null);\n" +
 				"    call g_array_add(desc_table, \"unused irq#\" + i);\n" +
 				"}\n" +
+				"call g_array_set(desc_table, 0, \"remote task\");\n" +
 				"call g_array_set(desc_table, 1, \"service task\");\n" +
 				"call g_array_set(desc_table, 2, \"print task\");\n" +
 				"call g_array_set(desc_table, 3, \"signal task\");\n" +
@@ -103,6 +105,10 @@ public class OSIrq implements IOSCodePage {
 				"};\n" +
 				"call g_task_init();\n" +
 				"call add_int_proc(1, task_handler);\n" +
+				"var remote_handler = func ~(ch) {\n" +
+				"    call g_remote_print_internal(ch);\n" +
+				"};\n" +
+				"call add_int_proc(0, remote_handler);\n" +
 				"";
 	}
 }

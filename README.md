@@ -49,9 +49,15 @@ Now has commands:
 - time
 - count
 
+Tasks:
+- System
+- Utility
+- Remote
+
 Implemented IPC, usage:
 - `task system now` -> Get system time
 - `task util calc 1+2*3` -> Val = 7
+- `task ui print hello world` -> Remote window
 
 #### Manual
 
