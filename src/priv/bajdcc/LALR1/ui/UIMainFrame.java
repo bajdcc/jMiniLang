@@ -12,6 +12,8 @@ import priv.bajdcc.LALR1.interpret.os.proc.OSSchd;
 import priv.bajdcc.LALR1.interpret.os.task.TKSystem;
 import priv.bajdcc.LALR1.interpret.os.task.TKUI;
 import priv.bajdcc.LALR1.interpret.os.task.TKUtil;
+import priv.bajdcc.LALR1.interpret.os.ui.UIClock;
+import priv.bajdcc.LALR1.interpret.os.ui.UIMain;
 import priv.bajdcc.LALR1.interpret.os.user.UserMain;
 import priv.bajdcc.LALR1.interpret.os.user.routine.*;
 import priv.bajdcc.LALR1.syntax.handler.SyntaxException;
@@ -72,6 +74,9 @@ public class UIMainFrame extends JFrame {
 				new TKSystem(),
 				new TKUtil(),
 				new TKUI(),
+				// UI
+				new UIMain(),
+				new UIClock(),
 				// USER
 				new UserMain(),
 				// USER ROUTINE

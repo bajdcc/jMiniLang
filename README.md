@@ -54,10 +54,14 @@ Tasks:
 - Utility
 - Remote
 
+UI:
+- Clock
+
 Implemented IPC, usage:
 - `task system now` -> Get system time
 - `task util calc 1+2*3` -> Val = 7
 - `task ui print hello world` -> Remote window
+- `task ui path M 100 100 L 200 200` -> SVG
 
 #### Manual
 

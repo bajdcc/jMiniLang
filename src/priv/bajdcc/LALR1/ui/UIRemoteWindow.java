@@ -1,6 +1,6 @@
 package priv.bajdcc.LALR1.ui;
 
-import priv.bajdcc.LALR1.ui.drawing.UIGraphics;
+import priv.bajdcc.LALR1.ui.drawing.UIRemoteGraphics;
 
 import javax.swing.*;
 import java.awt.*;
@@ -35,7 +35,7 @@ public class UIRemoteWindow extends JFrame {
 		this.dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
 	}
 
-	public UIGraphics getUIGraphics() {
+	public UIRemoteGraphics getUIGraphics() {
 		return this.panel.getUIGraphics();
 	}
 

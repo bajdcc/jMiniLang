@@ -3,7 +3,7 @@ package priv.bajdcc.LALR1.interpret.module;
 import priv.bajdcc.LALR1.grammar.Grammar;
 import priv.bajdcc.LALR1.grammar.runtime.*;
 import priv.bajdcc.LALR1.ui.UIRemoteWindow;
-import priv.bajdcc.LALR1.ui.drawing.UIGraphics;
+import priv.bajdcc.LALR1.ui.drawing.UIRemoteGraphics;
 
 import java.util.ArrayDeque;
 import java.util.List;
@@ -19,10 +19,12 @@ public class ModuleRemote implements IInterpreterModule {
 
 	private static ModuleRemote instance = new ModuleRemote();
 	private UIRemoteWindow remote;
-	private UIGraphics graphics;
+	private UIRemoteGraphics graphics;
 	private Queue<Character> queue = new LinkedBlockingDeque<>(1024);
 	private Queue<Character> queueDisplay = new ArrayDeque<>();
 	private StringBuilder sb = new StringBuilder();
+
+	public static final int UI_NUM = 8;
 
 	public void setGraphics() {
 		if (remote == null) {

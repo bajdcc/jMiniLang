@@ -1,6 +1,6 @@
 package priv.bajdcc.LALR1.ui;
 
-import priv.bajdcc.LALR1.ui.drawing.UIGraphics;
+import priv.bajdcc.LALR1.ui.drawing.UIRemoteGraphics;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,14 +12,14 @@ import java.awt.*;
  */
 public class UIRemotePanel extends JPanel {
 
-	private UIGraphics graphics;
+	private UIRemoteGraphics graphics;
 
 	public UIRemotePanel() {
-		this.graphics = new UIGraphics(800, 600, 70, 23, 11, 25, 1);
+		this.graphics = new UIRemoteGraphics(800, 600);
 		this.setFocusable(true);
 	}
 
-	public UIGraphics getUIGraphics() {
+	public UIRemoteGraphics getUIGraphics() {
 		return graphics;
 	}
 
