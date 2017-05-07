@@ -31,6 +31,7 @@ public class UIMain implements IOSCodePage {
 				"}\n" +
 				"\n" +
 				"call g_array_set(ui_name_table, 1, \"clock\");\n" +
+				"call g_array_set(ui_name_table, 2, \"hitokoto\");\n" +
 				"\n" +
 				"foreach (var j : call g_range(0, ui_num - 1)) {\n" +
 				"    var t = call g_array_get(ui_name_table, j);\n" +

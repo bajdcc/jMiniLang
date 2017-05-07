@@ -1,5 +1,7 @@
 package priv.bajdcc.LALR1.ui.drawing;
 
+import sun.awt.SunHints;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Queue;
@@ -16,6 +18,7 @@ public class UIRemoteGraphics {
 
 	private int width, height;
 	private int x, y, old_x, old_y;
+	private int lineWidth;
 	private boolean svgmode, stringmode;
 	private StringBuilder sb;
 	private Queue<Character> queue;
@@ -31,6 +34,7 @@ public class UIRemoteGraphics {
 		this.y = 0;
 		this.old_x = 0;
 		this.old_y = 0;
+		this.lineWidth = 9999;
 		this.svgmode = false;
 		this.stringmode = false;
 		this.queue = new LinkedBlockingQueue<>(1024);
@@ -42,6 +46,13 @@ public class UIRemoteGraphics {
 		this.gimage.fillRect(0, 0, width, height);
 		this.gimage.setColor(fg);
 		this.gimage.setFont(new Font("宋体", Font.PLAIN, 20));
+		Graphics2D g2d = (Graphics2D) gimage;
+		g2d.setRenderingHint(SunHints.KEY_ANTIALIASING, SunHints.VALUE_ANTIALIAS_ON);
+		g2d.setRenderingHint(SunHints.KEY_TEXT_ANTIALIASING, SunHints.VALUE_TEXT_ANTIALIAS_DEFAULT);
+		g2d.setRenderingHint(SunHints.KEY_STROKE_CONTROL, SunHints.VALUE_STROKE_DEFAULT);
+		g2d.setRenderingHint(SunHints.KEY_TEXT_ANTIALIAS_LCD_CONTRAST, 140);
+		g2d.setRenderingHint(SunHints.KEY_FRACTIONALMETRICS, SunHints.VALUE_FRACTIONALMETRICS_OFF);
+		g2d.setRenderingHint(SunHints.KEY_RENDERING, SunHints.VALUE_RENDER_DEFAULT);
 	}
 
 	public void paint(Graphics2D g) {
@@ -56,9 +67,12 @@ public class UIRemoteGraphics {
 					sb = new StringBuilder();
 				}
 				this.svgmode = !this.svgmode;
-			} else if (c == '#' && !this.svgmode) {
+			} else if ((c == '#' || c == '$') && !this.svgmode) {
 				if (this.stringmode) {
-					drawString(sb.toString());
+					if (c == '#')
+						drawString(sb.toString());
+					else
+						drawStringMultiLine(sb.toString());
 				} else {
 					sb = new StringBuilder();
 				}
@@ -74,6 +88,38 @@ public class UIRemoteGraphics {
 
 	private void drawString(String s) {
 		this.gimage.drawString(s, x, y);
+	}
+
+	private void drawStringMultiLine(String text) {
+		FontMetrics m = this.gimage.getFontMetrics();
+		drawStringMultiLine(text, m, x, y);
+	}
+
+	private void drawStringMultiLine(String text, FontMetrics m, int x, int y) {
+		String[] words = text.split("\n");
+		if (words.length > 1) {
+			for (String word : words) {
+				drawStringMultiLine(word, m, x, y);
+				y += m.getHeight();
+			}
+		} else if (m.stringWidth(text) < lineWidth) {
+			this.gimage.drawString(text, x, y);
+		} else {
+			words = text.split("");
+			StringBuilder currentLine = new StringBuilder(words[0]);
+			for (int i = 1; i < words.length; i++) {
+				if (m.stringWidth(currentLine + words[i]) < lineWidth) {
+					currentLine.append(words[i]);
+				} else {
+					this.gimage.drawString(currentLine.toString(), x, y);
+					y += m.getHeight();
+					currentLine = new StringBuilder(words[i]);
+				}
+			}
+			if (currentLine.toString().trim().length() > 0) {
+				this.gimage.drawString(currentLine.toString(), x, y);
+			}
+		}
 	}
 
 	private void drawSVGPath(String s) {
@@ -110,6 +156,9 @@ public class UIRemoteGraphics {
 					x += tryParse(arg1);
 					y += tryParse(arg2);
 					clear(old_x, old_y, x, y);
+					break;
+				case 'W':
+					lineWidth = tryParse(arg1);
 					break;
 			}
 		}

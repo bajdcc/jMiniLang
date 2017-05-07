@@ -9,10 +9,12 @@ import priv.bajdcc.LALR1.interpret.os.kern.OSEntry;
 import priv.bajdcc.LALR1.interpret.os.kern.OSIrq;
 import priv.bajdcc.LALR1.interpret.os.kern.OSTask;
 import priv.bajdcc.LALR1.interpret.os.proc.OSSchd;
+import priv.bajdcc.LALR1.interpret.os.task.TKNet;
 import priv.bajdcc.LALR1.interpret.os.task.TKSystem;
 import priv.bajdcc.LALR1.interpret.os.task.TKUI;
 import priv.bajdcc.LALR1.interpret.os.task.TKUtil;
 import priv.bajdcc.LALR1.interpret.os.ui.UIClock;
+import priv.bajdcc.LALR1.interpret.os.ui.UIHitokoto;
 import priv.bajdcc.LALR1.interpret.os.ui.UIMain;
 import priv.bajdcc.LALR1.interpret.os.user.UserMain;
 import priv.bajdcc.LALR1.interpret.os.user.routine.*;
@@ -74,9 +76,11 @@ public class UIMainFrame extends JFrame {
 				new TKSystem(),
 				new TKUtil(),
 				new TKUI(),
+				new TKNet(),
 				// UI
 				new UIMain(),
 				new UIClock(),
+				new UIHitokoto(),
 				// USER
 				new UserMain(),
 				// USER ROUTINE

@@ -1,5 +1,7 @@
 package priv.bajdcc.LALR1.ui.drawing;
 
+import sun.awt.SunHints;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
@@ -19,6 +21,13 @@ public class UIFontImage {
 		for (int i = 0; i < 256; i++) {
 			this.images[i] = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 			Graphics g = this.images[i].getGraphics();
+			Graphics2D g2d = (Graphics2D) g;
+			g2d.setRenderingHint(SunHints.KEY_ANTIALIASING, SunHints.VALUE_ANTIALIAS_ON);
+			g2d.setRenderingHint(SunHints.KEY_TEXT_ANTIALIASING, SunHints.VALUE_TEXT_ANTIALIAS_DEFAULT);
+			g2d.setRenderingHint(SunHints.KEY_STROKE_CONTROL, SunHints.VALUE_STROKE_DEFAULT);
+			g2d.setRenderingHint(SunHints.KEY_TEXT_ANTIALIAS_LCD_CONTRAST, 140);
+			g2d.setRenderingHint(SunHints.KEY_FRACTIONALMETRICS, SunHints.VALUE_FRACTIONALMETRICS_OFF);
+			g2d.setRenderingHint(SunHints.KEY_RENDERING, SunHints.VALUE_RENDER_DEFAULT);
 			g.setColor(Color.white);
 			g.fillRect(0, 0, width, height);
 			if (!Character.isISOControl((char) i)) {

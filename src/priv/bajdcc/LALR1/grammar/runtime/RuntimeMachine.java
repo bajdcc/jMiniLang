@@ -52,6 +52,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 					ModuleUI.getInstance(),
 					ModuleTask.getInstance(),
 					ModuleRemote.getInstance(),
+					ModuleNet.getInstance(),
 			};
 		}
 

@@ -53,9 +53,11 @@ Tasks:
 - System
 - Utility
 - Remote
+- UI
 
 UI:
 - Clock
+- Hitokoto
 
 Implemented IPC, usage:
 - `task system now` -> Get system time

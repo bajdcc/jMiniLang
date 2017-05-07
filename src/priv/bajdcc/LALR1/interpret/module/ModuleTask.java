@@ -41,11 +41,10 @@ public class ModuleTask implements IInterpreterModule {
 				"import \"sys.list\";\n" +
 				"import \"sys.proc\";\n" +
 				"\n" +
-				"var task_num = " + TASK_NUM + ";\n" +
 				"var g_task_init = func ~() {\n" +
 				"    var task_table = [];\n" +
 				"    call g_start_share(\"TASK#TABLE\", task_table);\n" +
-				"    foreach (var i : call g_range(0, task_num - 1)) {\n" +
+				"    foreach (var i : call g_range(0, " + TASK_NUM + " - 1)) {\n" +
 				"        call g_array_add(task_table, g_null);\n" +
 				"    }\n" +
 				"    var waiting_list = [];\n" +
