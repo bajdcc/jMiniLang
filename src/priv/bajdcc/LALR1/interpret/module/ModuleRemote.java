@@ -57,10 +57,12 @@ public class ModuleRemote implements IInterpreterModule {
 				"import \"sys.proc\";\n" +
 				"import \"sys.string\";\n" +
 				"var g_remote_print = func ~(str) {\n" +
+				"    call g_lock_share(\"REMOTE#MUTEX\");\n" +
 				"    var remote_int = call g_create_pipe(\"int#0\");\n" +
 				"    foreach (var c : call g_range_string(str)) {\n" +
 				"        call g_write_pipe(remote_int, c);\n" +
 				"    }\n" +
+				"    call g_unlock_share(\"REMOTE#MUTEX\");\n" +
 				"};\n" +
 				"export \"g_remote_print\";\n" +
 				"var g_remote_printn = func ~(str) {\n" +

@@ -37,7 +37,7 @@ public class UIRemoteGraphics {
 		this.lineWidth = 9999;
 		this.svgmode = false;
 		this.stringmode = false;
-		this.queue = new LinkedBlockingQueue<>(1024);
+		this.queue = new LinkedBlockingQueue<>();
 		this.bg = Color.white;
 		this.fg = Color.black;
 		this.image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
@@ -45,7 +45,7 @@ public class UIRemoteGraphics {
 		this.gimage.setColor(bg);
 		this.gimage.fillRect(0, 0, width, height);
 		this.gimage.setColor(fg);
-		this.gimage.setFont(new Font("宋体", Font.PLAIN, 20));
+		this.gimage.setFont(new Font("楷体", Font.PLAIN, 20));
 		Graphics2D g2d = (Graphics2D) gimage;
 		g2d.setRenderingHint(SunHints.KEY_ANTIALIASING, SunHints.VALUE_ANTIALIAS_ON);
 		g2d.setRenderingHint(SunHints.KEY_TEXT_ANTIALIASING, SunHints.VALUE_TEXT_ANTIALIAS_DEFAULT);

@@ -82,6 +82,7 @@ public class TKUI implements IOSCodePage {
 				"\n" +
 				"var data = {};\n" +
 				"call g_task_add_proc(3, data);\n" +
+				"call g_start_share(\"REMOTE#MUTEX\", \"remote mutex\");\n" +
 				"call g_load_x(\"/ui/main\");\n" +
 				"\n" +
 				"call g_read_pipe(handle, handler);\n";
