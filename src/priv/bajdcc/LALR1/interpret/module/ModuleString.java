@@ -210,12 +210,31 @@ public class ModuleString implements IInterpreterModule {
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) throws Exception {
 				String str = (String) args.get(0).getObj();
-				try	{
+				try {
 					BigInteger bi = new BigInteger(str);
 					return new RuntimeObject(new BigInteger(str));
 				} catch (NumberFormatException e) {
 					return new RuntimeObject(BigInteger.valueOf(-1));
 				}
+			}
+		});
+		info.addExternalFunc("g_string_join_array", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "字符串数组连接";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kArray, RuntimeObjectType.kString};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				RuntimeArray arr = (RuntimeArray) args.get(0).getObj();
+				String delim = (String) args.get(1).getObj();
+				return new RuntimeObject(String.join(delim, arr.toStringList()));
 			}
 		});
 	}

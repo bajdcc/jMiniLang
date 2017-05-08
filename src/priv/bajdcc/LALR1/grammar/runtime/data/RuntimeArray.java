@@ -98,6 +98,10 @@ public class RuntimeArray implements Cloneable {
 		return array.stream().map(a -> a.getObj()).collect(Collectors.toList());
 	}
 
+	public List<String> toStringList() {
+		return array.stream().map(a -> String.valueOf(a.getObj())).collect(Collectors.toList());
+	}
+
 	public RuntimeArray clone() {
 		try {
 			return (RuntimeArray) super.clone();

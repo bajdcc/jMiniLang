@@ -130,8 +130,7 @@ public class ModuleTask implements IInterpreterModule {
 				"    var tid = call g_map_get(m, \"tid\");\n" +
 				"    let tid = call g_task_get_id_by_name(tid);\n" +
 				"    var msg = call g_map_get(m, \"msg\");\n" +
-				"    var data = call g_array_get(task_table, tid);\n" +
-				"    if (call g_is_null(data)) {\n" +
+				"    if (call g_is_null(tid)) {\n" +
 				"        call g_map_put(msg, \"error\", 1);\n" +
 				"        call g_map_put(msg, \"val\", \"invalid task name\");\n" +
 				"    } else {\n" +
@@ -236,10 +235,10 @@ public class ModuleTask implements IInterpreterModule {
 				return new RuntimeObject(BigInteger.valueOf(System.currentTimeMillis()));
 			}
 		});
-		info.addExternalFunc("g_task_get_pipe_count", new IRuntimeDebugExec() {
+		info.addExternalFunc("g_task_get_pipe_stat", new IRuntimeDebugExec() {
 			@Override
 			public String getDoc() {
-				return "获取管道数量";
+				return "获取管道信息";
 			}
 
 			@Override
@@ -250,13 +249,13 @@ public class ModuleTask implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) throws Exception {
-				return new RuntimeObject(BigInteger.valueOf(status.getService().getPipeService().size()));
+				return new RuntimeObject(status.getService().getPipeService().stat());
 			}
 		});
-		info.addExternalFunc("g_task_get_share_count", new IRuntimeDebugExec() {
+		info.addExternalFunc("g_task_get_share_stat", new IRuntimeDebugExec() {
 			@Override
 			public String getDoc() {
-				return "获取共享数量";
+				return "获取共享信息";
 			}
 
 			@Override
@@ -267,7 +266,7 @@ public class ModuleTask implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) throws Exception {
-				return new RuntimeObject(BigInteger.valueOf(status.getService().getShareService().size()));
+				return new RuntimeObject(status.getService().getShareService().stat());
 			}
 		});
 	}

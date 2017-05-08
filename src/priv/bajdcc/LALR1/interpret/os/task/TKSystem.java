@@ -19,6 +19,7 @@ public class TKSystem implements IOSCodePage {
 				"import \"sys.list\";\n" +
 				"import \"sys.proc\";\n" +
 				"import \"sys.task\";\n" +
+				"import \"sys.string\";\n" +
 				"\n" +
 				"call g_set_process_desc(\"system service\");\n" +
 				"call g_set_process_priority(72);\n" +
@@ -44,10 +45,12 @@ public class TKSystem implements IOSCodePage {
 				"        }\n" +
 				"        call g_map_put(msg, \"val\", val);\n" +
 				"    } else if (id == \"pipe\") {\n" +
-				"        var val = call g_task_get_pipe_count();\n" +
+				"        var val = call g_task_get_pipe_stat();\n" +
+				"        let val = call g_string_join_array(val, \"\\n\");\n" +
 				"        call g_map_put(msg, \"val\", val);\n" +
 				"    } else if (id == \"share\") {\n" +
-				"        var val = call g_task_get_share_count();\n" +
+				"        var val = call g_task_get_share_stat();\n" +
+				"        let val = call g_string_join_array(val, \"\\n\");\n" +
 				"        call g_map_put(msg, \"val\", val);\n" +
 				"    }\n" +
 				"};\n" +

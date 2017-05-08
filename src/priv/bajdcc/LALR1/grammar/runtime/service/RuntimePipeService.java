@@ -1,6 +1,10 @@
 package priv.bajdcc.LALR1.grammar.runtime.service;
 
+import priv.bajdcc.LALR1.grammar.runtime.RuntimeObject;
+import priv.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
+
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 【运行时】运行时管道服务
@@ -16,6 +20,10 @@ public class RuntimePipeService implements IRuntimePipeService {
 		public PipeStruct(String name) {
 			this.name = name;
 			this.queue = new ArrayDeque<>();
+		}
+
+		public String getName() {
+			return name;
 		}
 	}
 
@@ -110,5 +118,19 @@ public class RuntimePipeService implements IRuntimePipeService {
 	@Override
 	public long size() {
 		return setPipeId.size();
+	}
+
+	@Override
+	public RuntimeArray stat() {
+		RuntimeArray array = new RuntimeArray();
+		array.add(new RuntimeObject(String.format("   %-5s   %-15s   %-20s",
+				"Id", "Name", "Queue")));
+		mapPipeNames.values().stream().sorted(Comparator.naturalOrder())
+				.collect(Collectors.toList())
+				.forEach((value) -> {
+					array.add(new RuntimeObject(String.format("   %-5s   %-15s   %-20s",
+							String.valueOf(value), arrPipes[value].name, arrPipes[value].queue.size())));
+				});
+		return array;
 	}
 }

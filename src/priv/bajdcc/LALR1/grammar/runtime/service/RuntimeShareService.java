@@ -1,9 +1,12 @@
 package priv.bajdcc.LALR1.grammar.runtime.service;
 
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeObject;
+import priv.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 【运行时】运行时共享服务
@@ -23,6 +26,14 @@ public class RuntimeShareService implements IRuntimeShareService {
 			this.obj = obj;
 			this.reference = 1;
 			this.locked = false;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public String getObjType() {
+			return obj.getType().name();
 		}
 	}
 
@@ -94,5 +105,19 @@ public class RuntimeShareService implements IRuntimeShareService {
 	@Override
 	public long size() {
 		return mapShares.size();
+	}
+
+	@Override
+	public RuntimeArray stat() {
+		RuntimeArray array = new RuntimeArray();
+		array.add(new RuntimeObject(String.format("   %-15s   %-15s   %-5s   %-5s",
+				"Name", "Type", "Ref", "Locked")));
+		mapShares.values().stream().sorted(Comparator.comparing(ShareStruct::getObjType).thenComparing(ShareStruct::getName))
+				.collect(Collectors.toList())
+				.forEach((value) -> {
+					array.add(new RuntimeObject(String.format("   %-15s   %-15s   %-5s   %-5s",
+							value.name, value.obj.getType().name(), String.valueOf(value.reference), String.valueOf(value.locked))));
+				});
+		return array;
 	}
 }

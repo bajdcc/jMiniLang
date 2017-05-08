@@ -1,5 +1,7 @@
 package priv.bajdcc.LALR1.grammar.runtime.service;
 
+import priv.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
+
 /**
  * 【运行时】运行时管道服务接口
  *
@@ -64,4 +66,11 @@ public interface IRuntimePipeService {
 	 * @return 管道数量
 	 */
 	long size();
+
+	/**
+	 * 获取列表
+	 *
+	 * @return 列表
+	 */
+	RuntimeArray stat();
 }
