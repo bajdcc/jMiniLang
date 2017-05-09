@@ -33,7 +33,9 @@ public class ModuleProc implements IInterpreterModule {
 
 	@Override
 	public RuntimeCodePage getCodePage() throws Exception {
-		String base = "import \"sys.base\"; import \"sys.list\";\n" +
+		String base = "import \"sys.base\";\n" +
+				"import \"sys.list\";\n" +
+				"import \"sys.string\";\n" +
 				"var g_join_process = func ~(pid) {\n" +
 				"    call g_printn(\"Waiting proc: #\" + call g_get_pid() + \" -> #\" + pid);\n" +
 				"    while (call g_join_process_once(pid) != 0) {}\n" +

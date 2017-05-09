@@ -1,19 +1,14 @@
 package priv.bajdcc.LALR1.interpret.module;
 
+import priv.bajdcc.LALR1.grammar.Grammar;
+import priv.bajdcc.LALR1.grammar.runtime.*;
+import priv.bajdcc.LALR1.grammar.runtime.RuntimeException;
+import priv.bajdcc.LALR1.grammar.runtime.RuntimeException.RuntimeError;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.math.BigInteger;
 import java.util.List;
-
-import priv.bajdcc.LALR1.grammar.Grammar;
-import priv.bajdcc.LALR1.grammar.runtime.IRuntimeDebugExec;
-import priv.bajdcc.LALR1.grammar.runtime.IRuntimeDebugInfo;
-import priv.bajdcc.LALR1.grammar.runtime.IRuntimeStatus;
-import priv.bajdcc.LALR1.grammar.runtime.RuntimeCodePage;
-import priv.bajdcc.LALR1.grammar.runtime.RuntimeException;
-import priv.bajdcc.LALR1.grammar.runtime.RuntimeException.RuntimeError;
-import priv.bajdcc.LALR1.grammar.runtime.RuntimeObject;
-import priv.bajdcc.LALR1.grammar.runtime.RuntimeObjectType;
 
 /**
  * 【模块】基本模块
@@ -69,13 +64,6 @@ public class ModuleBase implements IInterpreterModule {
 				+ "    }\n"
 				+ "};\n"
 				+ "export \"g_range\";\n"
-				+ "var g_range_string = yield ~(str) {\n"
-				+ "    var length = call g_string_length(str);"
-				+ "    for (var i = 0; i < length; i++) {\n"
-				+ "        yield call g_string_char(str, i);\n"
-				+ "    }\n"
-				+ "};\n"
-				+ "export \"g_range_string\";\n"
 				+ "var g_range_foreach = func ~(a, b, c) {\n"
 				+ "    foreach (var i : call g_range(a, b)) {\n"
 				+ "        call c(i);\n"
@@ -373,7 +361,6 @@ public class ModuleBase implements IInterpreterModule {
 			}
 		});
 		buildIORead(info);
-		buildStringMethod(info);
 
 		return page;
 	}
@@ -404,60 +391,5 @@ public class ModuleBase implements IInterpreterModule {
 		info.addExternalFunc("g_stdin_read_has_line",
 				new ModuleBaseIORead("标准输入是否匹配行",
 						ModuleBaseIORead.ModuleBaseIOReadType.kHasNextLine));
-	}
-
-	private void buildStringMethod(IRuntimeDebugInfo info) {
-		info.addExternalFunc("g_string_length", new IRuntimeDebugExec() {
-			@Override
-			public String getDoc() {
-				return "字符串长度";
-			}
-
-			@Override
-			public RuntimeObjectType[] getArgsType() {
-				return new RuntimeObjectType[] { RuntimeObjectType.kString };
-			}
-
-			@Override
-			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
-			                                      IRuntimeStatus status) throws Exception {
-				return new RuntimeObject(BigInteger.valueOf(args.get(0).getObj().toString().length()));
-			}
-		});
-		info.addExternalFunc("g_string_char", new IRuntimeDebugExec() {
-			@Override
-			public String getDoc() {
-				return "字符串遍历";
-			}
-
-			@Override
-			public RuntimeObjectType[] getArgsType() {
-				return new RuntimeObjectType[] { RuntimeObjectType.kString, RuntimeObjectType.kInt };
-			}
-
-			@Override
-			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
-			                                      IRuntimeStatus status) throws Exception {
-				BigInteger index = (BigInteger) args.get(1).getObj();
-				return new RuntimeObject(args.get(0).getObj().toString().charAt(index.intValue()));
-			}
-		});
-		info.addExternalFunc("g_string_empty", new IRuntimeDebugExec() {
-			@Override
-			public String getDoc() {
-				return "字符串是否为空";
-			}
-
-			@Override
-			public RuntimeObjectType[] getArgsType() {
-				return new RuntimeObjectType[] { RuntimeObjectType.kString };
-			}
-
-			@Override
-			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
-			                                      IRuntimeStatus status) throws Exception {
-				return new RuntimeObject(args.get(0).getObj().toString().isEmpty());
-			}
-		});
 	}
 }

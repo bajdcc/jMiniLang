@@ -252,6 +252,29 @@ public class ModuleList implements IInterpreterModule {
 				return new RuntimeObject(array.isEmpty());
 			}
 		});
+		info.addExternalFunc("g_array_range", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "产生连续整数数组";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kInt, RuntimeObjectType.kInt};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				RuntimeArray array = new RuntimeArray();
+				int a = ((BigInteger) args.get(0).getObj()).intValue();
+				int b = ((BigInteger) args.get(1).getObj()).intValue();
+				for (int i = a; i <= b; i++) {
+					array.add(new RuntimeObject(BigInteger.valueOf(i)));
+				}
+				return new RuntimeObject(array);
+			}
+		});
 	}
 
 	/**

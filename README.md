@@ -22,6 +22,7 @@
 13. Load file with Sync/Async.
 14. **Virtual machine**.
 15. **Support GUI**.
+16. **Functional programming**.
 
 #### What it generates
 
