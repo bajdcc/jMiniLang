@@ -51,36 +51,45 @@ public class ModuleFunction implements IInterpreterModule {
 				"export \"g_func_sub\";\n" +
 				"export \"g_func_mul\";\n" +
 				"export \"g_func_div\";\n" +
-				"var curry = func ~(a, b) {\n" +
-				"    var f = func ~(c) -> call a(b, c);\n" +
-				"    return f;\n" +
+				"var g_func_curry = func ~(a, b) {\n" +
+				"    var _curry = func ~(c) -> call a(b, c);\n" +
+				"    return _curry;\n" +
 				"};\n" +
-				"var swap = func ~(a) {\n" +
-				"    var f = func ~(b, c) -> call a(c, b);\n" +
-				"    return f;\n" +
+				"var g_func_swap = func ~(a) {\n" +
+				"    var _swap = func ~(b, c) -> call a(c, b);\n" +
+				"    return _swap;\n" +
 				"};\n" +
+				"export \"g_func_curry\";\n" +
+				"export \"g_func_swap\";\n" +
+				"var g_func_1 = func ~(a) -> a;\n" +
+				"export \"g_func_1\";\n" +
 				"\n" +
 				"var xs = func [\"数组遍历闭包\"] ~(l) {\n" +
 				"    var len = call g_array_size(l);\n" +
 				"    var idx = 0;\n" +
-				"    var f = func ~() {\n" +
+				"    var _xs = func ~() {\n" +
 				"        if (idx == len) { return g__; }\n" +
 				"        var d = call g_array_get(l, idx);\n" +
 				"        idx++;\n" +
-				"        var f2 = func ~() -> d;\n" +
-				"        return f2;\n" +
+				"        var _xs_ = func ~() -> d;\n" +
+				"        return _xs_;\n" +
 				"    };\n" +
-				"    return f;\n" +
+				"    return _xs;\n" +
 				"};\n" +
 				"\n" +
 				"var g_func_apply = func ~(name, list) {\n" +
+				"    return call g_func_apply_arg(name, list, \"g_func_1\");\n" +
+				"};\n" +
+				"export \"g_func_apply\";\n" +
+				"var g_func_apply_arg = func ~(name, list, arg) {\n" +
 				"    var len = call g_array_size(list);\n" +
 				"    if (len == 0) { return g__; }\n" +
 				"    if (len == 1) { return call g_array_get(list, 0); }\n" +
 				"    var x = call xs(list);\n" +
 				"    var val = call x();\n" +
 				"    let val = call val();\n" +
-				"    var n = \"g_func_\" + name;\n" +
+				"    var n = name;\n" +
+				"    let n = call arg(n);\n" +
 				"    for (;;) {\n" +
 				"        var v2 = call x();\n" +
 				"        if (call g_is_null(v2)) { break; }\n" +
@@ -89,7 +98,10 @@ public class ModuleFunction implements IInterpreterModule {
 				"    }\n" +
 				"    return val;\n" +
 				"};\n" +
-				"export \"g_func_apply\";\n";
+				"export \"g_func_apply_arg\";\n" +
+				"var g_func_applicative = func ~(f, a, b) -> call f(a, call b(a));\n" +
+				"export \"g_func_applicative\";\n" +
+				"\n";
 
 		Grammar grammar = new Grammar(base);
 		RuntimeCodePage page = grammar.getCodePage();

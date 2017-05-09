@@ -30,13 +30,17 @@ public class ModuleString implements IInterpreterModule {
 	@Override
 	public RuntimeCodePage getCodePage() throws Exception {
 		String base = "import \"sys.base\";\n" +
+				"import \"sys.func\";\n" +
 				"var g_range_string = yield ~(a) {\n" +
 				"    var size = call g_string_length(a);\n" +
 				"    for (var i = 0; i < size; i++) {\n" +
 				"        yield call g_string_get(a, i);\n" +
 				"    }\n" +
 				"};\n" +
-				"export \"g_range_string\";\n";
+				"export \"g_range_string\";\n" +
+				"var g_string_reverse = func ~(str) -> call g_func_apply_arg(\"g_func_add\", call g_string_split(str, \"\"), \"g_func_swap\");\n" +
+				"export \"g_string_reverse\";\n" +
+				"\n";
 
 		Grammar grammar = new Grammar(base);
 		RuntimeCodePage page = grammar.getCodePage();

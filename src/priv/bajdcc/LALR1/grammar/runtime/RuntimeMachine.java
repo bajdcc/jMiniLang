@@ -47,13 +47,13 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 					ModuleBase.getInstance(),
 					ModuleMath.getInstance(),
 					ModuleList.getInstance(),
+					ModuleFunction.getInstance(),
 					ModuleString.getInstance(),
 					ModuleProc.getInstance(),
 					ModuleUI.getInstance(),
 					ModuleTask.getInstance(),
 					ModuleRemote.getInstance(),
 					ModuleNet.getInstance(),
-					ModuleFunction.getInstance(),
 			};
 		}
 

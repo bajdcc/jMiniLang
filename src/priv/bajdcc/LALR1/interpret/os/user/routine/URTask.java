@@ -47,6 +47,7 @@ public class URTask implements IOSCodePage {
 				"\n" +
 				"var error = call g_map_get(msg, \"error\");\n" +
 				"var val = call g_map_get(msg, \"val\");\n" +
+				"let val = call g_to_string(val);\n" +
 				"if (error == 1) {\n" +
 				"    call g_write_pipe(out, \"Error: \" + val);\n" +
 				"    call g_write_pipe(out, '\\n');\n" +

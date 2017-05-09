@@ -19,12 +19,18 @@ public class TestInterpret11 {
 					"import \"sys.base\";\n" +
 							"import \"sys.func\";\n" +
 							"import \"sys.list\";\n" +
+							"import \"sys.string\";\n" +
 							"\n" +
 							"var a = call g_array_range(1, 10);\n" +
-							"var b = call g_func_apply(\"add\", a);\n" +
+							"var b = call g_func_apply(\"g_func_add\", a);\n" +
 							"call g_printn(b);\n" +
-							"var c = call g_func_apply(\"mul\", a);\n" +
+							"var c = call g_func_apply(\"g_func_add\", a);\n" +
 							"call g_printn(c);\n" +
+							"var d = call g_func_apply_arg(\"g_func_add\", call g_string_split(\"12345\", \"\"), \"g_func_swap\");\n" +
+							"call g_printn(d);\n" +
+							"var reverse = func ~(str) -> call g_string_reverse(str);\n" +
+							"var e = call g_func_applicative(\"g_func_eq\", \"12321\", reverse);\n" +
+							"call g_printn(e);\n" +
 							""
 			};
 
