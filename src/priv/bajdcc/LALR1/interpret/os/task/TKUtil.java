@@ -19,6 +19,8 @@ public class TKUtil implements IOSCodePage {
 				"import \"sys.list\";\n" +
 				"import \"sys.proc\";\n" +
 				"import \"sys.task\";\n" +
+				"import \"sys.string\";\n" +
+				"import \"sys.func\";\n" +
 				"\n" +
 				"call g_set_process_desc(\"util service\");\n" +
 				"call g_set_process_priority(73);\n" +
@@ -41,6 +43,32 @@ public class TKUtil implements IOSCodePage {
 				"            let str = str + call g_array_get(arg, i);\n" +
 				"        }\n" +
 				"        var val = call g_task_calc(str);\n" +
+				"        call g_map_put(msg, \"val\", val);\n" +
+				"    } else if (id == \"sum\") {\n" +
+				"        var arg = call g_map_get(msg, \"arg\");\n" +
+				"        var arr = [];\n" +
+				"        var len = call g_array_size(arg);\n" +
+				"        foreach (var i : call g_range(2, len - 1)) {\n" +
+				"            var num = call g_array_get(arg, i);\n" +
+				"            let num = call g_string_atoi_s(num);\n" +
+				"            if (!call g_is_null(num)) {\n" +
+				"                call g_array_add(arr, num);\n" +
+				"            }\n" +
+				"        }\n" +
+				"        var val = call g_func_apply(\"add\", arr);\n" +
+				"        call g_map_put(msg, \"val\", val);\n" +
+				"    } else if (id == \"product\") {\n" +
+				"        var arg = call g_map_get(msg, \"arg\");\n" +
+				"        var arr = [];\n" +
+				"        var len = call g_array_size(arg);\n" +
+				"        foreach (var i : call g_range(2, len - 1)) {\n" +
+				"            var num = call g_array_get(arg, i);\n" +
+				"            let num = call g_string_atoi_s(num);\n" +
+				"            if (!call g_is_null(num)) {\n" +
+				"                call g_array_add(arr, num);\n" +
+				"            }\n" +
+				"        }\n" +
+				"        var val = call g_func_apply(\"mul\", arr);\n" +
 				"        call g_map_put(msg, \"val\", val);\n" +
 				"    }\n" +
 				"};\n" +

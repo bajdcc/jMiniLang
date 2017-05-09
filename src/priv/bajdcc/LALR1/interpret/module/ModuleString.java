@@ -253,6 +253,29 @@ public class ModuleString implements IInterpreterModule {
 				}
 			}
 		});
+		info.addExternalFunc("g_string_atoi_s", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "字符串转换成数字（安全版本）";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kString};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				String str = (String) args.get(0).getObj();
+				try {
+					BigInteger bi = new BigInteger(str);
+					return new RuntimeObject(new BigInteger(str));
+				} catch (NumberFormatException e) {
+					return null;
+				}
+			}
+		});
 		info.addExternalFunc("g_string_join_array", new IRuntimeDebugExec() {
 			@Override
 			public String getDoc() {
