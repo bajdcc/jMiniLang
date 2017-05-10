@@ -24,6 +24,8 @@ public class TestInterpret11 {
 							"var a = call g_array_range(1, 10);\n" +
 							"var b = call g_func_apply(\"g_func_add\", a);\n" +
 							"call g_printn(b);\n" +
+							"var b1 = call g_func_length(a);\n" +
+							"call g_printn(b1);\n" +
 							"var c = call g_func_apply(\"g_func_add\", a);\n" +
 							"call g_printn(c);\n" +
 							"var c1 = call g_func_map(a, \"g_to_string\");\n" +
@@ -34,6 +36,11 @@ public class TestInterpret11 {
 							"call g_printn(c2);\n" +
 							"var c3 = call g_func_applyr(\"g_func_sub\", a);\n" +
 							"call g_printn(c3);\n" +
+							"var f4 = func ~(x) -> x % 2 == 0;\n" +
+							"var c4 = call g_func_filter(a, f4);\n" +
+							"let c4 = call g_func_map(c4, \"g_to_string\");\n" +
+							"let c4 = call g_func_apply(\"g_func_add\", c4);\n" +
+							"call g_printn(c4);\n" +
 							"var d = call g_func_apply_arg(\"g_func_add\", call g_string_split(\"12345\", \"\"), \"g_func_swap\");\n" +
 							"call g_printn(d);\n" +
 							"var reverse = func ~(str) -> call g_string_reverse(str);\n" +

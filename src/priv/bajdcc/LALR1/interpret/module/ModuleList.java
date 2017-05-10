@@ -77,7 +77,7 @@ public class ModuleList implements IInterpreterModule {
 				RuntimeArray array = (RuntimeArray) args.get(0).getObj();
 				args.get(1).setReadonly(false);
 				array.add(args.get(1));
-				return new RuntimeObject(array);
+				return args.get(0);
 			}
 		});
 		info.addExternalFunc("g_array_set", new IRuntimeDebugExec() {
