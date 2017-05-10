@@ -91,6 +91,28 @@ public class TKUtil implements IOSCodePage {
 				"        var reverse = func ~(str) -> call g_string_reverse(str);\n" +
 				"        var val = call g_func_applicative(\"g_func_eq\", str, reverse);\n" +
 				"        call g_map_put(msg, \"val\", val);\n" +
+				"    } else if (id == \"toupper\") {\n" +
+				"        var arg = call g_map_get(msg, \"arg\");\n" +
+				"        var arr = [];\n" +
+				"        var len = call g_array_size(arg);\n" +
+				"        foreach (var i : call g_range(2, len - 1)) {\n" +
+				"            call g_array_add(arr, call g_array_get(arg, i));\n" +
+				"        }\n" +
+				"        var toupper = func ~(str) -> call g_string_toupper(str);\n" +
+				"        let arr = call g_func_map(arr, toupper);\n" +
+				"        var val = call g_string_join_array(arr, \" \");\n" +
+				"        call g_map_put(msg, \"val\", val);\n" +
+				"    } else if (id == \"tolower\") {\n" +
+				"        var arg = call g_map_get(msg, \"arg\");\n" +
+				"        var arr = [];\n" +
+				"        var len = call g_array_size(arg);\n" +
+				"        foreach (var i : call g_range(2, len - 1)) {\n" +
+				"            call g_array_add(arr, call g_array_get(arg, i));\n" +
+				"        }\n" +
+				"        var tolower = func ~(str) -> call g_string_tolower(str);\n" +
+				"        let arr = call g_func_map(arr, tolower);\n" +
+				"        var val = call g_string_join_array(arr, \" \");\n" +
+				"        call g_map_put(msg, \"val\", val);\n" +
 				"    }\n" +
 				"};\n" +
 				"\n" +

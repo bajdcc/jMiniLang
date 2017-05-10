@@ -299,5 +299,41 @@ public class ModuleString implements IInterpreterModule {
 				return new RuntimeObject(String.join(delim, arr.toStringList()));
 			}
 		});
+		info.addExternalFunc("g_string_toupper", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "字符串大写";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kString};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				String delim = (String) args.get(0).getObj();
+				return new RuntimeObject(delim.toUpperCase());
+			}
+		});
+		info.addExternalFunc("g_string_tolower", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "字符串小写";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kString};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				String delim = (String) args.get(0).getObj();
+				return new RuntimeObject(delim.toLowerCase());
+			}
+		});
 	}
 }

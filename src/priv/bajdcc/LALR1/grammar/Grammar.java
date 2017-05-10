@@ -216,7 +216,7 @@ public class Grammar extends Semantic {
 		infer(handler.getSemanticHandler("exp_list"),
 				"exp_list -> exp[0] [@COMMA exp_list[1]]");
 		infer(handler.getSemanticHandler("token_list"),
-				"doc_list -> @LITERAL[0] [@COMMA exp_list[1]]");
+				"doc_list -> @LITERAL[0] [@COMMA doc_list[1]]");
 		infer(handler.getSemanticHandler("func"),
 				"func -> (@FUNCTION[10]#func_clearargs# | @YIELD#func_clearargs#) [@LSQ doc_list[0]{lost_doc} @RSQ] (@ID[1]#predeclear_funcname#{lost_func_name} | @NOT[1]#predeclear_funcname#{lost_func_name}) @LPA{lost_lpa} [var_list[2]] @RPA{lost_rpa} (@PTR_OP{lost_func_body} exp[3]{lost_exp} | block[4]{lost_func_body})");
 		/* 基本数据类型 */

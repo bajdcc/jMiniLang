@@ -26,11 +26,20 @@ public class TestInterpret11 {
 							"call g_printn(b);\n" +
 							"var c = call g_func_apply(\"g_func_add\", a);\n" +
 							"call g_printn(c);\n" +
+							"var c1 = call g_func_map(a, \"g_to_string\");\n" +
+							"var c2 = call g_func_applyr(\"g_func_add\", c1);\n" +
+							"call g_printn(c2);\n" +
+							"let c1 = call g_func_mapr(a, \"g_to_string\");\n" +
+							"let c2 = call g_func_apply(\"g_func_add\", c1);\n" +
+							"call g_printn(c2);\n" +
+							"var c3 = call g_func_applyr(\"g_func_sub\", a);\n" +
+							"call g_printn(c3);\n" +
 							"var d = call g_func_apply_arg(\"g_func_add\", call g_string_split(\"12345\", \"\"), \"g_func_swap\");\n" +
 							"call g_printn(d);\n" +
 							"var reverse = func ~(str) -> call g_string_reverse(str);\n" +
 							"var e = call g_func_applicative(\"g_func_eq\", \"12321\", reverse);\n" +
 							"call g_printn(e);\n" +
+							"call g_printn(call g_doc(\"g_func_fold\"));\n" +
 							""
 			};
 

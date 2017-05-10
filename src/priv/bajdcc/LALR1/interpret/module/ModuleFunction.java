@@ -64,41 +64,92 @@ public class ModuleFunction implements IInterpreterModule {
 				"var g_func_1 = func ~(a) -> a;\n" +
 				"export \"g_func_1\";\n" +
 				"\n" +
-				"var xs = func [\"数组遍历闭包\"] ~(l) {\n" +
+				"var g_func_xsl = func [\"数组遍历闭包-foldl\"] ~(l) {\n" +
 				"    var len = call g_array_size(l);\n" +
 				"    var idx = 0;\n" +
-				"    var _xs = func ~() {\n" +
+				"    var _xsl = func ~() {\n" +
 				"        if (idx == len) { return g__; }\n" +
 				"        var d = call g_array_get(l, idx);\n" +
 				"        idx++;\n" +
-				"        var _xs_ = func ~() -> d;\n" +
-				"        return _xs_;\n" +
+				"        var _xsl_ = func ~() -> d;\n" +
+				"        return _xsl_;\n" +
 				"    };\n" +
-				"    return _xs;\n" +
+				"    return _xsl;\n" +
 				"};\n" +
-				"\n" +
-				"var g_func_apply = func ~(name, list) {\n" +
-				"    return call g_func_apply_arg(name, list, \"g_func_1\");\n" +
+				"export \"g_func_xsl\";\n" +
+				"var g_func_xsr = func [\"数组遍历闭包-foldr\"] ~(l) {\n" +
+				"    var idx = call g_array_size(l) - 1;\n" +
+				"    var _xsr = func ~() {\n" +
+				"        if (idx < 0) { return g__; }\n" +
+				"        var d = call g_array_get(l, idx);\n" +
+				"        idx--;\n" +
+				"        var _xsr_ = func ~() -> d;\n" +
+				"        return _xsr_;\n" +
+				"    };\n" +
+				"    return _xsr;\n" +
 				"};\n" +
-				"export \"g_func_apply\";\n" +
-				"var g_func_apply_arg = func ~(name, list, arg) {\n" +
+				"export \"g_func_xsr\";\n" +
+				"// ----------------------------------------------\n" +
+				"var g_func_fold = func \n" +
+				"    [\n" +
+				"        \"函数名：g_func_fold\",\n" +
+				"        \"参数解释：\",\n" +
+				"        \"  - name: 套用的折叠函数\",\n" +
+				"        \"  - list: 需处理的数组\",\n" +
+				"        \"  - init: 初始值(不用则为空)\",\n" +
+				"        \"  - xs: 数组遍历方式(xsl=从左到右,xsr=从右到左)\",\n" +
+				"        \"  - map: 对遍历的每个元素施加的变换\",\n" +
+				"        \"  - arg: 对二元操作进行包装(默认=g_func_1,例=g_func_swap)\",\n" +
+				"        \"\"" +
+				"    ]\n" +
+				"    ~(name, list, init, xs, map, arg) {\n" +
 				"    var len = call g_array_size(list);\n" +
 				"    if (len == 0) { return g__; }\n" +
-				"    if (len == 1) { return call g_array_get(list, 0); }\n" +
-				"    var x = call xs(list);\n" +
-				"    var val = call x();\n" +
-				"    let val = call val();\n" +
+				"    var val = g__;\n" +
+				"    var x = g__;\n" +
+				"    if (call g_is_null(init)) {\n" +
+				"        if (len == 1) { return call g_array_get(list, 0); }\n" +
+				"        let x = call xs(list);\n" +
+				"        let val = call x();\n" +
+				"        let val = call val();\n" +
+				"        let val = call map(val);\n" +
+				"    } else {\n" +
+				"        let x = call xs(list);\n" +
+				"        let val = init;\n" +
+				"    }\n" +
 				"    var n = name;\n" +
 				"    let n = call arg(n);\n" +
 				"    for (;;) {\n" +
 				"        var v2 = call x();\n" +
 				"        if (call g_is_null(v2)) { break; }\n" +
 				"        let v2 = call v2();\n" +
+				"        let v2 = call map(v2);\n" +
 				"        let val = call n(val, v2);\n" +
 				"    }\n" +
 				"    return val;\n" +
 				"};\n" +
+				"export \"g_func_fold\";\n" +
+				"// ----------------------------------------------\n" +
+				"var g_func_apply = func ~(name, list) ->\n" +
+				"    call g_func_apply_arg(name, list, \"g_func_1\");\n" +
+				"export \"g_func_apply\";\n" +
+				"var g_func_apply_arg = func ~(name, list, arg) ->\n" +
+				"    call g_func_fold(name, list, g__, \"g_func_xsl\", \"g_func_1\", arg);\n" +
 				"export \"g_func_apply_arg\";\n" +
+				"var g_func_applyr = func ~(name, list) ->\n" +
+				"    call g_func_applyr_arg(name, list, \"g_func_1\");\n" +
+				"export \"g_func_applyr\";\n" +
+				"var g_func_applyr_arg = func ~(name, list, arg) ->\n" +
+				"    call g_func_fold(name, list, g__, \"g_func_xsr\", \"g_func_1\", arg);\n" +
+				"export \"g_func_applyr_arg\";\n" +
+				"// ----------------------------------------------\n" +
+				"var g_func_map = func ~(list, arg) ->\n" +
+				"    call g_func_fold(\"g_array_add\", list, g_new_array, \"g_func_xsl\", arg, \"g_func_1\");\n" +
+				"export \"g_func_map\";\n" +
+				"var g_func_mapr = func ~(list, arg) ->\n" +
+				"    call g_func_fold(\"g_array_add\", list, g_new_array, \"g_func_xsr\", arg, \"g_func_1\");\n" +
+				"export \"g_func_mapr\";\n" +
+				"// ----------------------------------------------\n" +
 				"var g_func_applicative = func ~(f, a, b) -> call f(a, call b(a));\n" +
 				"export \"g_func_applicative\";\n" +
 				"\n";
