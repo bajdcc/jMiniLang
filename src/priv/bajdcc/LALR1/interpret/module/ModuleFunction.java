@@ -169,6 +169,8 @@ public class ModuleFunction implements IInterpreterModule {
 				"// ----------------------------------------------\n" +
 				"var g_func_applicative = func ~(f, a, b) -> call f(a, call b(a));\n" +
 				"export \"g_func_applicative\";\n" +
+				"var g_func_import_string_module = func ~() { import \"sys.string\"; };\n" +
+				"export \"g_func_import_string_module\";\n" +
 				"\n";
 
 		Grammar grammar = new Grammar(base);

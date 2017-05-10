@@ -28,6 +28,8 @@ public class TKUtil implements IOSCodePage {
 				"var tid = 2;\n" +
 				"var handle = call g_create_pipe(\"TASKSEND#\" + tid);\n" +
 				"\n" +
+				"call g_func_import_string_module();\n" +
+				"\n" +
 				"var time = func ~(msg, caller) {\n" +
 				"    var id = call g_map_get(msg, \"id\");\n" +
 				"    if (call g_is_null(id)) {\n" +
@@ -88,8 +90,7 @@ public class TKUtil implements IOSCodePage {
 				"            call g_array_add(arr, call g_array_get(arg, i));\n" +
 				"        }\n" +
 				"        var str = call g_string_join_array(arr, \" \");\n" +
-				"        var reverse = func ~(str) -> call g_string_reverse(str);\n" +
-				"        var val = call g_func_applicative(\"g_func_eq\", str, reverse);\n" +
+				"        var val = call g_func_applicative(\"g_func_eq\", str, \"g_string_reverse\");\n" +
 				"        call g_map_put(msg, \"val\", val);\n" +
 				"    } else if (id == \"toupper\") {\n" +
 				"        var arg = call g_map_get(msg, \"arg\");\n" +
@@ -98,8 +99,7 @@ public class TKUtil implements IOSCodePage {
 				"        foreach (var i : call g_range(2, len - 1)) {\n" +
 				"            call g_array_add(arr, call g_array_get(arg, i));\n" +
 				"        }\n" +
-				"        var toupper = func ~(str) -> call g_string_toupper(str);\n" +
-				"        let arr = call g_func_map(arr, toupper);\n" +
+				"        let arr = call g_func_map(arr, \"g_string_toupper\");\n" +
 				"        var val = call g_string_join_array(arr, \" \");\n" +
 				"        call g_map_put(msg, \"val\", val);\n" +
 				"    } else if (id == \"tolower\") {\n" +
@@ -109,8 +109,7 @@ public class TKUtil implements IOSCodePage {
 				"        foreach (var i : call g_range(2, len - 1)) {\n" +
 				"            call g_array_add(arr, call g_array_get(arg, i));\n" +
 				"        }\n" +
-				"        var tolower = func ~(str) -> call g_string_tolower(str);\n" +
-				"        let arr = call g_func_map(arr, tolower);\n" +
+				"        let arr = call g_func_map(arr, \"g_string_tolower\");\n" +
 				"        var val = call g_string_join_array(arr, \" \");\n" +
 				"        call g_map_put(msg, \"val\", val);\n" +
 				"    }\n" +

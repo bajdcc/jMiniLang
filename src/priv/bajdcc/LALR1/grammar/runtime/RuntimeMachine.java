@@ -493,6 +493,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 		int idx = loadInt();
 		RuntimeObject obj = load();
 		obj.setReadonly(false);
+		obj.setSymbol(currentPage.getData().get(idx));
 		stack.storeVariableDirect(idx, obj);
 		store(obj);
 	}
@@ -675,7 +676,13 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 				Map<Integer, RuntimeObject> env = func.getEnv();
 				if (env != null) {
 					for (Entry<Integer, RuntimeObject> entry : env.entrySet()) {
-						stack.storeClosure(entry.getKey(), entry.getValue());
+						int id = entry.getKey();
+						RuntimeObject o = entry.getValue();
+						if (o != null) {
+							o.setSymbol(currentPage.getData().get(id));
+							o.setReadonly(false);
+						}
+						stack.storeClosure(id, o);
 					}
 					stack.pushData(obj);
 				}

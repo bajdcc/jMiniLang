@@ -153,7 +153,7 @@ public class ModuleBase implements IInterpreterModule {
 				if (obj == null) {
 					return new RuntimeObject(null);
 				}
-				return new RuntimeObject(args.get(0).getObj().toString());
+				return new RuntimeObject(String.valueOf(args.get(0).getObj()));
 			}
 		});
 		info.addExternalFunc("g_new", new IRuntimeDebugExec() {

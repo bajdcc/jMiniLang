@@ -43,10 +43,22 @@ public class TestInterpret11 {
 							"call g_printn(c4);\n" +
 							"var d = call g_func_apply_arg(\"g_func_add\", call g_string_split(\"12345\", \"\"), \"g_func_swap\");\n" +
 							"call g_printn(d);\n" +
-							"var reverse = func ~(str) -> call g_string_reverse(str);\n" +
-							"var e = call g_func_applicative(\"g_func_eq\", \"12321\", reverse);\n" +
+							"call g_func_import_string_module();\n" +
+							"var e = call g_func_applicative(\"g_func_eq\", \"12321\", \"g_string_reverse\");\n" +
 							"call g_printn(e);\n" +
 							"call g_printn(call g_doc(\"g_func_fold\"));\n" +
+							"var xx = func ~(l) {\n" +
+							"    var idx = call g_array_size(l) - 1;\n" +
+							"    var _xsr = func ~() ->\n" +
+							"        idx < 0 ? g_null : call g_array_get(l, idx--);\n" +
+							"    return _xsr;\n" +
+							"};\n" +
+							"var x1 = call xx(a);\n" +
+							"var x2 = call x1();\n" +
+							"while (!call g_is_null(x2)) {\n" +
+							"    call g_printn(x2);\n" +
+							"    let x2 = call x1();\n" +
+							"}\n" +
 							""
 			};
 

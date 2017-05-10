@@ -1,12 +1,12 @@
 package priv.bajdcc.LALR1.grammar.runtime;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-
 import priv.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
 import priv.bajdcc.LALR1.grammar.runtime.data.RuntimeFuncObject;
 import priv.bajdcc.LALR1.grammar.runtime.data.RuntimeMap;
 import priv.bajdcc.util.lexer.token.TokenType;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 /**
  * 【运行时】运行时对象
@@ -16,6 +16,7 @@ import priv.bajdcc.util.lexer.token.TokenType;
 public class RuntimeObject implements Cloneable {
 
 	private Object obj = null;
+	private Object symbol = null;
 	private RuntimeObjectType type = RuntimeObjectType.kNull;
 	private boolean readonly = false;
 	private boolean copyable = true;
@@ -118,6 +119,10 @@ public class RuntimeObject implements Cloneable {
 		this.copyable = copyable;
 	}
 
+	public void setSymbol(Object symbol) {
+		this.symbol = symbol;
+	}
+
 	public static RuntimeObjectType fromObject(Object obj) {
 		if (obj == null) {
 			return RuntimeObjectType.kNull;
@@ -151,7 +156,7 @@ public class RuntimeObject implements Cloneable {
 		}
 		return RuntimeObjectType.kNull;
 	}
-	
+
 	public static TokenType toTokenType(RuntimeObjectType obj) {
 		switch (obj) {
 		case kBool:
@@ -180,7 +185,7 @@ public class RuntimeObject implements Cloneable {
 
 	@Override
 	public String toString() {
-		return type.getName() +
+		return " " + String.valueOf(symbol) + " " + type.getName() +
 				(obj == null ? "(null)" : "(" + obj.toString() + ")") +
 				(readonly ? 'R' : 'r') +
 				(copyable ? 'C' : 'c');

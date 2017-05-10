@@ -90,7 +90,7 @@ public class RuntimeStack {
 	}
 
 	public void storeClosure(int idx, RuntimeObject obj) {
-		stkCall.get(0).getClosure().put(idx, obj);
+		stkCall.get(0).addClosure(idx, obj);
 	}
 
 	public boolean pushFuncData() {

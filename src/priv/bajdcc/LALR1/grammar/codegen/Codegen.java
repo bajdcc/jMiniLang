@@ -1,21 +1,13 @@
 package priv.bajdcc.LALR1.grammar.codegen;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import priv.bajdcc.LALR1.grammar.runtime.ICodegenByteWriter;
-import priv.bajdcc.LALR1.grammar.runtime.RuntimeCodePage;
-import priv.bajdcc.LALR1.grammar.runtime.RuntimeDebugInfo;
-import priv.bajdcc.LALR1.grammar.runtime.RuntimeInst;
-import priv.bajdcc.LALR1.grammar.runtime.RuntimeInstBase;
-import priv.bajdcc.LALR1.grammar.runtime.RuntimeInstBinary;
-import priv.bajdcc.LALR1.grammar.runtime.RuntimeInstNon;
-import priv.bajdcc.LALR1.grammar.runtime.RuntimeInstUnary;
+import priv.bajdcc.LALR1.grammar.runtime.*;
 import priv.bajdcc.LALR1.grammar.symbol.SymbolTable;
 import priv.bajdcc.LALR1.grammar.tree.Function;
 import priv.bajdcc.util.HashListMap;
 import priv.bajdcc.util.HashListMapEx;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 【中间代码】中间代码接口实现
@@ -66,7 +58,7 @@ public class Codegen implements ICodegen, ICodegenBlock, ICodegenByteWriter {
 	 * @return 代码页
 	 */
 	public RuntimeCodePage genCodePage() {
-		List<Object> objs = symbolList.list.stream().collect(Collectors.toList());
+		List<Object> objs = new ArrayList<>(symbolList.list);
 		insts = new ArrayList<>();
 		for (RuntimeInstUnary unary : data.callsToWriteBack) {
 			unary.op1 = data.funcEntriesMap.get(funcMap.list.get(unary.op1)
