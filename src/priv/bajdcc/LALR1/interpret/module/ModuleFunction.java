@@ -191,6 +191,28 @@ public class ModuleFunction implements IInterpreterModule {
 				"    call g_func_fold(\"g_array_add\", list, g_new_array, \"g_func_xsr\", \"g_func_1\", \"g_func_1\", call drop_filter(n));\n" +
 				"export \"g_func_dropr\";\n" +
 				"// ----------------------------------------------\n" +
+				"var func_zip = func ~(name, a, b, xs) {\n" +
+				"    var val = [];\n" +
+				"    var xa = call xs(a);\n" +
+				"    var xb = call xs(b);\n" +
+				"    for (;;) {\n" +
+				"        var _a = call xa();\n" +
+				"        var _b = call xb();\n" +
+				"        if (call g_is_null(_a) || call g_is_null(b)) {\n" +
+				"            break;\n" +
+				"        }\n" +
+				"        var c = call name(call _a(), call _b());\n" +
+				"        call g_array_add(val, c);\n" +
+				"    }\n" +
+				"    return val;\n" +
+				"};\n" +
+				"var g_func_zip = func ~(name, a, b) ->\n" +
+				"    call func_zip(name, a, b, \"g_func_xsl\");\n" +
+				"export \"g_func_zip\";\n" +
+				"var g_func_zipr = func ~(name, a, b) ->\n" +
+				"    call func_zip(name, a, b, \"g_func_xsr\");\n" +
+				"export \"g_func_zipr\";\n" +
+				"// ----------------------------------------------\n" +
 				"var g_func_applicative = func ~(f, a, b) -> call f(a, call b(a));\n" +
 				"export \"g_func_applicative\";\n" +
 				"var g_func_import_string_module = func ~() { import \"sys.string\"; };\n" +

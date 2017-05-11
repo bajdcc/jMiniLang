@@ -53,6 +53,10 @@ public class TestInterpret11 {
 							"let c5 = call g_func_dropr(c1, 5);\n" +
 							"let c5 = call g_func_apply(\"g_func_add\", c5);\n" +
 							"call g_printn(c5);\n" +
+							"var c6 = call g_func_zip(\"g_func_mul\" ,a, a);\n" +
+							"let c6 = call g_func_map(c6, \"g_to_string\");\n" +
+							"let c6 = call g_func_apply(\"g_func_add\", c6);\n" +
+							"call g_printn(c6);\n" +
 							"var d = call g_func_apply_arg(\"g_func_add\", call g_string_split(\"12345\", \"\"), \"g_func_swap\");\n" +
 							"call g_printn(d);\n" +
 							"call g_func_import_string_module();\n" +
