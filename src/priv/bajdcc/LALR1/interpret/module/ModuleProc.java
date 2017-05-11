@@ -37,17 +37,17 @@ public class ModuleProc implements IInterpreterModule {
 				"import \"sys.list\";\n" +
 				"import \"sys.string\";\n" +
 				"var g_join_process = func ~(pid) {\n" +
-				"    call g_printn(\"Waiting proc: #\" + call g_get_pid() + \" -> #\" + pid);\n" +
+				"    call g_printdn(\"Waiting proc: #\" + call g_get_pid() + \" -> #\" + pid);\n" +
 				"    while (call g_join_process_once(pid) != 0) {}\n" +
-				"    call g_printn(\"Waiting proc: #\" + call g_get_pid() + \" -> #\" + pid + \" ok\");\n" +
+				"    call g_printdn(\"Waiting proc: #\" + call g_get_pid() + \" -> #\" + pid + \" ok\");\n" +
 				"};\n" +
 				"export \"g_join_process\";\n" +
 				"var g_join_process_array = func ~(pid) {\n" +
 				"    var len = call g_array_size(pid) - 1;\n" +
 				"    foreach (var i : call g_range(0, len)) {\n" +
-				"        call g_printn(\"Waiting proc: #\" + call g_get_pid() + \" -> #\" + call g_array_get_ex(pid, i));\n" +
+				"        call g_printdn(\"Waiting proc: #\" + call g_get_pid() + \" -> #\" + call g_array_get_ex(pid, i));\n" +
 				"        call g_join_process(call g_array_get_ex(pid, i));\n" +
-				"        call g_printn(\"Waiting proc: #\" + call g_get_pid() + \" -> #\" + call g_array_get_ex(pid, i) + \" ok\");\n" +
+				"        call g_printdn(\"Waiting proc: #\" + call g_get_pid() + \" -> #\" + call g_array_get_ex(pid, i) + \" ok\");\n" +
 				"    }\n" +
 				"};\n" +
 				"export \"g_join_process_array\";\n" +
@@ -72,7 +72,7 @@ public class ModuleProc implements IInterpreterModule {
 				"};\n" +
 				"export \"g_lock_share\";\n" +
 				"var g_read_pipe = func ~(handle, callback) {\n" +
-				"    call g_printn(\"Reading pipe: #\" + call g_get_pid() + \" -> #\" + handle);\n" +
+				"    call g_printdn(\"Reading pipe: #\" + call g_get_pid() + \" -> #\" + handle);\n" +
 				"    var data = '\\0';" +
 				"    for (;;) {\n" +
 				"        let data = call g_read_pipe_char(handle);\n" +
@@ -83,11 +83,11 @@ public class ModuleProc implements IInterpreterModule {
 				"            call callback(data);\n" +
 				"        }\n" +
 				"    }\n" +
-				"    call g_printn(\"Reading pipe: #\" + call g_get_pid() + \" -> #\" + handle + \" ok\");\n" +
+				"    call g_printdn(\"Reading pipe: #\" + call g_get_pid() + \" -> #\" + handle + \" ok\");\n" +
 				"};\n" +
 				"export \"g_read_pipe\";\n" +
 				"var g_read_pipe_args = func ~(handle, callback, args) {\n" +
-				"    call g_printn(\"Reading pipe: #\" + call g_get_pid() + \" -> #\" + handle);\n" +
+				"    call g_printdn(\"Reading pipe: #\" + call g_get_pid() + \" -> #\" + handle);\n" +
 				"    var data = '\\0';" +
 				"    for (;;) {\n" +
 				"        let data = call g_read_pipe_char(handle);\n" +
@@ -98,7 +98,7 @@ public class ModuleProc implements IInterpreterModule {
 				"            call callback(data, args);\n" +
 				"        }\n" +
 				"    }\n" +
-				"    call g_printn(\"Reading pipe: #\" + call g_get_pid() + \" -> #\" + handle + \" ok\");\n" +
+				"    call g_printdn(\"Reading pipe: #\" + call g_get_pid() + \" -> #\" + handle + \" ok\");\n" +
 				"};\n" +
 				"export \"g_read_pipe_args\";\n" +
 				"var g_write_pipe = func ~(handle, data) {\n" +
@@ -120,13 +120,13 @@ public class ModuleProc implements IInterpreterModule {
 				"};\n" +
 				"export \"g_wait_share\";\n" +
 				"var g_wait_pipe = func ~(handle) {\n" +
-				"    call g_printn(\"Waiting pipe: PID#\" + call g_get_pid() + \" -> \" + handle);\n" +
+				"    call g_printdn(\"Waiting pipe: PID#\" + call g_get_pid() + \" -> \" + handle);\n" +
 				"    for (;;) {\n" +
 				"        var pipe = call g_query_pipe(handle);\n" +
 				"        if (pipe) { return call g_create_pipe(handle); }\n" +
 				"        call g_sleep(10);\n" +
 				"    }\n" +
-				"    call g_printn(\"Waiting pipe: PID#\" + call g_get_pid() + \" -> \" + handle + \" ok\");\n" +
+				"    call g_printdn(\"Waiting pipe: PID#\" + call g_get_pid() + \" -> \" + handle + \" ok\");\n" +
 				"};\n" +
 				"export \"g_wait_pipe\";\n" +
 				"var g_empty_pipe = func ~(handle) {\n" +
@@ -135,10 +135,10 @@ public class ModuleProc implements IInterpreterModule {
 				"};\n" +
 				"export \"g_empty_pipe\";\n" +
 				"var g_destroy_pipe = func ~(handle) {\n" +
-				"    call g_printn(\"Destroy pipe: PID#\" + call g_get_pid() + \" -> \" + handle);\n" +
+				"    call g_printdn(\"Destroy pipe: PID#\" + call g_get_pid() + \" -> \" + handle);\n" +
 				"    while (call g_wait_pipe_empty(handle)) {}\n" +
 				"    call g_destroy_pipe_once(handle);\n" +
-				"    call g_printn(\"Destroy pipe: PID#\" + call g_get_pid() + \" -> \" + handle +\" ok\");\n" +
+				"    call g_printdn(\"Destroy pipe: PID#\" + call g_get_pid() + \" -> \" + handle +\" ok\");\n" +
 				"};\n" +
 				"export \"g_destroy_pipe\";\n" +
 				"";

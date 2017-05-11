@@ -112,6 +112,16 @@ public class TKUtil implements IOSCodePage {
 				"        let arr = call g_func_map(arr, \"g_string_tolower\");\n" +
 				"        var val = call g_string_join_array(arr, \" \");\n" +
 				"        call g_map_put(msg, \"val\", val);\n" +
+				"    } else if (id == \"doc\") {\n" +
+				"        var arg = call g_map_get(msg, \"arg\");\n" +
+				"        var arr = [];\n" +
+				"        var len = call g_array_size(arg);\n" +
+				"        foreach (var i : call g_range(2, len - 1)) {\n" +
+				"            call g_array_add(arr, call g_array_get(arg, i));\n" +
+				"        }\n" +
+				"        var val = call g_string_join_array(arr, \" \");\n" +
+				"        let val = call g_doc(val);\n" +
+				"        call g_map_put(msg, \"val\", val);\n" +
 				"    }\n" +
 				"};\n" +
 				"\n" +

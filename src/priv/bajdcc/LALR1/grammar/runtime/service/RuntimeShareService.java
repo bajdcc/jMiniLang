@@ -1,5 +1,6 @@
 package priv.bajdcc.LALR1.grammar.runtime.service;
 
+import org.apache.log4j.Logger;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeObject;
 import priv.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
 
@@ -37,6 +38,7 @@ public class RuntimeShareService implements IRuntimeShareService {
 		}
 	}
 
+	private static Logger logger = Logger.getLogger("share");
 	private static final int MAX_SHARING = 1000;
 	private Map<String, ShareStruct> mapShares;
 
@@ -51,7 +53,7 @@ public class RuntimeShareService implements IRuntimeShareService {
 		if (mapShares.containsKey(name))
 			return 0;
 		mapShares.put(name, new ShareStruct(name, obj));
-		System.out.println("Sharing '" + name + "' created");
+		logger.debug("Sharing '" + name + "' created");
 		return 1;
 	}
 
@@ -60,7 +62,7 @@ public class RuntimeShareService implements IRuntimeShareService {
 		if (mapShares.size() >= MAX_SHARING)
 			return -1;
 		mapShares.put(name, new ShareStruct(name, obj));
-		System.out.println("Sharing '" + name + "' created");
+		logger.debug("Sharing '" + name + "' created");
 		return 1;
 	}
 

@@ -1,5 +1,6 @@
 package priv.bajdcc.LALR1.grammar.runtime;
 
+import org.apache.log4j.Logger;
 import priv.bajdcc.LALR1.grammar.Grammar;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeException.RuntimeError;
 import priv.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
@@ -26,6 +27,7 @@ import java.util.Map.Entry;
  */
 public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 
+	private static Logger logger = Logger.getLogger("machine");
 	private static IInterpreterModule[] modules;
 
 	private HashListMapEx<String, RuntimeCodePage> pageMap = new HashListMapEx<>();
@@ -43,6 +45,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 
 	public RuntimeMachine() throws Exception {
 		if (modules == null) {
+			logger.debug("Loading modules...");
 			modules = new IInterpreterModule[]{
 					ModuleBase.getInstance(),
 					ModuleMath.getInstance(),
@@ -85,6 +88,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 			sb.append(System.lineSeparator());
 		}
 		br.close();
+		logger.debug("Loading file: " + name);
 		Grammar grammar = new Grammar(sb.toString());
 		run(name, grammar.getCodePage());
 	}
@@ -99,6 +103,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 			sb.append(System.lineSeparator());
 		}
 		br.close();
+		logger.debug("Loading file: " + name);
 		Grammar grammar = new Grammar(sb.toString());
 		return process.createProcess(pid, true, name, grammar.getCodePage(), 0, null);
 	}

@@ -1,5 +1,6 @@
 package priv.bajdcc.LALR1.interpret.module;
 
+import org.apache.log4j.Logger;
 import priv.bajdcc.LALR1.grammar.Grammar;
 import priv.bajdcc.LALR1.grammar.runtime.*;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeException;
@@ -18,6 +19,7 @@ import java.util.List;
 public class ModuleBase implements IInterpreterModule {
 
 	private static ModuleBase instance = new ModuleBase();
+	private static Logger logger = Logger.getLogger("console");
 
 	public static ModuleBase getInstance() {
 		return instance;
@@ -95,7 +97,7 @@ public class ModuleBase implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 					IRuntimeStatus status) throws Exception {
-				System.out.print(args.get(0).getObj());
+				logger.info(args.get(0).getObj());
 				return null;
 			}
 		});
@@ -113,7 +115,25 @@ public class ModuleBase implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 					IRuntimeStatus status) throws Exception {
-				System.out.println(args.get(0).getObj());
+				logger.info(args.get(0).getObj());
+				return null;
+			}
+		});
+		info.addExternalFunc("g_printdn", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "调试输出并换行";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kObject};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				logger.debug(args.get(0).getObj());
 				return null;
 			}
 		});
@@ -131,7 +151,7 @@ public class ModuleBase implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 					IRuntimeStatus status) throws Exception {
-				System.err.print(args.get(0).getObj());
+				logger.error(args.get(0).getObj());
 				return null;
 			}
 		});

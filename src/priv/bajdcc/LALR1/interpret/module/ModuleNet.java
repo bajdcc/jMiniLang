@@ -3,6 +3,7 @@ package priv.bajdcc.LALR1.interpret.module;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.log4j.Logger;
 import priv.bajdcc.LALR1.grammar.Grammar;
 import priv.bajdcc.LALR1.grammar.runtime.*;
 import priv.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
@@ -21,6 +22,7 @@ import java.util.List;
  */
 public class ModuleNet implements IInterpreterModule {
 
+	private static Logger logger = Logger.getLogger("net");
 	private static ModuleNet instance = new ModuleNet();
 
 	public static ModuleNet getInstance() {
@@ -64,8 +66,10 @@ public class ModuleNet implements IInterpreterModule {
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
 				String text = "";
+				String txt = String.valueOf(args.get(0).getObj());
+				logger.debug("Request url: " + txt);
 				try {
-					URL url = new URL(String.valueOf(args.get(0).getObj()));
+					URL url = new URL(txt);
 					URLConnection urlConnection = url.openConnection(); // 打开连接
 					BufferedReader br = new BufferedReader(new InputStreamReader(urlConnection.getInputStream(), "utf-8")); // 获取输入流
 					String line = null;
@@ -96,8 +100,10 @@ public class ModuleNet implements IInterpreterModule {
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
 				String text = "";
+				String txt = String.valueOf(args.get(0).getObj());
+				logger.debug("Request url(json): " + txt);
 				try {
-					URL url = new URL(String.valueOf(args.get(0).getObj()));
+					URL url = new URL(txt);
 					URLConnection urlConnection = url.openConnection(); // 打开连接
 					BufferedReader br = new BufferedReader(new InputStreamReader(urlConnection.getInputStream(), "utf-8")); // 获取输入流
 					String line = null;

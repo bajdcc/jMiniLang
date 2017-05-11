@@ -1,5 +1,6 @@
 package priv.bajdcc.LALR1.grammar.runtime.service;
 
+import org.apache.log4j.Logger;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeObject;
 import priv.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
 
@@ -27,6 +28,7 @@ public class RuntimePipeService implements IRuntimePipeService {
 		}
 	}
 
+	private static Logger logger = Logger.getLogger("pipe");
 	private static final int MAX_PIPE = 1000;
 	private PipeStruct arrPipes[];
 	private Set<Integer> setPipeId;
@@ -64,7 +66,7 @@ public class RuntimePipeService implements IRuntimePipeService {
 				cyclePtr -= MAX_PIPE;
 			}
 		}
-		System.out.println("Pipe #" + handle + " '" + name + "' created");
+		logger.debug("Pipe #" + handle + " '" + name + "' created");
 		return handle;
 	}
 
@@ -73,7 +75,7 @@ public class RuntimePipeService implements IRuntimePipeService {
 		if (!setPipeId.contains(handle)) {
 			return false;
 		}
-		System.out.println("Pipe #" + handle + " '" + arrPipes[handle].name + "' destroyed");
+		logger.debug("Pipe #" + handle + " '" + arrPipes[handle].name + "' destroyed");
 		mapPipeNames.remove(arrPipes[handle].name);
 		arrPipes[handle] = null;
 		setPipeId.remove(handle);

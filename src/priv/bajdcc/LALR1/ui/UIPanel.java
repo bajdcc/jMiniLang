@@ -1,5 +1,6 @@
 package priv.bajdcc.LALR1.ui;
 
+import org.apache.log4j.Logger;
 import priv.bajdcc.LALR1.interpret.module.ModuleUI;
 import priv.bajdcc.LALR1.ui.drawing.UIGraphics;
 
@@ -15,6 +16,7 @@ import java.awt.event.KeyEvent;
  */
 public class UIPanel extends JPanel {
 
+	private static Logger logger = Logger.getLogger("machine");
 	private UIGraphics graphics;
 	private ModuleUI moduleUI;
 
@@ -25,6 +27,7 @@ public class UIPanel extends JPanel {
 		this.setFocusable(true);
 		this.addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent e) {
+				logger.debug("Key pressed: " + e.getKeyCode() + ", " + (e.isControlDown() ? KeyEvent.getKeyText(e.getKeyCode()) : (char) e.getKeyCode()));
 				switch (e.getKeyCode()) {
 					case KeyEvent.VK_UP:
 						moduleUI.addInputChar('\ufff0');

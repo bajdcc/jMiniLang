@@ -90,13 +90,13 @@ public class URShell implements IOSCodePage {
 				"    }\n" +
 				"    var ct = call g_query_share(\"PIPE#CTRL\");\n" +
 				"    if (!call g_array_empty(ct) && call g_array_get(ct, 0) == 'C') {\n" +
-				"        call g_printn(\"#\" + call g_get_pid() + \" Force kill!\");\n" +
+				"        call g_printdn(\"#\" + call g_get_pid() + \" Force kill!\");\n" +
 				"        call g_destroy_pipe_once(in);\n" +
-				"        call g_printn(\"#\" + call g_get_pid() + \" Force kill! ok\");\n" +
+				"        call g_printdn(\"#\" + call g_get_pid() + \" Force kill! ok\");\n" +
 				"    } else {\n" +
-				"        call g_printn(\"#\" + call g_get_pid() + \" Safe kill!\");\n" +
+				"        call g_printdn(\"#\" + call g_get_pid() + \" Safe kill!\");\n" +
 				"        call g_destroy_pipe(in);\n" +
-				"        call g_printn(\"#\" + call g_get_pid() + \" Safe kill! ok\");\n" +
+				"        call g_printdn(\"#\" + call g_get_pid() + \" Safe kill! ok\");\n" +
 				"    }\n" +
 				"};\n" +
 				"\n" +
@@ -147,7 +147,7 @@ public class URShell implements IOSCodePage {
 				"                let ch = 'C';\n" +
 				"            }\n" +
 				"            if (ch == 'C') {\n" +
-				"                call g_printn(\"#\" + call g_get_pid() + \" Force kill!\");\n" +
+				"                call g_printdn(\"#\" + call g_get_pid() + \" Force kill!\");\n" +
 				"                foreach (var hh : call g_range_array(hs)) {\n" +
 				"                    call g_destroy_pipe_by_name_once(\"PIPEIN#\" + hh);\n" +
 				"                    if (kill) { call g_create_share(\"PIDSIG#\" + hh, false); }\n" +
@@ -155,13 +155,13 @@ public class URShell implements IOSCodePage {
 				"                call g_join_process_array(hs);\n" +
 				"                var pp = call g_wait_pipe(\"SYS#INPUT\");\n" +
 				"                call g_destroy_pipe_once(pp);\n" +
-				"                call g_printn(\"#\" + call g_get_pid() + \" Force kill! ok\");\n" +
+				"                call g_printdn(\"#\" + call g_get_pid() + \" Force kill! ok\");\n" +
 				"            } else if (ch == 'A') {\n" +
-				"                call g_printn(\"#\" + call g_get_pid() + \" Safe kill!\");\n" +
+				"                call g_printdn(\"#\" + call g_get_pid() + \" Safe kill!\");\n" +
 				"                call g_join_process_array(hs);\n" +
 				"                var pp = call g_wait_pipe(\"SYS#INPUT\");\n" +
 				"                call g_destroy_pipe_once(pp);\n" +
-				"                call g_printn(\"#\" + call g_get_pid() + \" Safe kill! ok\");\n" +
+				"                call g_printdn(\"#\" + call g_get_pid() + \" Safe kill! ok\");\n" +
 				"            }\n" +
 				"        };\n" +
 				"        var handle = call g_create_pipe(\"SYS#INPUT\");\n" +

@@ -55,7 +55,7 @@ public class ModuleTask implements IInterpreterModule {
 				"var g_task_add_proc = func ~(no, data) {\n" +
 				"    var task_table = call g_query_share(\"TASK#TABLE\");\n" +
 				"    call g_array_set(task_table, no, data);\n" +
-				"    call g_printn(\"Task #\" + no + \" created\");\n" +
+				"    call g_printdn(\"Task #\" + no + \" created\");\n" +
 				"};\n" +
 				"export \"g_task_add_proc\";\n" +
 				"\n" +
