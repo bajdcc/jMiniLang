@@ -71,8 +71,7 @@ public class RuntimeTools {
 			Token tk = Token.createFromObject(obj.getObj());
 			if (TokenTools.bin(TokenTools.ins2op(inst), tk,
 					Token.createFromObject(obj2.getObj()))) {
-				obj.setObj(tk.object);
-				stk.store(obj);
+				stk.store(new RuntimeObject(tk.object));
 			} else {
 				return false;
 			}

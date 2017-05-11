@@ -41,6 +41,18 @@ public class TestInterpret11 {
 							"let c4 = call g_func_map(c4, \"g_to_string\");\n" +
 							"let c4 = call g_func_apply(\"g_func_add\", c4);\n" +
 							"call g_printn(c4);\n" +
+							"var c5 = call g_func_take(c1, 5);\n" +
+							"let c5 = call g_func_apply(\"g_func_add\", c5);\n" +
+							"call g_printn(c5);\n" +
+							"let c5 = call g_func_taker(c1, 5);\n" +
+							"let c5 = call g_func_apply(\"g_func_add\", c5);\n" +
+							"call g_printn(c5);\n" +
+							"let c5 = call g_func_drop(c1, 5);\n" +
+							"let c5 = call g_func_apply(\"g_func_add\", c5);\n" +
+							"call g_printn(c5);\n" +
+							"let c5 = call g_func_dropr(c1, 5);\n" +
+							"let c5 = call g_func_apply(\"g_func_add\", c5);\n" +
+							"call g_printn(c5);\n" +
 							"var d = call g_func_apply_arg(\"g_func_add\", call g_string_split(\"12345\", \"\"), \"g_func_swap\");\n" +
 							"call g_printn(d);\n" +
 							"call g_func_import_string_module();\n" +

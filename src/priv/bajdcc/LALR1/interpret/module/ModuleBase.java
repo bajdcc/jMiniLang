@@ -83,6 +83,23 @@ public class ModuleBase implements IInterpreterModule {
 				return new RuntimeObject(args.get(0).getObj() == null);
 			}
 		});
+		info.addExternalFunc("g_not_null", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "判断是否有效";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kObject};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				return new RuntimeObject(args.get(0).getObj() != null);
+			}
+		});
 		info.addExternalFunc("g_print", new IRuntimeDebugExec() {
 			@Override
 			public String getDoc() {

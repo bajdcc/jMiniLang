@@ -108,8 +108,7 @@ public class ModuleFunction implements IInterpreterModule {
 				"        \"  - xs: 数组遍历方式(xsl=从左到右,xsr=从右到左)\",\n" +
 				"        \"  - map: 对遍历的每个元素施加的变换\",\n" +
 				"        \"  - arg: 对二元操作进行包装(默认=g_func_1,例=g_func_swap)\",\n" +
-				"        \"  - filter: 对map后的元素进行过滤(true则处理)\",\n" +
-				"        \"\"" +
+				"        \"  - filter: 对map后的元素进行过滤(true则处理)\"\n" +
 				"    ]\n" +
 				"    ~(name, list, init, xs, map, arg, filter) {\n" +
 				"    var len = call g_array_size(list);\n" +
@@ -166,6 +165,31 @@ public class ModuleFunction implements IInterpreterModule {
 				"var g_func_filter = func ~(list, filter) ->\n" +
 				"    call g_func_fold(\"g_array_add\", list, g_new_array, \"g_func_xsl\", \"g_func_1\", \"g_func_1\", filter);\n" +
 				"export \"g_func_filter\";\n" +
+				"// ----------------------------------------------\n" +
+				"var take_filter = func ~(n) {\n" +
+				"    var idx = 0;\n" +
+				"    var end = n;\n" +
+				"    var _take_filter = func ~(a) -> idx++ <= end;\n" +
+				"    return _take_filter;\n" +
+				"};\n" +
+				"var drop_filter = func ~(n) {\n" +
+				"    var idx = 0;\n" +
+				"    var end = n;\n" +
+				"    var _drop_filter = func ~(a) -> idx++ > end;\n" +
+				"    return _drop_filter;\n" +
+				"};\n" +
+				"var g_func_take = func ~(list, n) ->\n" +
+				"    call g_func_fold(\"g_array_add\", list, g_new_array, \"g_func_xsl\", \"g_func_1\", \"g_func_1\", call take_filter(n));\n" +
+				"export \"g_func_take\";\n" +
+				"var g_func_taker = func ~(list, n) ->\n" +
+				"    call g_func_fold(\"g_array_add\", list, g_new_array, \"g_func_xsr\", \"g_func_1\", \"g_func_1\", call take_filter(n));\n" +
+				"export \"g_func_taker\";\n" +
+				"var g_func_drop = func ~(list, n) ->\n" +
+				"    call g_func_fold(\"g_array_add\", list, g_new_array, \"g_func_xsl\", \"g_func_1\", \"g_func_1\", call drop_filter(n));\n" +
+				"export \"g_func_drop\";\n" +
+				"var g_func_dropr = func ~(list, n) ->\n" +
+				"    call g_func_fold(\"g_array_add\", list, g_new_array, \"g_func_xsr\", \"g_func_1\", \"g_func_1\", call drop_filter(n));\n" +
+				"export \"g_func_dropr\";\n" +
 				"// ----------------------------------------------\n" +
 				"var g_func_applicative = func ~(f, a, b) -> call f(a, call b(a));\n" +
 				"export \"g_func_applicative\";\n" +

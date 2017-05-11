@@ -138,6 +138,7 @@ public class Function implements IExp {
 	@Override
 	public void genCode(ICodegen codegen) {
 		codegen.genFuncEntry(realName);
+		codegen.genCode(RuntimeInst.inop);
 		int start = codegen.getCodeIndex();
 		int i = 0;
 		for (Token token : params) {

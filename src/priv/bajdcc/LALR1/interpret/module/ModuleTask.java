@@ -1,5 +1,6 @@
 package priv.bajdcc.LALR1.interpret.module;
 
+import org.apache.log4j.Logger;
 import priv.bajdcc.LALR1.grammar.Grammar;
 import priv.bajdcc.LALR1.grammar.runtime.*;
 import priv.bajdcc.OP.grammar.error.GrammarException;
@@ -23,6 +24,7 @@ import java.util.List;
 public class ModuleTask implements IInterpreterModule {
 
 	private static ModuleTask instance = new ModuleTask();
+	private static Logger logger = Logger.getLogger("task");
 
 	public static ModuleTask getInstance() {
 		return instance;
@@ -376,12 +378,12 @@ public class ModuleTask implements IInterpreterModule {
 			grammar.initialize("E");
 			return String.valueOf(grammar.run());
 		} catch (RegexException e) {
-			System.err.println("Error: " + e.getPosition() + "," + e.getMessage());
+			logger.error("#CALC# Error: " + e.getPosition() + "," + e.getMessage());
 		} catch (SyntaxException e) {
-			System.err.println("Error: " + e.getPosition() + "," + e.getMessage() + " " + e.getInfo());
+			logger.error("#CALC#Error: " + e.getPosition() + "," + e.getMessage() + " " + e.getInfo());
 		} catch (GrammarException e) {
-			System.err.println("Error: " + e.getPosition() + "," + e.getMessage() + " " + e.getInfo());
+			logger.error("#CALC#Error: " + e.getPosition() + "," + e.getMessage() + " " + e.getInfo());
 		}
-		return "Error";
+		return "#CALC#Error";
 	}
 }

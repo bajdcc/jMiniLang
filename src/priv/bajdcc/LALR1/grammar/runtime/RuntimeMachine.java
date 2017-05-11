@@ -462,6 +462,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	public void opLoad() throws RuntimeException {
 		int idx = loadInt();
 		RuntimeObject obj = fetchFromGlobalData(idx);
+		obj.setSymbol(currentPage.getData().get(idx));
 		stack.pushData(obj);
 	}
 
