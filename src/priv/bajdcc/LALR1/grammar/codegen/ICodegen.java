@@ -22,4 +22,6 @@ public interface ICodegen {
 	int getFuncIndex(Function func);
 	int getCodeIndex();
 	ICodegenBlock getBlockService();
+
+	void genDebugInfo(int start, int end, Object info);
 }

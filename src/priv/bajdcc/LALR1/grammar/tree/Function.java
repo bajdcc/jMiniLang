@@ -1,13 +1,13 @@
 package priv.bajdcc.LALR1.grammar.tree;
 
-import java.util.ArrayList;
-
 import priv.bajdcc.LALR1.grammar.codegen.ICodegen;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeInst;
 import priv.bajdcc.LALR1.grammar.semantic.ISemanticRecorder;
 import priv.bajdcc.LALR1.grammar.tree.closure.IClosureScope;
 import priv.bajdcc.util.lexer.token.KeywordType;
 import priv.bajdcc.util.lexer.token.Token;
+
+import java.util.ArrayList;
 
 /**
  * 【语义分析】函数
@@ -138,6 +138,7 @@ public class Function implements IExp {
 	@Override
 	public void genCode(ICodegen codegen) {
 		codegen.genFuncEntry(realName);
+		int start = codegen.getCodeIndex();
 		int i = 0;
 		for (Token token : params) {
 			codegen.genCode(RuntimeInst.iloada, i);
@@ -147,6 +148,10 @@ public class Function implements IExp {
 			i++;
 		}
 		block.genCode(codegen);
+		int end = codegen.getCodeIndex() - 1;
+		if (start <= end) {
+			codegen.genDebugInfo(start, end, this.toString());
+		}
 		codegen.genCode(RuntimeInst.inop);
 	}
 

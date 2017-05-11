@@ -24,6 +24,7 @@ public class RuntimeException extends Exception {
 		WRONG_EXPORT("导出模块名错误"),
 		WRONG_LOAD_EXTERN("导入外部符号错误"),
 		WRONG_ARGCOUNT("参数个数不一致"),
+		WRONG_ARGINVALID("参数错误"),
 		WRONG_ARGTYPE("参数类型不一致"),
 		NULL_OPERATOR("空值运算"),
 		WRONG_FUNCNAME("过程不存在"),

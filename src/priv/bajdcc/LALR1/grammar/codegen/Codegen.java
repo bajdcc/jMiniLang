@@ -5,6 +5,7 @@ import priv.bajdcc.LALR1.grammar.symbol.SymbolTable;
 import priv.bajdcc.LALR1.grammar.tree.Function;
 import priv.bajdcc.util.HashListMap;
 import priv.bajdcc.util.HashListMapEx;
+import priv.bajdcc.util.intervalTree.Interval;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +22,7 @@ public class Codegen implements ICodegen, ICodegenBlock, ICodegenByteWriter {
 	private CodegenData data = new CodegenData();
 	private RuntimeDebugInfo info = new RuntimeDebugInfo();
 	private List<Byte> insts = null;
+	private List<Interval<Object>> itvList = new ArrayList<>();
 
 	public Codegen(SymbolTable symbol) {
 		symbolList = symbol.getManageDataService().getSymbolList();
@@ -67,7 +69,7 @@ public class Codegen implements ICodegen, ICodegenBlock, ICodegenByteWriter {
 		for (RuntimeInstBase inst : data.insts) {
 			inst.gen(this);
 		}
-		return new RuntimeCodePage(objs, insts, info);
+		return new RuntimeCodePage(objs, insts, info, itvList);
 	}
 
 	@Override
@@ -107,6 +109,11 @@ public class Codegen implements ICodegen, ICodegenBlock, ICodegenByteWriter {
 	@Override
 	public ICodegenBlock getBlockService() {
 		return this;
+	}
+
+	@Override
+	public void genDebugInfo(int start, int end, Object info) {
+		itvList.add(new Interval<Object>(start, end, info));
 	}
 
 	@Override

@@ -307,13 +307,13 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	@Override
 	public void err(RuntimeError type) throws RuntimeException {
 		System.err.println(stack);
-		throw new RuntimeException(type, stack.reg.execId, type.getMessage());
+		throw new RuntimeException(type, stack.reg.execId, type.getMessage() + "\n\n[ CODE ]\n" + currentPage.getDebugInfoByInc(stack.reg.execId));
 	}
 
 	@Override
 	public void err(RuntimeError type, String message) throws RuntimeException {
 		System.err.println(stack);
-		throw new RuntimeException(type, stack.reg.execId, type.getMessage() + " " + message);
+		throw new RuntimeException(type, stack.reg.execId, type.getMessage() + " " + message + "\n\n[ CODE ]\n" + currentPage.getDebugInfoByInc(stack.reg.execId));
 	}
 
 	@Override
@@ -510,7 +510,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 		int idx = current();
 		next();
 		if (idx < 0 || idx >= stack.getFuncArgsCount()) {
-			err(RuntimeError.WRONG_OPERATOR, String.valueOf(idx));
+			err(RuntimeError.WRONG_ARGINVALID, String.valueOf(idx));
 		}
 		store(stack.loadFuncArgs(idx));
 	}

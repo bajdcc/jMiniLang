@@ -1,12 +1,12 @@
 package priv.bajdcc.LALR1.grammar.tree;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import priv.bajdcc.LALR1.grammar.codegen.ICodegen;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeInst;
 import priv.bajdcc.LALR1.grammar.semantic.ISemanticRecorder;
 import priv.bajdcc.LALR1.grammar.tree.closure.IClosureScope;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 【语义分析】块
@@ -42,8 +42,14 @@ public class Block implements ICommon {
 	@Override
 	public void genCode(ICodegen codegen) {
 		codegen.genCode(RuntimeInst.iscpi);
+		int start, end;
 		for (IStmt stmt : stmts) {
+			start = codegen.getCodeIndex();
 			stmt.genCode(codegen);
+			end = codegen.getCodeIndex() - 1;
+			if (start <= end) {
+				codegen.genDebugInfo(start, end, stmt.toString());
+			}
 			if (stmt instanceof StmtReturn) {
 				break;
 			}
