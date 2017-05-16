@@ -66,13 +66,21 @@ Implemented IPC, usage:
 - `task ui print hello world` -> Remote window
 - `task ui path M 100 100 L 200 200` -> SVG
 
+Utility:
+- `task util doc g_func_fold` -> Document
+- `task util reverse ...`
+- `task util toupper ...`
+- `task util sum ...`
+- `task util product ...`
+- `task util palindrome ...`
+
 #### Manual
 
 [*Simplified Chinese Version*](https://raw.githubusercontent.com/bajdcc/jMiniLang/master/%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.pdf "Manual - Simplified Chinese")
 
 #### Example
 
-#####**Lambda: Y Combinator of Hanoi**
+**1. Lambda: Y Combinator of Hanoi**
 
 *Code:*
 
@@ -119,7 +127,7 @@ call h(3, 'A', 'B', 'C');
 1: A -> C
 ```
 
-#####**Lambda: Trampoline**
+**2. Lambda: Trampoline**
 
 *Code:*
 
@@ -154,7 +162,7 @@ n: 2
 n: 1
 ```
 
-#####**List: LinkedList**
+**3. List: LinkedList**
 
 *Code:*
 
@@ -201,7 +209,7 @@ while (!call g_is_null(p)) {
 0
 ```
 
-#####**Multi-Process: Pipe**
+**4. Multi-Process: Pipe**
 
 *Code:*
 
@@ -244,7 +252,7 @@ call proc();
 91
 ```
 
-#####**Multi-Process: Consumer-Producer Model**
+**5. Multi-Process: Consumer-Producer Model**
 
 *Code:*
 
@@ -378,7 +386,7 @@ Consumer#2 exit
 Consumers exit
 ```
 
-#####**Multi-Process: PC and Router**
+**6. Multi-Process: PC and Router**
 
 *Code:*
 
@@ -560,6 +568,203 @@ PC #1 stopped
 PC #0 stopped
 ```
 
+**7. Functional programming**
+
+```
+import "sys.base";
+import "sys.list";
+var g_func_max = func ~(a, b) -> a > b ? a : b;
+var g_func_min = func ~(a, b) -> a < b ? a : b;
+var g_func_lt = func ~(a, b) -> a < b;
+var g_func_lte = func ~(a, b) -> a <= b;
+var g_func_gt = func ~(a, b) -> a > b;
+var g_func_gte = func ~(a, b) -> a >= b;
+var g_func_eq = func ~(a, b) -> a == b;
+var g_func_neq = func ~(a, b) -> a != b;
+var g_func_add = func ~(a, b) -> a + b;
+var g_func_sub = func ~(a, b) -> a - b;
+var g_func_mul = func ~(a, b) -> a * b;
+var g_func_div = func ~(a, b) -> a / b;
+var g_func_and = func ~(a, b) -> a && b;
+var g_func_or = func ~(a, b) -> a || b;
+export "g_func_max";
+export "g_func_min";
+export "g_func_lt";
+export "g_func_lte";
+export "g_func_gt";
+export "g_func_gte";
+export "g_func_eq";
+export "g_func_neq";
+export "g_func_add";
+export "g_func_sub";
+export "g_func_mul";
+export "g_func_div";
+export "g_func_and";
+export "g_func_or";
+var g_func_curry = func ~(a, b) {
+    var _curry = func ~(c) -> call a(b, c);
+    return _curry;
+};
+var g_func_swap = func ~(a) {
+    var _swap = func ~(b, c) -> call a(c, b);
+    return _swap;
+};
+export "g_func_curry";
+export "g_func_swap";
+var g_func_1 = func ~(a) -> a;
+export "g_func_1";
+var g_func_always_1 = func ~(a) -> 1;
+export "g_func_always_1";
+var g_func_always_true = func ~(a) -> true;
+export "g_func_always_true";
+
+var g_func_xsl = func ["数组遍历闭包-foldl"] ~(l) {
+    var len = call g_array_size(l);
+    var idx = 0;
+    var _xsl = func ~() {
+        if (idx == len) { return g__; }
+        var d = call g_array_get(l, idx);
+        idx++;
+        var _xsl_ = func ~() -> d;
+        return _xsl_;
+    };
+    return _xsl;
+};
+export "g_func_xsl";
+var g_func_xsr = func ["数组遍历闭包-foldr"] ~(l) {
+    var idx = call g_array_size(l) - 1;
+    var _xsr = func ~() {
+        if (idx < 0) { return g__; }
+        var d = call g_array_get(l, idx);
+        idx--;
+        var _xsr_ = func ~() -> d;
+        return _xsr_;
+    };
+    return _xsr;
+};
+export "g_func_xsr";
+// ----------------------------------------------
+var g_func_fold = func 
+    [
+        "函数名：g_func_fold",
+        "参数解释：",
+        "  - name: 套用的折叠函数",
+        "  - list: 需处理的数组",
+        "  - init: 初始值(不用则为空)",
+        "  - xs: 数组遍历方式(xsl=从左到右,xsr=从右到左)",
+        "  - map: 对遍历的每个元素施加的变换",
+        "  - arg: 对二元操作进行包装(默认=g_func_1,例=g_func_swap)",
+        "  - filter: 对map后的元素进行过滤(true则处理)"
+    ]
+    ~(name, list, init, xs, map, arg, filter) {
+    var len = call g_array_size(list);
+    if (len == 0) { return g__; }
+    var val = g__;
+    var x = g__;
+    if (call g_is_null(init)) {
+        if (len == 1) { return call g_array_get(list, 0); }
+        let x = call xs(list);
+        let val = call x();
+        let val = call val();
+        let val = call map(val);
+    } else {
+        let x = call xs(list);
+        let val = init;
+    }
+    var n = name;
+    let n = call arg(n);
+    for (;;) {
+        var v2 = call x();
+        if (call g_is_null(v2)) { break; }
+        let v2 = call v2();
+        let v2 = call map(v2);
+        if (call filter(v2)) {
+            let val = call n(val, v2);
+        }
+    }
+    return val;
+};
+export "g_func_fold";
+// ----------------------------------------------
+var g_func_apply = func ~(name, list) ->
+    call g_func_apply_arg(name, list, "g_func_1");
+export "g_func_apply";
+var g_func_apply_arg = func ~(name, list, arg) ->
+    call g_func_fold(name, list, g__, "g_func_xsl", "g_func_1", arg, "g_func_always_true");
+export "g_func_apply_arg";
+var g_func_applyr = func ~(name, list) ->
+    call g_func_applyr_arg(name, list, "g_func_1");
+export "g_func_applyr";
+var g_func_applyr_arg = func ~(name, list, arg) ->
+    call g_func_fold(name, list, g__, "g_func_xsr", "g_func_1", arg, "g_func_always_true");
+export "g_func_applyr_arg";
+// ----------------------------------------------
+var g_func_map = func ~(list, arg) ->
+    call g_func_fold("g_array_add", list, g_new_array, "g_func_xsl", arg, "g_func_1", "g_func_always_true");
+export "g_func_map";
+var g_func_mapr = func ~(list, arg) ->
+    call g_func_fold("g_array_add", list, g_new_array, "g_func_xsr", arg, "g_func_1", "g_func_always_true");
+export "g_func_mapr";
+var g_func_length = func ~(list) ->
+    call g_func_fold("g_func_add", list, 0, "g_func_xsl", "g_func_always_1", "g_func_1", "g_func_always_true");
+export "g_func_length";
+var g_func_filter = func ~(list, filter) ->
+    call g_func_fold("g_array_add", list, g_new_array, "g_func_xsl", "g_func_1", "g_func_1", filter);
+export "g_func_filter";
+// ----------------------------------------------
+var take_filter = func ~(n) {
+    var idx = 0;
+    var end = n;
+    var _take_filter = func ~(a) -> idx++ <= end;
+    return _take_filter;
+};
+var drop_filter = func ~(n) {
+    var idx = 0;
+    var end = n;
+    var _drop_filter = func ~(a) -> idx++ > end;
+    return _drop_filter;
+};
+var g_func_take = func ~(list, n) ->
+    call g_func_fold("g_array_add", list, g_new_array, "g_func_xsl", "g_func_1", "g_func_1", call take_filter(n));
+export "g_func_take";
+var g_func_taker = func ~(list, n) ->
+    call g_func_fold("g_array_add", list, g_new_array, "g_func_xsr", "g_func_1", "g_func_1", call take_filter(n));
+export "g_func_taker";
+var g_func_drop = func ~(list, n) ->
+    call g_func_fold("g_array_add", list, g_new_array, "g_func_xsl", "g_func_1", "g_func_1", call drop_filter(n));
+export "g_func_drop";
+var g_func_dropr = func ~(list, n) ->
+    call g_func_fold("g_array_add", list, g_new_array, "g_func_xsr", "g_func_1", "g_func_1", call drop_filter(n));
+export "g_func_dropr";
+// ----------------------------------------------
+var func_zip = func ~(name, a, b, xs) {
+    var val = [];
+    var xa = call xs(a);
+    var xb = call xs(b);
+    for (;;) {
+        var _a = call xa();
+        var _b = call xb();
+        if (call g_is_null(_a) || call g_is_null(b)) {
+            break;
+        }
+        var c = call name(call _a(), call _b());
+        call g_array_add(val, c);
+    }
+    return val;
+};
+var g_func_zip = func ~(name, a, b) ->
+    call func_zip(name, a, b, "g_func_xsl");
+export "g_func_zip";
+var g_func_zipr = func ~(name, a, b) ->
+    call func_zip(name, a, b, "g_func_xsr");
+export "g_func_zipr";
+// ----------------------------------------------
+var g_func_applicative = func ~(f, a, b) -> call f(a, call b(a));
+export "g_func_applicative";
+var g_func_import_string_module = func ~() { import "sys.string"; };
+export "g_func_import_string_module";
+```
+
 #### Screenshot
 
 *Screenshot 1 - Code*
@@ -573,3 +778,9 @@ PC #0 stopped
 
 *Screenshot 4 - OS Virtual Machine with GUI*
 ![Screenshot 4](https://bajdcc.github.io/host/screenshot/jMiniLang_4.png)
+
+*Screenshot 5 - Remote window*
+![Screenshot 5](https://pic1.zhimg.com/v2-5072f9061e3bd1c5d8457bdeff24064c_r.png)
+
+*Screenshot 6 - Functional programming*
+![Screenshot 6](https://pic4.zhimg.com/v2-3b2c7ba9dd8d494555bd2b260c07e87f_r.png)

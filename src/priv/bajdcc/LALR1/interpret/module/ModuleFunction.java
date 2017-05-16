@@ -112,28 +112,28 @@ public class ModuleFunction implements IInterpreterModule {
 				"    ]\n" +
 				"    ~(name, list, init, xs, map, arg, filter) {\n" +
 				"    var len = call g_array_size(list);\n" +
-				"    if (len == 0) { return g__; }\n" +
+				"    if (len == 0) { return g__; }// 肯定返回空\n" +
 				"    var val = g__;\n" +
 				"    var x = g__;\n" +
-				"    if (call g_is_null(init)) {\n" +
+				"    if (call g_is_null(init)) { // 没初值的话，取第一个元素为初值\n" +
 				"        if (len == 1) { return call g_array_get(list, 0); }\n" +
-				"        let x = call xs(list);\n" +
-				"        let val = call x();\n" +
+				"        let x = call xs(list);// 创建遍历闭包\n" +
+				"        let val = call x();// 取第一个元素\n" +
 				"        let val = call val();\n" +
-				"        let val = call map(val);\n" +
+				"        let val = call map(val);// 对元素进行变换\n" +
 				"    } else {\n" +
 				"        let x = call xs(list);\n" +
 				"        let val = init;\n" +
 				"    }\n" +
-				"    var n = name;\n" +
-				"    let n = call arg(n);\n" +
-				"    for (;;) {\n" +
-				"        var v2 = call x();\n" +
-				"        if (call g_is_null(v2)) { break; }\n" +
-				"        let v2 = call v2();\n" +
-				"        let v2 = call map(v2);\n" +
-				"        if (call filter(v2)) {\n" +
-				"            let val = call n(val, v2);\n" +
+				"    var n = name;// 对数组进行变换\n" +
+				"    let n = call arg(n);// 对卷积方式进行变换\n" +
+				"    for (;;) {// 遍历数组\n" +
+				"        var v2 = call x();// 取得下一元素\n" +
+				"        if (call g_is_null(v2)) { break; }// 没有下一元素，中止\n" +
+				"        let v2 = call v2();// 下一元素\n" +
+				"        let v2 = call map(v2);// 对下一元素进行变换\n" +
+				"        if (call filter(v2)) {// 过滤控制\n" +
+				"            let val = call n(val, v2);// 将两元素进行处理\n" +
 				"        }\n" +
 				"    }\n" +
 				"    return val;\n" +
@@ -166,13 +166,13 @@ public class ModuleFunction implements IInterpreterModule {
 				"    call g_func_fold(\"g_array_add\", list, g_new_array, \"g_func_xsl\", \"g_func_1\", \"g_func_1\", filter);\n" +
 				"export \"g_func_filter\";\n" +
 				"// ----------------------------------------------\n" +
-				"var take_filter = func ~(n) {\n" +
+				"var take_filter = func ~(n) {//取数组前N个元素\n" +
 				"    var idx = 0;\n" +
 				"    var end = n;\n" +
 				"    var _take_filter = func ~(a) -> idx++ <= end;\n" +
 				"    return _take_filter;\n" +
 				"};\n" +
-				"var drop_filter = func ~(n) {\n" +
+				"var drop_filter = func ~(n) {//取数组后len-N个元素\n" +
 				"    var idx = 0;\n" +
 				"    var end = n;\n" +
 				"    var _drop_filter = func ~(a) -> idx++ > end;\n" +
@@ -191,14 +191,14 @@ public class ModuleFunction implements IInterpreterModule {
 				"    call g_func_fold(\"g_array_add\", list, g_new_array, \"g_func_xsr\", \"g_func_1\", \"g_func_1\", call drop_filter(n));\n" +
 				"export \"g_func_dropr\";\n" +
 				"// ----------------------------------------------\n" +
-				"var func_zip = func ~(name, a, b, xs) {\n" +
+				"var func_zip = func ~(name, a, b, xs) {//将两数组进行合并\n" +
 				"    var val = [];\n" +
 				"    var xa = call xs(a);\n" +
 				"    var xb = call xs(b);\n" +
 				"    for (;;) {\n" +
 				"        var _a = call xa();\n" +
 				"        var _b = call xb();\n" +
-				"        if (call g_is_null(_a) || call g_is_null(b)) {\n" +
+				"        if (call g_is_null(_a) || call g_is_null(_b)) {\n" +
 				"            break;\n" +
 				"        }\n" +
 				"        var c = call name(call _a(), call _b());\n" +
