@@ -15,8 +15,8 @@ public class RuntimeService implements IRuntimeService {
 
 	public RuntimeService(RuntimeProcess process) {
 		this.process = process;
-		this.pipe = new RuntimePipeService();
-		this.share = new RuntimeShareService();
+		this.pipe = new RuntimePipeService(this);
+		this.share = new RuntimeShareService(this);
 	}
 
 	@Override

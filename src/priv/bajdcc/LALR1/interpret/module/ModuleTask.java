@@ -170,7 +170,7 @@ public class ModuleTask implements IInterpreterModule {
 				"    var end = begin + second * 1000;\n" +
 				"    while (begin < end) {\n" +
 				"        let begin = call g_task_get_timestamp();\n" +
-				"        call g_sleep(50);\n" +
+				"        call g_sleep(500);\n" +
 				"    }\n" +
 				"};\n" +
 				"export \"g_task_sleep\";\n";

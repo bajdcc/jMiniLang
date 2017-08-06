@@ -521,7 +521,7 @@ public class ModuleProc implements IInterpreterModule {
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) throws Exception {
 				String name = String.valueOf(args.get(0).getObj());
-				return new RuntimeObject(status.getService().getPipeService().destroyByName(name));
+				return new RuntimeObject(status.getService().getPipeService().destroyByName(status.getPid(), name));
 			}
 		});
 		info.addExternalFunc("g_wait_pipe_empty", new IRuntimeDebugExec() {
@@ -558,9 +558,7 @@ public class ModuleProc implements IInterpreterModule {
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 												  IRuntimeStatus status) throws Exception {
 				int handle = (int) args.get(0).getObj();
-				char ch = status.getService().getPipeService().read(handle);
-				if (ch == '\ufffe')
-					status.getService().getProcessService().sleep(status.getPid(), PIPE_READ_TIME);
+				char ch = status.getService().getPipeService().read(status.getPid(), handle);
 				return new RuntimeObject(ch);
 			}
 		});
@@ -580,7 +578,7 @@ public class ModuleProc implements IInterpreterModule {
 												  IRuntimeStatus status) throws Exception {
 				int handle = (int) args.get(0).getObj();
 				char ch = (char) args.get(1).getObj();
-				return new RuntimeObject(status.getService().getPipeService().write(handle, ch));
+				return new RuntimeObject(status.getService().getPipeService().write(status.getPid(), handle, ch));
 			}
 		});
 	}
@@ -738,12 +736,12 @@ public class ModuleProc implements IInterpreterModule {
 
 	private static RuntimeArray getProcInfo(IRuntimeStatus status, List<Integer> pids) {
 		RuntimeArray array = new RuntimeArray();
-		array.add(new RuntimeObject(String.format("   %-5s   %-15s   %-20s   %s",
-				"Pid", "Name", "Function", "Description")));
+		array.add(new RuntimeObject(String.format(" %s  %-5s   %-15s   %-20s   %s",
+				"#", "Pid", "Name", "Function", "Description")));
 		for (int pid : pids) {
 			Object[] objs = status.getProcInfoById(pid);
-			array.add(new RuntimeObject(String.format("   %-5s   %-15s   %-20s   %s",
-					String.valueOf(pid), objs[0], objs[1], objs[2])));
+			array.add(new RuntimeObject(String.format(" %s  %-5d   %-15s   %-20s   %s",
+					objs[0], pid, objs[1], objs[2], objs[3])));
 		}
 		return array;
 	}

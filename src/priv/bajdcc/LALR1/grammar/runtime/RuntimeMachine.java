@@ -389,6 +389,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	@Override
 	public Object[] getProcInfo() {
 		return new Object[]{
+				process.isBlock(pid) ? "B" : "R",
 				name,
 				stack.getFuncName(),
 				description,

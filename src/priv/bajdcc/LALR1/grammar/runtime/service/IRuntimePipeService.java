@@ -26,25 +26,30 @@ public interface IRuntimePipeService {
 	/**
 	 * 销毁管道
 	 *
+	 * @param pid 进程ID
 	 * @param name 管道名称
 	 * @return 是否成功
 	 */
-	boolean destroyByName(String name);
+	boolean destroyByName(int pid, String name);
 
 	/**
 	 * 管道读
+	 *
+	 * @param pid 进程ID
 	 * @param handle 管道句柄
 	 * @return 读取的字符
 	 */
-	char read(int handle);
+	char read(int pid, int handle);
 
 	/**
 	 * 管道写
+	 *
+	 * @param pid 进程ID
 	 * @param handle 管道句柄
 	 * @param ch 字符
 	 * @return 是否成功
 	 */
-	boolean write(int handle, char ch);
+	boolean write(int pid, int handle, char ch);
 
 	/**
 	 * 管道是否为空

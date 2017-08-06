@@ -16,6 +16,11 @@ import java.util.stream.Collectors;
  */
 public class RuntimeShareService implements IRuntimeShareService {
 
+	public RuntimeShareService(RuntimeService service) {
+		this.service = service;
+		this.mapShares = new HashMap<>();
+	}
+
 	class ShareStruct {
 		public String name;
 		public RuntimeObject obj;
@@ -40,11 +45,8 @@ public class RuntimeShareService implements IRuntimeShareService {
 
 	private static Logger logger = Logger.getLogger("share");
 	private static final int MAX_SHARING = 1000;
+	private RuntimeService service;
 	private Map<String, ShareStruct> mapShares;
-
-	public RuntimeShareService() {
-		this.mapShares = new HashMap<>();
-	}
 
 	@Override
 	public int startSharing(String name, RuntimeObject obj) {

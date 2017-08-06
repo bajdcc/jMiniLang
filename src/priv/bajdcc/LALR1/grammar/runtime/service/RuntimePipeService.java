@@ -14,13 +14,22 @@ import java.util.stream.Collectors;
  */
 public class RuntimePipeService implements IRuntimePipeService {
 
+	public RuntimePipeService(RuntimeService service) {
+		this.service = service;
+		this.arrPipes = new PipeStruct[MAX_PIPE];
+		this.setPipeId = new HashSet<>();
+		this.mapPipeNames = new HashMap<>();
+	}
+
 	class PipeStruct {
 		public String name;
 		public Queue<Character> queue;
+		public Queue<Integer> waiting_pids;
 
 		public PipeStruct(String name) {
 			this.name = name;
 			this.queue = new ArrayDeque<>();
+			this.waiting_pids = new ArrayDeque<>();
 		}
 
 		public String getName() {
@@ -30,16 +39,11 @@ public class RuntimePipeService implements IRuntimePipeService {
 
 	private static Logger logger = Logger.getLogger("pipe");
 	private static final int MAX_PIPE = 1000;
+	private RuntimeService service;
 	private PipeStruct arrPipes[];
 	private Set<Integer> setPipeId;
 	private Map<String, Integer> mapPipeNames;
 	private int cyclePtr = 0;
-
-	public RuntimePipeService() {
-		this.arrPipes = new PipeStruct[MAX_PIPE];
-		this.setPipeId = new HashSet<>();
-		this.mapPipeNames = new HashMap<>();
-	}
 
 	@Override
 	public int create(String name) {
@@ -75,6 +79,9 @@ public class RuntimePipeService implements IRuntimePipeService {
 		if (!setPipeId.contains(handle)) {
 			return false;
 		}
+		for (int pid : arrPipes[handle].waiting_pids) {
+			service.getProcessService().wakeup(pid);
+		}
 		logger.debug("Pipe #" + handle + " '" + arrPipes[handle].name + "' destroyed");
 		mapPipeNames.remove(arrPipes[handle].name);
 		arrPipes[handle] = null;
@@ -83,7 +90,7 @@ public class RuntimePipeService implements IRuntimePipeService {
 	}
 
 	@Override
-	public boolean destroyByName(String name) {
+	public boolean destroyByName(int pid, String name) {
 		if (!mapPipeNames.containsKey(name)) {
 			return false;
 		}
@@ -91,19 +98,23 @@ public class RuntimePipeService implements IRuntimePipeService {
 	}
 
 	@Override
-	public char read(int handle) {
+	public char read(int pid, int handle) {
 		if (!setPipeId.contains(handle)) {
 			return '\uffff';
 		}
 		PipeStruct ps = arrPipes[handle];
-		if (ps.queue.isEmpty()) {
+		if (ps.queue.isEmpty()) { // 阻塞进程
+			service.getProcessService().block(pid);
+			arrPipes[handle].waiting_pids.add(pid); // 放入等待队列
 			return '\ufffe';
 		}
 		return ps.queue.poll();
 	}
 
 	@Override
-	public boolean write(int handle, char ch) {
+	public boolean write(int pid, int handle, char ch) {
+		if (!arrPipes[handle].waiting_pids.isEmpty())
+			service.getProcessService().wakeup(arrPipes[handle].waiting_pids.poll());
 		return setPipeId.contains(handle) && arrPipes[handle].queue.add(ch);
 	}
 
@@ -125,13 +136,13 @@ public class RuntimePipeService implements IRuntimePipeService {
 	@Override
 	public RuntimeArray stat() {
 		RuntimeArray array = new RuntimeArray();
-		array.add(new RuntimeObject(String.format("   %-5s   %-15s   %-20s",
-				"Id", "Name", "Queue")));
+		array.add(new RuntimeObject(String.format("   %-5s   %-15s   %-15s   %-15s",
+				"Id", "Name", "Queue", "Waiting")));
 		mapPipeNames.values().stream().sorted(Comparator.naturalOrder())
 				.collect(Collectors.toList())
 				.forEach((value) -> {
-					array.add(new RuntimeObject(String.format("   %-5s   %-15s   %-20s",
-							String.valueOf(value), arrPipes[value].name, arrPipes[value].queue.size())));
+					array.add(new RuntimeObject(String.format("   %-5s   %-15s   %-15d   %-15d",
+							String.valueOf(value), arrPipes[value].name, arrPipes[value].queue.size(), arrPipes[value].waiting_pids.size())));
 				});
 		return array;
 	}

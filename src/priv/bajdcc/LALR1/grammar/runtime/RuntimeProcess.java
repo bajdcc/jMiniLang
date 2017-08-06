@@ -33,12 +33,14 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		public int priority;
 		public int sleep;
 		public boolean kernel;
+		public boolean runable;
 
 		private SchdProcess(RuntimeMachine machine) {
 			this.machine = machine;
 			this.priority = 128;
 			this.sleep = 0;
 			this.kernel = true;
+			this.runable = true;
 		}
 
 		public SchdProcess(RuntimeMachine machine, boolean kernel) {
@@ -116,7 +118,7 @@ public class RuntimeProcess implements IRuntimeProcessService {
 	}
 
 	public void run() throws Exception {
-		while (schd() && step());
+		while (schd() && step()) ;
 	}
 
 	private void runMainProcess(String name, InputStream input) throws Exception {
@@ -131,11 +133,13 @@ public class RuntimeProcess implements IRuntimeProcessService {
 	private boolean schd() {
 		if (setProcessId.isEmpty())
 			return false;
-		List<SchdParticle> parts = setProcessId.stream().filter(id -> arrProcess[id].kernel).map(id ->
-				new SchdParticle(id, PER_CYCLE, arrProcess[id].priority)).collect(Collectors.toList());
+		List<SchdParticle> parts = setProcessId.stream()
+				.filter(id -> arrProcess[id].kernel && arrProcess[id].runable)
+				.map(id -> new SchdParticle(id, PER_CYCLE, arrProcess[id].priority))
+				.collect(Collectors.toList());
 		queue.addAll(parts);
 		for (Integer pid : arrActiveUsrProcs) {
-			if (setProcessId.contains(pid)) {
+			if (setProcessId.contains(pid) && arrProcess[pid].runable) {
 				queue.add(new SchdParticle(pid, USR_PER_CYCLE, arrProcess[pid].priority));
 			}
 		}
@@ -154,11 +158,13 @@ public class RuntimeProcess implements IRuntimeProcessService {
 					process.sleep--;
 					break;
 				}
-				switch (arrProcess[part.processId].machine.runStep()) {
-					case 1:
-						return false;
-					case 2:
-						break CYCLE_FOR;
+				if (process.runable) {
+					switch (arrProcess[part.processId].machine.runStep()) {
+						case 1:
+							return false;
+						case 2:
+							break CYCLE_FOR;
+					}
 				}
 			}
 		}
@@ -184,12 +190,13 @@ public class RuntimeProcess implements IRuntimeProcessService {
 
 	/**
 	 * 创建进程
+	 *
 	 * @param creatorId 创建者ID
-	 * @param kernel 是否为内核进程
-	 * @param name 页名
-	 * @param page 页
-	 * @param pc 起始指令
-	 * @param obj 参数
+	 * @param kernel    是否为内核进程
+	 * @param name      页名
+	 * @param page      页
+	 * @param pc        起始指令
+	 * @param obj       参数
 	 * @return 进程ID
 	 * @throws Exception 运行时异常
 	 */
@@ -203,9 +210,9 @@ public class RuntimeProcess implements IRuntimeProcessService {
 					RuntimeException.RuntimeError.ACCESS_FORBIDDEN, String.valueOf(page));
 		}
 		int pid;
-		for (;;) {
+		for (; ; ) {
 			if (arrProcess[cyclePtr] == null && !destroyedProcess.contains(cyclePtr)) {
-				RuntimeMachine machine = new RuntimeMachine(name, cyclePtr, creatorId,this);
+				RuntimeMachine machine = new RuntimeMachine(name, cyclePtr, creatorId, this);
 				machine.initStep(name, page, arrProcess[creatorId].machine.getPageRefers(name), pc, obj);
 				setProcessId.add(cyclePtr);
 				pid = cyclePtr;
@@ -229,6 +236,39 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		destroyedProcess.add(processId);
 		setProcessId.remove(processId);
 		logger.debug("Process #" + processId + " exit");
+	}
+
+	@Override
+	public boolean block(int pid) {
+		if (!setProcessId.contains(pid)) {
+			return false;
+		}
+		if (arrProcess[pid].runable) {
+			arrProcess[pid].runable = false;
+			return true;
+		}
+		logger.warn("Process #" + pid + " is blocked, but previous status was blocked.");
+		return false;
+	}
+
+	public boolean isBlock(int pid) {
+		if (!setProcessId.contains(pid)) {
+			return false;
+		}
+		return !arrProcess[pid].runable;
+	}
+
+	@Override
+	public boolean wakeup(int pid) {
+		if (!setProcessId.contains(pid)) {
+			return false;
+		}
+		if (!arrProcess[pid].runable) {
+			arrProcess[pid].runable = true;
+			return true;
+		}
+		logger.warn("Process #" + pid + " is running, but previous status was running.");
+		return false;
 	}
 
 	@Override
