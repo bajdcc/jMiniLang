@@ -95,6 +95,7 @@ public class UIMainFrame extends JFrame {
 				new URSleep(),
 				new URTime(),
 				new URCount(),
+				new URTest(),
 		};
 
 		try {

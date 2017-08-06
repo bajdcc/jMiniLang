@@ -1,25 +1,18 @@
 package priv.bajdcc.util.lexer;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-
 import priv.bajdcc.util.Position;
 import priv.bajdcc.util.lexer.algorithm.ITokenAlgorithm;
 import priv.bajdcc.util.lexer.algorithm.TokenAlgorithmCollection;
-import priv.bajdcc.util.lexer.algorithm.impl.CharacterTokenizer;
-import priv.bajdcc.util.lexer.algorithm.impl.CommentTokenizer;
-import priv.bajdcc.util.lexer.algorithm.impl.IdentifierTokenizer;
-import priv.bajdcc.util.lexer.algorithm.impl.MacroTokenizer;
-import priv.bajdcc.util.lexer.algorithm.impl.NumberTokenizer;
-import priv.bajdcc.util.lexer.algorithm.impl.OperatorTokenizer;
-import priv.bajdcc.util.lexer.algorithm.impl.StringTokenizer;
-import priv.bajdcc.util.lexer.algorithm.impl.WhitespaceTokenizer;
+import priv.bajdcc.util.lexer.algorithm.impl.*;
 import priv.bajdcc.util.lexer.error.RegexException;
 import priv.bajdcc.util.lexer.regex.IRegexStringFilterHost;
 import priv.bajdcc.util.lexer.regex.IRegexStringIteratorEx;
 import priv.bajdcc.util.lexer.regex.RegexStringIterator;
 import priv.bajdcc.util.lexer.token.Token;
 import priv.bajdcc.util.lexer.token.TokenType;
+
+import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * 【词法分析】词法分析器
@@ -139,6 +132,7 @@ public class Lexer extends RegexStringIterator implements
 		//
 		algorithmCollection.attach(new WhitespaceTokenizer());// 空白字符解析组件
 		algorithmCollection.attach(new CommentTokenizer());// 注释解析组件
+		algorithmCollection.attach(new Comment2Tokenizer());// 注释解析组件
 		algorithmCollection.attach(new MacroTokenizer());// 宏解析组件
 		algorithmCollection.attach(new OperatorTokenizer());// 操作符解析组件
 		algorithmCollection.attach(new StringTokenizer());// 字符串解析组件

@@ -54,6 +54,8 @@ public class UIGraphics {
 				break;
 			if (c == '\uffef') {
 				markInput();
+			} else if (c == '\f') {
+				clear(g);
 			} else {
 				if (c == '\t')
 					c = ' ';

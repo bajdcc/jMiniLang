@@ -22,7 +22,6 @@ public class ModuleProc implements IInterpreterModule {
 		return instance;
 	}
 
-	private static final int JOIN_TIME = 20;
 	private static final int LOCK_TIME = 20;
 	private static final int PIPE_READ_TIME = 5;
 
@@ -38,7 +37,7 @@ public class ModuleProc implements IInterpreterModule {
 				"import \"sys.string\";\n" +
 				"var g_join_process = func ~(pid) {\n" +
 				"    call g_printdn(\"Waiting proc: #\" + call g_get_pid() + \" -> #\" + pid);\n" +
-				"    while (call g_join_process_once(pid) != 0) {}\n" +
+				"    while (call g_join_process_once(pid)) {}\n" +
 				"    call g_printdn(\"Waiting proc: #\" + call g_get_pid() + \" -> #\" + pid + \" ok\");\n" +
 				"};\n" +
 				"export \"g_join_process\";\n" +
@@ -352,8 +351,7 @@ public class ModuleProc implements IInterpreterModule {
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) throws Exception {
 				BigInteger pid = (BigInteger) args.get(0).getObj();
-				return new RuntimeObject(BigInteger.valueOf(
-						status.getService().getProcessService().join(pid.intValue(), status.getPid(), JOIN_TIME)));
+				return new RuntimeObject(status.getService().getProcessService().join(pid.intValue(), status.getPid()));
 			}
 		});
 		info.addExternalFunc("g_live_process", new IRuntimeDebugExec() {

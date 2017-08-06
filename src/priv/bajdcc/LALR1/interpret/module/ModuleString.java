@@ -335,5 +335,29 @@ public class ModuleString implements IInterpreterModule {
 				return new RuntimeObject(delim.toLowerCase());
 			}
 		});
+		info.addExternalFunc("g_string_rep", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "字符串重复构造";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kString, RuntimeObjectType.kInt};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				String str = (String) args.get(0).getObj();
+				BigInteger dup = (BigInteger) args.get(1).getObj();
+				int n = dup.intValue();
+				StringBuilder sb = new StringBuilder();
+				for (int i = 0; i < n; i++) {
+					sb.append(str);
+				}
+				return new RuntimeObject(sb.toString());
+			}
+		});
 	}
 }

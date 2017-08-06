@@ -33,14 +33,16 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		public int priority;
 		public int sleep;
 		public boolean kernel;
-		public boolean runable;
+		public boolean runnable;
+		public Queue<Integer> waiting_pids;
 
 		private SchdProcess(RuntimeMachine machine) {
 			this.machine = machine;
 			this.priority = 128;
 			this.sleep = 0;
 			this.kernel = true;
-			this.runable = true;
+			this.runnable = true;
+			this.waiting_pids = new ArrayDeque<>();
 		}
 
 		public SchdProcess(RuntimeMachine machine, boolean kernel) {
@@ -134,12 +136,12 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		if (setProcessId.isEmpty())
 			return false;
 		List<SchdParticle> parts = setProcessId.stream()
-				.filter(id -> arrProcess[id].kernel && arrProcess[id].runable)
+				.filter(id -> arrProcess[id].kernel && arrProcess[id].runnable)
 				.map(id -> new SchdParticle(id, PER_CYCLE, arrProcess[id].priority))
 				.collect(Collectors.toList());
 		queue.addAll(parts);
 		for (Integer pid : arrActiveUsrProcs) {
-			if (setProcessId.contains(pid) && arrProcess[pid].runable) {
+			if (setProcessId.contains(pid) && arrProcess[pid].runnable) {
 				queue.add(new SchdParticle(pid, USR_PER_CYCLE, arrProcess[pid].priority));
 			}
 		}
@@ -158,7 +160,7 @@ public class RuntimeProcess implements IRuntimeProcessService {
 					process.sleep--;
 					break;
 				}
-				if (process.runable) {
+				if (process.runnable) {
 					switch (arrProcess[part.processId].machine.runStep()) {
 						case 1:
 							return false;
@@ -232,6 +234,9 @@ public class RuntimeProcess implements IRuntimeProcessService {
 	}
 
 	public void destroyProcess(int processId) throws Exception {
+		for (int pid : arrProcess[processId].waiting_pids) {
+			wakeup(pid);
+		}
 		arrProcess[processId] = null;
 		destroyedProcess.add(processId);
 		setProcessId.remove(processId);
@@ -243,8 +248,8 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		if (!setProcessId.contains(pid)) {
 			return false;
 		}
-		if (arrProcess[pid].runable) {
-			arrProcess[pid].runable = false;
+		if (arrProcess[pid].runnable) {
+			arrProcess[pid].runnable = false;
 			return true;
 		}
 		logger.warn("Process #" + pid + " is blocked, but previous status was blocked.");
@@ -255,7 +260,7 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		if (!setProcessId.contains(pid)) {
 			return false;
 		}
-		return !arrProcess[pid].runable;
+		return !arrProcess[pid].runnable;
 	}
 
 	@Override
@@ -263,8 +268,8 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		if (!setProcessId.contains(pid)) {
 			return false;
 		}
-		if (!arrProcess[pid].runable) {
-			arrProcess[pid].runable = true;
+		if (!arrProcess[pid].runnable) {
+			arrProcess[pid].runnable = true;
 			return true;
 		}
 		logger.warn("Process #" + pid + " is running, but previous status was running.");
@@ -283,16 +288,15 @@ public class RuntimeProcess implements IRuntimeProcessService {
 	}
 
 	@Override
-	public int join(int joined, int pid, int turn) {
+	public boolean join(int joined, int pid) {
 		if (!setProcessId.contains(pid)) {
-			return -1;
+			return false;
 		}
 		if (!setProcessId.contains(joined))
-			return 0;
-		if (turn < 0)
-			turn = 0;
-		arrProcess[pid].sleep += turn;
-		return arrProcess[pid].sleep;
+			return false;
+		block(pid);
+		arrProcess[joined].waiting_pids.add(pid);
+		return false;
 	}
 
 	@Override

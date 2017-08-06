@@ -111,7 +111,49 @@ public class TestInterpret7 {
 							"    }\n" +
 							"})(tfun);\n" +
 							"\n",
-
+					"import \"sys.base\";\n" +
+							"import \"sys.list\";\n" +
+							"import \"sys.proc\";\n" +
+							"import \"sys.task\";\n" +
+							"import \"sys.string\";\n" +
+							"/* 创建场景 */\n" +
+							"var create_stage = func ~(f) -> call f();\n" +
+							"\n" +
+							"/* 重复操作 */\n" +
+							"var real_repeat = func ~(_operation, _arg, _start, _end) {\n" +
+							"    var repeat = func ~(operation, arg, start, end) {\n" +
+							"        var index = start;\n" +
+							"        var repeat0 = func ~() {\n" +
+							"            if (index >= end) { return; }\n" +
+							"            call g_print(\"ttt\");call operation(arg, index);\n" +
+							"            return call repeat(operation, arg, ++index, end);\n" +
+							"        };\n" +
+							"        return repeat0;\n" +
+							"    };\n" +
+							"    var repear_f = func ~() -> call repeat(_operation, _arg, _start, _end);\n" +
+							"     call g_print(\"ttt2\");call(func ~(f) {\n" +
+							"call g_print(call g_to_string(call g_get_type_ordinal(f)));" +
+							"        while (!(call g_is_null(f)) && (call g_get_type_ordinal(f) == 8)) {\n" +
+							"            let f = call f();\n" +
+							"        }\n" +
+							"    })(repear_f); call g_print(\"tttr\");\n" +
+							"};\n" +
+							"    \n" +
+							"/* 打字效果 */\n" +
+							"var word_fadein = func ~(str, span) {\n" +
+							"    var print = func ~(a, n) {\n" +
+							"        call g_print(call g_string_char(a, n));\n" +
+							"        call g_sleep(span);\n" +
+							"    };\n" +
+							"    call real_repeat(print, str, 0, call g_string_length(str));\n" +
+							"};\n" +
+							"\n" +
+							"/* 场景一 */\n" +
+							"var stage_1 = func ~() {\n" +
+							"    call word_fadein(\"Hello world!\\n\", 200);\n" +
+							"};\n" +
+							"\n" +
+							"call create_stage(stage_1);"
 							};
 
 			System.out.println(codes[codes.length - 1]);

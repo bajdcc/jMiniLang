@@ -82,6 +82,10 @@ public class RuntimeObject implements Cloneable {
 		return fromObject(obj).getName();
 	}
 
+	public int getTypeIndex() {
+		return fromObject(obj).ordinal();
+	}
+
 	public String getTypeString() {
 		return fromObject(obj).toString();
 	}
