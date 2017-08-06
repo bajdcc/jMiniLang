@@ -5,6 +5,7 @@ import priv.bajdcc.LALR1.grammar.Grammar;
 import priv.bajdcc.LALR1.grammar.runtime.*;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeException;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeException.RuntimeError;
+import priv.bajdcc.util.ResourceLoader;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -32,33 +33,7 @@ public class ModuleBase implements IInterpreterModule {
 
 	@Override
 	public RuntimeCodePage getCodePage() throws Exception {
-		String base = "var g_author = func [\"标准库的作者：bajdcc\"] ~() -> \"bajdcc\";\n"
-				+ "export \"g_author\";\n"
-				+ "var g_println = func ~() {\n"
-				+ "    call g_print(g_endl);\n"
-				+ "};\n"
-				+ "export \"g_println\";\n"
-				+ "var g_range = yield ~(a, b) {\n"
-				+ "    for (var i = a; i <= b; i++) {\n"
-				+ "        yield i;\n"
-				+ "    }\n"
-				+ "};\n"
-				+ "export \"g_range\";\n"
-				+ "var g_range_foreach = func ~(a, b, c) {\n"
-				+ "    foreach (var i : call g_range(a, b)) {\n"
-				+ "        call c(i);\n"
-				+ "    }\n"
-				+ "};\n"
-				+ "export \"g_range_foreach\";\n"
-				+ "var g_range_any = func ~(a, b, c) {\n"
-				+ "    foreach (var i : call g_range(a, b)) {\n"
-				+ "        if (call c(i)) {\n"
-				+ "            return true;"
-				+ "        }\n"
-				+ "    }\n"
-				+ "    return false;\n"
-				+ "};\n"
-				+ "export \"g_range_any\";\n" + "\n";
+		String base = ResourceLoader.load(getClass());
 
 		Grammar grammar = new Grammar(base);
 		RuntimeCodePage page = grammar.getCodePage();

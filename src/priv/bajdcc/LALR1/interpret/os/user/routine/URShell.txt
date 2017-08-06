@@ -1,0 +1,195 @@
+import "sys.base";
+import "sys.list";
+import "sys.string";
+import "sys.proc";
+import "sys.ui";
+
+// PRINT WELCOME
+var welcome = func ["WELCOME"] ~() {
+    call g_ui_println();
+    call g_ui_printn(" ________  ________        ___  ________  ________  ________     ");
+    call g_ui_printn("|\\   __  \\|\\   __  \\      |\\  \\|\\   ___ \\|\\   ____\\|\\   ____\\    ");
+    call g_ui_printn("\\ \\  \\|\\ /\\ \\  \\|\\  \\     \\ \\  \\ \\  \\_|\\ \\ \\  \\___|\\ \\  \\___|    ");
+    call g_ui_printn(" \\ \\   __  \\ \\   __  \\  __ \\ \\  \\ \\  \\ \\\\ \\ \\  \\    \\ \\  \\       ");
+    call g_ui_printn("  \\ \\  \\|\\  \\ \\  \\ \\  \\|\\  \\\\_\\  \\ \\  \\_\\\\ \\ \\  \\____\\ \\  \\____  ");
+    call g_ui_printn("   \\ \\_______\\ \\__\\ \\__\\ \\________\\ \\_______\\ \\_______\\ \\_______\\");
+    call g_ui_printn("    \\|_______|\\|__|\\|__|\\|________|\\|_______|\\|_______|\\|_______|");
+    call g_ui_println();
+};
+call g_join_process(call g_create_user_process(welcome));
+call g_start_share("cmd#histroy", g_new_array);
+call g_start_share("PIPE#HANDLE", g_new_array);
+
+var parse_cmd_1 = func ["PARSE"] ~(arg) {
+    var pid = call g_get_pid();
+    var parse = call g_map_get(arg, "parse");
+    var cmd = call g_map_get(arg, "args");
+    var parent = call g_map_get(arg, "parent");
+    var exe = call g_array_pop(cmd);
+    let exe = call g_string_trim(exe);
+    var _args = call g_string_split(exe, " ");
+    var args = [];
+    foreach (var s :call g_range_array(_args)) {
+        var ss = call g_string_trim(s);
+        if (!call g_string_empty(ss)) {
+            call g_array_add(args, ss);
+        }
+    }
+    var exec = call g_array_get(args, 0);
+    call g_array_remove(args, 0);
+    var share = {};
+    call g_map_put(share, "args", args);
+    call g_set_process_desc("host: " + exec);
+    var path = "/usr/p/" + exec;
+    var child = call g_load_user_x(path);
+    call g_start_share("PID#" + child, share);
+    if (child+1 == 0) {
+        call g_ui_printn("Cannot execute '"+path+"'.");
+        var p = call g_wait_pipe("PIPEIN#" + parent);
+        call g_sleep(50);
+        call g_destroy_pipe(p);
+        return;
+    }
+    call g_map_put(share, "child", child);
+    var k = g_null;
+    if (call g_array_size(cmd) > 0) {
+        var _args_ = {};
+        call g_map_put(_args_, "parse", parse);
+        call g_map_put(_args_, "args", cmd);
+        call g_map_put(_args_, "parent", child);
+        let k = call g_create_user_process_args(parse, _args_);
+    }
+    var in = call g_create_pipe("PIPEIN#" + parent);
+    var out = call g_create_pipe("PIPEOUT#" + child);
+    var handles = call g_query_share("PIPE#HANDLE");
+    call g_array_add(handles, child);
+    var f1 = func ~(ch, in) {
+        call g_write_pipe(in, ch);
+    };
+    call g_read_pipe_args(out, f1, in);
+    call g_join_process(child);
+    if (!call g_is_null(k)) {
+        call g_join_process(k);
+    }
+    var ct = call g_query_share("PIPE#CTRL");
+    if (!call g_array_empty(ct) && call g_array_get(ct, 0) == 'C') {
+        call g_printdn("#" + call g_get_pid() + " Force kill!");
+        call g_destroy_pipe_once(in);
+        call g_printdn("#" + call g_get_pid() + " Force kill! ok");
+    } else {
+        call g_printdn("#" + call g_get_pid() + " Safe kill!");
+        call g_destroy_pipe(in);
+        call g_printdn("#" + call g_get_pid() + " Safe kill! ok");
+    }
+};
+
+var parse_cmd = func ["PARSE"] ~(cmd, parse) {
+    var pid = call g_get_pid();
+    var exe = call g_array_pop(cmd);
+    let exe = call g_string_trim(exe);
+    var _args = call g_string_split(exe, " ");
+    var args = [];
+    foreach (var s :call g_range_array(_args)) {
+        var ss = call g_string_trim(s);
+        if (!call g_string_empty(ss)) {
+            call g_array_add(args, ss);
+        }
+    }
+    var exec = call g_array_get(args, 0);
+    call g_array_remove(args, 0);
+    var share = {};
+    call g_map_put(share, "args", args);
+    call g_set_process_desc("host: " + exec);
+    var path = "/usr/p/" + exec;
+    var child = call g_load_user_x(path);
+    if (child+1 == 0) {
+        call g_ui_printn("Cannot execute '"+path+"'.");
+        return;
+    }
+    call g_start_share("PID#" + child, share);
+    var array = [];
+    call g_create_share("PIPE#CTRL", array);
+    call g_create_share("PIPE#HANDLE", g_new_array);
+    var k = g_null;
+    if (call g_array_size(cmd) > 0) {
+        var _args_ = {};
+        call g_map_put(_args_, "parse", parse);
+        call g_map_put(_args_, "args", cmd);
+        call g_map_put(_args_, "parent", child);
+        let k = call g_create_user_process_args(parse, _args_);
+    }
+    var f = func ~(ch) -> call g_ui_print(ch);
+    var out = call g_wait_pipe("PIPEOUT#" + child);
+    var handles = call g_query_share("PIPE#HANDLE");
+    var ctrl = func ~() {
+        var fn = func ~(ch) {
+            var hs = call g_query_share("PIPE#HANDLE");
+            var kill = false;
+            if (ch == 'C') { let kill = true; }
+            if (ch == 'A' && !call g_live_process_array(hs)) {
+                let ch = 'C';
+            }
+            if (ch == 'C') {
+                call g_printdn("#" + call g_get_pid() + " Force kill!");
+                foreach (var hh : call g_range_array(hs)) {
+                    call g_destroy_pipe_by_name_once("PIPEIN#" + hh);
+                    if (kill) { call g_create_share("PIDSIG#" + hh, false); }
+                }
+                call g_join_process_array(hs);
+                var pp = call g_wait_pipe("SYS#INPUT");
+                call g_destroy_pipe_once(pp);
+                call g_printdn("#" + call g_get_pid() + " Force kill! ok");
+            } else if (ch == 'A') {
+                call g_printdn("#" + call g_get_pid() + " Safe kill!");
+                call g_join_process_array(hs);
+                var pp = call g_wait_pipe("SYS#INPUT");
+                call g_destroy_pipe_once(pp);
+                call g_printdn("#" + call g_get_pid() + " Safe kill! ok");
+            }
+        };
+        var handle = call g_create_pipe("SYS#INPUT");
+        call g_read_pipe(handle, fn);
+    };
+    call g_array_add(handles, child);
+    var ctrl_handle = call g_create_user_process(ctrl);
+    var inputd = func ~(arr) -> call g_ui_inputd("SYS#INPUT", arr);
+    var inputd_handle = call g_create_user_process_args(inputd, array);
+    call g_read_pipe(out, f);
+    call g_join_process_array(handles);
+    if (!call g_is_null(k)) {
+        call g_join_process(k);
+    }
+    call g_array_add(array, 'A');
+    call g_join_process(inputd_handle);
+    call g_join_process(ctrl_handle);
+};
+
+// GET STDIO cmd
+var get_input = func ["INPUT"] ~(arg) {
+    call g_set_process_desc("shell routinue");
+    var this = call g_array_get(arg, 0);
+    var parse = call g_array_get(arg, 1);
+    call g_ui_print("$ \uffef");
+    call g_sleep(400);
+    var cmd = call g_ui_input();
+    let cmd = call g_string_trim(cmd);
+    if (call g_string_length(cmd) == 0) {
+        call g_ui_printn("Error: no cmd");
+        call g_create_user_process_args(this, arg);
+        return;
+    }
+    if (cmd == "exit") {
+        call g_ui_printn("** System is going to power off! **");
+        var handle = call g_create_pipe("int#3");
+        call g_write_pipe(handle, 'E');
+        return;
+    }
+    call g_printn("*** Input: " + cmd);
+    let cmd = call g_string_split(cmd, "\\|");
+    call parse_cmd(cmd, parse);
+    call g_create_user_process_args(this, arg);
+};
+var _args_ = [];
+call g_array_add(_args_, get_input);
+call g_array_add(_args_, parse_cmd_1);
+call g_create_user_process_args(get_input, _args_);

@@ -1,0 +1,67 @@
+import "sys.base";
+import "sys.list";
+import "sys.proc";
+import "sys.string";
+var g_ui_print = func ~(str) {
+    var ui_int = call g_create_pipe("int#2");
+    foreach (var c : call g_range_string(str)) {
+        call g_write_pipe(ui_int, c);
+    }
+};
+export "g_ui_print";
+var g_ui_printn = func ~(str) {
+    call g_ui_print(str);
+    call g_ui_println();
+};
+export "g_ui_printn";
+var g_ui_println = func ~() {
+    call g_ui_print(g_endl);
+};
+export "g_ui_println";
+var ui_input_mark = func ~() {
+    call g_empty_pipe("int#2");
+    call g_ui_input_mark();
+};
+var g_ui_input = func ~() {
+    call g_ui_caret(true);
+    var h = call g_query_share("cmd#histroy");
+    for (;;) {
+        var s = call g_ui_input_internal();
+        if (!call g_is_null(s)) {
+            while (!call g_ui_caret(false)) {};
+            call g_ui_println();
+            call g_array_add(h, s);
+            return s;
+        }
+        var c = call g_ui_print_input();
+        if (!call g_is_null(c)) {
+            if (c == '\ufff0') {
+                if (!call g_array_empty(h)) {
+                    var old = call g_array_pop(h);
+                    call g_ui_fallback();
+                    call g_ui_input_queue(old);
+                }
+            } else if (c == '\uffee') {
+                call g_ui_println();
+                return call g_ui_input_im();
+            } else {
+                call g_ui_print(c);
+            }
+        }
+    }
+};
+export "g_ui_input";
+var g_ui_inputd = func ~(callback, arr) {
+    var handle = call g_wait_pipe(callback);
+    while (call g_array_size(arr) == 0) {
+        var c = call g_ui_print_input();
+        if (!call g_is_null(c)) {
+            if (c == '\uffee') {
+                call g_array_add(arr, 'C');
+                break;
+            }
+        }
+    }
+    call g_write_pipe(handle, call g_array_get(arr, 0));
+};
+export "g_ui_inputd";

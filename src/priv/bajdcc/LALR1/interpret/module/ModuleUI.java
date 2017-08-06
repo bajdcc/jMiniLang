@@ -3,6 +3,7 @@ package priv.bajdcc.LALR1.interpret.module;
 import priv.bajdcc.LALR1.grammar.Grammar;
 import priv.bajdcc.LALR1.grammar.runtime.*;
 import priv.bajdcc.LALR1.ui.drawing.UIGraphics;
+import priv.bajdcc.util.ResourceLoader;
 
 import java.util.ArrayDeque;
 import java.util.List;
@@ -46,73 +47,7 @@ public class ModuleUI implements IInterpreterModule {
 
 	@Override
 	public RuntimeCodePage getCodePage() throws Exception {
-		String base = "import \"sys.base\";\n" +
-				"import \"sys.list\";\n" +
-				"import \"sys.proc\";\n" +
-				"import \"sys.string\";\n" +
-				"var g_ui_print = func ~(str) {\n" +
-				"    var ui_int = call g_create_pipe(\"int#2\");\n" +
-				"    foreach (var c : call g_range_string(str)) {\n" +
-				"        call g_write_pipe(ui_int, c);\n" +
-				"    }\n" +
-				"};\n" +
-				"export \"g_ui_print\";\n" +
-				"var g_ui_printn = func ~(str) {\n" +
-				"    call g_ui_print(str);\n" +
-				"    call g_ui_println();\n" +
-				"};\n" +
-				"export \"g_ui_printn\";\n" +
-				"var g_ui_println = func ~() {\n" +
-				"    call g_ui_print(g_endl);\n" +
-				"};\n" +
-				"export \"g_ui_println\";\n" +
-				"var ui_input_mark = func ~() {\n" +
-				"    call g_empty_pipe(\"int#2\");\n" +
-				"    call g_ui_input_mark();\n" +
-				"};\n" +
-				"var g_ui_input = func ~() {\n" +
-				"    call g_ui_caret(true);\n" +
-				"    var h = call g_query_share(\"cmd#histroy\");\n" +
-				"    for (;;) {\n" +
-				"        var s = call g_ui_input_internal();\n" +
-				"        if (!call g_is_null(s)) {\n" +
-				"            while (!call g_ui_caret(false)) {};\n" +
-				"            call g_ui_println();\n" +
-				"            call g_array_add(h, s);\n" +
-				"            return s;\n" +
-				"        }\n" +
-				"        var c = call g_ui_print_input();\n" +
-				"        if (!call g_is_null(c)) {\n" +
-				"            if (c == '\\ufff0') {\n" +
-				"                if (!call g_array_empty(h)) {\n" +
-				"                    var old = call g_array_pop(h);\n" +
-				"                    call g_ui_fallback();\n" +
-				"                    call g_ui_input_queue(old);\n" +
-				"                }\n" +
-				"            } else if (c == '\\uffee') {\n" +
-				"                call g_ui_println();\n" +
-				"                return call g_ui_input_im();\n" +
-				"            } else {\n" +
-				"                call g_ui_print(c);\n" +
-				"            }\n" +
-				"        }\n" +
-				"    }\n" +
-				"};\n" +
-				"export \"g_ui_input\";\n" +
-				"var g_ui_inputd = func ~(callback, arr) {\n" +
-				"    var handle = call g_wait_pipe(callback);\n" +
-				"    while (call g_array_size(arr) == 0) {\n" +
-				"        var c = call g_ui_print_input();\n" +
-				"        if (!call g_is_null(c)) {\n" +
-				"            if (c == '\\uffee') {\n" +
-				"                call g_array_add(arr, 'C');\n" +
-				"                break;\n" +
-				"            }\n" +
-				"        }\n" +
-				"    }\n" +
-				"    call g_write_pipe(handle, call g_array_get(arr, 0));\n" +
-				"};\n" +
-				"export \"g_ui_inputd\";\n";
+		String base = ResourceLoader.load(getClass());
 
 		Grammar grammar = new Grammar(base);
 		RuntimeCodePage page = grammar.getCodePage();

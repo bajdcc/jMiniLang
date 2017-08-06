@@ -1,0 +1,35 @@
+import "sys.base";
+import "sys.list";
+import "sys.proc";
+import "sys.string";
+
+call g_set_process_desc("dup routinue");
+var pid = call g_get_pid();
+var share = call g_wait_share("PID#" + pid);
+call g_stop_share("PID#" + pid);
+var args = call g_map_get(share, "args");
+var count = call g_array_get(args, 0);
+if (call g_is_null(count)) {
+    let count = "2";
+}
+let count = call g_string_atoi(count);
+
+var buf = [];
+var pipe = func ["PIPE"] ~(ch, out) {
+    if (ch == '\n' || ch == '\r') {
+        foreach (var i : call g_range(1, count)) {
+            foreach (var j : call g_range_array(buf)) {
+                call g_write_pipe(out, j);
+            }
+            call g_write_pipe(out, '\n');
+        }
+        call g_array_clear(buf);
+    } else {
+        call g_array_add(buf, ch);
+    }
+};
+
+var in = call g_create_pipe("PIPEIN#" + pid);
+var out = call g_create_pipe("PIPEOUT#" + pid);
+call g_read_pipe_args(in, pipe, out);
+call g_destroy_pipe(out);

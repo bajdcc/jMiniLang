@@ -1,0 +1,29 @@
+import "sys.base";
+import "sys.list";
+import "sys.string";
+import "sys.proc";
+
+call g_set_process_desc("proc routinue");
+var pid = call g_get_pid();
+var share = call g_wait_share("PID#" + pid);
+call g_stop_share("PID#" + pid);
+var args = call g_map_get(share, "args");
+
+var in = call g_create_pipe("PIPEIN#" + pid);
+var out = call g_create_pipe("PIPEOUT#" + pid);
+
+var sys = call g_array_get(args, 0);
+if (call g_is_null(sys) || sys != "sys") {
+    let sys = call g_query_usr_proc();
+} else {
+    let sys = call g_query_sys_proc();
+}
+foreach (var i : call g_range_array(sys)) {
+    foreach (var j : call g_range_string(call g_to_string(i))) {
+        call g_write_pipe(out, j);
+    }
+    call g_write_pipe(out, '\n');
+}
+
+call g_destroy_pipe(out);
+call g_destroy_pipe(in);

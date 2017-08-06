@@ -1,0 +1,24 @@
+import "sys.base";
+import "sys.list";
+import "sys.proc";
+import "sys.string";
+
+call g_set_process_desc("count routinue");
+var pid = call g_get_pid();
+var share = call g_wait_share("PID#" + pid);
+call g_stop_share("PID#" + pid);
+var args = call g_map_get(share, "args");
+
+var count = 0;
+var pipe = func ["PIPE"] ~(ch, out) {
+    if (ch == '\n' || ch == '\r') {
+        let count = count + 1;
+        call g_write_pipe(out, "" + count + "\r");
+    }
+};
+
+var in = call g_create_pipe("PIPEIN#" + pid);
+var out = call g_create_pipe("PIPEOUT#" + pid);
+call g_read_pipe_args(in, pipe, out);
+call g_write_pipe(out, "" + count + "\n");
+call g_destroy_pipe(out);

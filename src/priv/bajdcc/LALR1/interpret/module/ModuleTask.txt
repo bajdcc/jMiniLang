@@ -1,0 +1,134 @@
+import "sys.base";
+import "sys.list";
+import "sys.proc";
+
+var g_task_init = func ~() {
+    var task_table = [];
+    call g_start_share("TASK#TABLE", task_table);
+    foreach (var i : call g_range(0, 16 - 1)) {
+        call g_array_add(task_table, g_null);
+    }
+    var waiting_list = [];
+    call g_start_share("TASK#LIST", waiting_list);
+};
+export "g_task_init";
+
+var g_task_add_proc = func ~(no, data) {
+    var task_table = call g_query_share("TASK#TABLE");
+    call g_array_set(task_table, no, data);
+    call g_printdn("Task #" + no + " created");
+};
+export "g_task_add_proc";
+
+var g_task_get = func ~(tid, msg) {
+    var waiting_list = call g_query_share("TASK#LIST");
+    var pid = call g_get_pid();
+    var m = {};
+    call g_map_put(m, "pid", pid);
+    call g_map_put(m, "tid", tid);
+    call g_map_put(m, "msg", msg);
+    call g_start_share("MSG#" + pid, m);
+    call g_lock_share("TASK#LIST");
+    call g_array_add(waiting_list, pid);
+    call g_unlock_share("TASK#LIST");
+    var handle = call g_create_pipe("int#1");
+    call g_write_pipe(handle, '@');
+    var h = call g_wait_pipe("IPC#" + pid);
+    var f = func ~(ch) {
+        if (ch == 'E') { call g_destroy_pipe(h); }
+    };
+    call g_read_pipe(h, f);
+    call g_stop_share("MSG#" + pid);
+};
+export "g_task_get";
+
+var g_task_get_fast = func ~(tid, id) {
+    var arg = [];
+    call g_array_add(arg, tid);
+    call g_array_add(arg, id);
+
+    var msg = {};
+    call g_map_put(msg, "id", id);
+    call g_map_put(msg, "arg", arg);
+    call g_task_get(tid, msg);
+    var error = call g_map_get(msg, "error");
+    var val = call g_map_get(msg, "val");
+    if (error == 1) {
+        return g_null;
+    } else {
+        return val;
+    }
+};
+export "g_task_get_fast";
+var g_task_get_fast_arg = func ~(tid, id, a) {
+    var arg = [];
+    call g_array_add(arg, tid);
+    call g_array_add(arg, id);
+    call g_array_add(arg, a);
+
+    var msg = {};
+    call g_map_put(msg, "id", id);
+    call g_map_put(msg, "arg", arg);
+    call g_task_get(tid, msg);
+    var error = call g_map_get(msg, "error");
+    var val = call g_map_get(msg, "val");
+    if (error == 1) {
+        return g_null;
+    } else {
+        return val;
+    }
+};
+export "g_task_get_fast_arg";
+
+var task_handler = func ~(ch) {
+    var waiting_list = call g_query_share("TASK#LIST");
+    var task_table = call g_query_share("TASK#TABLE");
+    call g_lock_share("TASK#LIST");
+    var pid = call g_array_get(waiting_list, 0);
+    call g_array_remove(waiting_list, 0);
+    call g_unlock_share("TASK#LIST");
+    var m = call g_query_share("MSG#" + pid);
+    var tid = call g_map_get(m, "tid");
+    let tid = call g_task_get_id_by_name(tid);
+    var msg = call g_map_get(m, "msg");
+    if (call g_is_null(tid)) {
+        call g_map_put(msg, "error", 1);
+        call g_map_put(msg, "val", "invalid task name");
+    } else {
+        call g_map_put(msg, "error", 0);
+        call g_start_share("TASKDATA#" + tid, msg);
+        call g_start_share("TASKCALLER#" + tid, pid);
+        var h = call g_create_pipe("TASKSEND#" + tid);
+        call g_write_pipe(h, ch);
+        var h2 = call g_wait_pipe("TASKRECV#" + tid);
+        call g_write_pipe(h2, 'E');
+        call g_stop_share("TASKDATA#" + tid);
+        call g_stop_share("TASKCALLER#" + tid);
+    }
+    var handle = call g_create_pipe("IPC#" + pid);
+    call g_write_pipe(handle, 'E');
+};
+
+var g_task_handler = func ~(ch) -> call task_handler(ch);
+export "g_task_handler";
+var g_task_get_id_by_name = func ~(name) {
+    var task_name_table = call g_query_share("TASK#NAMELIST");
+    foreach (var i : call g_range(0, 16 - 1)) {
+        var t = call g_array_get(task_name_table, i);
+        if (!call g_is_null(t) && t == name) {
+            return i;
+        }
+    }
+    return g_null;
+};
+export "g_task_get_id_by_name";
+var g_task_sleep = func ~(second) {
+    if (second < 1) { return; }
+    var begin = call g_task_get_timestamp();
+    var end = begin + second * 1000;
+    while (begin < end) {
+        let begin = call g_task_get_timestamp();
+        call g_sleep(500);
+    }
+};
+export "g_task_sleep";

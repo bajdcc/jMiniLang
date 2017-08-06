@@ -504,7 +504,7 @@ public class TokenTools {
 
 	public static RuntimeInst op2ins(Token token) {
 		if (token.kToken == TokenType.OPERATOR) {
-			RuntimeInst inst = mapOp2Ins.get((OperatorType) token.object);
+			RuntimeInst inst = mapOp2Ins.get(token.object);
 			if (inst != null)
 				return inst;
 		}

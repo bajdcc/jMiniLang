@@ -1,0 +1,27 @@
+import "sys.base";
+import "sys.list";
+import "sys.proc";
+import "sys.task";
+import "sys.remote";
+
+call g_set_process_desc("hitokoto ui");
+call g_set_process_priority(81);
+
+var init = func ~() {
+    call g_task_get_fast_arg("ui", "path", "@M 100 200@@l 500 0@@l 0 150@@l -500 0@@l 0 -150@");
+};
+
+var draw = func ~() {
+    //var obj = call g_task_get_fast_arg("net", "get_json", "http://api.hitokoto.cn/?c=a&encode=json");
+    //if (call g_is_null(obj)) { call g_task_sleep(10); return; }
+    //var text = " —— " + call g_map_get(obj, "from") + " —— \n" + call g_map_get(obj, "hitokoto");
+    var text = "test string for debug";
+    call g_task_get_fast_arg("ui", "path", "@M 101 201@@R 599 349@@M 140 230@@W 450@$" + text + "$");
+    call g_task_sleep(8);
+};
+
+call init();
+
+while (call g_query_share("UI#hitokoto")) {
+    call draw();
+}

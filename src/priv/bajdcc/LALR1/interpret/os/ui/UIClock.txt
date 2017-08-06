@@ -1,0 +1,24 @@
+import "sys.base";
+import "sys.list";
+import "sys.proc";
+import "sys.task";
+import "sys.remote";
+
+call g_set_process_desc("clock ui");
+call g_set_process_priority(80);
+
+var init = func ~() {
+    call g_task_get_fast_arg("ui", "path", "@M 100 100@@l 300 0@@l 0 50@@l -300 0@@l 0 -50@");
+};
+
+var draw = func ~() {
+    var time = call g_task_get_fast("system", "now");
+    call g_task_get_fast_arg("ui", "path", "@M 110 110@@R 390 140@@M 140 130@#" + time + "#");
+    call g_task_sleep(1);
+};
+
+call init();
+
+while (call g_query_share("UI#clock")) {
+    call draw();
+}

@@ -1,0 +1,107 @@
+import "sys.base";
+import "sys.list";
+import "sys.string";
+var g_join_process = func ~(pid) {
+    call g_printdn("Waiting proc: #" + call g_get_pid() + " -> #" + pid);
+    while (call g_join_process_once(pid)) {}
+    call g_printdn("Waiting proc: #" + call g_get_pid() + " -> #" + pid + " ok");
+};
+export "g_join_process";
+var g_join_process_array = func ~(pid) {
+    var len = call g_array_size(pid) - 1;
+    foreach (var i : call g_range(0, len)) {
+        call g_printdn("Waiting proc: #" + call g_get_pid() + " -> #" + call g_array_get_ex(pid, i));
+        call g_join_process(call g_array_get_ex(pid, i));
+        call g_printdn("Waiting proc: #" + call g_get_pid() + " -> #" + call g_array_get_ex(pid, i) + " ok");
+    }
+};
+export "g_join_process_array";
+var g_join_process_time = func ~(pid, time) {
+    for (var i = 0; i < time; i++) {
+        call g_join_process_once(pid);
+    }
+};
+export "g_join_process_time";
+var g_live_process_array = func ~(pid) {
+    var len = call g_array_size(pid) - 1;
+    foreach (var i : call g_range(0, len)) {
+        if (call g_live_process(call g_array_get_ex(pid, i))) {
+            return true;
+        }
+    }
+    return false;
+};
+export "g_live_process_array";
+var g_lock_share = func ~(name) {
+    while (call g_try_lock_share(name)) {}};
+export "g_lock_share";
+var g_read_pipe = func ~(handle, callback) {
+    call g_printdn("Reading pipe: #" + call g_get_pid() + " -> #" + handle);
+    var data = '\0';
+    for (;;) {
+        let data = call g_read_pipe_char(handle);
+        if (data == '\uffff') {
+            break;
+        }
+        if (data != '\ufffe') {
+            call callback(data);
+        }
+    }
+    call g_printdn("Reading pipe: #" + call g_get_pid() + " -> #" + handle + " ok");
+};
+export "g_read_pipe";
+var g_read_pipe_args = func ~(handle, callback, args) {
+    call g_printdn("Reading pipe: #" + call g_get_pid() + " -> #" + handle);
+    var data = '\0';
+    for (;;) {
+        let data = call g_read_pipe_char(handle);
+        if (data == '\uffff') {
+            break;
+        }
+        if (data != '\ufffe') {
+            call callback(data, args);
+        }
+    }
+    call g_printdn("Reading pipe: #" + call g_get_pid() + " -> #" + handle + " ok");
+};
+export "g_read_pipe_args";
+var g_write_pipe = func ~(handle, data) {
+    foreach (var ch : call g_range_string(data)) {
+        call g_write_pipe_char(handle, ch);
+    }
+};
+export "g_write_pipe";
+var g_load_sync = func ~(fn) -> call g_join_process(call g_load(fn));
+export "g_load_sync";
+var g_load_sync_x = func ~(fn) -> call g_join_process(call g_load_x(fn));
+export "g_load_sync_x";
+var g_wait_share = func ~(handle) {
+    for (;;) {
+        var share = call g_query_share(handle);
+        if (call g_is_null(share)) { call g_sleep(10); continue; }
+        return share;
+    }
+};
+export "g_wait_share";
+var g_wait_pipe = func ~(handle) {
+    call g_printdn("Waiting pipe: PID#" + call g_get_pid() + " -> " + handle);
+    for (;;) {
+        var pipe = call g_query_pipe(handle);
+        if (pipe) { return call g_create_pipe(handle); }
+        call g_sleep(10);
+    }
+    call g_printdn("Waiting pipe: PID#" + call g_get_pid() + " -> " + handle + " ok");
+};
+export "g_wait_pipe";
+var g_empty_pipe = func ~(handle) {
+    var pipe = call g_wait_pipe(handle);
+    while (call g_wait_pipe_empty(pipe)) {}
+};
+export "g_empty_pipe";
+var g_destroy_pipe = func ~(handle) {
+    call g_printdn("Destroy pipe: PID#" + call g_get_pid() + " -> " + handle);
+    while (call g_wait_pipe_empty(handle)) {}
+    call g_destroy_pipe_once(handle);
+    call g_printdn("Destroy pipe: PID#" + call g_get_pid() + " -> " + handle +" ok");
+};
+export "g_destroy_pipe";

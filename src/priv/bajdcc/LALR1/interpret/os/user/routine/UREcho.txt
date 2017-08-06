@@ -1,0 +1,32 @@
+import "sys.base";
+import "sys.list";
+import "sys.string";
+import "sys.proc";
+import "sys.ui";
+
+call g_set_process_desc("echo routinue");
+var pid = call g_get_pid();
+var share = call g_wait_share("PID#" + pid);
+call g_stop_share("PID#" + pid);
+var args = call g_map_get(share, "args");
+
+var in = call g_create_pipe("PIPEIN#" + pid);
+var out = call g_create_pipe("PIPEOUT#" + pid);
+
+if (call g_array_empty(args)) {
+    var pipe = func ["PIPE"] ~(ch, out) {
+        call g_ui_print(ch);
+        call g_write_pipe(out, ch);
+    };
+    call g_read_pipe_args(in, pipe, out);
+} else {
+    foreach (var i : call g_range_array(args)) {
+        foreach (var j : call g_range_string(i)) {
+            call g_write_pipe(out, j);
+        }
+        call g_write_pipe(out, '\n');
+    }
+}
+
+call g_destroy_pipe(out);
+call g_destroy_pipe(in);

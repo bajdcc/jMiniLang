@@ -1,0 +1,23 @@
+// KERNEL ENTRY BY BAJDCC
+import "sys.base";
+import "sys.list";
+import "sys.proc";
+call g_set_process_desc("ui host");
+var ui_num = 8; // ! ModuleRemote.UI_NUM
+var ui_name_table = [];
+call g_start_share("UI#NAMELIST", ui_name_table);
+
+foreach (var i : call g_range(0, ui_num - 1)) {
+    call g_array_add(ui_name_table, g_null);
+}
+
+call g_array_set(ui_name_table, 1, "clock");
+call g_array_set(ui_name_table, 2, "hitokoto");
+
+foreach (var j : call g_range(0, ui_num - 1)) {
+    var t = call g_array_get(ui_name_table, j);
+    if (!call g_is_null(t)) {
+        call g_start_share("UI#" + t, true);
+        call g_load_x("/ui/" + t);
+    }
+}

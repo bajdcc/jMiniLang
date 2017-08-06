@@ -5,6 +5,7 @@ import priv.bajdcc.LALR1.grammar.runtime.*;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeException;
 import priv.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
 import priv.bajdcc.LALR1.grammar.runtime.data.RuntimeFuncObject;
+import priv.bajdcc.util.ResourceLoader;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -32,115 +33,7 @@ public class ModuleProc implements IInterpreterModule {
 
 	@Override
 	public RuntimeCodePage getCodePage() throws Exception {
-		String base = "import \"sys.base\";\n" +
-				"import \"sys.list\";\n" +
-				"import \"sys.string\";\n" +
-				"var g_join_process = func ~(pid) {\n" +
-				"    call g_printdn(\"Waiting proc: #\" + call g_get_pid() + \" -> #\" + pid);\n" +
-				"    while (call g_join_process_once(pid)) {}\n" +
-				"    call g_printdn(\"Waiting proc: #\" + call g_get_pid() + \" -> #\" + pid + \" ok\");\n" +
-				"};\n" +
-				"export \"g_join_process\";\n" +
-				"var g_join_process_array = func ~(pid) {\n" +
-				"    var len = call g_array_size(pid) - 1;\n" +
-				"    foreach (var i : call g_range(0, len)) {\n" +
-				"        call g_printdn(\"Waiting proc: #\" + call g_get_pid() + \" -> #\" + call g_array_get_ex(pid, i));\n" +
-				"        call g_join_process(call g_array_get_ex(pid, i));\n" +
-				"        call g_printdn(\"Waiting proc: #\" + call g_get_pid() + \" -> #\" + call g_array_get_ex(pid, i) + \" ok\");\n" +
-				"    }\n" +
-				"};\n" +
-				"export \"g_join_process_array\";\n" +
-				"var g_join_process_time = func ~(pid, time) {\n" +
-				"    for (var i = 0; i < time; i++) {\n" +
-				"        call g_join_process_once(pid);\n" +
-				"    }\n" +
-				"};\n" +
-				"export \"g_join_process_time\";\n" +
-				"var g_live_process_array = func ~(pid) {\n" +
-				"    var len = call g_array_size(pid) - 1;\n" +
-				"    foreach (var i : call g_range(0, len)) {\n" +
-				"        if (call g_live_process(call g_array_get_ex(pid, i))) {\n" +
-				"            return true;\n" +
-				"        }\n" +
-				"    }\n" +
-				"    return false;\n" +
-				"};\n" +
-				"export \"g_live_process_array\";\n" +
-				"var g_lock_share = func ~(name) {\n" +
-				"    while (call g_try_lock_share(name)) {}" +
-				"};\n" +
-				"export \"g_lock_share\";\n" +
-				"var g_read_pipe = func ~(handle, callback) {\n" +
-				"    call g_printdn(\"Reading pipe: #\" + call g_get_pid() + \" -> #\" + handle);\n" +
-				"    var data = '\\0';" +
-				"    for (;;) {\n" +
-				"        let data = call g_read_pipe_char(handle);\n" +
-				"        if (data == '\\uffff') {\n" +
-				"            break;\n" +
-				"        }\n" +
-				"        if (data != '\\ufffe') {\n" +
-				"            call callback(data);\n" +
-				"        }\n" +
-				"    }\n" +
-				"    call g_printdn(\"Reading pipe: #\" + call g_get_pid() + \" -> #\" + handle + \" ok\");\n" +
-				"};\n" +
-				"export \"g_read_pipe\";\n" +
-				"var g_read_pipe_args = func ~(handle, callback, args) {\n" +
-				"    call g_printdn(\"Reading pipe: #\" + call g_get_pid() + \" -> #\" + handle);\n" +
-				"    var data = '\\0';" +
-				"    for (;;) {\n" +
-				"        let data = call g_read_pipe_char(handle);\n" +
-				"        if (data == '\\uffff') {\n" +
-				"            break;\n" +
-				"        }\n" +
-				"        if (data != '\\ufffe') {\n" +
-				"            call callback(data, args);\n" +
-				"        }\n" +
-				"    }\n" +
-				"    call g_printdn(\"Reading pipe: #\" + call g_get_pid() + \" -> #\" + handle + \" ok\");\n" +
-				"};\n" +
-				"export \"g_read_pipe_args\";\n" +
-				"var g_write_pipe = func ~(handle, data) {\n" +
-				"    foreach (var ch : call g_range_string(data)) {\n" +
-				"        call g_write_pipe_char(handle, ch);\n" +
-				"    }\n" +
-				"};\n" +
-				"export \"g_write_pipe\";\n" +
-				"var g_load_sync = func ~(fn) -> call g_join_process(call g_load(fn));\n" +
-				"export \"g_load_sync\";\n" +
-				"var g_load_sync_x = func ~(fn) -> call g_join_process(call g_load_x(fn));\n" +
-				"export \"g_load_sync_x\";\n" +
-				"var g_wait_share = func ~(handle) {\n" +
-				"    for (;;) {\n" +
-				"        var share = call g_query_share(handle);\n" +
-				"        if (call g_is_null(share)) { call g_sleep(10); continue; }\n" +
-				"        return share;\n" +
-				"    }\n" +
-				"};\n" +
-				"export \"g_wait_share\";\n" +
-				"var g_wait_pipe = func ~(handle) {\n" +
-				"    call g_printdn(\"Waiting pipe: PID#\" + call g_get_pid() + \" -> \" + handle);\n" +
-				"    for (;;) {\n" +
-				"        var pipe = call g_query_pipe(handle);\n" +
-				"        if (pipe) { return call g_create_pipe(handle); }\n" +
-				"        call g_sleep(10);\n" +
-				"    }\n" +
-				"    call g_printdn(\"Waiting pipe: PID#\" + call g_get_pid() + \" -> \" + handle + \" ok\");\n" +
-				"};\n" +
-				"export \"g_wait_pipe\";\n" +
-				"var g_empty_pipe = func ~(handle) {\n" +
-				"    var pipe = call g_wait_pipe(handle);\n" +
-				"    while (call g_wait_pipe_empty(pipe)) {}\n" +
-				"};\n" +
-				"export \"g_empty_pipe\";\n" +
-				"var g_destroy_pipe = func ~(handle) {\n" +
-				"    call g_printdn(\"Destroy pipe: PID#\" + call g_get_pid() + \" -> \" + handle);\n" +
-				"    while (call g_wait_pipe_empty(handle)) {}\n" +
-				"    call g_destroy_pipe_once(handle);\n" +
-				"    call g_printdn(\"Destroy pipe: PID#\" + call g_get_pid() + \" -> \" + handle +\" ok\");\n" +
-				"};\n" +
-				"export \"g_destroy_pipe\";\n" +
-				"";
+		String base = ResourceLoader.load(getClass());
 
 		Grammar grammar = new Grammar(base);
 		RuntimeCodePage page = grammar.getCodePage();

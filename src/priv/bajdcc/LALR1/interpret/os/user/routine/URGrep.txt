@@ -1,0 +1,94 @@
+import "sys.base";
+import "sys.list";
+import "sys.proc";
+import "sys.string";
+
+call g_set_process_desc("grep routinue");
+// USE KMP ALGORITHM.
+var pid = call g_get_pid();
+var share = call g_wait_share("PID#" + pid);
+call g_stop_share("PID#" + pid);
+var args = call g_map_get(share, "args");
+var pat = call g_array_get(args, 0);
+if (call g_is_null(pat)) {
+    var _pipe = func ["PIPE"] ~(ch, out) {
+        call g_write_pipe(out, ch);
+    };
+    var _in = call g_create_pipe("PIPEIN#" + pid);
+    var _out = call g_create_pipe("PIPEOUT#" + pid);
+    call g_read_pipe_args(_in, _pipe, _out);
+    call g_destroy_pipe(_out);
+    return;
+}
+
+var patlen = call g_string_length(pat);
+var m1 = g_minus_1;
+
+var next = func ["CALC NEXT"] ~(str) {
+    var n = [];
+    var u = 0;
+    var v = g_minus_1;
+    call g_array_add(n, g_minus_1);
+    for (var t = 1; t < patlen; t++) {
+        call g_array_add(n, g_minus_1);
+    }
+    while (u < patlen - 1)
+    {
+        if (v == m1 || (call g_string_get(str, u) == call g_string_get(str, v)))
+        {
+            u++;
+            v++;
+            call g_array_set(n, u, v);
+        }
+        else
+        {
+            let v = call g_array_get(n, v);
+        }
+    }
+    return n;
+};
+
+var find = func ["FIND WITH NEXT"] ~(str, n) {
+    var i = 0;
+    var j = 0;
+    var slen = call g_string_length(str);
+    while (i < slen && j < patlen)
+    {
+        if (j == m1 || (call g_string_get(str, i) == call g_string_get(pat, j)))
+        {
+            i++; j++;
+        }
+        else
+        {
+            let j = call g_array_get(n, j);
+        }
+    }
+    if (j == patlen)
+    {
+        return i - j;
+    }
+    return m1;
+};
+
+var nextarr = call next(pat);
+
+var buf = [];
+var pipe = func ["PIPE"] ~(ch, out) {
+    if (ch == '\n' || ch == '\r') {
+        var str = call g_string_build(buf);
+        var idx = call find(str, nextarr);
+        if (idx != m1) {
+            foreach (var i : call g_range_array(buf)) {
+                call g_write_pipe(out, i);
+            }
+            call g_write_pipe(out, "\n");        }
+        call g_array_clear(buf);
+    } else {
+        call g_array_add(buf, ch);
+    }
+};
+
+var in = call g_create_pipe("PIPEIN#" + pid);
+var out = call g_create_pipe("PIPEOUT#" + pid);
+call g_read_pipe_args(in, pipe, out);
+call g_destroy_pipe(out);

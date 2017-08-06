@@ -1,0 +1,27 @@
+var g_author = func ["标准库的作者：bajdcc"] ~() -> "bajdcc";
+export "g_author";
+var g_println = func ~() {
+    call g_print(g_endl);
+};
+export "g_println";
+var g_range = yield ~(a, b) {
+    for (var i = a; i <= b; i++) {
+        yield i;
+    }
+};
+export "g_range";
+var g_range_foreach = func ~(a, b, c) {
+    foreach (var i : call g_range(a, b)) {
+        call c(i);
+    }
+};
+export "g_range_foreach";
+var g_range_any = func ~(a, b, c) {
+    foreach (var i : call g_range(a, b)) {
+        if (call c(i)) {
+            return true;
+        }
+    }
+    return false;
+};
+export "g_range_any";

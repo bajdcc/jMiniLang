@@ -1,0 +1,59 @@
+import "sys.base";
+import "sys.list";
+import "sys.proc";
+import "sys.task";
+import "sys.string";
+
+call g_set_process_desc("system service");
+call g_set_process_priority(72);
+
+var tid = 1;
+var handle = call g_create_pipe("TASKSEND#" + tid);
+
+var time = func ~(msg, caller) {
+    var id = call g_map_get(msg, "id");
+    if (call g_is_null(id)) {
+        call g_map_put(msg, "error", 1);
+        call g_map_put(msg, "val", "invalid task argument - id");
+        return;
+    }
+    if (id == "now") {
+        var val = "";
+        var arg = call g_map_get(msg, "arg");
+        var ts = call g_array_get(arg, 2);
+        if (!call g_is_null(ts) && ts == "timestamp") {
+           let val = call g_task_get_timestamp();
+        } else {
+           let val = call g_task_get_time("yyyy-MM-dd HH:mm:ss");
+        }
+        call g_map_put(msg, "val", val);
+    } else if (id == "pipe") {
+        var val = call g_task_get_pipe_stat();
+        let val = call g_string_join_array(val, "\n");
+        call g_map_put(msg, "val", val);
+    } else if (id == "share") {
+        var val = call g_task_get_share_stat();
+        let val = call g_string_join_array(val, "\n");
+        call g_map_put(msg, "val", val);
+    }
+};
+
+var handler = func ~(ch) {
+    if (ch == 'E') {
+        call g_destroy_pipe(handle);
+        return;
+    }
+    var msg = call g_query_share("TASKDATA#" + tid);
+    var caller = call g_query_share("TASKCALLER#" + tid);
+    call time(msg, caller);
+    var handle = call g_create_pipe("TASKRECV#" + tid);
+    var f = func ~(ch) {
+        if (ch == 'E') { call g_destroy_pipe(handle); }
+    };
+    call g_read_pipe(handle, f);
+};
+
+var data = {};
+call g_task_add_proc(1, data);
+
+call g_read_pipe(handle, handler);

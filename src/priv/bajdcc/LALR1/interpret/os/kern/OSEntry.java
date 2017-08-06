@@ -1,6 +1,7 @@
 package priv.bajdcc.LALR1.interpret.os.kern;
 
 import priv.bajdcc.LALR1.interpret.os.IOSCodePage;
+import priv.bajdcc.util.ResourceLoader;
 
 /**
  * 【内核】入口
@@ -8,6 +9,7 @@ import priv.bajdcc.LALR1.interpret.os.IOSCodePage;
  * @author bajdcc
  */
 public class OSEntry implements IOSCodePage {
+
 	@Override
 	public String getName() {
 		return "/kern/entry";
@@ -15,13 +17,6 @@ public class OSEntry implements IOSCodePage {
 
 	@Override
 	public String getCode() {
-		return "// KERNEL ENTRY BY BAJDCC\n" +
-				"import \"sys.base\";\n" +
-				"import \"sys.proc\";\n" +
-				"call g_load_sync_x(\"/kern/irq\");\n" +
-				"call g_load_x(\"/kern/task\");\n" +
-				"call g_load_x(\"/proc/schd\");\n" +
-				"call g_load_user_x(\"/usr/main\");\n" +
-				"";
+		return ResourceLoader.load(getClass());
 	}
 }

@@ -8,6 +8,7 @@ import priv.bajdcc.LALR1.grammar.Grammar;
 import priv.bajdcc.LALR1.grammar.runtime.*;
 import priv.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
 import priv.bajdcc.LALR1.grammar.runtime.data.RuntimeMap;
+import priv.bajdcc.util.ResourceLoader;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -36,11 +37,7 @@ public class ModuleNet implements IInterpreterModule {
 
 	@Override
 	public RuntimeCodePage getCodePage() throws Exception {
-		String base = "import \"sys.base\";\n" +
-				"import \"sys.list\";\n" +
-				"import \"sys.proc\";\n" +
-				"import \"sys.string\";\n" +
-				"\n";
+		String base = ResourceLoader.load(getClass());
 
 		Grammar grammar = new Grammar(base);
 		RuntimeCodePage page = grammar.getCodePage();

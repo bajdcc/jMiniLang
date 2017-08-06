@@ -1,0 +1,43 @@
+import "sys.base";
+import "sys.list";
+import "sys.string";
+import "sys.proc";
+import "sys.task";
+
+call g_set_process_desc("task routinue");
+var pid = call g_get_pid();
+var share = call g_wait_share("PID#" + pid);
+call g_stop_share("PID#" + pid);
+var args = call g_map_get(share, "args");
+
+var in = call g_create_pipe("PIPEIN#" + pid);
+var out = call g_create_pipe("PIPEOUT#" + pid);
+
+if (call g_array_size(args) < 2) {
+    call g_write_pipe(out, "Error: missing arguments.\n");
+    call g_destroy_pipe(out);
+    call g_destroy_pipe(in);
+    return;
+}
+
+var tid = call g_array_get(args, 0);
+var id = call g_array_get(args, 1);
+
+var msg = {};
+call g_map_put(msg, "id", id);
+call g_map_put(msg, "arg", args);
+call g_task_get(tid, msg);
+
+var error = call g_map_get(msg, "error");
+var val = call g_map_get(msg, "val");
+let val = call g_to_string(val);
+if (error == 1) {
+    call g_write_pipe(out, "Error: " + val);
+    call g_write_pipe(out, '\n');
+} else {
+    call g_write_pipe(out, val);
+    call g_write_pipe(out, '\n');
+}
+
+call g_destroy_pipe(out);
+call g_destroy_pipe(in);

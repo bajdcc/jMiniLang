@@ -1,0 +1,91 @@
+import "sys.base";
+import "sys.list";
+import "sys.proc";
+import "sys.task";
+import "sys.string";
+
+call g_set_process_desc("test routinue");
+var pid = call g_get_pid();
+var share = call g_wait_share("PID#" + pid);
+call g_stop_share("PID#" + pid);
+var args = call g_map_get(share, "args");
+
+var in = call g_create_pipe("PIPEIN#" + pid);
+var out = call g_create_pipe("PIPEOUT#" + pid);
+
+var put = func ["PIPE"] ~(ch) {
+    call g_write_pipe(out, ch);
+};
+var puts = func ["PIPE"] ~(str) {
+    foreach (var c : call g_range_string(str)) {
+        call g_write_pipe(out, c);
+    }
+};
+var signal = "PIDSIG#" + pid;
+call g_start_share(signal, true);
+
+/* 创建场景 */
+var create_stage = func ~(f) -> call f();
+
+/* 重复操作 */
+var real_repeat = func ~(_operation, _arg, _start, _end) {
+    var repeat = func ~(operation, arg, start, end) {
+        var index = start;
+        var repeat0 = func ~() {
+            if (index >= end) { return; }
+            call operation(arg, index);
+            return call repeat(operation, arg, ++index, end);
+        };
+        return repeat0;
+    };
+    var repear_f = func ~() -> call repeat(_operation, _arg, _start, _end);
+    call(func ~(f) {
+        while (!(call g_is_null(f)) && (call g_get_type_ordinal(f) == 8)) {
+            let f = call f();
+        }
+    })(repear_f);
+};
+    
+/* 打字效果 */
+var word_typewrite = func ~(str, span) {
+    var print = func ~(a, n) {
+        call put(call g_string_char(a, n));
+        call g_sleep(span);
+    };
+    call real_repeat(print, str, 0, call g_string_length(str));
+};
+
+/* 清屏 */
+var stage_clear = func ~() {
+    call word_typewrite("Are you ready?", 200);
+    call word_typewrite("  3!  2!  1!
+", 1500);
+    call word_typewrite("Let's go!!!   
+", 1000);
+    call put('\f');
+};
+
+/* 场景一 */
+var stage_1 = func ~() {
+    call puts(call g_string_rep(" ", 31));
+    call word_typewrite("- Stage 1 -\n", 2000);
+    call word_typewrite("* Hello world! 你好！\n", 300);
+    call word_typewrite("* This is a test program. 这是一个测试程序。\n", 400);
+    call word_typewrite("* Made by bajdcc. 由bajdcc编写。\n", 1000);
+    call word_typewrite("* 项目网址在 https://github.com/bajdcc/jMiniLang 上。\n", 600);
+    call word_typewrite("* 这是我做的一个脚本操作系统。\n", 1000);
+    call word_typewrite("* 支持闭包、进程、管道、互斥等特性。\n", 1000);
+    call word_typewrite("* 不过由于设计不足以及Java的使用，脚本运行还是太慢。\n", 1000);
+    call word_typewrite("* 最让我兴奋的是语法分析的实现、虚拟机的构建、同步/异步语义的实现。\n", 1000);
+    call word_typewrite("* 进程、管道、互斥是这个操作系统的基础。\n", 1000);
+    call word_typewrite("\n\n\n\n", 1000);
+    call puts(call g_string_rep(" ", 31));
+    call word_typewrite("- @bajdcc -\n", 2000);
+};
+
+call create_stage(stage_clear);
+call create_stage(stage_1);
+
+call g_stop_share(signal);
+call g_destroy_pipe(out);
+call g_destroy_pipe(in);
