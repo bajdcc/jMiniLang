@@ -7,6 +7,8 @@ import "sys.net";
 call g_set_process_desc("net service");
 call g_set_process_priority(75);
 
+call g_printn("Running...");
+
 var tid = 4;
 var handle = call g_create_pipe("TASKSEND#" + tid);
 
@@ -40,7 +42,6 @@ var time = func ~(msg, caller) {
 
 var handler = func ~(ch) {
     if (ch == 'E') {
-        call g_destroy_pipe(handle);
         var ui_num = 8; // ! UI_NUM
         var ui_name_table = call g_query_share("UI#NAMELIST");
 
@@ -50,6 +51,7 @@ var handler = func ~(ch) {
                 call g_create_share("UI#" + ui_name, false);
             }
         }
+        call g_destroy_pipe(handle);
         return;
     }
     var msg = call g_query_share("TASKDATA#" + tid);
@@ -66,3 +68,5 @@ var data = {};
 call g_task_add_proc(4, data);
 
 call g_read_pipe(handle, handler);
+
+call g_printn("Exit.");

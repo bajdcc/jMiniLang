@@ -11,6 +11,8 @@ foreach (var i : call g_range(0, ui_num - 1)) {
     call g_array_add(ui_name_table, g_null);
 }
 
+call g_printn("Setting ui...");
+
 call g_array_set(ui_name_table, 1, "clock");
 call g_array_set(ui_name_table, 2, "hitokoto");
 

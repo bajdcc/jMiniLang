@@ -7,6 +7,8 @@ import "sys.remote";
 call g_set_process_desc("clock ui");
 call g_set_process_priority(80);
 
+call g_printn("Running...");
+
 var init = func ~() {
     call g_task_get_fast_arg("ui", "path", "@M 100 100@@l 300 0@@l 0 50@@l -300 0@@l 0 -50@");
 };
@@ -22,3 +24,7 @@ call init();
 while (call g_query_share("UI#clock")) {
     call draw();
 }
+
+call g_stop_share("UI#clock");
+
+call g_printn("Exit.");

@@ -113,9 +113,12 @@ public class RuntimePipeService implements IRuntimePipeService {
 
 	@Override
 	public boolean write(int pid, int handle, char ch) {
-		if (!arrPipes[handle].waiting_pids.isEmpty())
-			service.getProcessService().wakeup(arrPipes[handle].waiting_pids.poll());
-		return setPipeId.contains(handle) && arrPipes[handle].queue.add(ch);
+		if (setPipeId.contains(handle)) {
+			if (!arrPipes[handle].waiting_pids.isEmpty())
+				service.getProcessService().wakeup(arrPipes[handle].waiting_pids.poll());
+			return arrPipes[handle].queue.add(ch);
+		}
+		return false;
 	}
 
 	@Override

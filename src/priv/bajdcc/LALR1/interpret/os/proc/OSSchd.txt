@@ -7,6 +7,7 @@ call g_set_process_priority(64);
 var state = [];
 call g_array_add(state, true);
 call g_start_share("SCHD#ON", state);
+call g_printn("Running...");
 for (;;) {
     foreach (var i : call g_range_array(call g_get_user_procs())) {
         call g_run_user(i);
@@ -24,4 +25,4 @@ for (;;) {
         call g_sleep(1);
     }
 }
-call g_printdn("schd exit");
+call g_printn("Exit.");

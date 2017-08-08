@@ -1,0 +1,29 @@
+import "sys.base";
+import "sys.list";
+import "sys.proc";
+import "sys.remote";
+
+// IRQ: 0
+var no = 0;
+call g_set_process_desc("remote task");
+call g_set_process_priority(10 + no);
+
+call g_printn("Running...");
+
+var handler = func ~(ch) {
+     call g_remote_print_internal(ch);
+};
+
+var state = [];
+call g_array_add(state, true);
+call g_start_share("IRQ#ON." + no, state);
+var handle = call g_create_pipe("int#" + no);
+for (;;) {
+    call g_read_pipe(handle, handler);
+    call g_sleep(10 + no);
+    var _state_ = call g_query_share("IRQ#ON." + no);
+    var on = call g_array_get(_state_, 0);
+    if (!on) { break; }
+}
+
+call g_printn("Exit.");

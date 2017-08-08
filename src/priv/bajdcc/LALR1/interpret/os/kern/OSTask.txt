@@ -7,6 +7,7 @@ var task_num = 16; // ! ModuleTask.TASK_NUM
 var task_name_table = [];
 call g_start_share("TASK#NAMELIST", task_name_table);
 
+call g_printn("Setting task...");
 foreach (var i : call g_range(0, task_num - 1)) {
     call g_array_add(task_name_table, g_null);
 }
@@ -19,6 +20,7 @@ call g_array_set(task_name_table, 4, "net");
 foreach (var j : call g_range(0, task_num - 1)) {
     var t = call g_array_get(task_name_table, j);
     if (!call g_is_null(t)) {
+        call g_printn("Create service: " + t);
         call g_load_x("/task/" + t);
     }
 }

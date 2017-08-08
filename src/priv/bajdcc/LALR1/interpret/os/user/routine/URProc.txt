@@ -19,6 +19,7 @@ if (call g_is_null(sys) || sys != "sys") {
     let sys = call g_query_sys_proc();
 }
 foreach (var i : call g_range_array(sys)) {
+    call g_printdn(call g_to_string(i));
     foreach (var j : call g_range_string(call g_to_string(i))) {
         call g_write_pipe(out, j);
     }

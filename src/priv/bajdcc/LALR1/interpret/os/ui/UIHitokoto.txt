@@ -7,6 +7,8 @@ import "sys.remote";
 call g_set_process_desc("hitokoto ui");
 call g_set_process_priority(81);
 
+call g_printn("Running...");
+
 var init = func ~() {
     call g_task_get_fast_arg("ui", "path", "@M 100 200@@l 500 0@@l 0 150@@l -500 0@@l 0 -150@");
 };
@@ -25,3 +27,7 @@ call init();
 while (call g_query_share("UI#hitokoto")) {
     call draw();
 }
+
+call g_stop_share("UI#hitokoto");
+
+call g_printn("Exit.");

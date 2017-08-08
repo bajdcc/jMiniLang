@@ -5,6 +5,10 @@ import priv.bajdcc.LALR1.grammar.runtime.RuntimeCodePage;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeException;
 import priv.bajdcc.LALR1.interpret.Interpreter;
 import priv.bajdcc.LALR1.interpret.os.IOSCodePage;
+import priv.bajdcc.LALR1.interpret.os.irq.IRPrint;
+import priv.bajdcc.LALR1.interpret.os.irq.IRRemote;
+import priv.bajdcc.LALR1.interpret.os.irq.IRSignal;
+import priv.bajdcc.LALR1.interpret.os.irq.IRTask;
 import priv.bajdcc.LALR1.interpret.os.kern.OSEntry;
 import priv.bajdcc.LALR1.interpret.os.kern.OSIrq;
 import priv.bajdcc.LALR1.interpret.os.kern.OSTask;
@@ -72,6 +76,11 @@ public class UIMainFrame extends JFrame {
 				new OSIrq(),
 				new OSSchd(),
 				new OSTask(),
+				// IRQ
+				new IRPrint(),
+				new IRRemote(),
+				new IRTask(),
+				new IRSignal(),
 				// TASK
 				new TKSystem(),
 				new TKUtil(),

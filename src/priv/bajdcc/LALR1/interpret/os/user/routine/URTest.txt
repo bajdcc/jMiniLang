@@ -47,7 +47,7 @@ var real_repeat = func ~(_operation, _arg, _start, _end) {
 };
     
 /* 打字效果 */
-var word_typewrite = func ~(str, span) {
+var word_typewrite0 = func ~(str, span) {
     var print = func ~(a, n) {
         call put(call g_string_char(a, n));
         call g_sleep(span);
@@ -55,13 +55,19 @@ var word_typewrite = func ~(str, span) {
     call real_repeat(print, str, 0, call g_string_length(str));
 };
 
+/* 打字效果 */
+var word_typewrite = func ~(str, span) {
+    foreach (var c : call g_range_string(str)) {
+        call put(c);
+        call g_sleep(span);
+    }
+};
+
 /* 清屏 */
 var stage_clear = func ~() {
     call word_typewrite("Are you ready?", 200);
-    call word_typewrite("  3!  2!  1!
-", 1500);
-    call word_typewrite("Let's go!!!   
-", 1000);
+    call word_typewrite("  3!  2!  1!\n", 1500);
+    call word_typewrite("  Let's go!!!   \n", 1000);
     call put('\f');
 };
 

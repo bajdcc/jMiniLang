@@ -107,7 +107,8 @@ public class ModuleBase implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 					IRuntimeStatus status) throws Exception {
-				logger.info(args.get(0).getObj());
+				Object[] info = status.getProcInfo();
+				logger.info(String.format("#%03d [%s] %s", status.getPid(), info[1], args.get(0).getObj()));
 				return null;
 			}
 		});

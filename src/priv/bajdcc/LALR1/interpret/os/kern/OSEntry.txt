@@ -1,6 +1,7 @@
 // KERNEL ENTRY BY BAJDCC
 import "sys.base";
 import "sys.proc";
+call g_printn("Booting...");
 call g_load_sync_x("/kern/irq");
 call g_load_x("/kern/task");
 call g_load_x("/proc/schd");

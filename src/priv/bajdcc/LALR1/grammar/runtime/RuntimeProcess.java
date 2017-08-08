@@ -51,7 +51,7 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		}
 	}
 
-	private static Logger logger = Logger.getLogger("pipe");
+	private static Logger logger = Logger.getLogger("proc");
 	private static final int MAX_PROCESS = 1000;
 	private static final int PER_CYCLE = 50;
 	private static final int USR_PER_CYCLE = 200;
@@ -229,7 +229,7 @@ public class RuntimeProcess implements IRuntimeProcessService {
 				cyclePtr -= MAX_PROCESS;
 			}
 		}
-		logger.debug((kernel ? "Kernel" : "User") + " process #" + pid + " '" + name + "' created");
+		logger.debug((kernel ? "Kernel" : "User") + " process #" + pid + " '" + name + "' created, " + setProcessId.size() + " now.");
 		return pid;
 	}
 
@@ -240,7 +240,7 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		arrProcess[processId] = null;
 		destroyedProcess.add(processId);
 		setProcessId.remove(processId);
-		logger.debug("Process #" + processId + " exit");
+		logger.debug("Process #" + processId + " exit, " + setProcessId.size() + " left.");
 	}
 
 	@Override

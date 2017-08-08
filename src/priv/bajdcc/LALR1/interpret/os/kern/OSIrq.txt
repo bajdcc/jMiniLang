@@ -6,84 +6,21 @@ import "sys.ui";
 import "sys.remote";
 var interrupt_num = 4; // ! INT_NUM
 var int_table = [];
-var desc_table = [];
+
+call g_printn("Setting irq...");
 foreach (var i : call g_range(0, interrupt_num - 1)) {
     call g_array_add(int_table, g_null);
-    call g_array_add(desc_table, "unused irq#" + i);
-}
-call g_array_set(desc_table, 0, "remote task");
-call g_array_set(desc_table, 1, "service task");
-call g_array_set(desc_table, 2, "print task");
-call g_array_set(desc_table, 3, "signal task");
-var add_int_proc = func ~(no, fn) {
-    call g_array_set(int_table, no, fn);};
-var int_proc = func ~(arg) {
-    var no = call g_map_get(arg, "no");
-    var table = call g_map_get(arg, "table");
-    var desc = call g_map_get(arg, "desc");
-    call g_set_process_priority(no);
-    var dstr = call g_array_get(desc, no);
-    call g_set_process_desc(dstr);
-    var state = [];
-    call g_array_add(state, true);
-    call g_start_share("IRQ#ON." + no, state);
-    var handle = call g_create_pipe("int#" + no);
-    for (;;) {
-        var p = call g_array_get(table, no);
-        if (!(call g_is_null(p))) {
-            call g_read_pipe(handle, p);
-        }
-        call g_sleep(10 + no);
-        var _state_ = call g_query_share("IRQ#ON." + no);
-        var on = call g_array_get(_state_, 0);
-        if (!on) { break; }
-    }
-    call g_printdn("int_proc: #" + no + " exit");
-};
-foreach (var j : call g_range(0, interrupt_num - 1)) {
-    var args = {};
-    call g_map_put(args, "no", j);
-    call g_map_put(args, "table", int_table);
-    call g_map_put(args, "desc", desc_table);
-    call g_create_process_args(int_proc, args);
-    call g_printdn("Create int_proc: #" + j);
 }
 
-var destroy_int = func ~() {
-    var tt = call g_query_share("TASK#TABLE");
-    foreach (var i : call g_range(0, 15)) { // ! ModuleTask.TASK_NUM - 1
-        if (!call g_is_null(call g_array_get(tt, i))) {
-           var handle = call g_create_pipe("TASKSEND#" + i);
-           call g_write_pipe(handle, 'E');
-        }
+call g_array_set(int_table, 0, "remote");
+call g_array_set(int_table, 1, "task");
+call g_array_set(int_table, 2, "print");
+call g_array_set(int_table, 3, "signal");
+
+foreach (var j : call g_range(0, interrupt_num - 1)) {
+    var t = call g_array_get(int_table, j);
+    if (!call g_is_null(t)) {
+        call g_printn("Create irq: " + t);
+        call g_load_x("/irq/" + t);
     }
-    foreach (var i : call g_range(0, 3)) { // ! INT_NUM
-        var _state_ = call g_query_share("IRQ#ON." + i);
-        call g_array_set(_state_, 0, false);
-        var handle = call g_create_pipe("int#" + i);
-        call g_destroy_pipe(handle);
-        call g_sleep(20);
-    }
-};
-var schd_handler = func ~(ch) {
-    if (ch == 'E') {
-        var _state_ = call g_query_share("SCHD#ON");
-        call g_array_set(_state_, 0, false);
-        call g_create_process(destroy_int);
-        call g_printn("*** System halt!");
-    }
-};
-call add_int_proc(3, schd_handler);
-var print_handler = func ~(ch) {
-    call g_ui_print_internal(ch);
-};
-call add_int_proc(2, print_handler);
-var task_handler = func ~(ch) {
-    call g_task_handler(ch);
-};
-call g_task_init();
-call add_int_proc(1, task_handler);
-var remote_handler = func ~(ch) {
-    call g_remote_print_internal(ch);
-};
-call add_int_proc(0, remote_handler);
+}

@@ -15,6 +15,7 @@ var welcome = func ["WELCOME"] ~() {
     call g_ui_printn("   \\ \\_______\\ \\__\\ \\__\\ \\________\\ \\_______\\ \\_______\\ \\_______\\");
     call g_ui_printn("    \\|_______|\\|__|\\|__|\\|________|\\|_______|\\|_______|\\|_______|");
     call g_ui_println();
+    call g_printn("Running...");
 };
 call g_join_process(call g_create_user_process(welcome));
 call g_start_share("cmd#histroy", g_new_array);

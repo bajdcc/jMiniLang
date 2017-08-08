@@ -10,18 +10,36 @@ var share = call g_wait_share("PID#" + pid);
 call g_stop_share("PID#" + pid);
 var args = call g_map_get(share, "args");
 
+var arg1 = call g_array_get(args, 0);
+
 var in = call g_create_pipe("PIPEIN#" + pid);
 var out = call g_create_pipe("PIPEOUT#" + pid);
 
 var signal = "PIDSIG#" + pid;
 call g_start_share(signal, true);
 
-var get_time = func ~() -> call g_task_get_fast("system", "now");
-for (; call g_query_share(signal);) {
-    call g_write_pipe(out, "" + call get_time() + "\r");
-    call g_task_sleep(1);
+if (call g_is_null(arg1)) { // 无参：当前时间
+    var get_time = func ~() -> call g_task_get_fast("system", "now");
+    for (; call g_query_share(signal);) {
+        call g_write_pipe(out, "" + call get_time() + "\r");
+        call g_task_sleep(1);
+    }
+    call g_write_pipe(out, "\n");
+} else { // 有参：程序运行计时
+    var pipe = func ["PIPE"] ~(ch, out) {
+        call g_write_pipe(out, ch);
+    };
+    var begin_time = call g_task_get_fast_arg("system", "now", "timestamp");
+    call g_read_pipe_args(in, pipe, out);
+    var end_time = call g_task_get_fast_arg("system", "now", "timestamp");
+    var period = end_time - begin_time;
+    call g_printn("Running time: " + period + "ms");
+    call g_write_pipe(out, "\n ** Running time: " + period + "ms\n");
+
+    /*
+      # 比如，输入命令“range 1 1000 | grep 1 | count | time a”，一般打印出2500ms左右的结果。
+    */
 }
-call g_write_pipe(out, "\n");
 
 call g_stop_share(signal);
 

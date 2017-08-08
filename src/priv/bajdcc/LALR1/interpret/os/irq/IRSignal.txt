@@ -1,0 +1,59 @@
+import "sys.base";
+import "sys.list";
+import "sys.proc";
+import "sys.remote";
+
+// IRQ: 3
+var no = 3;
+call g_set_process_desc("signal task");
+call g_set_process_priority(10 + no);
+
+call g_printn("Running...");
+
+var destroy_int = func ~() {
+    var tt = call g_query_share("TASK#TABLE");
+    // 确保任务和中断依次退出
+    // 1. task
+    call g_printn("Stopping service...");
+    foreach (var i : call g_range(0, 15)) { // ! ModuleTask.TASK_NUM - 1
+        if (!call g_is_null(call g_array_get(tt, i))) {
+           var handle = call g_create_pipe("TASKSEND#" + i);
+           call g_write_pipe(handle, 'E');
+           while (call g_query_pipe("TASKSEND#" + i)) {
+               call g_sleep(20);
+           }
+        }
+    }
+    // 2.irq
+    call g_printn("Stopping irq...");
+    foreach (var j : call g_range(0, 3)) { // ! INT_NUM
+        var _state_ = call g_query_share("IRQ#ON." + j);
+        call g_array_set(_state_, 0, false);
+        var handle = call g_create_pipe("int#" + j);
+        call g_destroy_pipe(handle);
+        call g_sleep(20);
+    }
+    call g_printn("Good bye.");
+};
+var handler = func ~(ch) {
+     if (ch == 'E') {
+         var _state_ = call g_query_share("SCHD#ON");
+         call g_array_set(_state_, 0, false);
+         call g_create_process(destroy_int);
+         call g_printn("*** System halt!");
+     }
+};
+
+var state = [];
+call g_array_add(state, true);
+call g_start_share("IRQ#ON." + no, state);
+var handle = call g_create_pipe("int#" + no);
+for (;;) {
+    call g_read_pipe(handle, handler);
+    call g_sleep(10 + no);
+    var _state_ = call g_query_share("IRQ#ON." + no);
+    var on = call g_array_get(_state_, 0);
+    if (!on) { break; }
+}
+
+call g_printn("Exit.");

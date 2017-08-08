@@ -8,6 +8,8 @@ import "sys.func";
 call g_set_process_desc("util service");
 call g_set_process_priority(73);
 
+call g_printn("Running...");
+
 var tid = 2;
 var handle = call g_create_pipe("TASKSEND#" + tid);
 
@@ -77,3 +79,5 @@ var data = {};
 call g_task_add_proc(2, data);
 
 call g_read_pipe(handle, handler);
+
+call g_printn("Exit.");
