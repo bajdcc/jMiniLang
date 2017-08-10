@@ -387,6 +387,11 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	}
 
 	@Override
+	public List<Integer> getAllProcs() {
+		return process.getAllProcs();
+	}
+
+	@Override
 	public Object[] getProcInfo() {
 		return new Object[]{
 				process.isBlock(pid) ? "B" : "R",
@@ -404,11 +409,6 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	@Override
 	public Object[] getProcInfoById(int id) {
 		return process.getProcInfoById(id);
-	}
-
-	@Override
-	public int stepUsrProcess(int pid) {
-		return process.stepUsrProcess(pid);
 	}
 
 	private void switchPage() throws RuntimeException {

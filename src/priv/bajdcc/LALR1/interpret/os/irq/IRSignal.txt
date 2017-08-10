@@ -13,7 +13,7 @@ call g_printn("Running...");
 var destroy_int = func ~() {
     var tt = call g_query_share("TASK#TABLE");
     // 确保任务和中断依次退出
-    // 1. task
+    // 1. stop task
     call g_printn("Stopping service...");
     foreach (var i : call g_range(0, 15)) { // ! ModuleTask.TASK_NUM - 1
         if (!call g_is_null(call g_array_get(tt, i))) {
@@ -24,7 +24,7 @@ var destroy_int = func ~() {
            }
         }
     }
-    // 2.irq
+    // 2. stop irq
     call g_printn("Stopping irq...");
     foreach (var j : call g_range(0, 3)) { // ! INT_NUM
         var _state_ = call g_query_share("IRQ#ON." + j);
@@ -37,8 +37,6 @@ var destroy_int = func ~() {
 };
 var handler = func ~(ch) {
      if (ch == 'E') {
-         var _state_ = call g_query_share("SCHD#ON");
-         call g_array_set(_state_, 0, false);
          call g_create_process(destroy_int);
          call g_printn("*** System halt!");
      }

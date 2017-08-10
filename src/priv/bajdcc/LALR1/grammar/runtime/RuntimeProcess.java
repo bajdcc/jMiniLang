@@ -16,18 +16,6 @@ import java.util.stream.Collectors;
  */
 public class RuntimeProcess implements IRuntimeProcessService {
 
-	private class SchdParticle {
-		public int processId;
-		public int cycle;
-		public int priority;
-
-		public SchdParticle(int processId, int cycle, int priority) {
-			this.processId = processId;
-			this.cycle = cycle;
-			this.priority = priority;
-		}
-	}
-
 	private class SchdProcess {
 		public RuntimeMachine machine;
 		public int priority;
@@ -53,8 +41,7 @@ public class RuntimeProcess implements IRuntimeProcessService {
 
 	private static Logger logger = Logger.getLogger("proc");
 	private static final int MAX_PROCESS = 1000;
-	private static final int PER_CYCLE = 50;
-	private static final int USR_PER_CYCLE = 200;
+	private static final int MAX_CYCLE = 150;
 	private int cyclePtr = 0;
 	private String name;
 	private RuntimeCodePage codePage;
@@ -62,10 +49,8 @@ public class RuntimeProcess implements IRuntimeProcessService {
 	private Map<String, RuntimeCodePage> arrPages;
 	private SchdProcess arrProcess[];
 	private Set<Integer> setProcessId;
-	private Queue<SchdParticle> queue;
 	private Set<Integer> destroyedProcess;
 	private RuntimeService service;
-	private List<Integer> arrActiveUsrProcs;
 
 	public RuntimeProcess(String name, InputStream input) throws Exception {
 		runMainProcess(name, input);
@@ -96,6 +81,10 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		return setProcessId.stream().filter(id -> arrProcess[id].kernel).collect(Collectors.toList());
 	}
 
+	public List<Integer> getAllProcs() {
+		return new ArrayList<>(setProcessId);
+	}
+
 	public Object[] getProcInfoById(int id) {
 		if (!setProcessId.contains(id)) {
 			return null;
@@ -120,52 +109,34 @@ public class RuntimeProcess implements IRuntimeProcessService {
 	}
 
 	public void run() throws Exception {
-		while (schd() && step()) ;
+		while (schd()) ;
 	}
 
 	private void runMainProcess(String name, InputStream input) throws Exception {
 		initMainProcess(name, input);
 	}
 
-	public int stepUsrProcess(int pid) {
-		arrActiveUsrProcs.add(pid);
-		return pid;
-	}
-
-	private boolean schd() {
+	private boolean schd() throws Exception {
 		if (setProcessId.isEmpty())
 			return false;
-		List<SchdParticle> parts = setProcessId.stream()
-				.filter(id -> arrProcess[id].kernel && arrProcess[id].runnable)
-				.map(id -> new SchdParticle(id, PER_CYCLE, arrProcess[id].priority))
-				.collect(Collectors.toList());
-		queue.addAll(parts);
-		for (Integer pid : arrActiveUsrProcs) {
-			if (setProcessId.contains(pid) && arrProcess[pid].runnable) {
-				queue.add(new SchdParticle(pid, USR_PER_CYCLE, arrProcess[pid].priority));
-			}
-		}
-		if (!arrActiveUsrProcs.isEmpty())
-			arrActiveUsrProcs.clear();
-		return true;
-	}
-
-	private boolean step() throws Exception {
-		while (!queue.isEmpty()) {
-			SchdParticle part = queue.poll();
-			SchdProcess process = arrProcess[part.processId];
-			CYCLE_FOR:
-			for (int i = 0; i < part.cycle; i++) {
-				if (process.sleep > 0) {
-					process.sleep--;
-					break;
-				}
-				if (process.runnable) {
-					switch (arrProcess[part.processId].machine.runStep()) {
-						case 1:
-							return false;
-						case 2:
-							break CYCLE_FOR;
+		List<Integer> pids = new ArrayList<>(setProcessId);
+		for (int pid : pids) {
+			SchdProcess process = arrProcess[pid];
+			if (process.runnable) {
+				int cycle = MAX_CYCLE - process.priority;
+				CYCLE_FOR:
+				for (int i = 0; i < cycle; i++) {
+					if (process.sleep > 0) {
+						process.sleep--;
+						break;
+					}
+					if (process.runnable) {
+						switch (process.machine.runStep()) {
+							case 1:
+								return false;
+							case 2:
+								break CYCLE_FOR;
+						}
 					}
 				}
 			}
@@ -180,10 +151,8 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		this.arrCodes = new HashMap<>();
 		this.arrPages = new HashMap<>();
 		this.setProcessId = new HashSet<>();
-		this.queue = new PriorityQueue<>((a, b) -> a.priority - b.priority);
 		this.destroyedProcess = new HashSet<>();
 		this.service = new RuntimeService(this);
-		this.arrActiveUsrProcs = new ArrayList<>();
 		RuntimeMachine machine = new RuntimeMachine(name, cyclePtr, -1, this);
 		machine.initStep(name, codePage, Collections.emptyList(), 0, null);
 		setProcessId.add(cyclePtr);

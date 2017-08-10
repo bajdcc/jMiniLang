@@ -12,7 +12,6 @@ import priv.bajdcc.LALR1.interpret.os.irq.IRTask;
 import priv.bajdcc.LALR1.interpret.os.kern.OSEntry;
 import priv.bajdcc.LALR1.interpret.os.kern.OSIrq;
 import priv.bajdcc.LALR1.interpret.os.kern.OSTask;
-import priv.bajdcc.LALR1.interpret.os.proc.OSSchd;
 import priv.bajdcc.LALR1.interpret.os.task.TKNet;
 import priv.bajdcc.LALR1.interpret.os.task.TKSystem;
 import priv.bajdcc.LALR1.interpret.os.task.TKUI;
@@ -74,7 +73,6 @@ public class UIMainFrame extends JFrame {
 				// OS
 				new OSEntry(),
 				new OSIrq(),
-				new OSSchd(),
 				new OSTask(),
 				// IRQ
 				new IRPrint(),

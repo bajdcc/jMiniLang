@@ -84,13 +84,14 @@ var g_wait_share = func ~(handle) {
 };
 export "g_wait_share";
 var g_wait_pipe = func ~(handle) {
-    call g_printdn("Waiting pipe: PID#" + call g_get_pid() + " -> " + handle);
+    call g_printdn("Waiting pipe: #" + call g_get_pid() + " -> #" + handle);
     for (;;) {
         var pipe = call g_query_pipe(handle);
-        if (pipe) { return call g_create_pipe(handle); }
+        if (pipe) { break; }
         call g_sleep(10);
     }
-    call g_printdn("Waiting pipe: PID#" + call g_get_pid() + " -> " + handle + " ok");
+    call g_printdn("Waiting pipe: #" + call g_get_pid() + " -> #" + handle + " ok");
+    return call g_create_pipe(handle);
 };
 export "g_wait_pipe";
 var g_empty_pipe = func ~(handle) {
@@ -99,9 +100,9 @@ var g_empty_pipe = func ~(handle) {
 };
 export "g_empty_pipe";
 var g_destroy_pipe = func ~(handle) {
-    call g_printdn("Destroy pipe: PID#" + call g_get_pid() + " -> " + handle);
+    call g_printdn("Destroy pipe: #" + call g_get_pid() + " -> #" + handle);
     while (call g_wait_pipe_empty(handle)) {}
     call g_destroy_pipe_once(handle);
-    call g_printdn("Destroy pipe: PID#" + call g_get_pid() + " -> " + handle +" ok");
+    call g_printdn("Destroy pipe: #" + call g_get_pid() + " -> #" + handle +" ok");
 };
 export "g_destroy_pipe";

@@ -172,6 +172,13 @@ public interface IRuntimeStatus {
 	List<Integer> getSysProcs();
 
 	/**
+	 * 获取进程列表
+	 *
+	 * @return 进程ID列表
+	 */
+	List<Integer> getAllProcs();
+
+	/**
 	 * 获取进程信息
 	 *
 	 * @param id 进程ID
@@ -192,11 +199,4 @@ public interface IRuntimeStatus {
 	 * @param desc 说明信息
 	 */
 	void setProcDesc(String desc);
-
-	/**
-	 * 运行用户态进程
-	 * @param pid 进程ID
-	 * @return 进程ID
-	 */
-	int stepUsrProcess(int pid);
 }

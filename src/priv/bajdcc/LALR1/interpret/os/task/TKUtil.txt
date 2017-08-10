@@ -69,10 +69,7 @@ var handler = func ~(ch) {
     var caller = call g_query_share("TASKCALLER#" + tid);
     call time(msg, caller);
     var handle = call g_create_pipe("TASKRECV#" + tid);
-    var f = func ~(ch) {
-        if (ch == 'E') { call g_destroy_pipe(handle); }
-    };
-    call g_read_pipe(handle, f);
+    call g_write_pipe(handle, 'E');
 };
 
 var data = {};

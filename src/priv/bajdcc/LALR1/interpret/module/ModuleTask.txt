@@ -20,6 +20,22 @@ var g_task_add_proc = func ~(no, data) {
 };
 export "g_task_add_proc";
 
+/* 下面区别三种对象：客户端、代理端、服务端
+ *   1. 客户端（调用者）
+ *      调用方法：客户端进程调用g_task_get/g_task_get_fast/g_task_get_fast_arg，获取数据
+ *   2. 代理端（充当中介）
+ *      已实现的task_handler，它的目的是连接客户端和服务端
+ *   3. 服务端（服务者）
+ *      这方面要自己实现
+ *
+ * 调用顺序：
+ *   1. 客户端调用task_get_fast等方法
+ *   2. task_get_fast安排好请求数据，触发int#1服务中断
+ *   3. 中断会调用task_handler代理方法
+ *   4.
+ */
+
+/* 客户端向代理端发送消息 */
 var g_task_get = func ~(tid, msg) {
     var waiting_list = call g_query_share("TASK#LIST");
     var pid = call g_get_pid();
@@ -27,17 +43,17 @@ var g_task_get = func ~(tid, msg) {
     call g_map_put(m, "pid", pid);
     call g_map_put(m, "tid", tid);
     call g_map_put(m, "msg", msg);
-    call g_start_share("MSG#" + pid, m);
-    call g_lock_share("TASK#LIST");
-    call g_array_add(waiting_list, pid);
-    call g_unlock_share("TASK#LIST");
-    var handle = call g_create_pipe("int#1");
-    call g_write_pipe(handle, '@');
-    var h = call g_wait_pipe("IPC#" + pid);
+    call g_start_share("MSG#" + pid, m);       // 准备请求数据
+    call g_lock_share("TASK#LIST");            // 锁定等待队列
+    call g_array_add(waiting_list, pid);       // 将当前进程添加至代理端的等待队列中
+    call g_unlock_share("TASK#LIST");          // 解锁队列
+    var handle = call g_create_pipe("int#1");  // 报告服务中断例程
+    call g_write_pipe(handle, '@');            // 发送消息事件给中断例程，使之调用task_handler
+    var h = call g_wait_pipe("IPC#" + pid);    // 等待代理端处理完毕，此时代理端会发服务端发送请求
     var f = func ~(ch) {
         if (ch == 'E') { call g_destroy_pipe(h); }
     };
-    call g_read_pipe(h, f);
+    call g_read_pipe(h, f);                    // 等待代理端处理完毕
     call g_stop_share("MSG#" + pid);
 };
 export "g_task_get";
@@ -80,16 +96,17 @@ var g_task_get_fast_arg = func ~(tid, id, a) {
 };
 export "g_task_get_fast_arg";
 
+/* 代理端处理客户端的消息 */
 var task_handler = func ~(ch) {
     var waiting_list = call g_query_share("TASK#LIST");
     var task_table = call g_query_share("TASK#TABLE");
-    call g_lock_share("TASK#LIST");
-    var pid = call g_array_get(waiting_list, 0);
-    call g_array_remove(waiting_list, 0);
-    call g_unlock_share("TASK#LIST");
-    var m = call g_query_share("MSG#" + pid);
-    var tid = call g_map_get(m, "tid");
-    let tid = call g_task_get_id_by_name(tid);
+    call g_lock_share("TASK#LIST");                     // 锁定等待队列
+    var pid = call g_array_get(waiting_list, 0);        // 取最早等待的进程
+    call g_array_remove(waiting_list, 0);               // 移除它
+    call g_unlock_share("TASK#LIST");                   // 解锁队列
+    var m = call g_query_share("MSG#" + pid);           // 读取客户端的数据
+    var _tid = call g_map_get(m, "tid");
+    var tid = call g_task_get_id_by_name(_tid);
     var msg = call g_map_get(m, "msg");
     if (call g_is_null(tid)) {
         call g_map_put(msg, "error", 1);
@@ -98,15 +115,20 @@ var task_handler = func ~(ch) {
         call g_map_put(msg, "error", 0);
         call g_start_share("TASKDATA#" + tid, msg);
         call g_start_share("TASKCALLER#" + tid, pid);
-        var h = call g_create_pipe("TASKSEND#" + tid);
-        call g_write_pipe(h, ch);
-        var h2 = call g_wait_pipe("TASKRECV#" + tid);
-        call g_write_pipe(h2, 'E');
+        var h = call g_create_pipe("TASKSEND#" + tid);  // 连接服务端
+        call g_write_pipe(h, ch);                       // 唤醒服务端，这时服务端在处理请求
+        var h1 = call g_create_pipe("TASKRECV#" + tid); // 连接服务端
+        var f1 = func ~(ch) {
+             if (ch == 'E') { call g_destroy_pipe(h1); }
+        };
+        call g_printdn("Waiting task: PID#" + pid + " -> TASK#" + _tid);
+        call g_read_pipe(h1, f1);                       // 防止多个代理端同时请求服务端，用管道做阻塞
+        call g_printdn("Waiting task: PID#" + pid + " -> TASK#" + _tid + " ok");
         call g_stop_share("TASKDATA#" + tid);
         call g_stop_share("TASKCALLER#" + tid);
     }
-    var handle = call g_create_pipe("IPC#" + pid);
-    call g_write_pipe(handle, 'E');
+    var handle = call g_create_pipe("IPC#" + pid);      // 处理完毕
+    call g_write_pipe(handle, 'E');                     // 唤醒客户端
 };
 
 var g_task_handler = func ~(ch) -> call task_handler(ch);

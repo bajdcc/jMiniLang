@@ -142,24 +142,6 @@ public class ModuleProc implements IInterpreterModule {
 				return new RuntimeObject(arr);
 			}
 		});
-		info.addExternalFunc("g_run_user", new IRuntimeDebugExec() {
-			@Override
-			public String getDoc() {
-				return "运行用户态进程";
-			}
-
-			@Override
-			public RuntimeObjectType[] getArgsType() {
-				return new RuntimeObjectType[] { RuntimeObjectType.kPtr };
-			}
-
-			@Override
-			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
-			                                      IRuntimeStatus status) throws Exception {
-				int pid = (int) args.get(0).getObj();
-				return new RuntimeObject(BigInteger.valueOf(status.stepUsrProcess(pid)));
-			}
-		});
 		info.addExternalFunc("g_get_pid", new IRuntimeDebugExec() {
 			@Override
 			public String getDoc() {
@@ -317,6 +299,23 @@ public class ModuleProc implements IInterpreterModule {
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) throws Exception {
 				return new RuntimeObject(getProcInfo(status, status.getSysProcs()));
+			}
+		});
+		info.addExternalFunc("g_query_all_proc", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "枚举进程";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return null;
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				return new RuntimeObject(getProcInfo(status, status.getAllProcs()));
 			}
 		});
 		info.addExternalFunc("g_set_process_desc", new IRuntimeDebugExec() {
