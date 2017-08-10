@@ -18,6 +18,24 @@ var g_ui_println = func ~() {
     call g_ui_print(g_endl);
 };
 export "g_ui_println";
+var g_ui_print_safe = func ~(str) {
+    var ui_int = call g_create_pipe("int#2");
+    call g_lock_share("UI#MUTEX");
+    foreach (var c : call g_range_string(str)) {
+        call g_write_pipe(ui_int, c);
+    }
+    call g_unlock_share("UI#MUTEX");
+};
+export "g_ui_print_safe";
+var g_ui_printn_safe = func ~(str) {
+    call g_ui_print_safe(str);
+    call g_ui_println_safe();
+};
+export "g_ui_printn_safe";
+var g_ui_println_safe = func ~() {
+    call g_ui_print_safe(g_endl);
+};
+export "g_ui_println_safe";
 var ui_input_mark = func ~() {
     call g_empty_pipe("int#2");
     call g_ui_input_mark();

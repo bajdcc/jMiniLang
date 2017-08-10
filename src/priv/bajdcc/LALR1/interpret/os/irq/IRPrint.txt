@@ -14,6 +14,8 @@ var handler = func ~(ch) {
     call g_ui_print_internal(ch);
 };
 
+call g_start_share("UI#MUTEX", "ui mutex");
+
 var state = [];
 call g_array_add(state, true);
 call g_start_share("IRQ#ON." + no, state);
