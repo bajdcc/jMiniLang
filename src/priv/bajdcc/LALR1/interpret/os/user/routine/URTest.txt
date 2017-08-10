@@ -59,34 +59,34 @@ var word_typewrite0 = func ~(str, span) {
 var word_typewrite = func ~(str, span) {
     foreach (var c : call g_range_string(str)) {
         call put(c);
-        call g_sleep(span);
+        call g_task_sleep_ms(span);
     }
 };
 
 /* 清屏 */
 var stage_clear = func ~() {
     call word_typewrite("Are you ready?", 200);
-    call word_typewrite("  3!  2!  1!\n", 1500);
-    call word_typewrite("  Let's go!!!   \n", 1000);
+    call word_typewrite("  3!  2!  1!\n", 300);
+    call word_typewrite("  Let's go!!!   \n", 300);
     call put('\f');
 };
 
 /* 场景一 */
 var stage_1 = func ~() {
     call puts(call g_string_rep(" ", 31));
-    call word_typewrite("- Stage 1 -\n", 2000);
-    call word_typewrite("* Hello world! 你好！\n", 300);
-    call word_typewrite("* This is a test program. 这是一个测试程序。\n", 400);
-    call word_typewrite("* Made by bajdcc. 由bajdcc编写。\n", 1000);
-    call word_typewrite("* 项目网址在 https://github.com/bajdcc/jMiniLang 上。\n", 600);
-    call word_typewrite("* 这是我做的一个脚本操作系统。\n", 1000);
-    call word_typewrite("* 支持闭包、进程、管道、互斥等特性。\n", 1000);
-    call word_typewrite("* 不过由于设计不足以及Java的使用，脚本运行还是太慢。\n", 1000);
-    call word_typewrite("* 最让我兴奋的是语法分析的实现、虚拟机的构建、同步/异步语义的实现。\n", 1000);
-    call word_typewrite("* 进程、管道、互斥是这个操作系统的基础。\n", 1000);
-    call word_typewrite("\n\n\n\n", 1000);
+    call word_typewrite("- Stage 1 -\n", 400);
+    call word_typewrite("* Hello world! 你好！\n", 80);
+    call word_typewrite("* This is a test program. 这是一个测试程序。\n", 80);
+    call word_typewrite("* Made by bajdcc. 由bajdcc编写。\n", 80);
+    call word_typewrite("* 项目网址在 https://github.com/bajdcc/jMiniLang 上。\n", 100);
+    call word_typewrite("* 这是我做的一个脚本操作系统。\n", 100);
+    call word_typewrite("* 支持闭包、进程、管道、互斥等特性。\n", 100);
+    call word_typewrite("* 不过由于设计不足以及Java的使用，脚本运行还是太慢。\n", 100);
+    call word_typewrite("* 最让我兴奋的是语法分析的实现、虚拟机的构建、同步/异步语义的实现。\n", 100);
+    call word_typewrite("* 进程、管道、互斥是这个操作系统的基础。\n", 100);
+    call word_typewrite("\n\n\n\n", 400);
     call puts(call g_string_rep(" ", 31));
-    call word_typewrite("- @bajdcc -\n", 2000);
+    call word_typewrite("- @bajdcc -\n", 400);
 };
 
 call create_stage(stage_clear);

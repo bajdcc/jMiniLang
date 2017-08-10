@@ -154,3 +154,13 @@ var g_task_sleep = func ~(second) {
     }
 };
 export "g_task_sleep";
+var g_task_sleep_ms = func ~(ms) {
+    if (ms < 1) { return; }
+    var begin = call g_task_get_timestamp();
+    var end = begin + ms;
+    while (begin < end) {
+        let begin = call g_task_get_timestamp();
+        call g_sleep(20);
+    }
+};
+export "g_task_sleep_ms";
