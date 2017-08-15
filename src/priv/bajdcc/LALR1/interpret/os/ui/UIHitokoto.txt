@@ -14,10 +14,10 @@ var init = func ~() {
 };
 
 var draw = func ~() {
-    //var obj = call g_task_get_fast_arg("net", "get_json", "http://api.hitokoto.cn/?c=a&encode=json");
-    //if (call g_is_null(obj)) { call g_task_sleep(10); return; }
-    //var text = " —— " + call g_map_get(obj, "from") + " —— \n" + call g_map_get(obj, "hitokoto");
-    var text = "test string for debug";
+    var obj = call g_task_get_fast_arg("net", "get_json", "http://api.hitokoto.cn/?c=a&encode=json");
+    if (call g_is_null(obj)) { call g_task_sleep(10); return; }
+    var text = " —— " + call g_map_get(obj, "from") + " —— \n" + call g_map_get(obj, "hitokoto");
+    //var text = "test string for debug";
     call g_task_get_fast_arg("ui", "path", "@M 101 201@@R 599 349@@M 140 230@@W 450@$" + text + "$");
     call g_task_sleep(8);
 };

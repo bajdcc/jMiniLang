@@ -51,7 +51,9 @@ public class Block implements ICommon {
 				codegen.genDebugInfo(start, end, stmt.toString());
 			}
 			if (stmt instanceof StmtReturn) {
-				break;
+				StmtReturn ret = (StmtReturn) stmt;
+				if (!ret.isYield())
+					break;
 			}
 		}
 		codegen.genCode(RuntimeInst.iscpo);
