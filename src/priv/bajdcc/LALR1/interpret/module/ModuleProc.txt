@@ -50,6 +50,21 @@ var g_read_pipe = func ~(handle, callback) {
     call g_printdn("Reading pipe: #" + call g_get_pid() + " -> #" + handle + " ok");
 };
 export "g_read_pipe";
+var g_read_pipe_once = func ~(handle) {
+    call g_printdn("Reading pipe once: #" + call g_get_pid() + " -> #" + handle);
+    var data = '\0';
+    for (;;) {
+        let data = call g_read_pipe_char(handle);
+        if (data == '\uffff') {
+            break;
+        }
+        if (data != '\ufffe') {
+            break;
+        }
+    }
+    call g_printdn("Reading pipe once: #" + call g_get_pid() + " -> #" + handle + " ok");
+};
+export "g_read_pipe_once";
 var g_read_pipe_args = func ~(handle, callback, args) {
     call g_printdn("Reading pipe: #" + call g_get_pid() + " -> #" + handle);
     var data = '\0';
@@ -106,3 +121,53 @@ var g_destroy_pipe = func ~(handle) {
     call g_printdn("Destroy pipe: #" + call g_get_pid() + " -> #" + handle +" ok");
 };
 export "g_destroy_pipe";
+var g_create_semaphore = func ~(name, n) {
+    if (call g_query_pipe(name)) {
+        return;
+    }
+    var pipe = call g_create_pipe(name);
+    call g_write_pipe(pipe, call g_string_rep("*", n));
+    return pipe;
+};
+export "g_create_semaphore";
+var g_use_semaphore = func ~(name) {
+    return call g_create_pipe(name);
+};
+export "g_use_semaphore";
+var g_destroy_semaphore = func ~(handle) {
+    call g_destroy_pipe_once(handle);
+};
+export "g_destroy_semaphore";
+var g_lock_semaphore = func ~(handle) {
+    call g_read_pipe_once(handle);
+};
+export "g_lock_semaphore";
+var g_unlock_semaphore = func ~(handle) {
+    call g_write_pipe(handle, "*");
+};
+export "g_unlock_semaphore";
+var g_create_mutex = func ~(name) {
+    if (call g_query_pipe(name)) {
+        return;
+    }
+    var pipe = call g_create_pipe(name);
+    call g_write_pipe(pipe, "*");
+    return pipe;
+};
+export "g_create_mutex";
+var g_use_mutex = func ~(name) {
+    return call g_create_pipe(name);
+};
+export "g_use_mutex";
+var g_destroy_mutex = func ~(handle) {
+    call g_destroy_pipe_once(handle);
+};
+export "g_destroy_mutex";
+var g_lock_mutex = func ~(handle) {
+    call g_read_pipe_once(handle);
+};
+export "g_lock_mutex";
+var g_unlock_mutex = func ~(handle) {
+    call g_write_pipe(handle, "*");
+};
+export "g_unlock_mutex";
