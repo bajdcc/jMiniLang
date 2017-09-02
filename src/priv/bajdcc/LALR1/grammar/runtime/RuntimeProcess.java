@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import priv.bajdcc.LALR1.grammar.Grammar;
 import priv.bajdcc.LALR1.grammar.runtime.service.IRuntimeProcessService;
 import priv.bajdcc.LALR1.grammar.runtime.service.RuntimeService;
+import priv.bajdcc.LALR1.syntax.handler.SyntaxException;
 
 import java.io.InputStream;
 import java.util.*;
@@ -99,8 +100,14 @@ public class RuntimeProcess implements IRuntimeProcessService {
 				return arrPages.get(code);
 			} else {
 				logger.debug("Loading page: " + name);
-				Grammar grammar = new Grammar(code);
-				RuntimeCodePage page = grammar.getCodePage();
+                Grammar grammar = null;
+                try {
+                    grammar = new Grammar(code);
+                } catch (SyntaxException e) {
+                    System.err.println("#PAGE ERROR# --> " + name);
+                    throw e;
+                }
+                RuntimeCodePage page = grammar.getCodePage();
 				arrPages.put(name, page);
 				return page;
 			}

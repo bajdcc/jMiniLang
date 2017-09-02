@@ -9,11 +9,19 @@ call g_set_process_priority(81);
 
 call g_printn("Running...");
 
+var first = false;
 var init = func ~() {
     call g_task_get_fast_arg("ui", "path", "@M 100 200@@l 500 0@@l 0 150@@l -500 0@@l 0 -150@");
 };
+var destroy = func ~() {
+    call g_task_get_fast_arg("ui", "path", "@M 100 200@@R 601 351@");
+};
 
 var draw = func ~() {
+    if (!first) {
+        call init();
+        let first = true;
+    }
     var obj = call g_task_get_fast_arg("net", "get_json", "http://api.hitokoto.cn/?c=a&encode=json");
     if (call g_is_null(obj)) { call g_task_sleep(10); return; }
     var text = " —— " + call g_map_get(obj, "from") + " —— \n" + call g_map_get(obj, "hitokoto");
@@ -21,13 +29,25 @@ var draw = func ~() {
     call g_task_get_fast_arg("ui", "path", "@M 101 201@@R 599 349@@M 140 230@@W 450@$" + text + "$");
     call g_task_sleep(8);
 };
+var clear = func ~() {
+    if (first) {
+        call destroy();
+        let first = false;
+    }
+};
 
-call init();
+call g_start_share("UI_SWITCH#hitokoto", g_false);
 
 while (call g_query_share("UI#hitokoto")) {
-    call draw();
+    if (call g_query_share("UI_SWITCH#hitokoto")) {
+        call draw();
+    } else {
+        call clear();
+        call g_task_sleep(5);
+    }
 }
 
+call g_stop_share("UI_SWITCH#hitokoto");
 call g_stop_share("UI#hitokoto");
 
 call g_printn("Exit.");

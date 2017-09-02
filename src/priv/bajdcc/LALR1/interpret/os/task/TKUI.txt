@@ -37,7 +37,58 @@ var time = func ~(msg, caller) {
         }
         call g_remote_print(str);
         call g_map_put(msg, "val", str);
-    }};
+    } else if (id == "on") {
+        var arg = call g_map_get(msg, "arg");
+        var len = call g_array_size(arg);
+        var target = "";
+        if (len == 3) {
+            let target = call g_array_get(arg, 2);
+            var name_list = call g_query_share("UI#NAMELIST");
+            var index = call g_array_find(name_list, target);
+            if (call g_is_null(index)) {
+                call g_map_put(msg, "error", 1);
+                call g_map_put(msg, "val", "invalid target");
+            } else {
+                var name = "UI_SWITCH#" + target;
+                if (call g_query_share(name)) {
+                    call g_map_put(msg, "error", 1);
+                    call g_map_put(msg, "val", target + " already ON");
+                } else {
+                    call g_create_share(name, g_true);
+                    call g_map_put(msg, "val", target + " ON");
+                }
+            }
+        } else {
+            call g_map_put(msg, "error", 1);
+            call g_map_put(msg, "val", "invalid argument");
+        }
+    } else if (id == "off") {
+        var arg = call g_map_get(msg, "arg");
+        var len = call g_array_size(arg);
+        var target = "";
+        if (len == 3) {
+            let target = call g_array_get(arg, 2);
+            var name_list = call g_query_share("UI#NAMELIST");
+            var index = call g_array_find(name_list, target);
+            if (call g_is_null(index)) {
+                call g_map_put(msg, "error", 1);
+                call g_map_put(msg, "val", "invalid target");
+            } else {
+                var name = "UI_SWITCH#" + target;
+                if (!call g_query_share(name)) {
+                    call g_map_put(msg, "error", 1);
+                    call g_map_put(msg, "val", target + " already OFF");
+                } else {
+                    call g_create_share(name, g_false);
+                    call g_map_put(msg, "val", target + " OFF");
+                }
+            }
+        } else {
+            call g_map_put(msg, "error", 1);
+            call g_map_put(msg, "val", "invalid argument");
+        }
+    }
+};
 
 var handler = func ~(ch) {
     if (ch == 'E') {

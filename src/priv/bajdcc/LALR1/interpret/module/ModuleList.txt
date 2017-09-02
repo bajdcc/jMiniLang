@@ -6,3 +6,12 @@ var g_range_array = yield ~(a) {
     }
 };
 export "g_range_array";
+var g_array_find = func ~(a, b) {
+    var size = call g_array_size(a);
+    for (var i = 0; i < size; i++) {
+        if (b == call g_array_get(a, i)) {
+            return i;
+        }
+    }
+};
+export "g_array_find";

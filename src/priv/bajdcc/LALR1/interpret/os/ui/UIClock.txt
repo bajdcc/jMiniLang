@@ -9,22 +9,42 @@ call g_set_process_priority(80);
 
 call g_printn("Running...");
 
+var first = false;
 var init = func ~() {
     call g_task_get_fast_arg("ui", "path", "@M 100 100@@l 300 0@@l 0 50@@l -300 0@@l 0 -50@");
 };
+var destroy = func ~() {
+    call g_task_get_fast_arg("ui", "path", "@M 100 100@@R 401 151@");
+};
 
 var draw = func ~() {
+    if (!first) {
+        call init();
+        let first = true;
+    }
     var time = call g_task_get_fast("system", "now");
     call g_task_get_fast_arg("ui", "path", "@M 110 110@@R 390 140@@M 140 130@#" + time + "#");
     call g_task_sleep(1);
 };
+var clear = func ~() {
+    if (first) {
+        call destroy();
+        let first = false;
+    }
+};
 
-call init();
+call g_start_share("UI_SWITCH#clock", g_false);
 
 while (call g_query_share("UI#clock")) {
-    call draw();
+    if (call g_query_share("UI_SWITCH#clock")) {
+        call draw();
+    } else {
+        call clear();
+        call g_task_sleep(1);
+    }
 }
 
+call g_stop_share("UI_SWITCH#clock");
 call g_stop_share("UI#clock");
 
 call g_printn("Exit.");

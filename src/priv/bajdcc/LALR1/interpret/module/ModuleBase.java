@@ -41,6 +41,8 @@ public class ModuleBase implements IInterpreterModule {
 		info.addExternalValue("g_null", () -> new RuntimeObject(null));
 		info.addExternalValue("g_minus_1", () -> new RuntimeObject(new BigInteger("-1")));
 		info.addExternalValue("g_endl", () -> new RuntimeObject("\n"));
+		info.addExternalValue("g_true", () -> new RuntimeObject(true));
+		info.addExternalValue("g_false", () -> new RuntimeObject(false));
 		info.addExternalFunc("g_is_null", new IRuntimeDebugExec() {
 			@Override
 			public String getDoc() {

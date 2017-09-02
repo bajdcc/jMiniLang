@@ -106,7 +106,7 @@ public class UIGraphics {
 	private void draw(Graphics2D g, char c) {
 		if (c == '\n') {
 			if (ptr_y == rows - 1) {
-				clear(g);
+				newline(g);
 			} else {
 				ptr_x = 0;
 				ptr_y++;
@@ -133,7 +133,7 @@ public class UIGraphics {
 			ptr_x = 0;
 		} else if (ptr_x == cols - 1) {
 			if (ptr_y == rows - 1) {
-				clear(g);
+				newline(g);
 				drawChar(c);
 				ptr_x++;
 			} else {
@@ -148,7 +148,7 @@ public class UIGraphics {
 	}
 
 	private void drawChar(char c) {
-		this.data[ptr_y * rows + ptr_x] = c;
+		this.data[ptr_y * cols + ptr_x] = c;
 		image.getGraphics().drawImage(fontImage.getImage(c),
 				ptr_x * width, ptr_y * height, null);
 	}
@@ -161,6 +161,22 @@ public class UIGraphics {
 		}
 		image.getGraphics().setColor(Color.white);
 		image.getGraphics().fillRect(0, 0, w, h);
+		g.drawImage(image, 0, 0, null);
+	}
+
+	public void newline(Graphics2D g) {
+		this.ptr_x = 0;
+		int end = size - cols;
+		image.getGraphics().setColor(Color.white);
+		image.getGraphics().fillRect(0, 0, w, h);
+		for (int i = 0; i < end; i++) {
+			this.data[i] = this.data[i + cols]; // move to prev line
+			image.getGraphics().drawImage(fontImage.getImage(this.data[i]),
+					(i % cols) * width, (i / cols) * height, null);
+		}
+		for (int i = end; i < size; i++) {
+			this.data[i] = '\0';
+		}
 		g.drawImage(image, 0, 0, null);
 	}
 
@@ -189,7 +205,7 @@ public class UIGraphics {
 				x = cols - 1;
 				y--;
 			}
-			this.data[y * rows + x] = '\0';
+			this.data[y * cols + x] = '\0';
 			image.getGraphics().drawImage(fontImage.getImage('\0'),
 					x * width, y * height, null);
 			x--;
