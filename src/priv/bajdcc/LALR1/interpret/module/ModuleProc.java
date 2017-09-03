@@ -631,8 +631,8 @@ public class ModuleProc implements IInterpreterModule {
 	private static RuntimeArray getProcInfo(IRuntimeStatus status, List<Integer> pids) {
 		RuntimeArray array = new RuntimeArray();
 		array.add(new RuntimeObject(String.format(" %s  %-5s   %-15s   %-20s   %s",
-				"#", "Pid", "Name", "Function", "Description")));
-		for (int pid : pids) {
+                " ", "Pid", "Name", "Function", "Description")));
+        for (int pid : pids) {
 			Object[] objs = status.getProcInfoById(pid);
 			array.add(new RuntimeObject(String.format(" %s  %-5d   %-15s   %-20s   %s",
 					objs[0], pid, objs[1], objs[2], objs[3])));

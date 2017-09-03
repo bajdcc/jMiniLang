@@ -19,6 +19,7 @@ import priv.bajdcc.LALR1.interpret.os.task.TKUtil;
 import priv.bajdcc.LALR1.interpret.os.ui.UIClock;
 import priv.bajdcc.LALR1.interpret.os.ui.UIHitokoto;
 import priv.bajdcc.LALR1.interpret.os.ui.UIMain;
+import priv.bajdcc.LALR1.interpret.os.ui.UIMonitor;
 import priv.bajdcc.LALR1.interpret.os.user.UserMain;
 import priv.bajdcc.LALR1.interpret.os.user.routine.*;
 import priv.bajdcc.LALR1.syntax.handler.SyntaxException;
@@ -89,7 +90,8 @@ public class UIMainFrame extends JFrame {
 				new UIMain(),
 				new UIClock(),
 				new UIHitokoto(),
-				// USER
+                new UIMonitor(),
+                // USER
 				new UserMain(),
 				// USER ROUTINE
 				new URShell(),

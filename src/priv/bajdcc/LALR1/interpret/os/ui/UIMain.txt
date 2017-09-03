@@ -1,4 +1,4 @@
-// KERNEL ENTRY BY BAJDCC
+// UI ENTRY BY BAJDCC
 import "sys.base";
 import "sys.list";
 import "sys.proc";
@@ -15,6 +15,9 @@ call g_printn("Setting ui...");
 
 call g_array_set(ui_name_table, 1, "clock");
 call g_array_set(ui_name_table, 2, "hitokoto");
+call g_array_set(ui_name_table, 3, "monitor");
+
+call g_start_share("TASK#SLEEP", g_true);
 
 foreach (var j : call g_range(0, ui_num - 1)) {
     var t = call g_array_get(ui_name_table, j);

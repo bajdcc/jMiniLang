@@ -12,8 +12,6 @@ call g_printn("Running...");
 var tid = 1;
 var handle = call g_create_pipe("TASKSEND#" + tid);
 
-call g_start_share("TASK#SLEEP", g_true);
-
 var time = func ~(msg, caller) {
     var id = call g_map_get(msg, "id");
     if (call g_is_null(id)) {
@@ -45,7 +43,6 @@ var time = func ~(msg, caller) {
 var handler = func ~(ch) {
     if (ch == 'E') {
         call g_destroy_pipe(handle);
-        call g_stop_share("TASK#SLEEP");
         return;
     }
     var msg = call g_query_share("TASKDATA#" + tid);

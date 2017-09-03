@@ -27,7 +27,7 @@ var draw = func ~() {
     var text = " —— " + call g_map_get(obj, "from") + " —— \n" + call g_map_get(obj, "hitokoto");
     //var text = "test string for debug";
     call g_task_get_fast_arg("ui", "path", "@M 101 201@@R 599 349@@M 140 230@@W 450@$" + text + "$");
-    call g_task_sleep(8);
+    call g_task_sleep_signal(8, "TASK#SLEEP");
 };
 var clear = func ~() {
     if (first) {

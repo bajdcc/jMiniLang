@@ -50,7 +50,7 @@ var real_repeat = func ~(_operation, _arg, _start, _end) {
 var word_typewrite0 = func ~(str, span) {
     var print = func ~(a, n) {
         call put(call g_string_char(a, n));
-        call g_sleep(span);
+        call g_task_sleep_ms_signal(span, signal);
     };
     call real_repeat(print, str, 0, call g_string_length(str));
 };
@@ -59,7 +59,7 @@ var word_typewrite0 = func ~(str, span) {
 var word_typewrite = func ~(str, span) {
     foreach (var c : call g_range_string(str)) {
         call put(c);
-        call g_task_sleep_ms(span);
+        call g_task_sleep_ms_signal(span, signal);
     }
 };
 
@@ -126,7 +126,7 @@ var stage_philo = func ~() {
             call g_write_pipe(out, c);
         }
         call g_write_pipe(out, '\n');
-        call g_task_sleep_ms(100);
+        call g_task_sleep_ms_signal(100, signal);
         call g_unlock_mutex(pm);
     };
     foreach (var j : call g_range(1, 5)) {
@@ -233,7 +233,7 @@ var stage_philo2 = func ~() {
             call g_write_pipe(out, c);
         }
         call g_write_pipe(out, '\n');
-        call g_task_sleep_ms(100);
+        call g_task_sleep_ms_signal(100, signal);
         call g_unlock_mutex(pm);
     };
     foreach (var j : call g_range(1, 5)) {

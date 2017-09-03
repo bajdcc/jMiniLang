@@ -95,6 +95,7 @@ var handler = func ~(ch) {
         var ui_num = 8; // ! UI_NUM
         var ui_name_table = call g_query_share("UI#NAMELIST");
 
+        call g_stop_share("TASK#SLEEP");
         foreach (var i : call g_range(0, ui_num - 1)) {
             var ui_name = call g_array_get(ui_name_table, i);
             if (!call g_is_null(ui_name)) {

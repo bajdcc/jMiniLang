@@ -40,7 +40,7 @@ while (call g_query_share("UI#clock")) {
         call draw();
     } else {
         call clear();
-        call g_task_sleep(1);
+        call g_task_sleep_signal(1, "TASK#SLEEP");
     }
 }
 

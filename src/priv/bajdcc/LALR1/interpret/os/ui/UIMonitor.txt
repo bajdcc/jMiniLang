@@ -1,0 +1,54 @@
+import "sys.base";
+import "sys.list";
+import "sys.proc";
+import "sys.task";
+import "sys.string";
+import "sys.remote";
+
+call g_set_process_desc("monitor ui");
+call g_set_process_priority(80);
+
+call g_printn("Running...");
+
+var first = false;
+var init = func ~() {
+    call g_task_get_fast_arg("ui", "path", "@M 0 0@@R 800 600@");
+};
+var destroy = func ~() {
+    call g_task_get_fast_arg("ui", "path", "@M 0 0@@R 800 600@");
+};
+
+var draw = func ~() {
+    if (!first) {
+        call init();
+        let first = true;
+    }
+
+    var procs = call g_query_all_proc();
+    var text = call g_string_join_array(procs, "\n");
+    call g_task_get_fast_arg("ui", "path", "@M 0 0@@R 800 600@");
+    call g_task_get_fast_arg("ui", "path", "@W 800@@M 0 20@$" + text + "$");
+    call g_task_sleep_signal(1, "TASK#SLEEP");
+};
+var clear = func ~() {
+    if (first) {
+        call destroy();
+        let first = false;
+    }
+};
+
+call g_start_share("UI_SWITCH#monitor", g_false);
+
+while (call g_query_share("UI#monitor")) {
+    if (call g_query_share("UI_SWITCH#monitor")) {
+        call draw();
+    } else {
+        call clear();
+        call g_task_sleep_signal(1, "TASK#SLEEP");
+    }
+}
+
+call g_stop_share("UI_SWITCH#monitor");
+call g_stop_share("UI#monitor");
+
+call g_printn("Exit.");
