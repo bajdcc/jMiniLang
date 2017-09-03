@@ -18,6 +18,7 @@ import java.util.List;
 public class ModuleList implements IInterpreterModule {
 
 	private static ModuleList instance = new ModuleList();
+	private RuntimeCodePage runtimeCodePage;
 
 	public static ModuleList getInstance() {
 		return instance;
@@ -30,6 +31,9 @@ public class ModuleList implements IInterpreterModule {
 
 	@Override
 	public RuntimeCodePage getCodePage() throws Exception {
+		if (runtimeCodePage != null)
+			return runtimeCodePage;
+
 		String base = ResourceLoader.load(getClass());
 
 		Grammar grammar = new Grammar(base);
@@ -39,7 +43,7 @@ public class ModuleList implements IInterpreterModule {
 		info.addExternalValue("g_new_map", () -> new RuntimeObject(new RuntimeMap()));
 		buildMethod(info);
 
-		return page;
+		return runtimeCodePage = page;
 	}
 
 	private void buildMethod(IRuntimeDebugInfo info) {

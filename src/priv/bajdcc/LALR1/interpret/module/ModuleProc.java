@@ -18,6 +18,7 @@ import java.util.List;
 public class ModuleProc implements IInterpreterModule {
 
 	private static ModuleProc instance = new ModuleProc();
+	private RuntimeCodePage runtimeCodePage;
 
 	public static ModuleProc getInstance() {
 		return instance;
@@ -33,6 +34,9 @@ public class ModuleProc implements IInterpreterModule {
 
 	@Override
 	public RuntimeCodePage getCodePage() throws Exception {
+		if (runtimeCodePage != null)
+			return runtimeCodePage;
+
 		String base = ResourceLoader.load(getClass());
 
 		Grammar grammar = new Grammar(base);
@@ -42,7 +46,7 @@ public class ModuleProc implements IInterpreterModule {
 		buildPipeMethod(info);
 		buildShareMethod(info);
 
-		return page;
+		return runtimeCodePage = page;
 	}
 
 	private void buildMethod(IRuntimeDebugInfo info) {

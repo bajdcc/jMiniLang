@@ -26,6 +26,7 @@ public class ModuleTask implements IInterpreterModule {
 
 	private static ModuleTask instance = new ModuleTask();
 	private static Logger logger = Logger.getLogger("task");
+	private RuntimeCodePage runtimeCodePage;
 
 	public static ModuleTask getInstance() {
 		return instance;
@@ -40,6 +41,9 @@ public class ModuleTask implements IInterpreterModule {
 
 	@Override
 	public RuntimeCodePage getCodePage() throws Exception {
+		if (runtimeCodePage != null)
+			return runtimeCodePage;
+
 		String base = ResourceLoader.load(getClass());
 
 		Grammar grammar = new Grammar(base);
@@ -48,7 +52,7 @@ public class ModuleTask implements IInterpreterModule {
 		buildSystemMethod(info);
 		buildUtilMethod(info);
 
-		return page;
+		return runtimeCodePage = page;
 	}
 
 	private void buildSystemMethod(IRuntimeDebugInfo info) {

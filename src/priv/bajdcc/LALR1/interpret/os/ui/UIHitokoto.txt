@@ -43,7 +43,7 @@ while (call g_query_share("UI#hitokoto")) {
         call draw();
     } else {
         call clear();
-        call g_task_sleep(5);
+        call g_task_sleep_signal(8, "TASK#SLEEP");
     }
 }
 

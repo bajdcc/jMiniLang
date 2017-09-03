@@ -17,6 +17,7 @@ import java.math.BigInteger;
 public class ModuleMath implements IInterpreterModule {
 
 	private static ModuleMath instance = new ModuleMath();
+	private RuntimeCodePage runtimeCodePage;
 
 	public static ModuleMath getInstance() {
 		return instance;
@@ -31,6 +32,9 @@ public class ModuleMath implements IInterpreterModule {
 
 	@Override
 	public RuntimeCodePage getCodePage() throws Exception {
+		if (runtimeCodePage != null)
+			return runtimeCodePage;
+
 		String base = ResourceLoader.load(getClass());
 
 		Grammar grammar = new Grammar(base);
@@ -40,7 +44,7 @@ public class ModuleMath implements IInterpreterModule {
 		info.addExternalValue("g_E", () -> new RuntimeObject(Math.E));
 		buildUnaryFunc(info);
 
-		return page;
+		return runtimeCodePage = page;
 	}
 
 	private void buildUnaryFunc(IRuntimeDebugInfo info) {

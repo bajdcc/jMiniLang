@@ -154,6 +154,20 @@ var g_task_sleep = func ~(second) {
     }
 };
 export "g_task_sleep";
+var g_task_sleep_signal = func ~(second, signal) {
+    if (second < 1) { return; }
+    var begin = call g_task_get_timestamp();
+    var end = begin + second * 1000;
+    while (begin < end) {
+        let begin = call g_task_get_timestamp();
+        if (call g_is_null(call g_query_share(signal))) {
+            call g_printdn("Sleep interrupt: #" + call g_get_pid() + " -> " + signal);
+            break;
+        }
+        call g_sleep(500);
+    }
+};
+export "g_task_sleep_signal";
 var g_task_sleep_ms = func ~(ms) {
     if (ms < 1) { return; }
     var begin = call g_task_get_timestamp();

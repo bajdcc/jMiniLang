@@ -24,6 +24,7 @@ public class ModuleRemote implements IInterpreterModule {
 	private Queue<Character> queue = new LinkedBlockingDeque<>(1024);
 	private Queue<Character> queueDisplay = new ArrayDeque<>();
 	private StringBuilder sb = new StringBuilder();
+	private RuntimeCodePage runtimeCodePage;
 
 	public static final int UI_NUM = 8;
 
@@ -53,6 +54,9 @@ public class ModuleRemote implements IInterpreterModule {
 
 	@Override
 	public RuntimeCodePage getCodePage() throws Exception {
+		if (runtimeCodePage != null)
+			return runtimeCodePage;
+
 		String base = ResourceLoader.load(getClass());
 
 		Grammar grammar = new Grammar(base);
@@ -60,7 +64,7 @@ public class ModuleRemote implements IInterpreterModule {
 		IRuntimeDebugInfo info = page.getInfo();
 		buildRemoteMethods(info);
 
-		return page;
+		return runtimeCodePage = page;
 	}
 
 	private void buildRemoteMethods(IRuntimeDebugInfo info) {

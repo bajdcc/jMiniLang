@@ -2,6 +2,7 @@ package priv.bajdcc.LALR1.ui.drawing;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -167,17 +168,12 @@ public class UIGraphics {
 	public void newline(Graphics2D g) {
 		this.ptr_x = 0;
 		int end = size - cols;
-		image.getGraphics().setColor(Color.white);
-		image.getGraphics().fillRect(0, 0, w, h);
-		for (int i = 0; i < end; i++) {
-			this.data[i] = this.data[i + cols]; // move to prev line
-			image.getGraphics().drawImage(fontImage.getImage(this.data[i]),
-					(i % cols) * width, (i / cols) * height, null);
-		}
-		for (int i = end; i < size; i++) {
-			this.data[i] = '\0';
-		}
-		g.drawImage(image, 0, 0, null);
+        System.arraycopy(data, cols, data, 0, size - cols);
+        Arrays.fill(data, end, size - 1, '\0');
+        image.getGraphics().copyArea(0, height, w, (rows - 1) * height, 0, -height);
+        image.getGraphics().setColor(Color.white);
+        image.getGraphics().fillRect(0, (rows - 1) * height, w, height);
+        g.drawImage(image, 0, 0, null);
 	}
 
 	public void drawText(char c) {

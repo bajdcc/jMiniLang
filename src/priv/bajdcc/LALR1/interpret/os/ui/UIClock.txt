@@ -24,7 +24,7 @@ var draw = func ~() {
     }
     var time = call g_task_get_fast("system", "now");
     call g_task_get_fast_arg("ui", "path", "@M 110 110@@R 390 140@@M 140 130@#" + time + "#");
-    call g_task_sleep(1);
+    call g_task_sleep_signal(1, "TASK#SLEEP");
 };
 var clear = func ~() {
     if (first) {

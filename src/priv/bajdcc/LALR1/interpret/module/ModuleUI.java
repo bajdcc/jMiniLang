@@ -23,6 +23,7 @@ public class ModuleUI implements IInterpreterModule {
 	private Queue<Character> queue = new LinkedBlockingDeque<>(1024);
 	private Queue<Character> queueDisplay = new ArrayDeque<>();
 	private StringBuilder sb = new StringBuilder();
+	private RuntimeCodePage runtimeCodePage;
 
 	public void setGraphics(UIGraphics graphics) {
 		this.graphics = graphics;
@@ -47,6 +48,9 @@ public class ModuleUI implements IInterpreterModule {
 
 	@Override
 	public RuntimeCodePage getCodePage() throws Exception {
+		if (runtimeCodePage != null)
+			return runtimeCodePage;
+
 		String base = ResourceLoader.load(getClass());
 
 		Grammar grammar = new Grammar(base);
@@ -54,7 +58,7 @@ public class ModuleUI implements IInterpreterModule {
 		IRuntimeDebugInfo info = page.getInfo();
 		buildUIMethods(info);
 
-		return page;
+		return runtimeCodePage = page;
 	}
 
 	private void buildUIMethods(IRuntimeDebugInfo info) {

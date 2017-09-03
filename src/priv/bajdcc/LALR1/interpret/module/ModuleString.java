@@ -18,6 +18,7 @@ import java.util.regex.Pattern;
 public class ModuleString implements IInterpreterModule {
 
 	private static ModuleString instance = new ModuleString();
+	private RuntimeCodePage runtimeCodePage;
 
 	public static ModuleString getInstance() {
 		return instance;
@@ -30,6 +31,9 @@ public class ModuleString implements IInterpreterModule {
 
 	@Override
 	public RuntimeCodePage getCodePage() throws Exception {
+		if (runtimeCodePage != null)
+			return runtimeCodePage;
+
 		String base = ResourceLoader.load(getClass());
 
 		Grammar grammar = new Grammar(base);
@@ -37,7 +41,7 @@ public class ModuleString implements IInterpreterModule {
 		IRuntimeDebugInfo info = page.getInfo();
 		buildStringUtils(info);
 
-		return page;
+		return runtimeCodePage = page;
 	}
 
 	private void buildStringUtils(IRuntimeDebugInfo info) {

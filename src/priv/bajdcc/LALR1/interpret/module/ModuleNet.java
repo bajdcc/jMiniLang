@@ -25,6 +25,7 @@ public class ModuleNet implements IInterpreterModule {
 
 	private static Logger logger = Logger.getLogger("net");
 	private static ModuleNet instance = new ModuleNet();
+	private RuntimeCodePage runtimeCodePage;
 
 	public static ModuleNet getInstance() {
 		return instance;
@@ -37,6 +38,9 @@ public class ModuleNet implements IInterpreterModule {
 
 	@Override
 	public RuntimeCodePage getCodePage() throws Exception {
+		if (runtimeCodePage != null)
+			return runtimeCodePage;
+
 		String base = ResourceLoader.load(getClass());
 
 		Grammar grammar = new Grammar(base);
@@ -44,7 +48,7 @@ public class ModuleNet implements IInterpreterModule {
 		IRuntimeDebugInfo info = page.getInfo();
 		buildRemoteMethods(info);
 
-		return page;
+		return runtimeCodePage = page;
 	}
 
 	private void buildRemoteMethods(IRuntimeDebugInfo info) {

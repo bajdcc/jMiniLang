@@ -14,6 +14,7 @@ import priv.bajdcc.util.ResourceLoader;
 public class ModuleFunction implements IInterpreterModule {
 
 	private static ModuleFunction instance = new ModuleFunction();
+	private RuntimeCodePage runtimeCodePage;
 
 	public static ModuleFunction getInstance() {
 		return instance;
@@ -26,6 +27,9 @@ public class ModuleFunction implements IInterpreterModule {
 
 	@Override
 	public RuntimeCodePage getCodePage() throws Exception {
+		if (runtimeCodePage != null)
+			return runtimeCodePage;
+
 		String base = ResourceLoader.load(getClass());
 
 		Grammar grammar = new Grammar(base);
@@ -33,6 +37,6 @@ public class ModuleFunction implements IInterpreterModule {
 		IRuntimeDebugInfo info = page.getInfo();
 		info.addExternalValue("g__", () -> new RuntimeObject(null));
 
-		return page;
+		return runtimeCodePage = page;
 	}
 }

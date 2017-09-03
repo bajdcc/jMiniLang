@@ -21,6 +21,7 @@ public class ModuleBase implements IInterpreterModule {
 
 	private static ModuleBase instance = new ModuleBase();
 	private static Logger logger = Logger.getLogger("console");
+	private RuntimeCodePage runtimeCodePage;
 
 	public static ModuleBase getInstance() {
 		return instance;
@@ -33,6 +34,9 @@ public class ModuleBase implements IInterpreterModule {
 
 	@Override
 	public RuntimeCodePage getCodePage() throws Exception {
+		if (runtimeCodePage != null)
+			return runtimeCodePage;
+
 		String base = ResourceLoader.load(getClass());
 
 		Grammar grammar = new Grammar(base);
@@ -373,7 +377,7 @@ public class ModuleBase implements IInterpreterModule {
 		});
 		buildIORead(info);
 
-		return page;
+		return runtimeCodePage = page;
 	}
 
 	private void buildIORead(IRuntimeDebugInfo info) {
