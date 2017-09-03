@@ -94,7 +94,7 @@ var stage_1 = func ~() {
 /* 哲学家就餐问题 */
 var stage_philo = func ~() {
     call word_typewrite("演示哲学家就餐问题！    \n", 100);
-    var print_mutex = call g_create_mutex("philo_print");
+    call g_create_mutex("philo_print");
     foreach (var i : call g_range(1, 5)) {
         call g_create_semaphore("fork_" + i, 1); // 每个叉最多能使用一次
     }
@@ -109,13 +109,13 @@ var stage_philo = func ~() {
         var right = call g_use_semaphore("fork_" + right_id);
         call eat(o, "Philosophy#" + id + " ready");
         foreach (var j : call g_range(1, 10)) {
-            call g_lock_semaphore(left);
+            call g_lock_semaphore(left); // P左
             call eat(o, "Philosophy#" + id + " is using fork#" + left_id);
-            call g_lock_semaphore(right);
+            call g_lock_semaphore(right); // P右
             call eat(o, "Philosophy#" + id + " is using fork#" + right_id);
             call eat(o, "Philosophy#" + id + " is eating. Process: " + j + "0%");
-            call g_unlock_semaphore(left);
-            call g_unlock_semaphore(right);
+            call g_unlock_semaphore(left); // V左
+            call g_unlock_semaphore(right); // V右
         }
         call eat(o, "Philosophy#" + id + " OK");
     };
@@ -147,13 +147,122 @@ var stage_philo = func ~() {
     call g_destroy_mutex(call g_use_mutex("philo_print"));
 };
 
+/* 哲学家就餐问题 - 管程解决 */
+var stage_philo2 = func ~() {
+    call word_typewrite("【管程】演示哲学家就餐问题！    \n", 100);
+    call g_create_mutex("philo_print");
+    call g_create_mutex("philo_monitor");
+    var states = [];
+    call g_array_add(states, g_null);
+    foreach (var i : call g_range(1, 5)) {
+        call g_create_semaphore("philo_" + i, 1); // 记录每个哲学家的状态（管程）
+        call g_array_add(states, "thinking"); // 开始时哲学家都在思考
+    }
+    var handles = [];
+    var philo2 = func ~(args) {
+        var eat = call g_map_get(args, "eating");
+        var states = call g_map_get(args, "states");
+        var o = call g_map_get(args, "out");
+        var id = call g_map_get(args, "id");
+        var left_id = call g_map_get(args, "left_id");
+        var right_id = call g_map_get(args, "right_id");
+        var monitor = call g_use_mutex("philo_monitor");
+        call eat(o, "Philosophy#" + id + " ready");
+        var enter = func ~() { // 进入临界区
+            var monitor = call g_use_mutex("philo_monitor");
+            call g_lock_mutex(monitor); // mutex自带等待队列
+            call g_printdn("Philosophy#" + id + " entered critical section");
+        };
+        var leave = func ~() { // 离开临界区
+            call g_printdn("Philosophy#" + id + " leaved critical section");
+            var monitor = call g_use_mutex("philo_monitor");
+            call g_unlock_mutex(monitor);
+        };
+        var wait = func ~(_id) { // 等待信号
+            var sem = call g_use_semaphore("philo_" + _id);
+            call g_printdn("Philosophy#" + _id + " waiting");
+            call g_lock_mutex(sem); // semaphore自带等待队列
+        };
+        var signal = func ~(_id) { // 发出信号
+            var sem = call g_use_semaphore("philo_" + _id);
+            call g_unlock_mutex(sem);
+            call g_printdn("Philosophy#" + _id + " received signal");
+        };
+        var test = func ~(_id) { // 测试哲学家是否具备进餐条件
+            var _left_id = (_id == 1) ? 5 : (_id - 1);
+            var _right_id = (_id == 5) ? 1 : (_id + 1);
+            if ((call g_array_get(states, _left_id) != "eating") && // 如果左右都不在进餐
+                (call g_array_get(states, _right_id) != "eating") &&
+                (call g_array_get(states, _id) == "hungry")) { // 且自己为饥饿状态
+                call signal(_id); // 发出就餐信号
+            } else {
+                call g_printdn("Test failed. #" + _left_id + ": " + call g_array_get(states, _left_id) +
+                    ", #" + _right_id + ": " + call g_array_get(states, _right_id) + ", #" +
+                    _id + ": " +　call g_array_get(states, _id));
+            }
+        };
+        var pickup = func ~() { // 拿起叉子
+            call enter();
+            call g_array_set(states, id, "hungry"); // 设置状态是饥饿
+            call test(id);
+            call leave();
+            if (call g_array_get(states, id) != "eating") { // 如果尝试失败
+                call wait(id); // 等待
+                call g_array_set(states, id, "eating"); // 设置为进餐状态
+            }
+        };
+        var putdown = func ~() { // 放下叉子
+            call enter();
+            call g_array_set(states, id, "thinking"); // 设置状态是思考
+            call test(left_id); // 测试左边的哲学家可否就餐
+            call test(right_id); // 测试右边的哲学家可否就餐
+            call leave();
+        };
+        foreach (var j : call g_range(1, 10)) {
+            call eat(o, "Philosophy#" + id + " is thinking");
+            call pickup();
+            call eat(o, "Philosophy#" + id + " is eating. Process: " + j + "0%");
+            call putdown();
+        }
+        call eat(o, "Philosophy#" + id + " OK");
+    };
+    var eating = func ~(out, str) {
+        var pm = call g_use_mutex("philo_print");
+        call g_lock_mutex(pm);
+        foreach (var c : call g_range_string(str)) {
+            call g_write_pipe(out, c);
+        }
+        call g_write_pipe(out, '\n');
+        call g_task_sleep_ms(100);
+        call g_unlock_mutex(pm);
+    };
+    foreach (var j : call g_range(1, 5)) {
+        var args = {};
+        call g_map_put(args, "eating", eating);
+        call g_map_put(args, "states", states);
+        call g_map_put(args, "out", out);
+        call g_map_put(args, "id", j);
+        call g_map_put(args, "left_id", (j == 1) ? 5 : (j - 1));
+        call g_map_put(args, "right_id", (j == 5) ? 1 : (j + 1));
+        var h = call g_create_user_process_args(philo2, args);
+        call g_array_add(handles, h);
+    }
+    call g_join_process_array(handles);
+    foreach (var k : call g_range(1, 5)) {
+        call g_destroy_semaphore(call g_use_semaphore("fork_" + k));
+    }
+    call g_destroy_mutex(call g_use_mutex("philo_print"));
+};
+
 var name = call g_array_get(args, 0);
 if (call g_is_null(name)) {
     call create_stage(stage_clear);
     call create_stage(stage_1);
 } else if (name == "philo") {
     call create_stage(stage_philo);
-}
+} else if (name == "philo2") {
+     call create_stage(stage_philo2);
+ }
 
 call g_stop_share(signal);
 call g_destroy_pipe(out);

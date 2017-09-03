@@ -51,6 +51,7 @@ public class UIMainFrame extends JFrame {
 		this.setContentPane(panel);
 		this.pack();
 		this.setLocationRelativeTo(null);
+		this.setAlwaysOnTop(true);
 		this.setResizable(false);
 		this.setVisible(true);
 	}
