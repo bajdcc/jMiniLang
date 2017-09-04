@@ -19,10 +19,14 @@ call g_array_set(ui_name_table, 3, "monitor");
 
 call g_start_share("TASK#SLEEP", g_true);
 
+var handles = [];
+call g_start_share("UI#PIDS", handles);
+
 foreach (var j : call g_range(0, ui_num - 1)) {
     var t = call g_array_get(ui_name_table, j);
     if (!call g_is_null(t)) {
         call g_start_share("UI#" + t, true);
-        call g_load_x("/ui/" + t);
+        var pid = call g_load_x("/ui/" + t);
+        call g_array_add(handles, pid);
     }
 }

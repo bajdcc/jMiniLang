@@ -90,8 +90,12 @@ var time = func ~(msg, caller) {
     }
 };
 
+var handler_count = 0;
 var handler = func ~(ch) {
     if (ch == 'E') {
+        while (handler_count > 0) {
+            call g_sleep(100);
+        }
         var ui_num = 8; // ! UI_NUM
         var ui_name_table = call g_query_share("UI#NAMELIST");
 
@@ -101,19 +105,19 @@ var handler = func ~(ch) {
             if (!call g_is_null(ui_name)) {
                 call g_create_share("UI#" + ui_name, false);
             }
-            // 确保UI任务全部退出
-            while (!call g_is_null(call g_query_share("UI#" + ui_name))) {
-                call g_sleep(20);
-            }
         }
+        call g_join_process_array(call g_query_share("UI#PIDS"));
+        call g_stop_share("UI#PIDS");
         call g_destroy_pipe(handle);
         return;
     }
+    handler_count++;
     var msg = call g_query_share("TASKDATA#" + tid);
     var caller = call g_query_share("TASKCALLER#" + tid);
     call time(msg, caller);
     var handle = call g_create_pipe("TASKRECV#" + tid);
     call g_write_pipe(handle, 'E');
+    handler_count--;
 };
 
 var data = {};

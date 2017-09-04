@@ -19,11 +19,10 @@ var destroy_int = func ~() {
         if (!call g_is_null(call g_array_get(tt, i))) {
            var handle = call g_create_pipe("TASKSEND#" + i);
            call g_write_pipe(handle, 'E');
-           while (call g_query_pipe("TASKSEND#" + i)) {
-               call g_sleep(20);
-           }
         }
     }
+    call g_join_process_array(call g_query_share("TASK#PIDS"));
+    call g_stop_share("TASK#PIDS");
     // 2. stop irq
     call g_printn("Stopping irq...");
     foreach (var j : call g_range(0, 3)) { // ! INT_NUM
@@ -33,6 +32,8 @@ var destroy_int = func ~() {
         call g_destroy_pipe(handle);
         call g_sleep(20);
     }
+    call g_join_process_array(call g_query_share("IRQ#PIDS"));
+    call g_stop_share("IRQ#PIDS");
     call g_printn("Good bye.");
 };
 var handler = func ~(ch) {

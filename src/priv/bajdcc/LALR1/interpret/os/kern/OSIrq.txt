@@ -17,10 +17,14 @@ call g_array_set(int_table, 1, "task");
 call g_array_set(int_table, 2, "print");
 call g_array_set(int_table, 3, "signal");
 
+var handles = [];
+call g_start_share("IRQ#PIDS", handles);
+
 foreach (var j : call g_range(0, interrupt_num - 1)) {
     var t = call g_array_get(int_table, j);
     if (!call g_is_null(t)) {
         call g_printn("Create irq: " + t);
-        call g_load_x("/irq/" + t);
+        var pid = call g_load_x("/irq/" + t);
+        call g_array_add(handles, pid);
     }
 }

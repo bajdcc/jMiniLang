@@ -17,10 +17,14 @@ call g_array_set(task_name_table, 2, "util");
 call g_array_set(task_name_table, 3, "ui");
 call g_array_set(task_name_table, 4, "net");
 
+var handles = [];
+call g_start_share("TASK#PIDS", handles);
+
 foreach (var j : call g_range(0, task_num - 1)) {
     var t = call g_array_get(task_name_table, j);
     if (!call g_is_null(t)) {
         call g_printn("Create service: " + t);
-        call g_load_x("/task/" + t);
+        var pid = call g_load_x("/task/" + t);
+        call g_array_add(handles, pid);
     }
 }
