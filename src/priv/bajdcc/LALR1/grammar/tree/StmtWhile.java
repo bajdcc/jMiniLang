@@ -7,7 +7,6 @@ import priv.bajdcc.LALR1.grammar.runtime.RuntimeInstUnary;
 import priv.bajdcc.LALR1.grammar.semantic.ISemanticRecorder;
 import priv.bajdcc.LALR1.grammar.tree.closure.IClosureScope;
 import priv.bajdcc.util.lexer.token.KeywordType;
-import priv.bajdcc.util.lexer.token.OperatorType;
 
 /**
  * 【语义分析】循环语句
@@ -81,7 +80,6 @@ public class StmtWhile implements IStmt {
 		sb.append(KeywordType.WHILE.getName());
 		sb.append(" ( ");
 		sb.append(cond.print(prefix));
-		sb.append(OperatorType.SEMI.getName());
 		sb.append(" ) ");
 		sb.append(block.print(prefix));
 		return sb.toString();

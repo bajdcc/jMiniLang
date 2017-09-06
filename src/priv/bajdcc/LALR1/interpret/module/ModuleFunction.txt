@@ -126,12 +126,23 @@ var g_func_applyr_arg = func ~(name, list, arg) ->
     call g_func_fold(name, list, g__, "g_func_xsr", "g_func_1", arg, "g_func_always_true");
 export "g_func_applyr_arg";
 // ----------------------------------------------
+var g_func_apply_gen = func ~(name) {
+    var lambda = func ~(args) {
+        return call g_func_apply(name, args);
+    };
+    return lambda;
+};
+export "g_func_apply_gen";
+// ----------------------------------------------
 var g_func_map = func ~(list, arg) ->
     call g_func_fold("g_array_add", list, g_new_array, "g_func_xsl", arg, "g_func_1", "g_func_always_true");
 export "g_func_map";
 var g_func_mapr = func ~(list, arg) ->
     call g_func_fold("g_array_add", list, g_new_array, "g_func_xsr", arg, "g_func_1", "g_func_always_true");
 export "g_func_mapr";
+var g_func_reverse = func ~(list) ->
+    call g_func_fold("g_array_add", list, g_new_array, "g_func_xsr", "g_func_1", "g_func_1", "g_func_always_true");
+export "g_func_reverse";
 var g_func_length = func ~(list) ->
     call g_func_fold("g_func_add", list, 0, "g_func_xsl", "g_func_always_1", "g_func_1", "g_func_always_true");
 export "g_func_length";

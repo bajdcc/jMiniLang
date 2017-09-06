@@ -4,6 +4,7 @@ import "sys.proc";
 import "sys.task";
 import "sys.string";
 import "sys.func";
+import "module.lisp";
 
 call g_set_process_desc("util service");
 call g_set_process_priority(73);
@@ -14,6 +15,7 @@ var tid = 2;
 var handle = call g_create_pipe("TASKSEND#" + tid);
 
 call g_func_import_string_module();
+var env = call g_lisp_env();
 
 var time = func ~(msg, caller) {
     var id = call g_map_get(msg, "id");
@@ -57,6 +59,10 @@ var time = func ~(msg, caller) {
         var val = call g_string_join_array(arr, " ");
         let val = call g_doc(val);
         call g_map_put(msg, "val", val);
+    } else if (id == "lisp") {
+         var str = call g_string_join_array(arr, " ");
+         var val = call g_lisp_repl(env, str);
+         call g_map_put(msg, "val", val);
     }
 };
 

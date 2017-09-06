@@ -119,6 +119,24 @@ public class ModuleList implements IInterpreterModule {
 				return new RuntimeObject(array.pop());
 			}
 		});
+		info.addExternalFunc("g_array_pop", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "数组弹出元素";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kArray};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+												  IRuntimeStatus status) throws Exception {
+				RuntimeArray array = (RuntimeArray) args.get(0).getObj();
+				return new RuntimeObject(array.pop());
+			}
+		});
 		info.addExternalFunc("g_array_clear", new IRuntimeDebugExec() {
 			@Override
 			public String getDoc() {

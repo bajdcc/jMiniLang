@@ -5,6 +5,7 @@ import priv.bajdcc.LALR1.grammar.runtime.*;
 import priv.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
 import priv.bajdcc.util.ResourceLoader;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -45,7 +46,28 @@ public class ModuleString implements IInterpreterModule {
 	}
 
 	private void buildStringUtils(IRuntimeDebugInfo info) {
-		info.addExternalFunc("g_string_split", new IRuntimeDebugExec() {
+        info.addExternalFunc("g_string_replace", new IRuntimeDebugExec() {
+            @Override
+            public String getDoc() {
+                return "字符串替换";
+            }
+
+            @Override
+            public RuntimeObjectType[] getArgsType() {
+                return new RuntimeObjectType[]{RuntimeObjectType.kString, RuntimeObjectType.kString, RuntimeObjectType.kString};
+            }
+
+            @Override
+            public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+                                                  IRuntimeStatus status) throws Exception {
+                String str = (String) args.get(0).getObj();
+                String pat = (String) args.get(1).getObj();
+                String sub = (String) args.get(2).getObj();
+                RuntimeArray arr = new RuntimeArray();
+                return new RuntimeObject(str.replaceAll(pat, sub));
+            }
+        });
+        info.addExternalFunc("g_string_split", new IRuntimeDebugExec() {
 			@Override
 			public String getDoc() {
 				return "字符串分割";
@@ -353,5 +375,94 @@ public class ModuleString implements IInterpreterModule {
 				return new RuntimeObject(sb.toString());
 			}
 		});
-	}
+        info.addExternalFunc("g_string_to_number", new IRuntimeDebugExec() {
+            @Override
+            public String getDoc() {
+                return "字符串转换数字";
+            }
+
+            @Override
+            public RuntimeObjectType[] getArgsType() {
+                return new RuntimeObjectType[]{RuntimeObjectType.kString};
+            }
+
+            @Override
+            public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+                                                  IRuntimeStatus status) throws Exception {
+                String str = (String) args.get(0).getObj();
+                try {
+                    return new RuntimeObject(new BigInteger(str));
+                } catch (Exception e1) {
+                    try {
+                        return new RuntimeObject(new BigDecimal(str));
+                    } catch (Exception e2) {
+                        return null;
+                    }
+                }
+            }
+        });
+        info.addExternalFunc("g_string_equal", new IRuntimeDebugExec() {
+            @Override
+            public String getDoc() {
+                return "字符串相等比较";
+            }
+
+            @Override
+            public RuntimeObjectType[] getArgsType() {
+                return new RuntimeObjectType[]{RuntimeObjectType.kObject, RuntimeObjectType.kString};
+            }
+
+            @Override
+            public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+                                                  IRuntimeStatus status) throws Exception {
+                if (args.get(0).getType() == RuntimeObjectType.kString) {
+                    String str = (String) args.get(0).getObj();
+                    String cmp = (String) args.get(1).getObj();
+                    return new RuntimeObject(str.compareTo(cmp) == 0);
+                }
+                return new RuntimeObject(false);
+            }
+        });
+        info.addExternalFunc("g_string_not_equal", new IRuntimeDebugExec() {
+            @Override
+            public String getDoc() {
+                return "字符串不等比较";
+            }
+
+            @Override
+            public RuntimeObjectType[] getArgsType() {
+                return new RuntimeObjectType[]{RuntimeObjectType.kObject, RuntimeObjectType.kString};
+            }
+
+            @Override
+            public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+                                                  IRuntimeStatus status) throws Exception {
+                if (args.get(0).getType() == RuntimeObjectType.kString) {
+                    String str = (String) args.get(0).getObj();
+                    String cmp = (String) args.get(1).getObj();
+                    return new RuntimeObject(str.compareTo(cmp) != 0);
+                }
+                return new RuntimeObject(true);
+            }
+        });
+        info.addExternalFunc("g_string_start_with", new IRuntimeDebugExec() {
+            @Override
+            public String getDoc() {
+                return "字符串开头比较";
+            }
+
+            @Override
+            public RuntimeObjectType[] getArgsType() {
+                return new RuntimeObjectType[]{RuntimeObjectType.kString, RuntimeObjectType.kString};
+            }
+
+            @Override
+            public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+                                                  IRuntimeStatus status) throws Exception {
+                String str = (String) args.get(0).getObj();
+                String cmp = (String) args.get(1).getObj();
+                return new RuntimeObject(str.startsWith(cmp));
+            }
+        });
+    }
 }

@@ -16,6 +16,7 @@ public class RuntimeMap implements Cloneable {
 	private Map<String, RuntimeObject> map;
 
 	public RuntimeMap() {
+		map = new HashMap<>();
 	}
 
 	public RuntimeMap(RuntimeMap obj) {
@@ -23,9 +24,6 @@ public class RuntimeMap implements Cloneable {
 	}
 
 	public void put(String key, RuntimeObject obj) {
-		if (map == null) {
-			map = new HashMap<>();
-		}
 		map.put(key, obj);
 	}
 
@@ -74,6 +72,6 @@ public class RuntimeMap implements Cloneable {
 
 	@Override
 	public String toString() {
-		return map == null ? "NULL" : String.valueOf(map.size());
+		return String.valueOf(map.size());
 	}
 }

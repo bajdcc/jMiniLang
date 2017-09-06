@@ -127,6 +127,10 @@ public class RuntimeObject implements Cloneable {
 		this.symbol = symbol;
 	}
 
+	public Object getSymbol() {
+		return this.symbol;
+	}
+
 	public static RuntimeObjectType fromObject(Object obj) {
 		if (obj == null) {
 			return RuntimeObjectType.kNull;

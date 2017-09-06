@@ -1,0 +1,185 @@
+// 代码参考 http://norvig.com/lispy.html @LISPY
+import "sys.base";
+import "sys.string";
+import "sys.list";
+import "sys.func";
+
+var error = func ~(s) -> "Error: " + s;
+var symbol = func ~(s) -> s;
+
+var standard_env = func [
+    "内置函数",
+    "An environment with some Scheme standard procedures."
+    ] ~() {
+    var env = {};
+    var bind = func ~(op, name) -> call g_map_put(env, op, call g_func_apply_gen(name));
+    call bind("+", "g_func_add");
+    call bind("*", "g_func_mul");
+    var set = func ~(name, value) -> call g_map_put(env, name, value);
+    call set("pi", 3.1415926);
+    return env;
+};
+
+var g_lisp_env = func ~() -> call standard_env();
+export "g_lisp_env";
+
+var atom = func [
+    "构造原子",
+    "Numbers become numbers; every other token is a symbol."
+    ] ~(token) {
+    var number = call g_string_to_number(token);
+    if (call g_is_null(number)) {
+        return call symbol(token);
+    } else {
+        return number;
+    }
+};
+
+var not_equal = func ~(a, b) -> !call g_is_null(a) && call g_string_not_equal(a, b);
+
+var read_from = func [
+    "语法分析",
+    "Read an expression from a sequence of tokens."
+    ] read_from(tokens) {
+        if (call g_array_empty(tokens)) {
+            return call error("unexpected EOF while reading");
+        }
+        var token = call g_array_remove(tokens, 0); // first token
+        if (call g_string_equal(token, "(")) {
+            if (call g_array_empty(tokens)) {
+                return call error("missing )");
+            }
+            var L = [];
+            while (call not_equal(call g_array_get(tokens, 0), ")")) {
+                call g_array_add(L, call read_from(tokens));
+            }
+            if (call g_array_empty(tokens)) {
+                return call error("missing )");
+            } else {
+                call g_array_remove(tokens, 0); // pop off ')'
+            }
+            return L;
+        } else if (call g_string_equal(token, ")")) {
+            return call error("unexpected )");
+        } else {
+            return call atom(token);
+        }
+};
+
+var tokenize = func [
+    "词法分析",
+    "Convert a string into a list of tokens."
+    ] ~(s) {
+    let s = call g_string_replace(s, "\\(", " ( "); // 以空格为定界符
+    let s = call g_string_replace(s, "\\)", " ) ");
+    let s = call g_string_trim(s);
+    let s = call g_string_split(s, "\\s+");
+    return s;
+};
+
+var read = func [
+    "读取原始代码",
+    "Read a Scheme expression from a string."
+    ] ~(s) -> call read_from(call tokenize(s));
+
+var is_error = func ~(exp) {
+    var type = call g_get_type_ordinal(exp);
+    return type == 6 && call g_string_start_with(exp, "Error");
+};
+
+var is_symbol = func ~(exp) {
+    var type = call g_get_type_ordinal(exp);
+    return type == 6 && !call g_string_start_with(exp, "Error");
+};
+
+var is_list = func ~(exp) {
+    var type = call g_get_type_ordinal(exp);
+    return type == 9;
+};
+
+var eval = func [
+    "运行表达式",
+    "Evaluate an expression in an environment."
+    ] eval(x, env) {
+    if (call is_symbol(x)) {         // variable reference
+        return call g_map_get(env, x);
+    } else if (!call is_list(x)) {   // constant literal
+        return x;
+    } else if (!call g_array_empty(x)) {
+        var head = call g_array_get(x, 0);
+        if (call g_string_equal(head, "quote")) {          // quotation (quote exp)
+            // (_, exp) = x
+            return call g_array_get(x, 1);
+        } else if (call g_string_equal(head, "if")) {      // conditional (if test conseq alt)
+            // (_, test, conseq, alt) = x
+            var test = call g_array_get(x, 1);
+            var conseq = call g_array_get(x, 2);
+            var alt = call g_array_get(x, 3);
+            return call eval(call eval(test, env) ? conseq : alt, env);
+        } else if (call g_string_equal(head, "set!")) {    // definition (set! var exp)
+            // (_, var, exp) = x
+            var _var = call g_array_get(x, 1);
+            var exp = call g_array_get(x, 2);
+            if (call g_map_contains(env, _var)) { // 不增加新变量
+                call g_map_put(env, _var, call eval(exp, env));
+            }
+        } else if (call g_string_equal(head, "define")) {  // assignment (define var exp)
+            // (_, var, exp) = x
+            var _var = call g_array_get(x, 1);
+            var exp = call g_array_get(x, 2);
+            call g_map_put(env, _var, call eval(exp, env));
+        } else if (call g_string_equal(head, "lambda")) {  // procedure (lambda (var*) exp)
+            // (_, vars, exp) = x
+            var vars = call g_array_get(x, 1);
+            var exp = call g_array_get(x, 2);
+            var lambda = func ~(args) {
+                var env_new = call g_new(env);
+                var size = call g_array_size(vars);
+                call g_map_put(env_new, "#PARENT#", env);
+                for (var i = 0; i < size; i++) {
+                    call g_map_put(env_new, call g_array_get(vars, i), call g_array_get(args, i));
+                }
+                return call eval(exp, env_new);
+            };
+            return lambda;
+        } else if (call g_string_equal(head, "begin")) {   // begin (begin exp*)
+            var size = call g_array_size(x);
+            var val = g_null;
+            for (var j = 1; j < size; j++) {
+                let val = call eval(call g_array_get(x, j), env);
+            }
+            return val;
+        } else {                                           // procedure call (proc exp*)
+            var proc = call eval(head, env);
+            var _eval = func ~(arg) -> call eval(arg, env);
+            var x_1 = call g_func_drop(x, 1); // take x[-1]
+            var args = call g_func_map(x_1, _eval);
+            return call proc(args);
+        }
+    } else {
+        return "Error";
+    }
+};
+
+var string = func [
+    "序列化",
+    "Convert `RuntimeObject` back into a Lisp-readable string."
+    ] string(exp) {
+    if (call is_list(exp)) {
+        return "(" + call g_string_join_array(call g_func_map(exp, string), " ") + ")";
+    } else {
+        return call g_to_string(exp);
+    }
+};
+
+var g_lisp_repl = func [
+    "解释器",
+    "A prompt-read-eval-print loop."
+    ] ~(env, s) {
+    var r = call read(s);
+    if (call is_error(r)) {
+        return r;
+    }
+    return call string(call eval(r, env));
+};
+export "g_lisp_repl";

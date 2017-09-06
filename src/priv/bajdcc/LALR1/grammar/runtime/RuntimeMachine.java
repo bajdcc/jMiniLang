@@ -57,6 +57,8 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 					ModuleTask.getInstance(),
 					ModuleRemote.getInstance(),
 					ModuleNet.getInstance(),
+					// ---------------------
+					ModuleLisp.getInstance(),
 			};
 		}
 
@@ -463,7 +465,8 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	public void opLoad() throws RuntimeException {
 		int idx = loadInt();
 		RuntimeObject obj = fetchFromGlobalData(idx);
-		obj.setSymbol(currentPage.getData().get(idx));
+		if (obj.getSymbol() == null)
+			obj.setSymbol(currentPage.getData().get(idx));
 		stack.pushData(obj);
 	}
 
@@ -500,7 +503,8 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 		int idx = loadInt();
 		RuntimeObject obj = load();
 		obj.setReadonly(false);
-		obj.setSymbol(currentPage.getData().get(idx));
+		if (obj.getSymbol() == null)
+			obj.setSymbol(currentPage.getData().get(idx));
 		stack.storeVariableDirect(idx, obj);
 		store(obj);
 	}
@@ -686,7 +690,8 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 						int id = entry.getKey();
 						RuntimeObject o = entry.getValue();
 						if (o != null) {
-							o.setSymbol(currentPage.getData().get(id));
+							if (o.getSymbol() == null)
+								o.setSymbol(currentPage.getData().get(id));
 							o.setReadonly(false);
 						}
 						stack.storeClosure(id, o);

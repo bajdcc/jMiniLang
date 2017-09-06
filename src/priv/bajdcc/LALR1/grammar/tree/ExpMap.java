@@ -4,10 +4,7 @@ import priv.bajdcc.LALR1.grammar.codegen.ICodegen;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeInst;
 import priv.bajdcc.LALR1.grammar.semantic.ISemanticRecorder;
 import priv.bajdcc.LALR1.grammar.tree.closure.IClosureScope;
-import priv.bajdcc.LALR1.grammar.type.TokenTools;
 import priv.bajdcc.util.lexer.token.OperatorType;
-import priv.bajdcc.util.lexer.token.Token;
-import priv.bajdcc.util.lexer.token.TokenType;
 
 /**
  * 【语义分析】字典
@@ -43,8 +40,8 @@ public class ExpMap implements IExp {
 
 	@Override
 	public String toString() {
-		return OperatorType.LBRACE.toString() + OperatorType.RBRACE.toString();
-	}
+        return OperatorType.LBRACE.getName() + OperatorType.RBRACE.getName();
+    }
 
 	@Override
 	public String print(StringBuilder prefix) {
