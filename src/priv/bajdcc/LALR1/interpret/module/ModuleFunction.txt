@@ -14,6 +14,7 @@ var g_func_mul = func ~(a, b) -> a * b;
 var g_func_div = func ~(a, b) -> a / b;
 var g_func_and = func ~(a, b) -> a && b;
 var g_func_or = func ~(a, b) -> a || b;
+var g_func_mod = func ~(a, b) -> a % b;
 export "g_func_max";
 export "g_func_min";
 export "g_func_lt";
@@ -28,6 +29,7 @@ export "g_func_mul";
 export "g_func_div";
 export "g_func_and";
 export "g_func_or";
+export "g_func_mod";
 var g_func_curry = func ~(a, b) {
     var _curry = func ~(c) -> call a(b, c);
     return _curry;
@@ -85,7 +87,7 @@ var g_func_fold = func
     ]
     ~(name, list, init, xs, map, arg, filter) {
     var len = call g_array_size(list);
-    if (len == 0) { return g__; }// 肯定返回空
+    if (len == 0) { return g_new_array; }// 肯定返回空
     var val = g__;
     var x = g__;
     if (call g_is_null(init)) { // 没初值的话，取第一个元素为初值

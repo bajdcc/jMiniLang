@@ -40,8 +40,8 @@ public class ModuleMath implements IInterpreterModule {
 		Grammar grammar = new Grammar(base);
 		RuntimeCodePage page = grammar.getCodePage();
 		IRuntimeDebugInfo info = page.getInfo();
-		info.addExternalValue("g_PI", () -> new RuntimeObject(Math.PI));
-		info.addExternalValue("g_E", () -> new RuntimeObject(Math.E));
+		info.addExternalValue("g_PI", () -> new RuntimeObject(BigDecimal.valueOf(Math.PI)));
+		info.addExternalValue("g_E", () -> new RuntimeObject(BigDecimal.valueOf(Math.E)));
 		buildUnaryFunc(info);
 
 		return runtimeCodePage = page;

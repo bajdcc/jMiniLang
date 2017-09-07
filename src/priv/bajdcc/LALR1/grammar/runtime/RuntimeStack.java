@@ -10,7 +10,7 @@ import java.util.*;
 public class RuntimeStack {
 
 	private static final int MAX_DATASTACKSIZE = 100;
-	private static final int MAX_CALLSTACKSIZE = 20;
+	private static final int MAX_CALLSTACKSIZE = 100;
 	private static final int MAX_ARGSIZE = 12;
 
 	public RuntimeStack prev = null;

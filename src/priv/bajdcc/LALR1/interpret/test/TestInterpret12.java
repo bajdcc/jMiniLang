@@ -23,8 +23,15 @@ public class TestInterpret12 {
                             "import \"module.lisp\";\n" +
                             "\n" +
                             "var env = call g_lisp_env();\n" +
-                            "call g_lisp_repl(env, \"(define circle-area (lambda (r) (* pi r r)))\");\n" +
-                            "call g_print(call g_lisp_repl(env, \"(circle-area 3)\"));\n" +
+                            "call g_lisp_repl(env, \"(define circle-area (lambda (r) (* PI (* r r))))\");\n" +
+                            "call g_print(call g_lisp_repl(env, \"(circle-area 10)\"));\n" +
+                            "call g_lisp_repl(env, \"(define fact (lambda (n) (if (<= n 1) 1 (* n (fact (- n 1))))))\");\n" +
+                            "call g_print(call g_lisp_repl(env, \"(fact 10)\"));\n" +
+                            "call g_print(call g_lisp_repl(env, \"(list 1 2 3 4 5)\"));\n" +
+                            "call g_print(\"-----\");\n" +
+                            "call g_print(call g_lisp_repl(env, \"(define L (list 1 2 3 4 5))\"));\n" +
+                            "call g_print(call g_lisp_repl(env, \"(car L)\"));\n" +
+                            "call g_print(call g_lisp_repl(env, \"(cdr L)\"));\n" +
                             ""
             };
 

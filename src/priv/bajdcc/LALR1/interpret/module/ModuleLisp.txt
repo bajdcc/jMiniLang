@@ -3,20 +3,105 @@ import "sys.base";
 import "sys.string";
 import "sys.list";
 import "sys.func";
+import "sys.math";
+import "sys.ui";
 
 var error = func ~(s) -> "Error: " + s;
 var symbol = func ~(s) -> s;
+
+var is_error = func ~(exp) {
+    var type = call g_get_type_ordinal(exp);
+    return type == 6 && call g_string_start_with(exp, "Error");
+};
+
+var is_symbol = func ~(exp) {
+    var type = call g_get_type_ordinal(exp);
+    return type == 6 && !call g_string_start_with(exp, "Error");
+};
+
+var is_list = func ~(exp) {
+    var type = call g_get_type_ordinal(exp);
+    return type == 9;
+};
+
+var string = func [
+    "序列化",
+    "Convert `RuntimeObject` back into a Lisp-readable string."
+    ] string(exp) {
+    if (call is_list(exp)) {
+        var _string = func ~(exp) -> call string(exp);
+        return "(" + call g_string_join_array(call g_func_map(exp, _string), " ") + ")";
+    } else {
+        return call g_to_string(exp);
+    }
+};
 
 var standard_env = func [
     "内置函数",
     "An environment with some Scheme standard procedures."
     ] ~() {
     var env = {};
+    // ------------------------
     var bind = func ~(op, name) -> call g_map_put(env, op, call g_func_apply_gen(name));
+    var bind_direct = func ~(op, name) -> call g_map_put(env, op, name);
+    // ------------------------
+    // 基本运算
     call bind("+", "g_func_add");
+    call bind("-", "g_func_sub");
     call bind("*", "g_func_mul");
+    call bind("/", "g_func_div");
+    call bind("%", "g_func_mod");
+    call bind("==", "g_func_eq");
+    call bind("!=", "g_func_neq");
+    call bind("<", "g_func_lt");
+    call bind(">", "g_func_gt");
+    call bind("<=", "g_func_lte");
+    call bind(">=", "g_func_gte");
+    call bind("&&", "g_func_and");
+    call bind("||", "g_func_or");
+    // 内置方法
+    var bind_1st = func ~(op, name) {
+        var lambda0 = func ~(args) {
+            var val = call name(call g_array_get(args, 0));
+            if (call g_is_null(val)) {
+                return "Function: " + op;
+            }
+            return val;
+        };
+        call g_map_put(env, op, lambda0);
+    };
+    var bind_1st_map = func ~(op, name, f) {
+        var lambda1 = func ~(args) {
+            var val = call name(call g_array_get(args, 0));
+            if (call g_is_null(val)) {
+                return "Function: " + op;
+            }
+            return call f(val);
+        };
+        call g_map_put(env, op, lambda1);
+        return lambda1;
+    };
+    var bind_1st_curry = func ~(op, name, f, arg) {
+        var lambda2 = func ~(args) {
+            var val = call name(call g_array_get(args, 0));
+            if (call g_is_null(val)) {
+                return "Function: " + op;
+            }
+            return call f(val, arg);
+        };
+        call g_map_put(env, op, lambda2);
+        return lambda2;
+    };
+    call bind_1st_map("print", "g_ui_printn", string);
+    call bind_1st("type", "g_type");
+    call bind_1st_curry("car", "g_func_1", "g_array_get", 0);
+    call bind_1st_curry("cdr", "g_func_1", "g_func_drop", 1);
+    // ------------------------
     var set = func ~(name, value) -> call g_map_put(env, name, value);
-    call set("pi", 3.1415926);
+    // ------------------------
+    // 常量
+    call set("PI", g_PI);
+    call set("E", g_E);
     return env;
 };
 
@@ -82,21 +167,6 @@ var read = func [
     "Read a Scheme expression from a string."
     ] ~(s) -> call read_from(call tokenize(s));
 
-var is_error = func ~(exp) {
-    var type = call g_get_type_ordinal(exp);
-    return type == 6 && call g_string_start_with(exp, "Error");
-};
-
-var is_symbol = func ~(exp) {
-    var type = call g_get_type_ordinal(exp);
-    return type == 6 && !call g_string_start_with(exp, "Error");
-};
-
-var is_list = func ~(exp) {
-    var type = call g_get_type_ordinal(exp);
-    return type == 9;
-};
-
 var eval = func [
     "运行表达式",
     "Evaluate an expression in an environment."
@@ -149,6 +219,8 @@ var eval = func [
                 let val = call eval(call g_array_get(x, j), env);
             }
             return val;
+        } else if (call g_string_equal(head, "list")) {    // list (list exp*)
+            return call g_func_drop(x, 1);
         } else {                                           // procedure call (proc exp*)
             var proc = call eval(head, env);
             var _eval = func ~(arg) -> call eval(arg, env);
@@ -158,17 +230,6 @@ var eval = func [
         }
     } else {
         return "Error";
-    }
-};
-
-var string = func [
-    "序列化",
-    "Convert `RuntimeObject` back into a Lisp-readable string."
-    ] string(exp) {
-    if (call is_list(exp)) {
-        return "(" + call g_string_join_array(call g_func_map(exp, string), " ") + ")";
-    } else {
-        return call g_to_string(exp);
     }
 };
 
