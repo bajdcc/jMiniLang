@@ -36,6 +36,21 @@ var string = func [
     }
 };
 
+var init = func ~(env) {
+    var code = "
+    (begin
+        (define nil       ())
+        (define list      (lambda args args))
+        (define caar      (lambda (x) (car (car x))))
+        (define cadr      (lambda (x) (car (cdr x))))
+        (define cdar      (lambda (x) (cdr (car x))))
+        (define cddr      (lambda (x) (cdr (cdr x))))
+        (define count     (lambda (item L) (if L (+ 0 (== item (car L)) (count item (cdr L))) 0)))
+    )
+    ";
+    call g_lisp_repl(env, code);
+};
+
 var standard_env = func [
     "内置函数",
     "An environment with some Scheme standard procedures."
@@ -79,7 +94,6 @@ var standard_env = func [
             return call f(val);
         };
         call g_map_put(env, op, lambda1);
-        return lambda1;
     };
     var bind_1st_curry = func ~(op, name, f, arg) {
         var lambda2 = func ~(args) {
@@ -90,10 +104,10 @@ var standard_env = func [
             return call f(val, arg);
         };
         call g_map_put(env, op, lambda2);
-        return lambda2;
     };
     call bind_1st_map("print", "g_ui_printn", string);
     call bind_1st("type", "g_type");
+    call bind_1st("empty", "g_array_empty");
     call bind_1st_curry("car", "g_func_1", "g_array_get", 0);
     call bind_1st_curry("cdr", "g_func_1", "g_func_drop", 1);
     // ------------------------
@@ -102,6 +116,7 @@ var standard_env = func [
     // 常量
     call set("PI", g_PI);
     call set("E", g_E);
+    call init(env);
     return env;
 };
 
@@ -185,7 +200,8 @@ var eval = func [
             var test = call g_array_get(x, 1);
             var conseq = call g_array_get(x, 2);
             var alt = call g_array_get(x, 3);
-            return call eval(call eval(test, env) ? conseq : alt, env);
+            var cond = call eval(test, env);
+            return call eval((call is_list(cond) && call g_array_empty(cond)) ? alt : conseq, env);
         } else if (call g_string_equal(head, "set!")) {    // definition (set! var exp)
             // (_, var, exp) = x
             var _var = call g_array_get(x, 1);
@@ -204,10 +220,14 @@ var eval = func [
             var exp = call g_array_get(x, 2);
             var lambda = func ~(args) {
                 var env_new = call g_new(env);
-                var size = call g_array_size(vars);
-                call g_map_put(env_new, "#PARENT#", env);
-                for (var i = 0; i < size; i++) {
-                    call g_map_put(env_new, call g_array_get(vars, i), call g_array_get(args, i));
+                if (call is_list(vars)) {                  // (lambda (var*) exp)
+                    var size = call g_array_size(vars);
+                    call g_map_put(env_new, "#PARENT#", env);
+                    for (var i = 0; i < size; i++) {
+                        call g_map_put(env_new, call g_array_get(vars, i), call g_array_get(args, i));
+                    }
+                } else if (call is_symbol(vars)) {
+                    call g_map_put(env_new, vars, args);   // (lambda var exp)
                 }
                 return call eval(exp, env_new);
             };
@@ -216,11 +236,10 @@ var eval = func [
             var size = call g_array_size(x);
             var val = g_null;
             for (var j = 1; j < size; j++) {
-                let val = call eval(call g_array_get(x, j), env);
+                var _v = call eval(call g_array_get(x, j), env);
+                let val = _v;
             }
             return val;
-        } else if (call g_string_equal(head, "list")) {    // list (list exp*)
-            return call g_func_drop(x, 1);
         } else {                                           // procedure call (proc exp*)
             var proc = call eval(head, env);
             var _eval = func ~(arg) -> call eval(arg, env);

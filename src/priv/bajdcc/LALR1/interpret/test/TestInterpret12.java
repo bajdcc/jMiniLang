@@ -32,7 +32,8 @@ public class TestInterpret12 {
                             "call g_print(call g_lisp_repl(env, \"(define L (list 1 2 3 4 5))\"));\n" +
                             "call g_print(call g_lisp_repl(env, \"(car L)\"));\n" +
                             "call g_print(call g_lisp_repl(env, \"(cdr L)\"));\n" +
-                            ""
+		                    "call g_print(call g_lisp_repl(env, \"(count 0 (list 0 1 2 3 0 0))\"));\n" +
+		                    ""
             };
 
             Interpreter interpreter = new Interpreter();
