@@ -57,9 +57,17 @@ public class RuntimeMap implements Cloneable {
 		return map.isEmpty();
 	}
 
-	public void copyFrom(RuntimeMap obj) {
-		map = new HashMap<>(obj.map);
-	}
+    /**
+     * 深拷贝
+     *
+     * @param obj 原对象
+     */
+    public void copyFrom(RuntimeMap obj) {
+        map = new HashMap<>();
+        for (Map.Entry<String, RuntimeObject> o : obj.map.entrySet()) {
+            map.put(o.getKey(), o.getValue().clone());
+        }
+    }
 
 	public RuntimeMap clone() {
 		try {

@@ -46,6 +46,16 @@ var init = func ~(env) {
         (define cdar      (lambda (x) (cdr (car x))))
         (define cddr      (lambda (x) (cdr (cdr x))))
         (define count     (lambda (item L) (if L (+ 0 (== item (car L)) (count item (cdr L))) 0)))
+        (define range     (lambda (a b) (if (== a b) (quote ()) (cons a (range (+ a 1) b)))))
+        (define null?     empty)
+        (define int?      (lambda (x) (== (type_ord x) 3)))
+        (define real?     (lambda (x) (== (type_ord x) 4)))
+        (define number?   (lambda (x) (|| (int? x) (real? x))))
+        (define symbol?   (lambda (x) (== (type_ord x) 6)))
+        (define bool?     (lambda (x) (== (type_ord x) 7)))
+        (define func?     (lambda (x) (== (type_ord x) 8)))
+        (define list?     (lambda (x) (== (type_ord x) 9)))
+        )))
     )
     ";
     call g_lisp_repl(env, code);
@@ -74,6 +84,8 @@ var standard_env = func [
     call bind(">=", "g_func_gte");
     call bind("&&", "g_func_and");
     call bind("||", "g_func_or");
+    call bind("max", "g_func_max");
+    call bind("min", "g_func_min");
     // 内置方法
     var bind_1st = func ~(op, name) {
         var lambda0 = func ~(args) {
@@ -105,11 +117,18 @@ var standard_env = func [
         };
         call g_map_put(env, op, lambda2);
     };
-    call bind_1st_map("print", "g_ui_printn", string);
+    call bind_1st_map("print", "g_print", string);
     call bind_1st("type", "g_type");
+    call bind_1st("type_ord", "g_get_type_ordinal");
     call bind_1st("empty", "g_array_empty");
+    call bind_1st("length", "g_array_size");
+    call bind_1st("not", "g_func_not");
     call bind_1st_curry("car", "g_func_1", "g_array_get", 0);
     call bind_1st_curry("cdr", "g_func_1", "g_func_drop", 1);
+    // map
+    var _map = func ~(args) ->
+        call g_func_map(call g_array_get(args, 1), call g_array_get(args, 0));
+    call bind_direct("map", _map);
     // ------------------------
     var set = func ~(name, value) -> call g_map_put(env, name, value);
     // ------------------------
@@ -182,12 +201,28 @@ var read = func [
     "Read a Scheme expression from a string."
     ] ~(s) -> call read_from(call tokenize(s));
 
+var find = func find(exp, env) {
+    var val = call g_map_get(env, exp);
+    if (call g_is_null(val)) {
+        var outer = call g_map_get(env, "#PARENT#");
+        if (call g_is_null(outer)) {
+            return;
+        }
+        return call find(exp, outer);
+    }
+    return env;
+};
+
 var eval = func [
     "运行表达式",
     "Evaluate an expression in an environment."
     ] eval(x, env) {
     if (call is_symbol(x)) {         // variable reference
-        return call g_map_get(env, x);
+        var _env = call find(x, env);
+        if (call g_is_null(_env)) {
+            return call error("undefined symbol " + x);
+        }
+        return call g_map_get(_env, x);
     } else if (!call is_list(x)) {   // constant literal
         return x;
     } else if (!call g_array_empty(x)) {
@@ -195,20 +230,32 @@ var eval = func [
         if (call g_string_equal(head, "quote")) {          // quotation (quote exp)
             // (_, exp) = x
             return call g_array_get(x, 1);
+        } else if (call g_string_equal(head, "cons")) {    // construct (cons a b)
+            // (_, a, b) = x
+            var a = call eval(call g_array_get(x, 1), env);
+            var b = call eval(call g_array_get(x, 2), env);
+            var val = call g_new(b);
+            call g_array_insert(val, 0, a);
+            return val;
         } else if (call g_string_equal(head, "if")) {      // conditional (if test conseq alt)
             // (_, test, conseq, alt) = x
             var test = call g_array_get(x, 1);
             var conseq = call g_array_get(x, 2);
             var alt = call g_array_get(x, 3);
             var cond = call eval(test, env);
-            return call eval((call is_list(cond) && call g_array_empty(cond)) ? alt : conseq, env);
+            if (call is_error(cond)) {
+                return cond;
+            }
+            if (call is_list(cond)) {
+                return call eval(call g_array_empty(cond) ? alt : conseq, env);
+            } else {
+                return call eval(cond ? conseq : alt, env);
+            }
         } else if (call g_string_equal(head, "set!")) {    // definition (set! var exp)
             // (_, var, exp) = x
             var _var = call g_array_get(x, 1);
             var exp = call g_array_get(x, 2);
-            if (call g_map_contains(env, _var)) { // 不增加新变量
-                call g_map_put(env, _var, call eval(exp, env));
-            }
+            call g_map_set(call find(_var, env), _var, call eval(exp, env));
         } else if (call g_string_equal(head, "define")) {  // assignment (define var exp)
             // (_, var, exp) = x
             var _var = call g_array_get(x, 1);
@@ -219,12 +266,16 @@ var eval = func [
             var vars = call g_array_get(x, 1);
             var exp = call g_array_get(x, 2);
             var lambda = func ~(args) {
-                var env_new = call g_new(env);
+                var env_new = call g_new(env); // deep copy
+                call g_map_put(env_new, "#PARENT#", env);
                 if (call is_list(vars)) {                  // (lambda (var*) exp)
-                    var size = call g_array_size(vars);
-                    call g_map_put(env_new, "#PARENT#", env);
-                    for (var i = 0; i < size; i++) {
-                        call g_map_put(env_new, call g_array_get(vars, i), call g_array_get(args, i));
+                    if (call is_list(args)) {
+                        var size = call g_array_size(vars);
+                        for (var i = 0; i < size; i++) {
+                            call g_map_put(env_new, call g_array_get(vars, i), call g_array_get(args, i));
+                        }
+                    } else {
+                        call g_map_put(env_new, call g_array_get(vars, 0), args);
                     }
                 } else if (call is_symbol(vars)) {
                     call g_map_put(env_new, vars, args);   // (lambda var exp)
@@ -242,6 +293,9 @@ var eval = func [
             return val;
         } else {                                           // procedure call (proc exp*)
             var proc = call eval(head, env);
+            if (call g_is_null(proc)) {
+                return call error("undefined function " + head);
+            }
             var _eval = func ~(arg) -> call eval(arg, env);
             var x_1 = call g_func_drop(x, 1); // take x[-1]
             var args = call g_func_map(x_1, _eval);

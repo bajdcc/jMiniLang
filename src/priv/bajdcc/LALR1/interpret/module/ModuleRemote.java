@@ -82,8 +82,8 @@ public class ModuleRemote implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) throws Exception {
-				if (graphics == null)
-					setGraphics();
+                if (remote != null && graphics == null)
+                    setGraphics();
 				return null;
 			}
 		});

@@ -57,8 +57,8 @@ public class RuntimeObject implements Cloneable {
 
 	public void copyFrom(RuntimeObject obj) {
 		if (obj != null) {
-			this.obj = obj.obj;
-			this.readonly = obj.readonly;
+            this.obj = obj.obj; // 注意：这里是浅拷贝！
+            this.readonly = obj.readonly;
 			this.copyable = obj.copyable;
 			this.type = obj.type;
 		} else {
@@ -183,13 +183,44 @@ public class RuntimeObject implements Cloneable {
 	}
 
 	public RuntimeObject clone() {
-		try {
-			return (RuntimeObject) super.clone();
-		} catch (CloneNotSupportedException e) {
+        if (obj == null) {
+            return null;
+        }
+        RuntimeObject o = null;
+        try {
+            o = (RuntimeObject) super.clone();
+        } catch (CloneNotSupportedException e) {
 			e.printStackTrace();
 		}
-		return new RuntimeObject(null);
-	}
+        if (obj instanceof String) {
+            return o; // 本来就是不可修改的
+        }
+        if (obj instanceof Character) {
+            return o; // 传值
+        }
+        if (obj instanceof BigInteger) {
+            return new RuntimeObject(BigInteger.ZERO.add((BigInteger) obj)); // 一定要新建
+        }
+        if (obj instanceof BigDecimal) {
+            return new RuntimeObject(BigDecimal.ZERO.add((BigDecimal) obj)); // 一定要新建
+        }
+        if (obj instanceof Boolean) {
+            return o; // 传值
+        }
+        if (obj instanceof Integer) {
+            return o; // 传值
+        }
+        if (obj instanceof RuntimeFuncObject) {
+            return o; // 不可变的
+        }
+        if (obj instanceof RuntimeArray) {
+            return new RuntimeObject(new RuntimeArray((RuntimeArray) obj)); // 引用类型要创建
+        }
+        if (obj instanceof RuntimeMap) {
+            return new RuntimeObject(new RuntimeMap((RuntimeMap) obj)); // 引用类型要创建
+        }
+        return null;
+    }
 
 	@Override
 	public String toString() {

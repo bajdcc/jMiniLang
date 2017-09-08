@@ -78,11 +78,11 @@ public class ModuleList implements IInterpreterModule {
 				return args.get(0);
 			}
 		});
-		info.addExternalFunc("g_array_set", new IRuntimeDebugExec() {
-			@Override
+        info.addExternalFunc("g_array_insert", new IRuntimeDebugExec() {
+            @Override
 			public String getDoc() {
-				return "数组设置元素";
-			}
+                return "数组添加元素";
+            }
 
 			@Override
 			public RuntimeObjectType[] getArgsType() {
@@ -93,31 +93,34 @@ public class ModuleList implements IInterpreterModule {
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 												  IRuntimeStatus status) throws Exception {
 				RuntimeArray array = (RuntimeArray) args.get(0).getObj();
-				BigInteger index = (BigInteger) args.get(1).getObj();
-				args.get(2).setReadonly(false);
-				if (!array.set(index.intValue(), args.get(2))) {
-					status.err(RuntimeException.RuntimeError.INVALID_INDEX, "array.set");
-				}
-				return null;
-			}
+                BigInteger n = (BigInteger) args.get(1).getObj();
+                args.get(2).setReadonly(false);
+                array.insert(n.intValue(), args.get(2));
+                return args.get(0);
+            }
 		});
-		info.addExternalFunc("g_array_pop", new IRuntimeDebugExec() {
-			@Override
+        info.addExternalFunc("g_array_set", new IRuntimeDebugExec() {
+            @Override
 			public String getDoc() {
-				return "数组弹出元素";
-			}
+                return "数组设置元素";
+            }
 
 			@Override
 			public RuntimeObjectType[] getArgsType() {
-				return new RuntimeObjectType[] { RuntimeObjectType.kArray };
-			}
+                return new RuntimeObjectType[]{RuntimeObjectType.kArray, RuntimeObjectType.kInt, RuntimeObjectType.kObject};
+            }
 
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 												  IRuntimeStatus status) throws Exception {
 				RuntimeArray array = (RuntimeArray) args.get(0).getObj();
-				return new RuntimeObject(array.pop());
-			}
+                BigInteger index = (BigInteger) args.get(1).getObj();
+                args.get(2).setReadonly(false);
+                if (!array.set(index.intValue(), args.get(2))) {
+                    status.err(RuntimeException.RuntimeError.INVALID_INDEX, "array.set");
+                }
+                return null;
+            }
 		});
 		info.addExternalFunc("g_array_pop", new IRuntimeDebugExec() {
 			@Override
@@ -127,8 +130,8 @@ public class ModuleList implements IInterpreterModule {
 
 			@Override
 			public RuntimeObjectType[] getArgsType() {
-				return new RuntimeObjectType[]{RuntimeObjectType.kArray};
-			}
+                return new RuntimeObjectType[]{RuntimeObjectType.kArray};
+            }
 
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,

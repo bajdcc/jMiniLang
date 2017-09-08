@@ -179,8 +179,8 @@ public class ModuleBase implements IInterpreterModule {
 		info.addExternalFunc("g_new", new IRuntimeDebugExec() {
 			@Override
 			public String getDoc() {
-				return "拷贝";
-			}
+                return "深拷贝";
+            }
 
 			@Override
 			public RuntimeObjectType[] getArgsType() {
@@ -262,7 +262,26 @@ public class ModuleBase implements IInterpreterModule {
 				return new RuntimeObject(args.get(0).getTypeString());
 			}
 		});
-		info.addExternalFunc("g_exit", new IRuntimeDebugExec() {
+        info.addExternalFunc("g_hash", new IRuntimeDebugExec() {
+            @Override
+            public String getDoc() {
+                return "获取哈希";
+            }
+
+            @Override
+            public RuntimeObjectType[] getArgsType() {
+                return new RuntimeObjectType[]{RuntimeObjectType.kObject};
+            }
+
+            @Override
+            public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+                                                  IRuntimeStatus status) throws Exception {
+                if (args.get(0).getObj() == null)
+                    return new RuntimeObject("NULL");
+                return new RuntimeObject(String.valueOf(args.get(0).getObj().hashCode()));
+            }
+        });
+        info.addExternalFunc("g_exit", new IRuntimeDebugExec() {
 			@Override
 			public String getDoc() {
 				return "程序退出";

@@ -31,6 +31,10 @@ public class RuntimeArray implements Cloneable {
 		array.add(obj);
 	}
 
+    public void insert(int index, RuntimeObject obj) {
+        array.add(index, obj);
+    }
+
 	public boolean set(int index, RuntimeObject obj) {
 		if (array == null) {
 			return false;
@@ -90,9 +94,17 @@ public class RuntimeArray implements Cloneable {
 		return array.isEmpty();
 	}
 
-	public void copyFrom(RuntimeArray obj) {
-		array = new ArrayList<>(obj.array);
-	}
+    /**
+     * 深拷贝
+     *
+     * @param obj 原对象
+     */
+    public void copyFrom(RuntimeArray obj) {
+        array = new ArrayList<>();
+        for (RuntimeObject o : obj.array) {
+            array.add(o.clone());
+        }
+    }
 
 	public List<Object> toList() {
 		return array.stream().map(a -> a.getObj()).collect(Collectors.toList());
