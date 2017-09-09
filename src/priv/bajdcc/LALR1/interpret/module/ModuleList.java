@@ -58,26 +58,47 @@ public class ModuleList implements IInterpreterModule {
 	 * @param info 信息
      */
 	private void buildArrayMethod(IRuntimeDebugInfo info) {
-		info.addExternalFunc("g_array_add", new IRuntimeDebugExec() {
-			@Override
-			public String getDoc() {
-				return "数组添加元素";
-			}
+        info.addExternalFunc("g_array_add", new IRuntimeDebugExec() {
+            @Override
+            public String getDoc() {
+                return "数组添加元素";
+            }
 
-			@Override
-			public RuntimeObjectType[] getArgsType() {
-				return new RuntimeObjectType[] { RuntimeObjectType.kArray, RuntimeObjectType.kObject };
-			}
+            @Override
+            public RuntimeObjectType[] getArgsType() {
+                return new RuntimeObjectType[] { RuntimeObjectType.kArray, RuntimeObjectType.kObject };
+            }
 
-			@Override
-			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
-												  IRuntimeStatus status) throws Exception {
-				RuntimeArray array = (RuntimeArray) args.get(0).getObj();
-				args.get(1).setReadonly(false);
-				array.add(args.get(1));
-				return args.get(0);
-			}
-		});
+            @Override
+            public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+                                                  IRuntimeStatus status) throws Exception {
+                RuntimeArray array = (RuntimeArray) args.get(0).getObj();
+                args.get(1).setReadonly(false);
+                array.add(args.get(1));
+                return args.get(0);
+            }
+        });
+        info.addExternalFunc("g_array_append", new IRuntimeDebugExec() {
+            @Override
+            public String getDoc() {
+                return "数组添加数组";
+            }
+
+            @Override
+            public RuntimeObjectType[] getArgsType() {
+                return new RuntimeObjectType[]{RuntimeObjectType.kArray, RuntimeObjectType.kArray};
+            }
+
+            @Override
+            public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+                                                  IRuntimeStatus status) throws Exception {
+                RuntimeArray array = (RuntimeArray) args.get(0).getObj();
+                RuntimeArray array2 = (RuntimeArray) args.get(1).getObj();
+                array.add(array2);
+                args.get(1).setReadonly(false);
+                return args.get(0);
+            }
+        });
         info.addExternalFunc("g_array_insert", new IRuntimeDebugExec() {
             @Override
 			public String getDoc() {

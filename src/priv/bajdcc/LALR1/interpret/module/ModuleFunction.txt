@@ -204,3 +204,7 @@ var g_func_applicative = func ~(f, a, b) -> call f(a, call b(a));
 export "g_func_applicative";
 var g_func_import_string_module = func ~() { import "sys.string"; };
 export "g_func_import_string_module";
+// ----------------------------------------------
+var g_func_apply_array = func ~(list) ->
+    call g_func_fold("g_array_append", list, g_new_array, "g_func_xsl", "g_func_1", "g_func_1", "g_func_always_true");
+export "g_func_apply_array";

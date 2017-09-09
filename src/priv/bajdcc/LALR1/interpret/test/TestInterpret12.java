@@ -65,6 +65,8 @@ public class TestInterpret12 {
                             "call g_print(call g_lisp_repl(env, \"(cdr (cons 'a '(b c)))\"));\n" +
                             "call g_print(call g_lisp_repl(env, \"(apply + (range 1 10))\"));\n" +
                             "call g_print(call g_lisp_repl(env, \"(apply + (list \\\"hello\\\" #s \\\"world\\\" #s \\\"bajdcc\\\"))\"));\n" +
+                            "call g_print(call g_lisp_repl(env, \"(append '(a b) '(c d))\"));\n" +
+                            "call g_print(call g_lisp_repl(env, \"(apply 'append '('(a b) '(c d)))\"));\n" +
                             ""
             };
 

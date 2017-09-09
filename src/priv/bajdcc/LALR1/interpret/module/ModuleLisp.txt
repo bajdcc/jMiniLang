@@ -130,6 +130,8 @@ var standard_env = func [
     var _map = func ~(args) ->
         call g_func_map(call g_array_get(args, 1), call g_array_get(args, 0));
     call bind_direct("map", _map);
+    // append
+    call bind_direct("append", "g_func_apply_array");
     // ------------------------
     var set = func ~(name, value) -> call g_map_put(env, name, value);
     // ------------------------

@@ -31,6 +31,10 @@ public class RuntimeArray implements Cloneable {
 		array.add(obj);
 	}
 
+    public void add(RuntimeArray arr) {
+        array.addAll(arr.array);
+    }
+
     public void insert(int index, RuntimeObject obj) {
         array.add(index, obj);
     }
