@@ -60,8 +60,62 @@ public class ModuleBase implements IInterpreterModule {
 
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
-					IRuntimeStatus status) throws Exception {
+												  IRuntimeStatus status) throws Exception {
 				return new RuntimeObject(args.get(0).getObj() == null);
+			}
+		});
+		info.addExternalFunc("g_set_flag", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "设置对象属性";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kObject, RuntimeObjectType.kInt};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+												  IRuntimeStatus status) throws Exception {
+				BigInteger flag = (BigInteger) args.get(1).getObj();
+				args.get(0).setFlag(flag.longValue());
+				return args.get(0);
+			}
+		});
+		info.addExternalFunc("g_get_flag", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "获取对象属性";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kObject};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+												  IRuntimeStatus status) throws Exception {
+				return new RuntimeObject(BigInteger.valueOf(args.get(0).getFlag()));
+			}
+		});
+		info.addExternalFunc("g_is_flag", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "判断对象属性";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kObject, RuntimeObjectType.kInt};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+												  IRuntimeStatus status) throws Exception {
+				BigInteger flag = (BigInteger) args.get(1).getObj();
+				return new RuntimeObject(args.get(0).getFlag() == flag.longValue());
 			}
 		});
 		info.addExternalFunc("g_not_null", new IRuntimeDebugExec() {
@@ -96,6 +150,24 @@ public class ModuleBase implements IInterpreterModule {
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 					IRuntimeStatus status) throws Exception {
 				logger.info(args.get(0).getObj());
+				return null;
+			}
+		});
+		info.addExternalFunc("g_print_info", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "标准输出";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kObject};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+												  IRuntimeStatus status) throws Exception {
+				logger.info(args.get(0));
 				return null;
 			}
 		});

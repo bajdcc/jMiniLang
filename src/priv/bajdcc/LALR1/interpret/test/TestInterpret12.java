@@ -61,8 +61,10 @@ public class TestInterpret12 {
                             "call g_print(call g_lisp_repl(env, \"(map (lambda (n) ((repeat twice) n)) (range 1 10))\"));\n" +
                             "call g_print(\"-----\");\n" +
                             "call g_lisp_repl(env, \"(print \\\"ab_cd\\\")\");\n" +
-                            "call g_print(call g_lisp_repl(env, \"(car (cons ('a) ('(b c))))\"));\n" +
-                            "call g_print(call g_lisp_repl(env, \"(cdr (cons ('a) ('(b c))))\"));\n" +
+                            "call g_print(call g_lisp_repl(env, \"(car (cons 'a '(b c)))\"));\n" +
+                            "call g_print(call g_lisp_repl(env, \"(cdr (cons 'a '(b c)))\"));\n" +
+                            "call g_print(call g_lisp_repl(env, \"(apply + (range 1 10))\"));\n" +
+                            "call g_print(call g_lisp_repl(env, \"(apply + (list \\\"hello\\\" #s \\\"world\\\" #s \\\"bajdcc\\\"))\"));\n" +
                             ""
             };
 

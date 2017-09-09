@@ -6,31 +6,13 @@ import "sys.func";
 import "sys.math";
 import "sys.ui";
 
-var error = func ~(s) -> "Error: " + s;
-var symbol = func ~(s) -> s;
+var symbol = func ~(s) -> call g_set_flag(s, 1);
+var str = func ~(s) -> call g_set_flag(s, 2);
+var error = func ~(s) -> call g_set_flag(s, 3);
 
-var is_error = func ~(exp) {
-    var type = call g_get_type_ordinal(exp);
-    return type == 6 && call g_string_start_with(exp, "Error");
-};
-
-var is_quote = func ~(exp) {
-    var type = call g_get_type_ordinal(exp);
-    return type == 6 && call g_string_start_with(exp, "'");
-};
-
-var is_symbol = func ~(exp) {
-    var type = call g_get_type_ordinal(exp);
-    return type == 6 &&
-        !call g_string_start_with(exp, "Error") &&
-        !call g_string_start_with(exp, "\"") &&
-        !call g_string_start_with(exp, "'");
-};
-
-var is_string = func ~(exp) {
-    var type = call g_get_type_ordinal(exp);
-    return type == 6 && call g_string_start_with(exp, "\"");
-};
+var is_symbol = func ~(exp) -> call g_get_type_ordinal(exp) == 6 && call g_is_flag(exp, 1);
+var is_string = func ~(exp) -> call g_get_type_ordinal(exp) == 6 && call g_is_flag(exp, 2);
+var is_error = func ~(exp) -> call g_get_type_ordinal(exp) == 6 && call g_is_flag(exp, 3);
 
 var is_list = func ~(exp) {
     var type = call g_get_type_ordinal(exp);
@@ -70,6 +52,7 @@ var init = func ~(env) {
         (define list?     (lambda (x) (== (type_ord x) 9)))
         (define +1        (lambda (x) (+ x 1)))
         (define -1        (lambda (x) (- x 1)))
+        (define apply     (lambda (item L) (eval (cons item L)))
         )))
     )
     ";
@@ -153,6 +136,7 @@ var standard_env = func [
     // 常量
     call set("PI", g_PI);
     call set("E", g_E);
+    call set("#s", " ");
     call init(env);
     return env;
 };
@@ -164,10 +148,8 @@ var atom = func [
     "构造原子",
     "Numbers become numbers; every other token is a symbol."
     ] ~(token) {
-    if (call is_string(token)) {
-        return token;
-    } else if (call g_string_equal(token, "'")) {
-        return call symbol("quote");
+    if (call g_string_start_with(token, "\"")) {
+        return call str(call g_string_substr(token, 1, call g_string_length(token) - 1));
     }
     var number = call g_string_to_number(token);
     if (call g_is_null(number)) {
@@ -203,6 +185,11 @@ var read_from = func [
             return L;
         } else if (call g_string_equal(token, ")")) {
             return call error("unexpected )");
+        } else if (call g_string_equal(token, "'")) {
+            var L = [];
+            call g_array_add(L, call symbol("quote"));
+            call g_array_add(L, call read_from(tokens));
+            return L;
         } else  {
             return call atom(token);
         }
@@ -255,9 +242,6 @@ var eval = func [
         }
         return call g_map_get(_env, x);
     } else if (!call is_list(x)) {   // constant literal
-        if (call is_string(x)) {
-            return call g_string_substr(x, 1, call g_string_length(x) - 1);
-        }
         return x;
     } else if (!call g_array_empty(x)) {
         var head = call g_array_get(x, 0);
@@ -325,6 +309,10 @@ var eval = func [
                 let val = _v;
             }
             return val;
+        } else if (call g_string_equal(head, "eval")) {    // eval (eval exp*)
+            var exp = call g_array_get(x, 1);
+            var exp1 = call eval(exp, env); // 第一次返回一个函数指针
+            return call eval(exp1, env); // 再次调用
         } else {                                           // procedure call (proc exp*)
             var proc = call eval(head, env);
             if (call g_is_null(proc)) {
