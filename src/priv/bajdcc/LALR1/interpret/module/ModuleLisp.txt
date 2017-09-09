@@ -14,9 +14,22 @@ var is_error = func ~(exp) {
     return type == 6 && call g_string_start_with(exp, "Error");
 };
 
+var is_quote = func ~(exp) {
+    var type = call g_get_type_ordinal(exp);
+    return type == 6 && call g_string_start_with(exp, "'");
+};
+
 var is_symbol = func ~(exp) {
     var type = call g_get_type_ordinal(exp);
-    return type == 6 && !call g_string_start_with(exp, "Error");
+    return type == 6 &&
+        !call g_string_start_with(exp, "Error") &&
+        !call g_string_start_with(exp, "\"") &&
+        !call g_string_start_with(exp, "'");
+};
+
+var is_string = func ~(exp) {
+    var type = call g_get_type_ordinal(exp);
+    return type == 6 && call g_string_start_with(exp, "\"");
 };
 
 var is_list = func ~(exp) {
@@ -55,6 +68,8 @@ var init = func ~(env) {
         (define bool?     (lambda (x) (== (type_ord x) 7)))
         (define func?     (lambda (x) (== (type_ord x) 8)))
         (define list?     (lambda (x) (== (type_ord x) 9)))
+        (define +1        (lambda (x) (+ x 1)))
+        (define -1        (lambda (x) (- x 1)))
         )))
     )
     ";
@@ -118,6 +133,9 @@ var standard_env = func [
         call g_map_put(env, op, lambda2);
     };
     call bind_1st_map("print", "g_print", string);
+    call bind_1st_map("printn", "g_printn", string);
+    call bind_1st_map("ui/print", "g_ui_print", string);
+    call bind_1st_map("ui/printn", "g_ui_printn", string);
     call bind_1st("type", "g_type");
     call bind_1st("type_ord", "g_get_type_ordinal");
     call bind_1st("empty", "g_array_empty");
@@ -146,6 +164,11 @@ var atom = func [
     "构造原子",
     "Numbers become numbers; every other token is a symbol."
     ] ~(token) {
+    if (call is_string(token)) {
+        return token;
+    } else if (call g_string_equal(token, "'")) {
+        return call symbol("quote");
+    }
     var number = call g_string_to_number(token);
     if (call g_is_null(number)) {
         return call symbol(token);
@@ -180,7 +203,7 @@ var read_from = func [
             return L;
         } else if (call g_string_equal(token, ")")) {
             return call error("unexpected )");
-        } else {
+        } else  {
             return call atom(token);
         }
 };
@@ -191,8 +214,16 @@ var tokenize = func [
     ] ~(s) {
     let s = call g_string_replace(s, "\\(", " ( "); // 以空格为定界符
     let s = call g_string_replace(s, "\\)", " ) ");
+    let s = call g_string_replace(s, "'", " ' ");
     let s = call g_string_trim(s);
     let s = call g_string_split(s, "\\s+");
+    var _rep = func ~(str) {
+        if (call g_string_start_with(str, "\"")) {
+            let s = call g_string_replace(s, "_", " ");
+        }
+        return str;
+    };
+    let s = call g_func_map(s, _rep);
     return s;
 };
 
@@ -224,6 +255,9 @@ var eval = func [
         }
         return call g_map_get(_env, x);
     } else if (!call is_list(x)) {   // constant literal
+        if (call is_string(x)) {
+            return call g_string_substr(x, 1, call g_string_length(x) - 1);
+        }
         return x;
     } else if (!call g_array_empty(x)) {
         var head = call g_array_get(x, 0);

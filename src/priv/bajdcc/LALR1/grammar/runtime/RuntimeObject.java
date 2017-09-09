@@ -192,34 +192,13 @@ public class RuntimeObject implements Cloneable {
         } catch (CloneNotSupportedException e) {
 			e.printStackTrace();
 		}
-        if (obj instanceof String) {
-            return o; // 本来就是不可修改的
-        }
-        if (obj instanceof Character) {
-            return o; // 传值
-        }
-        if (obj instanceof BigInteger) {
-            return new RuntimeObject(BigInteger.ZERO.add((BigInteger) obj)); // 一定要新建
-        }
-        if (obj instanceof BigDecimal) {
-            return new RuntimeObject(BigDecimal.ZERO.add((BigDecimal) obj)); // 一定要新建
-        }
-        if (obj instanceof Boolean) {
-            return o; // 传值
-        }
-        if (obj instanceof Integer) {
-            return o; // 传值
-        }
-        if (obj instanceof RuntimeFuncObject) {
-            return o; // 不可变的
-        }
         if (obj instanceof RuntimeArray) {
             return new RuntimeObject(new RuntimeArray((RuntimeArray) obj)); // 引用类型要创建
         }
         if (obj instanceof RuntimeMap) {
             return new RuntimeObject(new RuntimeMap((RuntimeMap) obj)); // 引用类型要创建
         }
-        return null;
+        return o;
     }
 
 	@Override

@@ -464,5 +464,25 @@ public class ModuleString implements IInterpreterModule {
                 return new RuntimeObject(str.startsWith(cmp));
             }
         });
+        info.addExternalFunc("g_string_substr", new IRuntimeDebugExec() {
+            @Override
+            public String getDoc() {
+                return "字符串子串";
+            }
+
+            @Override
+            public RuntimeObjectType[] getArgsType() {
+                return new RuntimeObjectType[]{RuntimeObjectType.kString, RuntimeObjectType.kInt, RuntimeObjectType.kInt};
+            }
+
+            @Override
+            public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+                                                  IRuntimeStatus status) throws Exception {
+                String str = (String) args.get(0).getObj();
+                BigInteger a = (BigInteger) args.get(1).getObj();
+                BigInteger b = (BigInteger) args.get(2).getObj();
+                return new RuntimeObject(str.substring(a.intValue(), b.intValue()));
+            }
+        });
     }
 }
