@@ -67,6 +67,10 @@ public class TestInterpret12 {
                             "call g_print(call g_lisp_repl(env, \"(apply + (list \\\"hello\\\" #s \\\"world\\\" #s \\\"bajdcc\\\"))\"));\n" +
                             "call g_print(call g_lisp_repl(env, \"(append '(a b) '(c d))\"));\n" +
                             "call g_print(call g_lisp_repl(env, \"(apply 'append '('(a b) '(c d)))\"));\n" +
+                            "call g_print(call g_lisp_repl(env, \"(apply max (range 1 10))\"));\n" +
+                            "call g_print(\"-----\");\n" +
+                            "call g_print(call g_lisp_repl(env, \"(define fib_Y (lambda (f) (lambda (n) (if (<= n 2) 1 (+ (f (- n 1)) (f (- n 2)))))))\"));\n" +
+                            "call g_print(call g_lisp_repl(env, \"(apply + (map (Y fib_Y) (range 1 10)))\"));\n" +
                             ""
             };
 

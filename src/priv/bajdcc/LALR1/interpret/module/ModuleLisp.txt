@@ -50,9 +50,15 @@ var init = func ~(env) {
         (define bool?     (lambda (x) (== (type_ord x) 7)))
         (define func?     (lambda (x) (== (type_ord x) 8)))
         (define list?     (lambda (x) (== (type_ord x) 9)))
-        (define +1        (lambda (x) (+ x 1)))
-        (define -1        (lambda (x) (- x 1)))
-        (define apply     (lambda (item L) (eval (cons item L)))
+        (define ++        (lambda (x) (+ x 1)))
+        (define --        (lambda (x) (- x 1)))
+        (define apply     (lambda (item L) (eval (cons item L))))
+        (define Y
+          (lambda (F)
+            ((lambda (self)
+               (F (lambda (x)((self self) x))))
+             (lambda (self)
+               (F (lambda (x)((self self) x)))))))
         )))
     )
     ";
