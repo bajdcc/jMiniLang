@@ -19,6 +19,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 public class ModuleRemote implements IInterpreterModule {
 
 	private static ModuleRemote instance = new ModuleRemote();
+	private static boolean enable = false;
 	private UIRemoteWindow remote;
 	private UIRemoteGraphics graphics;
 	private Queue<Character> queue = new LinkedBlockingDeque<>(1024);
@@ -27,6 +28,10 @@ public class ModuleRemote implements IInterpreterModule {
 	private RuntimeCodePage runtimeCodePage;
 
 	public static final int UI_NUM = 8;
+
+	public static void enabled() {
+		enable = true;
+	}
 
 	public void setGraphics() {
 		if (remote == null) {
@@ -82,8 +87,8 @@ public class ModuleRemote implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) throws Exception {
-                if (remote != null && graphics == null)
-                    setGraphics();
+				if (enable && graphics == null)
+					setGraphics();
 				return null;
 			}
 		});

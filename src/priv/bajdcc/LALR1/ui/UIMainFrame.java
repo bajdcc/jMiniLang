@@ -4,6 +4,7 @@ import priv.bajdcc.LALR1.grammar.Grammar;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeCodePage;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeException;
 import priv.bajdcc.LALR1.interpret.Interpreter;
+import priv.bajdcc.LALR1.interpret.module.ModuleRemote;
 import priv.bajdcc.LALR1.interpret.os.IOSCodePage;
 import priv.bajdcc.LALR1.interpret.os.irq.IRPrint;
 import priv.bajdcc.LALR1.interpret.os.irq.IRRemote;
@@ -59,6 +60,7 @@ public class UIMainFrame extends JFrame {
 
 	public static void main(String[] args) {
 		UIMainFrame frame = new UIMainFrame();
+		ModuleRemote.enabled();
 		frame.setTimer();
 		startOS(frame.getPanel().getUIGraphics());
 		frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));

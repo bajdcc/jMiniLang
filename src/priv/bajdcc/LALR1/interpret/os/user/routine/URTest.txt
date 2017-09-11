@@ -3,6 +3,7 @@ import "sys.list";
 import "sys.proc";
 import "sys.task";
 import "sys.string";
+import "module.lisp";
 
 call g_set_process_desc("test routinue");
 var pid = call g_get_pid();
@@ -254,6 +255,120 @@ var stage_philo2 = func ~() {
     call g_destroy_mutex(call g_use_mutex("philo_print"));
 };
 
+// -------------------------------------
+// lisp
+/* 哲学家就餐问题 - 管程解决 */
+var stage_lisp = func ~() {
+    call word_typewrite("\n    TEST LISP!!!       @jMiniLisp \n", 100);
+    var env = call g_lisp_env();
+    var eval = func~(exp) {
+        call word_typewrite("jMiniLisp> " + exp + "\n", 30);
+        var val = call g_lisp_repl(env, exp);
+        if (val != "null") {
+            call word_typewrite("Answer: " + val + "\n", 30);
+        }
+    };
+    var comment = func~(str) -> call word_typewrite("\n    " + str + "\n\n", 40);
+    var builtin = func~(str) -> call word_typewrite("jMiniLisp> " + str + "\n", 25);
+    // eval code
+    // ##########################
+    call comment("1. Lambda");
+    call eval("(define circle-area
+    (lambda (r)
+        (* PI
+            (* r r))))");
+    call eval("(circle-area 10)");
+    call eval("(define fact
+    (lambda (n)
+        (if (<= n 1)
+            1
+            (* n (fact (- n 1))))))");
+    call eval("(fact 10)");
+    // ##########################
+    call comment("2. List");
+    call eval("(list 1 2 3 4 5)");
+    call eval("(range 1 10)");
+    call eval("(define L (list 1 2 3 4 5))");
+    call eval("(car L)");
+    call eval("(cdr L)");
+    // ##########################
+    call comment("3. Count");
+    call builtin("(define count
+    (lambda (item L)
+        (if L
+            (+ 0
+                (== item (car L))
+                (count item (cdr L)))
+            0)))");
+    call eval("(count 0 (list 0 1 2 3 0 0))");
+    call eval("(count 'the
+    '(the more the merrier the bigger the better))");
+    // ##########################
+    call comment("4. Type");
+    call eval("(null? (list))");
+    call eval("(number? 5.0)");
+    call eval("(number? (list))");
+    call eval("(type 'hello)");
+    call eval("(list? (list))");
+    call eval("(car '(a b c))");
+    call eval("(type (car '(a b c)))");
+    call eval("(cdr (cons 'a '(b c)))");
+    // ##########################
+    call comment("5. Function");
+    call eval("(define repeat
+    (lambda (f)
+        (lambda (x)
+            (f (f x)))))");
+    call eval("(define twice
+    (lambda (x)
+        (* 2 x)))");
+    call eval("((repeat twice) 10)");
+    call eval("(define sum
+    (lambda (n)
+        (if (< n 2)
+            1
+            (+ n (sum (- n 1))))))");
+    call eval("(sum 10)");
+    call eval("(min 50 60)");
+    call eval("(range 0 10)");
+    call eval("(define fib
+    (lambda (n)
+    (if (<= n 2)
+        1
+        (+ (fib (- n 1)) (fib (- n 2))))))");
+    call eval("(fib 10)");
+    call eval("(map fib (list 3 2 3 4 5))");
+    call eval("(map fib (range 1 10))");
+    call eval("(map
+    (lambda (n)
+        ((repeat twice) n))
+    (range 1 10))");
+    call builtin("(define apply
+    (lambda (item L)
+        (eval (cons item L))))");
+    call eval("(apply +
+    (list \"hello\" #s \"world\" #s \"bajdcc!\"))");
+    call eval("(apply + (range 1 10))");
+    call eval("(append '(a b) '(c d))");
+    call eval("(apply 'append '('(a b) '(c d)))");
+    call eval("(apply max (range 1 10))");
+    call builtin("(define Y
+    (lambda (F)
+        ((lambda (self)
+            (F (lambda (x)((self self) x))))
+        (lambda (self)
+            (F (lambda (x)((self self) x))))))))))");
+    call eval("(define fib_Y
+    (lambda (f)
+        (lambda (n)
+            (if (<= n 2)
+                1
+                (+ (f (- n 1)) (f (- n 2)))))))");
+    call eval("(apply + (map (Y fib_Y) (range 1 10)))");
+    // ##########################
+    call comment("The end.                @bajdcc");
+};
+
 var name = call g_array_get(args, 0);
 if (call g_is_null(name)) {
     call create_stage(stage_clear);
@@ -261,8 +376,10 @@ if (call g_is_null(name)) {
 } else if (name == "philo") {
     call create_stage(stage_philo);
 } else if (name == "philo2") {
-     call create_stage(stage_philo2);
- }
+    call create_stage(stage_philo2);
+} else if (name == "lisp") {
+    call create_stage(stage_lisp);
+}
 
 call g_stop_share(signal);
 call g_destroy_pipe(out);
