@@ -68,6 +68,14 @@ public class TestInterpret12 {
                             "call g_print(\"-----\");\n" +
                             "call g_print(call g_lisp_repl(env, \"(define fib_Y (lambda (f) (lambda (n) (if (<= n 2) 1 (+ (f (- n 1)) (f (- n 2)))))))\"));\n" +
                             "call g_print(call g_lisp_repl(env, \"(apply + (map (Y fib_Y) (range 1 10)))\"));\n" +
+                            "call g_print(\"-----\");\n" +
+                            "call g_print(call g_lisp_repl(env, \"(cond ((== 1 2) 3 7) ((== 4 4) 6))\"));\n" +
+                            "call g_print(call g_lisp_repl(env, \"(cond ((== 1 2) 3) ((== 4 4) 6))\"));\n" +
+                            "call g_print(call g_lisp_repl(env, \"(define N 8)\"));\n" +
+                            "call g_print(call g_lisp_repl(env, \"(case N (1 2) (8 9))\"));\n" +
+                            "call g_print(call g_lisp_repl(env, \"(case N (3 2) (2 9) ('(4 8) 5))\"));\n" +
+                            "call g_print(call g_lisp_repl(env, \"(when (> N 5) 6)\"));\n" +
+                            "call g_print(call g_lisp_repl(env, \"(when (> N 50) 6)\"));\n" +
                             ""
             };
 

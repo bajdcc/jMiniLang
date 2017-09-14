@@ -333,9 +333,9 @@ var stage_lisp = func ~() {
     call eval("(range 0 10)");
     call eval("(define fib
     (lambda (n)
-    (if (<= n 2)
-        1
-        (+ (fib (- n 1)) (fib (- n 2))))))");
+        (if (<= n 2)
+            1
+            (+ (fib (- n 1)) (fib (- n 2))))))");
     call eval("(fib 10)");
     call eval("(map fib (list 3 2 3 4 5))");
     call eval("(map fib (range 1 10))");

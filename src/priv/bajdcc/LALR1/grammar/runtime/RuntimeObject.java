@@ -217,6 +217,19 @@ public class RuntimeObject implements Cloneable {
         return o;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (obj instanceof RuntimeObject) {
+            RuntimeObject o = (RuntimeObject) obj;
+            if (this.obj == null)
+                return o.obj == null && this.type.equals(o.type) && this.flag == o.flag;
+            return this.obj.equals(o.obj) && this.type.equals(o.type) && this.flag == o.flag;
+        }
+        return super.equals(obj);
+    }
+
 	@Override
 	public String toString() {
 		return " " + String.valueOf(symbol) + " " + type.getName() +

@@ -75,6 +75,10 @@ public class RuntimeArray implements Cloneable {
 		return null;
 	}
 
+    public boolean contains(RuntimeObject obj) throws RuntimeException {
+        return array.contains(obj);
+    }
+
 	public RuntimeObject size() {
 		return new RuntimeObject(BigInteger.valueOf(array.size()));
 	}

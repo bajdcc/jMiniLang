@@ -35,6 +35,7 @@ var init = func ~(env) {
     var code = "
     (begin
         (define nil       ())
+        (define when      (lambda (t a) (if t a nil)))
         (define list      (lambda args args))
         (define caar      (lambda (x) (car (car x))))
         (define cadr      (lambda (x) (car (cdr x))))
@@ -145,6 +146,8 @@ var standard_env = func [
     call set("PI", g_PI);
     call set("E", g_E);
     call set("#s", " ");
+    call set("'t", g_true);
+    call set("'f", g_false);
     call init(env);
     return env;
 };
@@ -276,6 +279,42 @@ var eval = func [
                 return call eval(call g_array_empty(cond) ? alt : conseq, env);
             } else {
                 return call eval(cond ? conseq : alt, env);
+            }
+        } else if (call g_string_equal(head, "cond")) {      // conditional (cond (test_i action_i)*)
+            // (_, (test_i action_i)*) = x
+            var size = call g_array_size(x);
+            for (var j = 1; j < size; j++) {
+                var pair = call g_array_get(x, j);
+                if (!call is_list(pair) || call g_array_size(pair) != 2) {
+                    return call error("invalid cond: " + call string(pair));
+                }
+                var _test = call eval(call g_array_get(pair, 0), env); // eval test_i
+                if (_test) {
+                    return call eval(call g_array_get(pair, 1), env); // return eval action_i
+                }
+            }
+        } else if (call g_string_equal(head, "case")) {      // case (cond key (key_i action_i)*)
+            // (_, key, (key_i action_i)*) = x
+            var key = call eval(call g_array_get(x, 1), env);
+            if (call g_is_null(key)) {
+                return call error("invalid case: null " + call g_array_get(x, 1));
+            }
+            var size = call g_array_size(x);
+            for (var j = 2; j < size; j++) {
+                var pair = call g_array_get(x, j);
+                if (!call is_list(pair) || call g_array_size(pair) != 2) {
+                    return call error("invalid case: " + call string(pair));
+                }
+                var _key = call eval(call g_array_get(pair, 0), env); // eval key_i
+                if (call is_list(_key)) {
+                    if (call g_array_contains(_key, key)) {
+                        return call eval(call g_array_get(pair, 1), env); // return eval action_i
+                    }
+                } else {
+                    if (key == _key) {
+                        return call eval(call g_array_get(pair, 1), env); // return eval action_i
+                    }
+                }
             }
         } else if (call g_string_equal(head, "set!")) {    // definition (set! var exp)
             // (_, var, exp) = x
