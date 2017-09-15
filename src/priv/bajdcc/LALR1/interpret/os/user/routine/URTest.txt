@@ -257,19 +257,28 @@ var stage_philo2 = func ~() {
 
 // -------------------------------------
 // lisp
-/* 哲学家就餐问题 - 管程解决 */
+/* LISP 测试示例 */
 var stage_lisp = func ~() {
     call word_typewrite("\n    TEST LISP!!!       @jMiniLisp \n", 100);
     var env = call g_lisp_env();
     var eval = func~(exp) {
-        call word_typewrite("jMiniLisp> " + exp + "\n", 30);
+        call puts("\n");
+        //call puts("jMiniLisp> ");
+        call word_typewrite(exp + "\n", 30);
         var val = call g_lisp_repl(env, exp);
         if (val != "null") {
-            call word_typewrite("Answer: " + val + "\n", 30);
+            call puts("= ");
+            call word_typewrite(val + "\n", 30);
         }
     };
     var comment = func~(str) -> call word_typewrite("\n    " + str + "\n\n", 40);
-    var builtin = func~(str) -> call word_typewrite("jMiniLisp> " + str + "\n", 25);
+    var out_call = func~(strs) -> call word_typewrite(call g_array_get(strs, 0) + "\n", 35);
+    call g_map_put(env, "out", out_call);
+    var builtin = func~(str) {
+        call puts("\n");
+        //call puts("jMiniLisp> ");
+        call word_typewrite(str + "\n", 25);
+    };
     // eval code
     // ##########################
     call comment("1. Lambda");
@@ -365,6 +374,31 @@ var stage_lisp = func ~() {
                 1
                 (+ (f (- n 1)) (f (- n 2)))))))");
     call eval("(apply + (map (Y fib_Y) (range 1 10)))");
+    // ##########################
+    call comment("6. Condition");
+    call eval("(cond
+    ((== 1 2) 3 7)
+    ((== 4 4) 6))");
+    call eval("(cond
+    ((== 1 2) 3)
+    ((== 4 4) 6))");
+    call eval("(define N 8)");
+    call eval("(case N
+    (1 2)
+    (8 9))");
+    call eval("(case N
+    (3 2)
+    (2 9)
+    ('(4 8) 5))");
+    call eval("(when (> N 5) 6)");
+    call eval("(when (> N 50) 6)");
+    call eval("(while (> N 1)
+    (set! N (-- N)))");
+    call eval("(val N)");
+    call eval("(while (<= N 10)
+    (begin
+        (out (+ \"Hello_world!_\" (str N)))
+        (set! N (++ N))))");
     // ##########################
     call comment("The end.                @bajdcc");
 };

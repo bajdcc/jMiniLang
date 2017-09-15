@@ -8,7 +8,7 @@ import "sys.ui";
 
 var symbol = func ~(s) -> call g_set_flag(s, 1);
 var str = func ~(s) -> call g_set_flag(s, 2);
-var error = func ~(s) -> call g_set_flag(s, 3);
+var error = func ~(s) { call g_set_flag(s, 3); return "Error: " + s; };
 
 var is_symbol = func ~(exp) -> call g_get_type_ordinal(exp) == 6 && call g_is_flag(exp, 1);
 var is_string = func ~(exp) -> call g_get_type_ordinal(exp) == 6 && call g_is_flag(exp, 2);
@@ -140,6 +140,9 @@ var standard_env = func [
     call bind_direct("map", _map);
     // append
     call bind_direct("append", "g_func_apply_array");
+    // str
+    var _str = func ~(args) -> call string(call g_array_get(args, 0));
+    call bind_direct("str", _str);
     // ------------------------
     var set = func ~(name, value) -> call g_map_put(env, name, value);
     // ------------------------
@@ -161,7 +164,9 @@ var atom = func [
     "Numbers become numbers; every other token is a symbol."
     ] ~(token) {
     if (call g_string_start_with(token, "\"")) {
-        return call str(call g_string_substr(token, 1, call g_string_length(token) - 1));
+        var s = call g_string_substr(token, 1, call g_string_length(token) - 1);
+        let s = call g_string_replace(s, "_", " ");
+        return call str(s);
     }
     var number = call g_string_to_number(token);
     if (call g_is_null(number)) {
