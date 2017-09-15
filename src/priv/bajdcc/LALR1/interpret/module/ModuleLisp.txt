@@ -35,7 +35,7 @@ var init = func ~(env) {
     var code = "
     (begin
         (define nil       ())
-        (define when      (lambda (t a) (if t a nil)))
+        (define when      (lambda (t a) (if t a)))
         (define list      (lambda args args))
         (define caar      (lambda (x) (car (car x))))
         (define cadr      (lambda (x) (car (cdr x))))
@@ -53,6 +53,7 @@ var init = func ~(env) {
         (define list?     (lambda (x) (== (type_ord x) 9)))
         (define ++        (lambda (x) (+ x 1)))
         (define --        (lambda (x) (- x 1)))
+        (define val       (lambda (x) (eval x)))
         (define apply     (lambda (item L) (eval (cons item L))))
         (define Y
           (lambda (F)
@@ -266,6 +267,23 @@ var eval = func [
             var val = call g_new(b);
             call g_array_insert(val, 0, a);
             return val;
+        } else if (call g_string_equal(head, "while")) {   // while (while test action)
+            // (_, test, action) = x
+            var test = call g_array_get(x, 1);
+            var action = call g_array_get(x, 2);
+            for (;;) {
+                var cond = call eval(test, env);
+                if (call is_error(cond)) {
+                    return cond;
+                }
+                if (call is_list(cond)) {
+                    return call error("invalid while: test " + call string(cond));
+                } else if (cond) {
+                    call eval(action, env);
+                } else {
+                    break;
+                }
+            }
         } else if (call g_string_equal(head, "if")) {      // conditional (if test conseq alt)
             // (_, test, conseq, alt) = x
             var test = call g_array_get(x, 1);
@@ -280,7 +298,7 @@ var eval = func [
             } else {
                 return call eval(cond ? conseq : alt, env);
             }
-        } else if (call g_string_equal(head, "cond")) {      // conditional (cond (test_i action_i)*)
+        } else if (call g_string_equal(head, "cond")) {    // conditional (cond (test_i action_i)*)
             // (_, (test_i action_i)*) = x
             var size = call g_array_size(x);
             for (var j = 1; j < size; j++) {
@@ -293,7 +311,7 @@ var eval = func [
                     return call eval(call g_array_get(pair, 1), env); // return eval action_i
                 }
             }
-        } else if (call g_string_equal(head, "case")) {      // case (cond key (key_i action_i)*)
+        } else if (call g_string_equal(head, "case")) {    // case (cond key (key_i action_i)*)
             // (_, key, (key_i action_i)*) = x
             var key = call eval(call g_array_get(x, 1), env);
             if (call g_is_null(key)) {
@@ -320,7 +338,7 @@ var eval = func [
             // (_, var, exp) = x
             var _var = call g_array_get(x, 1);
             var exp = call g_array_get(x, 2);
-            call g_map_set(call find(_var, env), _var, call eval(exp, env));
+            call g_map_put(call find(_var, env), _var, call eval(exp, env));
         } else if (call g_string_equal(head, "define")) {  // assignment (define var exp)
             // (_, var, exp) = x
             var _var = call g_array_get(x, 1);
