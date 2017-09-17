@@ -49,7 +49,7 @@ public class UIMainFrame extends JFrame {
 		panel = new UIPanel();
 		this.setTitle("jMiniLang Command Window");
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.setPreferredSize(new Dimension(800, 600));
+		this.setPreferredSize(new Dimension(800, 610));
 		this.setContentPane(panel);
 		this.pack();
 		this.setLocationRelativeTo(null);

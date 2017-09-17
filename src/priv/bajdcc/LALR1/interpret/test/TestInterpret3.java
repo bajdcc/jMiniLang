@@ -47,6 +47,10 @@ public class TestInterpret3 {
 							+ "};\n"
 							+ "call enumerator(0, 10, set);\n"
 							+ "call g_print(sum);\n",
+					"import \"sys.base\";" +
+							"var a=func~(){var f=func~()->call g_print(\"af\");call f();};" +
+							"var b=func~(){var f=func~()->call g_print(\"bf\");call f();};" +
+							"call a();call b();"
 							};
 
 			Interpreter interpreter = new Interpreter();

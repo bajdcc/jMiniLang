@@ -3,6 +3,7 @@
 ===========================
 
 设计思路：https://zhuanlan.zhihu.com/p/28540783
+
 视频演示：https://www.bilibili.com/video/av13294962/
 
 ***jMiniLang*** is a simplified interpreter framework. Developed by ***bajdcc***.
@@ -789,9 +790,13 @@ export "g_func_import_string_module";
 ![Screenshot 6](https://pic4.zhimg.com/v2-3b2c7ba9dd8d494555bd2b260c07e87f_r.png)
 
 *Screenshot 7 - 哲学家就餐*
+
 专栏：https://zhuanlan.zhihu.com/p/29008180
+
 ![Screenshot 7](https://pic1.zhimg.com/v2-15c59a7711011767c2279f9a23e16c78_r.png)
 
 *Screenshot 8 - LISP*
+
 专栏：https://zhuanlan.zhihu.com/p/29243574
+
 ![Screenshot 8](https://pic1.zhimg.com/v2-1b12b80741e7b0fcd4f3102f462a7780_r.png)

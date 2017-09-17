@@ -64,7 +64,7 @@ public class Codegen implements ICodegen, ICodegenBlock, ICodegenByteWriter {
 		insts = new ArrayList<>();
 		for (RuntimeInstUnary unary : data.callsToWriteBack) {
 			unary.op1 = data.funcEntriesMap.get(funcMap.list.get(unary.op1)
-					.getRealName());
+					.getName().toRealString());
 		}
 		for (RuntimeInstBase inst : data.insts) {
 			inst.gen(this);

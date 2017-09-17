@@ -106,13 +106,16 @@ public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
 		if (func != null) {
 			return func;
 		}
+		int count = 0;
 		for (Function function : funcMap.list) {
 			String funcName = function.getRealName();
 			if (funcName != null && funcName.equals(name)) {
-				return function;
+				func = function;
+				count++;
 			}
 		}
-		return null;
+		// count=1 即无歧义, count>1 有歧义
+		return (count == 1) ? func : null;
 	}
 
 	@Override

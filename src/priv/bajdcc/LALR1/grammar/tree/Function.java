@@ -17,12 +17,12 @@ import java.util.ArrayList;
 public class Function implements IExp {
 
 	/**
-	 * 名称
+	 * 名称（Lambda记号）
 	 */
 	private Token name = null;
 
 	/**
-	 * 真实名称（Lambda记号）
+	 * 真实名称（变量名）
 	 */
 	private String realName = null;
 
@@ -137,7 +137,7 @@ public class Function implements IExp {
 
 	@Override
 	public void genCode(ICodegen codegen) {
-		codegen.genFuncEntry(realName);
+		codegen.genFuncEntry(name.toRealString());
 		codegen.genCode(RuntimeInst.inop);
 		int start = codegen.getCodeIndex();
 		int i = 0;
