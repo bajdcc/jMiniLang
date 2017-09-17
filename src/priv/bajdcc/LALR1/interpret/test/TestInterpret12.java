@@ -78,6 +78,9 @@ public class TestInterpret12 {
                             "call g_print(call g_lisp_repl(env, \"(when (> N 50) 6)\"));\n" +
                             "call g_print(call g_lisp_repl(env, \"(while (< N 12) (set! N (++ N)))\"));\n" +
                             "call g_print(call g_lisp_repl(env, \"(val N)\"));\n" +
+                            "call g_print(\"-----\");\n" +
+                            "call g_print(call g_lisp_repl(env, \"(call/cc (lambda (k) (* 5 4)) (lambda (c) c))\"));\n" +
+                            "call g_print(call g_lisp_repl(env, \"(call/cc (lambda (k) (k 4)) (lambda (c) c))\"));\n" +
                             ""
             };
 

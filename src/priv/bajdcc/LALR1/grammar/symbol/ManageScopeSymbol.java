@@ -1,10 +1,5 @@
 package priv.bajdcc.LALR1.grammar.symbol;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Stack;
-
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeObject;
 import priv.bajdcc.LALR1.grammar.semantic.ISemanticRecorder;
 import priv.bajdcc.LALR1.grammar.tree.Function;
@@ -14,6 +9,11 @@ import priv.bajdcc.util.HashListMapEx;
 import priv.bajdcc.util.Position;
 import priv.bajdcc.util.lexer.token.Token;
 import priv.bajdcc.util.lexer.token.TokenType;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Stack;
 
 /**
  * 命名空间管理
@@ -135,8 +135,8 @@ public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
 	}
 
 	@Override
-	public void registeFunc(String name, Function func) {
-		if (func.getName().kToken == TokenType.ID) {
+    public void registerFunc(String name, Function func) {
+        if (func.getName().kToken == TokenType.ID) {
 			func.setRealName(func.getName().toRealString());
 			symbolList.add(func.getRealName());
 		} else {

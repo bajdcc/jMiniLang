@@ -1,9 +1,5 @@
 package priv.bajdcc.LALR1.grammar.semantic;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 import priv.bajdcc.LALR1.grammar.error.SemanticException.SemanticError;
 import priv.bajdcc.LALR1.grammar.symbol.BlockType;
 import priv.bajdcc.LALR1.grammar.tree.*;
@@ -13,6 +9,10 @@ import priv.bajdcc.LALR1.semantic.token.ISemanticAnalyzer;
 import priv.bajdcc.util.lexer.token.KeywordType;
 import priv.bajdcc.util.lexer.token.Token;
 import priv.bajdcc.util.lexer.token.TokenType;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * 【语义分析】语义处理器集合
@@ -59,7 +59,7 @@ public class SemanticHandler {
             }
             Function func = new Function();
             func.setName(token);
-            manage.getManageScopeService().registeFunc(
+            manage.getManageScopeService().registerFunc(
                     token.toRealString(), func);
             if (token.kToken != TokenType.ID) {
                 token.object = func.getRealName();

@@ -1,20 +1,12 @@
 package priv.bajdcc.LALR1.semantic;
 
-import java.util.ArrayList;
-import java.util.stream.Collectors;
-
 import priv.bajdcc.LALR1.grammar.semantic.ISemanticRecorder;
 import priv.bajdcc.LALR1.grammar.symbol.IManageSymbol;
 import priv.bajdcc.LALR1.grammar.symbol.IQuerySymbol;
 import priv.bajdcc.LALR1.grammar.tree.Function;
 import priv.bajdcc.LALR1.semantic.lexer.TokenFactory;
 import priv.bajdcc.LALR1.semantic.token.ISemanticAnalyzer;
-import priv.bajdcc.LALR1.semantic.tracker.ErrorRecord;
-import priv.bajdcc.LALR1.semantic.tracker.Instruction;
-import priv.bajdcc.LALR1.semantic.tracker.InstructionRecord;
-import priv.bajdcc.LALR1.semantic.tracker.Tracker;
-import priv.bajdcc.LALR1.semantic.tracker.TrackerError;
-import priv.bajdcc.LALR1.semantic.tracker.TrackerResource;
+import priv.bajdcc.LALR1.semantic.tracker.*;
 import priv.bajdcc.LALR1.syntax.Syntax;
 import priv.bajdcc.LALR1.syntax.automata.npa.NPAEdge;
 import priv.bajdcc.LALR1.syntax.automata.npa.NPAStatus;
@@ -29,6 +21,9 @@ import priv.bajdcc.util.lexer.error.RegexException;
 import priv.bajdcc.util.lexer.regex.IRegexStringIterator;
 import priv.bajdcc.util.lexer.token.Token;
 import priv.bajdcc.util.lexer.token.TokenType;
+
+import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 /**
  * 【语义分析】语义分析
@@ -583,8 +578,8 @@ public class Semantic extends Syntax implements IErrorHandler {
 		object = machine.getObject();
 		if (object != null) {
 			Function entry = (Function) object;
-			manage.getManageScopeService().registeFunc(entry.getRealName(),
-					entry);
+            manage.getManageScopeService().registerFunc(entry.getRealName(),
+                    entry);
 		}
 	}
 

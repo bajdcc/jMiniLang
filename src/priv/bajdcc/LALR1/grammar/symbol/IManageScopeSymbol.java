@@ -40,7 +40,7 @@ public interface IManageScopeSymbol {
 	 * @param func
 	 *            过程
 	 */
-	void registeFunc(String name, Function func);
+    void registerFunc(String name, Function func);
 
 	/**
 	 * 注册下个块的参数表

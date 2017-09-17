@@ -61,7 +61,12 @@ var init = func ~(env) {
                (F (lambda (x)((self self) x))))
              (lambda (self)
                (F (lambda (x)((self self) x)))))))
-        )))
+        (define call/cc
+          (lambda (f cc)
+            (f
+              (lambda (x k) (cc x))
+              cc)))
+        )
     )
     ";
     call g_lisp_repl(env, code);
@@ -150,8 +155,8 @@ var standard_env = func [
     call set("PI", g_PI);
     call set("E", g_E);
     call set("#s", " ");
-    call set("'t", g_true);
-    call set("'f", g_false);
+    call set("#t", g_true);
+    call set("#f", g_false);
     call init(env);
     return env;
 };

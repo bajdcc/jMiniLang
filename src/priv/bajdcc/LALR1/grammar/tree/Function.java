@@ -55,6 +55,10 @@ public class Function implements IExp {
 		return name;
 	}
 
+	public String getRefName() {
+		return name.toRealString() + "$" + realName;
+	}
+
 	public void setName(Token name) {
 		this.name = name;
 	}
@@ -137,7 +141,7 @@ public class Function implements IExp {
 
 	@Override
 	public void genCode(ICodegen codegen) {
-		codegen.genFuncEntry(name.toRealString());
+		codegen.genFuncEntry(getRefName());
 		codegen.genCode(RuntimeInst.inop);
 		int start = codegen.getCodeIndex();
 		int i = 0;
