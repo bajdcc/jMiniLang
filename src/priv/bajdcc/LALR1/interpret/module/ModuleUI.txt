@@ -83,3 +83,7 @@ var g_ui_inputd = func ~(callback, arr) {
     call g_write_pipe(handle, call g_array_get(arr, 0));
 };
 export "g_ui_inputd";
+var g_ui_print_internal = func ~(ch) {
+    while (call g_ui_print_internal_block(ch)) {}
+};
+export "g_ui_print_internal";

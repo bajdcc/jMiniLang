@@ -24,6 +24,7 @@ public class ModuleUI implements IInterpreterModule {
 	private Queue<Character> queueDisplay = new ArrayDeque<>();
 	private StringBuilder sb = new StringBuilder();
 	private RuntimeCodePage runtimeCodePage;
+	private static final int PRINT_BLOCK_TIME = 5;
 
 	public void setGraphics(UIGraphics graphics) {
 		this.graphics = graphics;
@@ -62,7 +63,7 @@ public class ModuleUI implements IInterpreterModule {
 	}
 
 	private void buildUIMethods(IRuntimeDebugInfo info) {
-		info.addExternalFunc("g_ui_print_internal", new IRuntimeDebugExec() {
+		info.addExternalFunc("g_ui_print_internal_block", new IRuntimeDebugExec() {
 			@Override
 			public String getDoc() {
 				return "显示输出";
@@ -76,8 +77,12 @@ public class ModuleUI implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) throws Exception {
-				graphics.drawText((char) args.get(0).getObj());
-				return null;
+				boolean failure = graphics.drawText((char) args.get(0).getObj());
+				if (failure) {
+					status.getService().getProcessService().waitForUI();
+					status.getService().getProcessService().sleep(status.getPid(), PRINT_BLOCK_TIME);
+				}
+				return new RuntimeObject(failure);
 			}
 		});
 		info.addExternalFunc("g_ui_input_internal", new IRuntimeDebugExec() {

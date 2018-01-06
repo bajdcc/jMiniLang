@@ -54,4 +54,9 @@ public interface IRuntimeProcessService {
 	 * @return 是否成功
 	 */
 	boolean addCodePage(String name, String code);
+
+	/**
+	 * 让解释器等待一段时间，让UI刷新
+	 */
+	void waitForUI();
 }

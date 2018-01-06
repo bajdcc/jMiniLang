@@ -14,6 +14,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class UIGraphics {
 
 	private static final int CARET_TIME = 20;
+    private static final int MAX_QUEUE_SIZE = 2000;
 	private int w, h, cols, rows, width, height, zoom, size;
 	private char[] data;
 	private int ptr_x, ptr_y;
@@ -40,7 +41,7 @@ public class UIGraphics {
 		this.ptr_y = 0;
 		this.ptr_mx = 0;
 		this.ptr_my = 0;
-		this.queue = new LinkedBlockingQueue<>(1024);
+        this.queue = new LinkedBlockingQueue<>(MAX_QUEUE_SIZE);
 		this.fontImage = new UIFontImage(this.width, this.height);
 		this.image = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
 		this.image.getGraphics().setColor(Color.white);
@@ -176,8 +177,12 @@ public class UIGraphics {
         g.drawImage(image, 0, 0, null);
 	}
 
-	public void drawText(char c) {
+    public boolean drawText(char c) {
+        if (this.queue.size() == MAX_QUEUE_SIZE) { // 满了
+            return true;
+        }
 		this.queue.add(c);
+        return false;
 	}
 
 	public void setCaret(boolean caret) {

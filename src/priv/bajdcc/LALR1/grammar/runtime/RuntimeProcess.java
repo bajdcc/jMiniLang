@@ -43,6 +43,9 @@ public class RuntimeProcess implements IRuntimeProcessService {
 	private static Logger logger = Logger.getLogger("proc");
 	private static final int MAX_PROCESS = 1000;
 	private static final int MAX_CYCLE = 150;
+	private static final int TIME_SLEEP_FULL = 5;
+	private static final int CLOCK_ONCE_SLEEP = 50;
+	private static final int CLOCK_WAIT_UI = 500;
 	private int cyclePtr = 0;
 	private String name;
 	private RuntimeCodePage codePage;
@@ -52,6 +55,7 @@ public class RuntimeProcess implements IRuntimeProcessService {
 	private Set<Integer> setProcessId;
 	private Set<Integer> destroyedProcess;
 	private RuntimeService service;
+	private boolean isWaitingForUI = false;
 
 	public RuntimeProcess(String name, InputStream input) throws Exception {
 		runMainProcess(name, input);
@@ -126,7 +130,13 @@ public class RuntimeProcess implements IRuntimeProcessService {
 	private boolean schd() throws Exception {
 		if (setProcessId.isEmpty())
 			return false;
+		if (isWaitingForUI) {
+			Thread.sleep(CLOCK_WAIT_UI);
+			isWaitingForUI = false;
+			return true;
+		}
 		List<Integer> pids = new ArrayList<>(setProcessId);
+		int sleep = 0;
 		for (int pid : pids) {
 			SchdProcess process = arrProcess[pid];
 			if (process.runnable) {
@@ -135,6 +145,7 @@ public class RuntimeProcess implements IRuntimeProcessService {
 				for (int i = 0; i < cycle; i++) {
 					if (process.sleep > 0) {
 						process.sleep--;
+						sleep++;
 						break;
 					}
 					if (process.runnable) {
@@ -146,7 +157,21 @@ public class RuntimeProcess implements IRuntimeProcessService {
 						}
 					}
 				}
+			} else {
+				sleep++;
 			}
+		}
+		if (sleep == pids.size()) { // 都在休眠，等待并关掉休眠时间
+			for (int pid : pids) {
+				SchdProcess process = arrProcess[pid];
+				if (process.runnable) {
+					if (process.sleep < CLOCK_ONCE_SLEEP)
+						process.sleep = 0;
+					else
+						process.sleep -= CLOCK_ONCE_SLEEP;
+				}
+			}
+			Thread.sleep(TIME_SLEEP_FULL);
 		}
 		return true;
 	}
@@ -287,5 +312,10 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		}
 		arrCodes.put(name, code);
 		return true;
+	}
+
+	@Override
+	public void waitForUI() {
+		isWaitingForUI = true;
 	}
 }
