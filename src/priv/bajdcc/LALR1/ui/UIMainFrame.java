@@ -108,6 +108,7 @@ public class UIMainFrame extends JFrame {
 				new URTime(),
 				new URCount(),
 				new URTest(),
+                new URMsg(),
 		};
 
 		try {

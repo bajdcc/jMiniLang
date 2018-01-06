@@ -181,6 +181,7 @@ public class ModuleUI implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) throws Exception {
+                status.getService().getProcessService().sleep(status.getPid(), INPUT_TIME);
 				return new RuntimeObject(queueDisplay.poll());
 			}
 		});

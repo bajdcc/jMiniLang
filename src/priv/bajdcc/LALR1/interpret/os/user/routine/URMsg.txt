@@ -1,0 +1,69 @@
+import "sys.base";
+import "sys.list";
+import "sys.proc";
+import "sys.task";
+import "sys.string";
+import "sys.net";
+
+call g_set_process_desc("time routinue");
+var pid = call g_get_pid();
+var share = call g_wait_share("PID#" + pid);
+call g_stop_share("PID#" + pid);
+var args = call g_map_get(share, "args");
+
+var in = call g_create_pipe("PIPEIN#" + pid);
+var out = call g_create_pipe("PIPEOUT#" + pid);
+
+var signal = "PIDSIG#" + pid;
+call g_start_share(signal, true);
+
+var help = func ["HELP"] ~(in, out) {
+    call g_write_pipe(out, "Usage:\n");
+    call g_write_pipe(out, "---- Create server ----\n");
+    call g_write_pipe(out, "    msg server [PORT]\n");
+    call g_write_pipe(out, "  # msg server 7777\n");
+    call g_write_pipe(out, "---- Create client ----\n");
+    call g_write_pipe(out, "    msg connect [IP:PORT]\n");
+    call g_write_pipe(out, "  # msg connect 127.0.0.1:7777\n");
+    call g_destroy_pipe(out);
+    call g_destroy_pipe(in);
+};
+
+if (call g_array_size(args) < 2) {
+    call g_write_pipe(out, "Error: missing arguments.\n");
+    return call help(in, out);
+}
+
+if (call g_array_size(args) > 2) {
+    call g_write_pipe(out, "Error: too many arguments.\n");
+    return call help(in, out);
+}
+
+var pipe = func ["PIPE"] ~(ch, out) {
+    call g_write_pipe(out, ch);
+};
+
+var type = call g_array_get(args, 0);
+if (type == "server") {
+    var port = call g_string_atoi(call g_array_get(args, 1));
+    if (port == g_minus_1) {
+        call g_write_pipe(out, "Error: invalid port '" + call g_array_get(args, 1) + "'\n");
+        return call help(in, out);
+    }
+    call g_write_pipe(out, "Using port: " + port + "\n");
+    call g_printdn("Created server, port: " + port);
+    call g_net_msg_create_server(out, signal, port);
+} else if (type == "connect") {
+    var addr = call g_array_get(args, 1);
+    call g_write_pipe(out, "Using address: " + addr + "\n");
+    call g_printdn("Created client, address: " + addr);
+    call g_net_msg_create_client(out, signal, addr);
+} else {
+    call g_write_pipe(out, "Error: invalid command '" + type + "'\n");
+    return call help(in, out);
+}
+
+call g_stop_share(signal);
+
+call g_destroy_pipe(out);
+call g_destroy_pipe(in);
