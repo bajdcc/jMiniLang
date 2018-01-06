@@ -30,6 +30,7 @@ public class ModuleNet implements IInterpreterModule {
 	private static ModuleNet instance = new ModuleNet();
 
 	private static final int MSG_QUERY_TIME = 15;
+	private static final int MSG_SEND_TIME = 5;
 	private RuntimeCodePage runtimeCodePage;
 	private ModuleNetServer server;
 	private ModuleNetClient client;
@@ -287,6 +288,31 @@ public class ModuleNet implements IInterpreterModule {
 					return new RuntimeObject(BigInteger.valueOf(s.ordinal()));
 				}
 				return new RuntimeObject(BigInteger.valueOf(ModuleNetClient.Status.NULL.ordinal()));
+			}
+		});
+		info.addExternalFunc("g_net_msg_client_send", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "MSG CLIENT SEND";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kString};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+												  IRuntimeStatus status) {
+				if (getClient() != null) {
+					ModuleNetClient.Status s = getClient().getStatus();
+					if (s == ModuleNetClient.Status.RUNNING) {
+						status.getService().getProcessService().sleep(status.getPid(), MSG_SEND_TIME);
+						getClient().send(String.valueOf(args.get(0).getObj()));
+						return new RuntimeObject(true);
+					}
+				}
+				return new RuntimeObject(false);
 			}
 		});
 		// client

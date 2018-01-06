@@ -22,6 +22,7 @@ var help = func ["HELP"] ~(in, out) {
     call g_write_pipe(out, "---- Create server ----\n");
     call g_write_pipe(out, "    msg server [PORT]\n");
     call g_write_pipe(out, "  # msg server 7777\n");
+    call g_write_pipe(out, "  # msg s 7777 (no debug info)\n");
     call g_write_pipe(out, "---- Create client ----\n");
     call g_write_pipe(out, "    msg connect [IP:PORT]\n");
     call g_write_pipe(out, "  # msg connect 127.0.0.1:7777\n");
@@ -44,20 +45,20 @@ var pipe = func ["PIPE"] ~(ch, out) {
 };
 
 var type = call g_array_get(args, 0);
-if (type == "server") {
+if (type == "server" || type == "s") {
     var port = call g_string_atoi(call g_array_get(args, 1));
     if (port == g_minus_1) {
         call g_write_pipe(out, "Error: invalid port '" + call g_array_get(args, 1) + "'\n");
         return call help(in, out);
     }
-    call g_write_pipe(out, "Using port: " + port + "\n");
+    if (type == "server") { call g_write_pipe(out, "Using port: " + port + "\n"); }
     call g_printdn("Created server, port: " + port);
-    call g_net_msg_create_server(out, signal, port);
+    call g_net_msg_create_server(in, out, signal, port, type == "server");
 } else if (type == "connect") {
     var addr = call g_array_get(args, 1);
     call g_write_pipe(out, "Using address: " + addr + "\n");
     call g_printdn("Created client, address: " + addr);
-    call g_net_msg_create_client(out, signal, addr);
+    call g_net_msg_create_client(in, out, signal, addr, type == "connect");
 } else {
     call g_write_pipe(out, "Error: invalid command '" + type + "'\n");
     return call help(in, out);

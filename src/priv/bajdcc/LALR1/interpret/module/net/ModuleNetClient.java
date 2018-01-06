@@ -1,5 +1,6 @@
 package priv.bajdcc.LALR1.interpret.module.net;
 
+import com.alibaba.fastjson.JSON;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -55,6 +56,13 @@ public class ModuleNetClient extends Thread {
             return null;
         }
         return msgQueue.poll();
+    }
+
+    public void send(String msg) {
+        CHANNEL_GROUP.forEach(channel -> {
+            channel.writeAndFlush(String.format("{ \"addr\": \"%s\", \"type\": \"MSG \", \"content\": %s }\r\n",
+                    channel.localAddress().toString(), JSON.toJSONString(msg)));
+        });
     }
 
     public void exit() {

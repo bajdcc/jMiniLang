@@ -32,16 +32,12 @@ var next = func ["CALC NEXT"] ~(str) {
     for (var t = 1; t < patlen; t++) {
         call g_array_add(n, g_minus_1);
     }
-    while (u < patlen - 1)
-    {
-        if (v == m1 || (call g_string_get(str, u) == call g_string_get(str, v)))
-        {
+    while (u < patlen - 1) {
+        if (v == m1 || (call g_string_get(str, u) == call g_string_get(str, v))) {
             u++;
             v++;
             call g_array_set(n, u, v);
-        }
-        else
-        {
+        } else {
             let v = call g_array_get(n, v);
         }
     }
@@ -52,19 +48,14 @@ var find = func ["FIND WITH NEXT"] ~(str, n) {
     var i = 0;
     var j = 0;
     var slen = call g_string_length(str);
-    while (i < slen && j < patlen)
-    {
-        if (j == m1 || (call g_string_get(str, i) == call g_string_get(pat, j)))
-        {
+    while (i < slen && j < patlen) {
+        if (j == m1 || (call g_string_get(str, i) == call g_string_get(pat, j))) {
             i++; j++;
-        }
-        else
-        {
+        } else {
             let j = call g_array_get(n, j);
         }
     }
-    if (j == patlen)
-    {
+    if (j == patlen) {
         return i - j;
     }
     return m1;
@@ -81,7 +72,8 @@ var pipe = func ["PIPE"] ~(ch, out) {
             foreach (var i : call g_range_array(buf)) {
                 call g_write_pipe(out, i);
             }
-            call g_write_pipe(out, "\n");        }
+            call g_write_pipe(out, "\n");
+        }
         call g_array_clear(buf);
     } else {
         call g_array_add(buf, ch);

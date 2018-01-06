@@ -34,6 +34,13 @@ public class ModuleNetServerHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        Channel ch = ctx.channel();
+        msgQueue.add(String.valueOf(String.format("{ \"addr\": \"%s\", \"type\": \"INFO\", \"content\": \"Bye, client!\" }\r\n",
+                ch.remoteAddress().toString())));
+    }
+
+    @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         msgQueue.add(String.valueOf(msg));
         ReferenceCountUtil.release(msg);

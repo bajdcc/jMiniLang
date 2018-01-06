@@ -1,16 +1,17 @@
 // Net
 import "sys.base";
 import "sys.list";
+import "sys.func";
 import "sys.proc";
 import "sys.task";
 import "sys.string";
 
 // --------------------------------------------------------
 // SERVER
-var shutdown_server = func ~(out, signal, port) {
+var shutdown_server = func ~(out, signal, port, log) {
     call g_net_msg_shutdown_server();
     call g_printn("Shutting down msg server, port: " + port);
-    call g_write_pipe(out, "Server stopped!\n");
+    if (log) { call g_write_pipe(out, "Server stopped!\n"); }
     while (true) {
         var s = call g_net_msg_get_server_status();
         if (s == 3) {
@@ -22,8 +23,8 @@ var shutdown_server = func ~(out, signal, port) {
     }
 };
 
-var msg_receive = func ~(out, signal, port) {
-    call g_write_pipe(out, "Server listening...\n");
+var msg_receive = func ~(out, signal, port, log) {
+    if (log) { call g_write_pipe(out, "Server listening...\n"); }
     while (call g_query_share(signal)) {
         var s = call g_net_msg_get_server_msg();
         if (call g_is_null(s)) {
@@ -40,15 +41,16 @@ var msg_receive = func ~(out, signal, port) {
         var addr = call g_map_get(obj, "addr");
         var content = call g_map_get(obj, "content");
         var msg = "[" + type + "] " + addr + ": " + content;
-        call g_write_pipe(out, "[" + type + "] " + addr + ": " + content + "\n");
-        call g_printn("Received msg: " + msg);
+        if (log) { call g_write_pipe(out, "[" + type + "] " + addr + ": " + content + "\n"); }
+        else if (type == "MSG ") { call g_write_pipe(out, content + "\n"); }
+        call g_printdn("Received msg: " + msg);
     }
 };
 
-var g_net_msg_create_server = func ~(out, signal, port) {
+var g_net_msg_create_server = func ~(in, out, signal, port, log) {
     var r = call g_net_msg_create_server_internal(port);
     if (r) {
-        call g_write_pipe(out, "Server initializing...\n");
+        if (log) { call g_write_pipe(out, "Server initializing...\n"); }
         while (true) {
             var s = call g_net_msg_get_server_status();
             if (s == 3) {
@@ -59,12 +61,12 @@ var g_net_msg_create_server = func ~(out, signal, port) {
             }
             if (s == 2) {
                 call g_printn("Running msg server, port: " + port);
-                call g_write_pipe(out, "Server created successfully!\n");
+                if (log) { call g_write_pipe(out, "Server created successfully!\n"); }
                 break;
             }
         }
-        call msg_receive(out, signal, port);
-        call shutdown_server(out, signal, port);
+        call msg_receive(out, signal, port, log);
+        call shutdown_server(out, signal, port, log);
     } else {
         call g_write_pipe(out, "Client/Server already created!\n");
     }
@@ -88,12 +90,14 @@ var shutdown_client = func ~(out, signal, addr) {
     }
 };
 
-var msg_send = func ~(out, signal, addr) {
+var msg_send = func ~(in, out, signal, addr) {
     call g_write_pipe(out, "Client connecting...\n");
-    while (call g_query_share(signal)) {
+    var i = 0;
+    while (call g_query_share(signal) && i < 2) {
         var s = call g_net_msg_get_client_msg();
         if (call g_is_null(s)) {
             call g_task_sleep_signal(1, signal);
+            i++;
             continue;
         }
         call g_printdn("Received msg: " + s);
@@ -107,11 +111,24 @@ var msg_send = func ~(out, signal, addr) {
         var content = call g_map_get(obj, "content");
         var msg = "[" + type + "] " + addr + ": " + content;
         call g_write_pipe(out, "[" + type + "] " + addr + ": " + content + "\n");
-        call g_printn("Received msg: " + msg);
+        call g_printdn("Received msg: " + msg);
     }
+    var buf = [];
+    var pipe = func ["PIPE"] ~(ch, out) {
+        if (ch == '\n' || ch == '\r') {
+            var str = call g_string_build(buf);
+            call g_printn("Sending msg: " + str);
+            call g_net_msg_client_send(str);
+            call g_array_clear(buf);
+        } else {
+            call g_array_add(buf, ch);
+        }
+        call g_write_pipe(out, ch);
+    };
+    call g_read_pipe_args(in, pipe, out);
 };
 
-var g_net_msg_create_client = func ~(out, signal, addr) {
+var g_net_msg_create_client = func ~(in, out, signal, addr) {
     var r = call g_net_msg_create_client_internal(addr);
     if (r) {
         call g_write_pipe(out, "Client initializing...\n");
@@ -129,7 +146,7 @@ var g_net_msg_create_client = func ~(out, signal, addr) {
                 break;
             }
         }
-        call msg_send(out, signal, addr);
+        call msg_send(in, out, signal, addr);
         call shutdown_client(out, signal, addr);
     } else {
         call g_write_pipe(out, "Client/Server already created!\n");

@@ -4,6 +4,15 @@ import "sys.string";
 import "sys.proc";
 import "sys.ui";
 
+if (!call g_is_null(call g_query_share("cmd#histroy"))) {
+    var pid = call g_get_pid();
+    var in = call g_create_pipe("PIPEIN#" + pid);
+    var out = call g_create_pipe("PIPEOUT#" + pid);
+    call g_destroy_pipe(out);
+    call g_destroy_pipe(in);
+    return;
+}
+
 // PRINT WELCOME
 var welcome = func ["WELCOME"] ~() {
     call g_ui_println();

@@ -25,7 +25,7 @@ public class ModuleNetClientHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         Channel ch = ctx.channel();
-        ctx.writeAndFlush(String.format("{ \"addr\": \"%s\", \"type\": \"MSG \", \"content\": \"Hello, server!\" }\r\n",
+        ctx.writeAndFlush(String.format("{ \"addr\": \"%s\", \"type\": \"INFO\", \"content\": \"Hello, server!\" }\r\n",
                 ch.localAddress().toString()));
     }
 
