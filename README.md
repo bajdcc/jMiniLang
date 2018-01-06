@@ -1,12 +1,12 @@
 
-# jMiniLang - A Simple Interpreter (*Java*)
+# jMiniLang - GLR Compiler and Virtual Machine (*Java*)
 ===========================
 
 设计思路：https://zhuanlan.zhihu.com/p/28540783
 
 视频演示：https://www.bilibili.com/video/av13294962/
 
-***jMiniLang*** is a simplified interpreter framework. Developed by ***bajdcc***.
+***jMiniLang*** is a simplified compiler framework. Developed by ***bajdcc***.
 *PS.* ***LR Analysis*** refers to ***VFS*** developed by [*vczh*](https://github.com/vczh "Github page of vczh").
 
 #### Features
@@ -27,6 +27,8 @@
 14. **Virtual machine**.
 15. **Support GUI**.
 16. **Functional programming**.
+17. **LISP**.
+18. **Socket stream**.
 
 #### What it generates
 
@@ -40,7 +42,7 @@
 
 #### Virtual Machine OS
 
-An OS running on *jMiniLang* interpreter.
+An OS running on *jMiniLang* compiler and interpreter.
 
 Now has commands:
 - echo
@@ -53,6 +55,7 @@ Now has commands:
 - sleep
 - time
 - count
+- **msg**
 
 Tasks:
 - System
@@ -63,6 +66,12 @@ Tasks:
 UI:
 - Clock
 - Hitokoto
+- Monitor
+
+Toggle UI:
+- `task ui on/off clock`
+- `task ui on/off hitokoto`
+- `task ui on/off monitor`
 
 Implemented IPC, usage:
 - `task system now` -> Get system time
@@ -77,6 +86,10 @@ Utility:
 - `task util sum ...`
 - `task util product ...`
 - `task util palindrome ...`
+
+Implemented MSG, usage:
+- Create server: `msg server PORT | filter pipe`
+- Create client: `other pipe | msg connect IP:PORT`
 
 #### Manual
 
@@ -800,3 +813,9 @@ export "g_func_import_string_module";
 专栏：https://zhuanlan.zhihu.com/p/29243574
 
 ![Screenshot 8](https://pic1.zhimg.com/v2-1b12b80741e7b0fcd4f3102f462a7780_r.png)
+
+*Screenshot 9 - 网络流*
+
+专栏：https://zhuanlan.zhihu.com/p/32692408
+
+![Screenshot 9](https://pic1.zhimg.com/v2-17290335f4d3e9e278b114882956975c_r.jpg)
