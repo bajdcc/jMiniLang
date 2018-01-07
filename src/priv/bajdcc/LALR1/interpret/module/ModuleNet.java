@@ -315,6 +315,106 @@ public class ModuleNet implements IInterpreterModule {
 				return new RuntimeObject(false);
 			}
 		});
+		info.addExternalFunc("g_net_msg_client_send_with_origin", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "MSG CLIENT SEND(ORIGIN)";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kString, RuntimeObjectType.kString};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+												  IRuntimeStatus status) {
+				if (getClient() != null) {
+					ModuleNetClient.Status s = getClient().getStatus();
+					if (s == ModuleNetClient.Status.RUNNING) {
+						status.getService().getProcessService().sleep(status.getPid(), MSG_SEND_TIME);
+						getClient().send(String.valueOf(args.get(0).getObj()), String.valueOf(args.get(1).getObj()));
+						return new RuntimeObject(true);
+					}
+				}
+				return new RuntimeObject(false);
+			}
+		});
+		info.addExternalFunc("g_net_msg_server_send", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "MSG SERVER SEND";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kString};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+												  IRuntimeStatus status) {
+				if (getServer() != null) {
+					ModuleNetServer.Status s = getServer().getStatus();
+					if (s == ModuleNetServer.Status.RUNNING) {
+						status.getService().getProcessService().sleep(status.getPid(), MSG_SEND_TIME);
+						getServer().send(String.valueOf(args.get(0).getObj()));
+						return new RuntimeObject(true);
+					}
+				}
+				return new RuntimeObject(false);
+			}
+		});
+		info.addExternalFunc("g_net_msg_server_send_error", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "MSG SERVER SEND ERROR";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kString};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+												  IRuntimeStatus status) {
+				if (getServer() != null) {
+					ModuleNetServer.Status s = getServer().getStatus();
+					if (s == ModuleNetServer.Status.RUNNING) {
+						status.getService().getProcessService().sleep(status.getPid(), MSG_SEND_TIME);
+						getServer().send_error(String.valueOf(args.get(0).getObj()));
+						return new RuntimeObject(true);
+					}
+				}
+				return new RuntimeObject(false);
+			}
+		});
+		info.addExternalFunc("g_net_msg_server_send_with_origin", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "MSG SERVER SEND(ORIGIN)";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kString, RuntimeObjectType.kString};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+												  IRuntimeStatus status) {
+				if (getServer() != null) {
+					ModuleNetServer.Status s = getServer().getStatus();
+					if (s == ModuleNetServer.Status.RUNNING) {
+						status.getService().getProcessService().sleep(status.getPid(), MSG_SEND_TIME);
+						getServer().send(String.valueOf(args.get(0).getObj()), String.valueOf(args.get(1).getObj()));
+						return new RuntimeObject(true);
+					}
+				}
+				return new RuntimeObject(false);
+			}
+		});
 		// client
 		// -----------------------------------
 		info.addExternalFunc("g_net_msg_get_error", new IRuntimeDebugExec() {
@@ -348,7 +448,7 @@ public class ModuleNet implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 												  IRuntimeStatus status) {
-				return new RuntimeObject(getServer().getMessage());
+				return new RuntimeObject(getServer() == null ? null : getServer().getMessage());
 			}
 		});
 		info.addExternalFunc("g_net_msg_get_client_msg", new IRuntimeDebugExec() {
@@ -365,7 +465,24 @@ public class ModuleNet implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 												  IRuntimeStatus status) {
-				return new RuntimeObject(getClient().getMessage());
+				return new RuntimeObject(getClient() == null ? null : getClient().getMessage());
+			}
+		});
+		info.addExternalFunc("g_net_msg_get_client_addr", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "MSG CLIENT GET ADDRESS";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return null;
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+												  IRuntimeStatus status) {
+				return new RuntimeObject(getClient() == null ? null : getClient().getAddr());
 			}
 		});
 		info.addExternalFunc("g_net_parse_json", new IRuntimeDebugExec() {

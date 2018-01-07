@@ -5,6 +5,8 @@ import "sys.func";
 import "sys.proc";
 import "sys.task";
 import "sys.string";
+import "sys.ui";
+import "module.lisp";
 
 // --------------------------------------------------------
 // SERVER
@@ -153,3 +155,240 @@ var g_net_msg_create_client = func ~(in, out, signal, addr) {
     }
 };
 export "g_net_msg_create_client";
+
+// --------------------------------------------------------
+// TASK SSHD
+var sshd_shutdown_server = func ~(port) {
+    call g_net_msg_shutdown_server();
+    call g_printn("Shutting down msg server, port: " + port);
+    while (true) {
+        var s = call g_net_msg_get_server_status();
+        if (s == 3) {
+            call g_ui_printn(call g_net_msg_get_error());
+        }
+        if (s == 0) {
+            break;
+        }
+    }
+};
+
+var task_fast_invoker = func ~(cmd, arg) {
+    let cmd = call g_string_right(cmd, 1);
+    call g_array_remove(arg, 0);
+    if (call g_array_size(arg) == 1) {
+        return call g_task_get_fast(cmd, call g_array_get(arg, 0));
+    } else {
+        return call g_task_get_fast_arg(cmd, call g_array_get(arg, 0), call g_array_get(arg, 1));
+    }
+};
+
+// TASK FAST INVOKER
+var handle_task_command = func ~(arg) {
+    var arr = call g_string_split(arg, " ");
+    var cmd = call g_array_get(arr, 0);
+    if (call g_string_start_with(cmd, "@")) {
+        return call task_fast_invoker(cmd, arr);
+    }
+};
+
+var sshd_run_lisp = func ~(code) {
+    var env = call g_lisp_env();
+    let code = call g_string_right(code, 1);
+    var val = call g_lisp_repl(env, code);
+    return val;
+};
+
+var sshd_msg_receive = func ~(port) {
+    call g_ui_printn("Server listening...");
+    var cnt = 0;
+    call g_start_share("SSHD#EXIT", false);
+    while (true) {
+        if (call g_query_share("SSHD#EXIT")) {
+            call g_stop_share("SSHD#EXIT");
+            break;
+        }
+        var s = call g_net_msg_get_server_msg();
+        if (call g_is_null(s)) {
+            call g_task_sleep(1);
+            continue;
+        }
+        call g_printdn("Received msg: " + s);
+        var obj = call g_net_parse_json(s);
+        if (call g_is_null(obj)) {
+            call g_task_sleep(1);
+            continue;
+        }
+        var type = call g_map_get(obj, "type");
+        var origin = call g_map_get(obj, "origin");
+        var addr = call g_map_get(obj, "addr");
+        var content = call g_map_get(obj, "content");
+        var msg = "[" + type + "] " + addr + ": " + content;
+        call g_ui_printn("[" + type + "] " + addr + ": " + content);
+        call g_printdn("Received msg: " + msg);
+        if (type == "INFO" && call g_string_start_with(content, "Hello")) {
+            cnt++;
+            continue;
+        }
+        if (type == "INFO" && call g_string_start_with(content, "Bye")) {
+            cnt--;
+            //if (cnt == 0) { break; }
+        }
+
+        if (call g_string_start_with(content, "(")) {
+            call g_net_msg_server_send_with_origin(call sshd_run_lisp(content), origin);
+        } else if (call g_string_start_with(content, "@")) {
+            var ret = call handle_task_command(content);
+            if (call g_is_null(ret)) {
+                call g_net_msg_server_send_with_origin("Error: invalid command", origin);
+            } else {
+                call g_net_msg_server_send_with_origin(call g_to_string(ret), origin);
+            }
+        } else {
+            call g_net_msg_server_send_with_origin(content, origin);
+        }
+    }
+};
+
+var g_net_sshd = func ~(port) {
+    let port = call g_string_atoi(port);
+    if (port == g_minus_1) {
+        return "Error: Invalid port";
+    }
+    var r = call g_net_msg_create_server_internal(port);
+    if (r) {
+        call g_ui_printn("Server initializing...");
+        while (true) {
+            var s = call g_net_msg_get_server_status();
+            if (s == 3) {
+                call g_ui_printn(call g_net_msg_get_error());
+            }
+            if (s == 0) {
+                return "Error";
+            }
+            if (s == 2) {
+                call g_printn("Running msg server, port: " + port);
+                call g_ui_printn("Server created successfully!");
+                break;
+            }
+        }
+        call sshd_msg_receive(port);
+        call sshd_shutdown_server(port);
+        return "Server stopped!";
+    } else {
+        return "Error: Client/Server already created!";
+    }
+};
+export "g_net_sshd";
+
+// TASK SSHD
+// --------------------------------------------------------
+// TASK SSH
+var ssh_shutdown_client = func ~(addr) {
+    call g_net_msg_shutdown_client();
+    call g_printn("Shutting down msg client, addr: " + addr);
+    while (true) {
+        var s = call g_net_msg_get_client_status();
+        if (s == 3) {
+            call g_ui_printn(call g_net_msg_get_error());
+        }
+        if (s == 0) {
+            break;
+        }
+    }
+};
+
+var ssh_msg_recv = func ~(address) {
+    var i = 0;
+    while (i < 2) {
+        // RECV
+        var s = call g_net_msg_get_client_msg();
+        if (call g_is_null(s)) {
+            call g_task_sleep(1);
+            i++;
+            continue;
+        }
+        call g_printdn("Received msg: " + s);
+        var obj = call g_net_parse_json(s);
+        if (call g_is_null(obj)) {
+            call g_task_sleep(1);
+            i++;
+            continue;
+        }
+        var origin = call g_map_get(obj, "origin");
+        var type = call g_map_get(obj, "type");
+        var addr = call g_map_get(obj, "addr");
+        var content = call g_map_get(obj, "content");
+        var msg = "[" + type + "] " + addr + ": " + content;
+        if (type == "ECHO") {
+            if (!call g_is_null(origin) && call g_net_msg_get_client_addr() == origin) {
+                call g_ui_printn(content);
+            }
+        } else if (type == "ERR ") {
+            call g_ui_printn(msg);
+            return false;
+        } else {
+            if (!call g_is_null(origin) && call g_array_empty(address)) {
+                call g_array_add(address, origin);
+            }
+            //call g_ui_printn("[" + type + "] " + addr + ": " + content);
+        }
+        call g_printdn("Received msg: " + msg);
+    }
+    return true;
+};
+
+var ssh_msg_send = func ~() {
+    call g_ui_printn("Client connecting...");
+    var address = [];
+    while (true) {
+        // RECV
+        if (!call ssh_msg_recv(address)) {
+            break;
+        }
+
+        call g_ui_print("# \uffef");
+        call g_sleep(400);
+
+        // SEND
+        var cmd = call g_ui_input();
+        let cmd = call g_string_trim(cmd);
+        if (cmd == "exit") { break; }
+        if (call g_string_length(cmd) > 0) {
+            if (call g_array_empty(address)) {
+                call g_net_msg_client_send(cmd);
+            } else {
+                call g_net_msg_client_send_with_origin(cmd, call g_array_get(address, 0));
+            }
+        }
+    }
+};
+
+var g_net_ssh = func ~(addr) {
+    var r = call g_net_msg_create_client_internal(addr);
+    if (r) {
+        call g_ui_printn("Client initializing...");
+        while (true) {
+            var s = call g_net_msg_get_client_status();
+            if (s == 3) {
+                call g_ui_printn(call g_net_msg_get_error());
+            }
+            if (s == 0) {
+                return "Error";
+            }
+            if (s == 2) {
+                call g_printn("Running msg client, addr: " + addr);
+                call g_ui_printn("Client created successfully!");
+                break;
+            }
+        }
+        call ssh_msg_send();
+        call ssh_shutdown_client(addr);
+        return "Client stopped!";
+    } else {
+        return "Error: Client/Server already created!";
+    }
+};
+export "g_net_ssh";
+
+// TASK SSH
+// --------------------------------------------------------

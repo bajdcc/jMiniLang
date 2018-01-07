@@ -16,6 +16,7 @@ import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * 【模块】服务模块
@@ -33,6 +34,7 @@ public class ModuleTask implements IInterpreterModule {
 	}
 
 	public static final int TASK_NUM = 16;
+	private static final UUID guid = UUID.randomUUID();
 
 	@Override
 	public String getModuleName() {
@@ -140,6 +142,23 @@ public class ModuleTask implements IInterpreterModule {
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) throws Exception {
 				return new RuntimeObject(status.getService().getShareService().stat());
+			}
+		});
+		info.addExternalFunc("g_task_get_guid", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "获取GUID";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return null;
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+												  IRuntimeStatus status) throws Exception {
+				return new RuntimeObject(guid.toString());
 			}
 		});
 	}

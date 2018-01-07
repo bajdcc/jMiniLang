@@ -11,7 +11,8 @@ import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.LineBasedFrameDecoder;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.util.concurrent.GlobalEventExecutor;
@@ -65,6 +66,13 @@ public class ModuleNetClient extends Thread {
         });
     }
 
+    public void send(String msg, String address) {
+        CHANNEL_GROUP.forEach(channel -> {
+            channel.writeAndFlush(String.format("{ \"origin\": \"%s\", \"addr\": \"%s\", \"type\": \"MSG \", \"content\": %s }\r\n",
+                    address, channel.localAddress().toString(), JSON.toJSONString(msg)));
+        });
+    }
+
     public void exit() {
         CHANNEL_GROUP.close().awaitUninterruptibly();
     }
@@ -85,10 +93,12 @@ public class ModuleNetClient extends Thread {
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         public void initChannel(SocketChannel ch) throws Exception {
-                            ch.pipeline().addLast(new LineBasedFrameDecoder(1024));
-                            ch.pipeline().addLast(new StringDecoder());
-                            ch.pipeline().addLast(new StringEncoder());
-                            ch.pipeline().addLast(new ModuleNetClientHandler(msgQueue));
+                            ch.pipeline()
+                                    .addLast("decoder", new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4))
+                                    .addLast("encoder", new LengthFieldPrepender(4, false))
+                                    .addLast(new StringDecoder())
+                                    .addLast(new StringEncoder())
+                                    .addLast(new ModuleNetClientHandler(msgQueue));
                         }
                     });
             ChannelFuture f = b.connect(uri.getHost(), uri.getPort());
@@ -97,6 +107,7 @@ public class ModuleNetClient extends Thread {
             if (f.isDone()) {
                 status = Status.RUNNING;
             }
+            this.addr = f.channel().localAddress().toString();
             f.channel().closeFuture().sync();
             status = Status.ERROR;
             error = "Client closed.";

@@ -2,7 +2,9 @@ import "sys.base";
 import "sys.list";
 import "sys.string";
 import "sys.proc";
+import "sys.task";
 import "sys.ui";
+import "sys.net";
 
 if (!call g_is_null(call g_query_share("cmd#histroy"))) {
     var pid = call g_get_pid();
@@ -23,6 +25,8 @@ var welcome = func ["WELCOME"] ~() {
     call g_ui_printn("  \\ \\  \\|\\  \\ \\  \\ \\  \\|\\  \\\\_\\  \\ \\  \\_\\\\ \\ \\  \\____\\ \\  \\____  ");
     call g_ui_printn("   \\ \\_______\\ \\__\\ \\__\\ \\________\\ \\_______\\ \\_______\\ \\_______\\");
     call g_ui_printn("    \\|_______|\\|__|\\|__|\\|________|\\|_______|\\|_______|\\|_______|");
+    call g_ui_println();
+    call g_ui_printn("  ID: " + call g_task_get_fast("system", "guid"));
     call g_ui_println();
     call g_printn("Running...");
 };
@@ -174,6 +178,38 @@ var parse_cmd = func ["PARSE"] ~(cmd, parse) {
     call g_join_process(ctrl_handle);
 };
 
+var task_native = func ~(tid, msg, arg) {
+    if (tid == "net") {
+        if (msg == "sshd") {
+            return call g_to_string(call g_net_sshd(arg));
+        }
+    }
+};
+
+// TASK FAST INVOKER
+var task_fast_invoker = func ~(cmd, arg) {
+    let cmd = call g_string_right(cmd, 1);
+    call g_array_remove(arg, 0);
+    if (call g_array_size(arg) == 1) {
+        return call g_task_get_fast(cmd, call g_array_get(arg, 0));
+    } else {
+        var ret = call task_native(cmd, call g_array_get(arg, 0), call g_array_get(arg, 1));
+        if (call g_is_null(ret)) {
+            return call g_task_get_fast_arg(cmd, call g_array_get(arg, 0), call g_array_get(arg, 1));
+        }
+        return ret;
+    }
+};
+
+// TASK COMMAND
+var handle_task_command = func ~(arg) {
+    var arr = call g_string_split(arg, " ");
+    var cmd = call g_array_get(arr, 0);
+    if (call g_string_start_with(cmd, "@")) {
+        return call task_fast_invoker(cmd, arr);
+    }
+};
+
 // GET STDIO cmd
 var get_input = func ["INPUT"] ~(arg) {
     call g_set_process_desc("shell routinue");
@@ -195,9 +231,19 @@ var get_input = func ["INPUT"] ~(arg) {
         return;
     }
     call g_printn("*** Input: " + cmd);
-    let cmd = call g_string_split(cmd, "\\|");
-    call parse_cmd(cmd, parse);
-    call g_create_user_process_args(this, arg);
+    if (call g_string_start_with(cmd, "@")) {
+        var ret = call handle_task_command(cmd);
+        if (call g_is_null(ret)) {
+            call g_ui_printn("Error: invalid command");
+        } else {
+            call g_ui_printn(call g_to_string(ret));
+        }
+        call g_create_user_process_args(this, arg);
+    } else {
+        let cmd = call g_string_split(cmd, "\\|");
+        call parse_cmd(cmd, parse);
+        call g_create_user_process_args(this, arg);
+    }
 };
 var _args_ = [];
 call g_array_add(_args_, get_input);

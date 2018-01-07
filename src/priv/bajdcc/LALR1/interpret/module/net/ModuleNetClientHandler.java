@@ -1,5 +1,6 @@
 package priv.bajdcc.LALR1.interpret.module.net;
 
+import com.alibaba.fastjson.JSON;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -48,6 +49,8 @@ public class ModuleNetClientHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         cause.printStackTrace();
+        msgQueue.add(String.format("{ \"origin\": \"NULL\", \"addr\": \"Error\", \"type\": \"ERR \", \"content\": %s }",
+                JSON.toJSONString(cause.getMessage())));
         CHANNEL_GROUP.remove(ctx.channel());
         ctx.close();
     }

@@ -1,5 +1,6 @@
 package priv.bajdcc.LALR1.interpret.module.net;
 
+import com.alibaba.fastjson.JSON;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -10,7 +11,8 @@ import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.LineBasedFrameDecoder;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.util.concurrent.GlobalEventExecutor;
@@ -69,10 +71,12 @@ public class ModuleNetServer extends Thread {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         public void initChannel(SocketChannel ch) throws Exception {
-                            ch.pipeline().addLast(new LineBasedFrameDecoder(1024));
-                            ch.pipeline().addLast(new StringDecoder());
-                            ch.pipeline().addLast(new StringEncoder());
-                            ch.pipeline().addLast(new ModuleNetServerHandler(msgQueue));
+                            ch.pipeline()
+                                    .addLast("decoder", new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4))
+                                    .addLast("encoder", new LengthFieldPrepender(4, false))
+                                    .addLast(new StringDecoder())
+                                    .addLast(new StringEncoder())
+                                    .addLast(new ModuleNetServerHandler(msgQueue));
                         }
                     })
                     .option(ChannelOption.SO_BACKLOG, 1024)
@@ -96,6 +100,28 @@ public class ModuleNetServer extends Thread {
             workerGroup.shutdownGracefully();
             bossGroup.shutdownGracefully();
         }
+    }
+
+    public void send(String msg) {
+        CHANNEL_GROUP.forEach(channel -> {
+            channel.writeAndFlush(String.format("{ \"addr\": \"%s\", \"type\": \"ECHO\", \"content\": %s }\r\n",
+                    channel.localAddress().toString(), JSON.toJSONString(msg)));
+        });
+    }
+
+    public void send(String msg, String address) {
+        CHANNEL_GROUP.forEach(channel -> {
+            channel.writeAndFlush(String.format("{ \"origin\": \"%s\", \"addr\": \"%s\", \"type\": \"ECHO\", \"content\": %s }\r\n",
+                    address, channel.localAddress().toString(), JSON.toJSONString(msg)));
+        });
+    }
+
+
+    public void send_error(String msg) {
+        CHANNEL_GROUP.forEach(channel -> {
+            channel.writeAndFlush(String.format("{ \"addr\": \"%s\", \"type\": \"ERR \", \"content\": %s }\r\n",
+                    channel.localAddress().toString(), JSON.toJSONString(msg)));
+        });
     }
 
     public enum Status {

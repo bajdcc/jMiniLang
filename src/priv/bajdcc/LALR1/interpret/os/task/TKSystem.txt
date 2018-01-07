@@ -37,6 +37,9 @@ var time = func ~(msg, caller) {
         var val = call g_task_get_share_stat();
         let val = call g_string_join_array(val, "\n");
         call g_map_put(msg, "val", val);
+    } else if (id == "guid") {
+        var val = call g_task_get_guid();
+        call g_map_put(msg, "val", val);
     }
 };
 

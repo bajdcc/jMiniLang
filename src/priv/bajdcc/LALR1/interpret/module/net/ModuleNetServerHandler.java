@@ -28,8 +28,8 @@ public class ModuleNetServerHandler extends ChannelInboundHandlerAdapter {
         CHANNEL_GROUP.add(ch);
         if (CHANNEL_GROUP.size() > 0) {
             CHANNEL_GROUP.writeAndFlush(
-                    String.format("{ \"addr\": \"%s\", \"type\": \"INFO\", \"content\": \"Hello, client!\" }\r\n",
-                            ch.localAddress().toString()));
+                    String.format("{ \"origin\": \"%s\", \"addr\": \"%s\", \"type\": \"INFO\", \"content\": \"Hello, client!\" }\r\n",
+                            ch.remoteAddress().toString(), ch.localAddress().toString()));
         }
     }
 
