@@ -95,6 +95,25 @@ var g_task_get_fast_arg = func ~(tid, id, a) {
     }
 };
 export "g_task_get_fast_arg";
+var g_task_get_fast_args = func ~(tid, id, a) {
+    var arg = [];
+    call g_array_add(arg, tid);
+    call g_array_add(arg, id);
+    call g_array_append(arg, a);
+
+    var msg = {};
+    call g_map_put(msg, "id", id);
+    call g_map_put(msg, "arg", arg);
+    call g_task_get(tid, msg);
+    var error = call g_map_get(msg, "error");
+    var val = call g_map_get(msg, "val");
+    if (error == 1) {
+        return g_null;
+    } else {
+        return val;
+    }
+};
+export "g_task_get_fast_args";
 
 /* 代理端处理客户端的消息 */
 var task_handler = func ~(ch) {

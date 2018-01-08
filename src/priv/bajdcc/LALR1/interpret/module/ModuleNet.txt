@@ -177,8 +177,12 @@ var task_fast_invoker = func ~(cmd, arg) {
     call g_array_remove(arg, 0);
     if (call g_array_size(arg) == 1) {
         return call g_task_get_fast(cmd, call g_array_get(arg, 0));
-    } else {
+    } else if (call g_array_size(arg) == 2) {
         return call g_task_get_fast_arg(cmd, call g_array_get(arg, 0), call g_array_get(arg, 1));
+    } else {
+        var msg = call g_array_get(arg, 0);
+        call g_array_remove(arg, 0);
+        return call g_task_get_fast_args(cmd, msg, arg);
     }
 };
 
@@ -207,6 +211,9 @@ var sshd_msg_receive = func ~(port) {
             call g_stop_share("SSHD#EXIT");
             break;
         }
+        if (!call g_is_null(call g_query_share("CMD#EXIT"))) {
+            break;
+        }
         var s = call g_net_msg_get_server_msg();
         if (call g_is_null(s)) {
             call g_task_sleep(1);
@@ -225,6 +232,7 @@ var sshd_msg_receive = func ~(port) {
         var msg = "[" + type + "] " + addr + ": " + content;
         call g_ui_printn("[" + type + "] " + addr + ": " + content);
         call g_printdn("Received msg: " + msg);
+        call g_printn("*** Remote: " + content);
         if (type == "INFO" && call g_string_start_with(content, "Hello")) {
             cnt++;
             continue;

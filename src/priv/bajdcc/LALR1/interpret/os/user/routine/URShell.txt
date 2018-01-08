@@ -192,10 +192,18 @@ var task_fast_invoker = func ~(cmd, arg) {
     call g_array_remove(arg, 0);
     if (call g_array_size(arg) == 1) {
         return call g_task_get_fast(cmd, call g_array_get(arg, 0));
-    } else {
+    } else if (call g_array_size(arg) == 2) {
         var ret = call task_native(cmd, call g_array_get(arg, 0), call g_array_get(arg, 1));
         if (call g_is_null(ret)) {
             return call g_task_get_fast_arg(cmd, call g_array_get(arg, 0), call g_array_get(arg, 1));
+        }
+        return ret;
+    } else {
+        var msg = call g_array_get(arg, 0);
+        call g_array_remove(arg, 0);
+        var ret = call task_native(cmd, msg, arg);
+        if (call g_is_null(ret)) {
+            return call g_task_get_fast_args(cmd, msg, arg);
         }
         return ret;
     }
@@ -238,7 +246,11 @@ var get_input = func ["INPUT"] ~(arg) {
         } else {
             call g_ui_printn(call g_to_string(ret));
         }
-        call g_create_user_process_args(this, arg);
+        if (call g_is_null(call g_query_share("CMD#EXIT"))) {
+            call g_create_user_process_args(this, arg);
+        } else {
+            call g_stop_share("CMD#EXIT");
+        }
     } else {
         let cmd = call g_string_split(cmd, "\\|");
         call parse_cmd(cmd, parse);
