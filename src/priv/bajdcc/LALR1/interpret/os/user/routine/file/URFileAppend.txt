@@ -31,7 +31,7 @@ if (call g_array_empty(args)) {
         }
     }
     if (!call function(filename, in)) {
-        call g_write_pipe(out, "Error: Write file failed!");
+        call g_write_pipe(out, "Error: Write file failed!\n");
     }
 }
 

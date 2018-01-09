@@ -34,9 +34,9 @@ if (call g_array_empty(args)) {
         call g_write_pipe(out, ch);
     };
     if (!call function(filename, callback, out)) {
-        call g_write_pipe(out, "Error: Read file failed!");
+        call g_write_pipe(out, "Error: Read file failed!\n");
     }
-    call g_write_pipe(out, '\n');
+    //call g_write_pipe(out, '\n');
 }
 
 call g_sleep(50);

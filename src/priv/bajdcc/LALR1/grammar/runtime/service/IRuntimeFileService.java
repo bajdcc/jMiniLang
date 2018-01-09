@@ -8,6 +8,14 @@ package priv.bajdcc.LALR1.grammar.runtime.service;
 public interface IRuntimeFileService {
 
     /**
+     * 添加代码页到VFS
+     *
+     * @param name    代码路径
+     * @param content 代码内容
+     */
+    void addVfs(String name, String content);
+
+    /**
      * 创建管道
      *
      * @param name     管道名称

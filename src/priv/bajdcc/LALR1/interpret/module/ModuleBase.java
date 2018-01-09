@@ -33,6 +33,11 @@ public class ModuleBase implements IInterpreterModule {
 	}
 
 	@Override
+	public String getModuleCode() {
+		return ResourceLoader.load(getClass());
+	}
+
+	@Override
 	public RuntimeCodePage getCodePage() throws Exception {
 		if (runtimeCodePage != null)
 			return runtimeCodePage;

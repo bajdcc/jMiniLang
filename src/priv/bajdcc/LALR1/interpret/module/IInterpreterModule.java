@@ -14,6 +14,13 @@ public interface IInterpreterModule {
 	 * @return 模块名
 	 */
 	String getModuleName();
+
+	/**
+	 * 返回模块代码
+	 *
+	 * @return 模块代码
+	 */
+	String getModuleCode();
 	
 	/**
 	 * 返回代码页

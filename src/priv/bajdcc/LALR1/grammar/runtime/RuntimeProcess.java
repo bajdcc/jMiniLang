@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import priv.bajdcc.LALR1.grammar.Grammar;
 import priv.bajdcc.LALR1.grammar.runtime.service.IRuntimeProcessService;
 import priv.bajdcc.LALR1.grammar.runtime.service.RuntimeService;
+import priv.bajdcc.LALR1.interpret.module.*;
 import priv.bajdcc.LALR1.syntax.handler.SyntaxException;
 
 import java.io.InputStream;
@@ -185,10 +186,32 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		this.setProcessId = new HashSet<>();
 		this.destroyedProcess = new HashSet<>();
 		this.service = new RuntimeService(this);
+		initModules();
 		RuntimeMachine machine = new RuntimeMachine(name, cyclePtr, -1, this);
 		machine.initStep(name, codePage, Collections.emptyList(), 0, null);
 		setProcessId.add(cyclePtr);
 		arrProcess[cyclePtr++] = new SchdProcess(machine);
+	}
+
+	private void initModules() {
+		IInterpreterModule[] modules = new IInterpreterModule[]{
+				ModuleBase.getInstance(),
+				ModuleMath.getInstance(),
+				ModuleList.getInstance(),
+				ModuleFunction.getInstance(),
+				ModuleString.getInstance(),
+				ModuleProc.getInstance(),
+				ModuleUI.getInstance(),
+				ModuleTask.getInstance(),
+				ModuleRemote.getInstance(),
+				ModuleLisp.getInstance(),
+				ModuleNet.getInstance(),
+				ModuleFile.getInstance(),
+		};
+
+		for (IInterpreterModule module : modules) {
+			service.getFileService().addVfs(module.getModuleName(), module.getModuleCode());
+		}
 	}
 
 	/**
@@ -310,6 +333,7 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		if (arrCodes.containsKey(name)) {
 			return false;
 		}
+		service.getFileService().addVfs(name, code);
 		arrCodes.put(name, code);
 		return true;
 	}

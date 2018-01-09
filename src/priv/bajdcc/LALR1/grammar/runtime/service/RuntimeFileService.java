@@ -17,18 +17,26 @@ public class RuntimeFileService implements IRuntimeFileService {
 
     private static final int OFFSET_FILE = 20000;
     private static final int MAX_FILE = 1000;
+    private static final String VFS_PREFIX = "$";
     private static Logger logger = Logger.getLogger("file");
     private RuntimeService service;
     private FileStruct arrFiles[];
     private Set<Integer> setFileId;
     private Map<String, Integer> mapFileNames;
     private int cyclePtr = 0;
+    private Map<String, VfsStruct> mapVfs;
 
     public RuntimeFileService(RuntimeService service) {
         this.service = service;
         this.arrFiles = new FileStruct[MAX_FILE];
         this.setFileId = new HashSet<>();
         this.mapFileNames = new HashMap<>();
+        this.mapVfs = new HashMap<>();
+    }
+
+    @Override
+    public void addVfs(String name, String content) {
+        mapVfs.put(VFS_PREFIX + name, new VfsStruct(content.getBytes(), true));
     }
 
     private int encodeHandle(int handle) {
@@ -48,7 +56,7 @@ public class RuntimeFileService implements IRuntimeFileService {
             return -1;
         }
         int handle;
-        FileStruct fs = new FileStruct(name, mode, encoding);
+        FileStruct fs = new FileStruct(name, mode, encoding, mapVfs);
         if (fs.status == FileStatus.ERROR) {
             return -1;
         }
@@ -78,12 +86,40 @@ public class RuntimeFileService implements IRuntimeFileService {
         if (!setFileId.contains(handle)) {
             return false;
         }
-        logger.debug("File #" + handle + " '" + arrFiles[handle].name + "' destroyed");
-        mapFileNames.remove(arrFiles[handle].name);
-        arrFiles[handle].destroy();
-        arrFiles[handle] = null;
-        setFileId.remove(handle);
+        FileStruct fs = arrFiles[handle];
+        logger.debug("File #" + handle + " '" + fs.name + "' destroyed");
+        if (fs.vfs) {
+            mapFileNames.remove(fs.name);
+            fs.destroy(mapVfs);
+            arrFiles[handle] = null;
+            setFileId.remove(handle);
+        } else {
+            mapFileNames.remove(fs.name);
+            fs.destroy();
+            arrFiles[handle] = null;
+            setFileId.remove(handle);
+        }
         return true;
+    }
+
+    class VfsStruct {
+        public byte[] data;
+        public boolean readonly;
+
+        public VfsStruct() {
+            data = null;
+            readonly = false;
+        }
+
+        public VfsStruct(byte[] data) {
+            this.data = data;
+            readonly = false;
+        }
+
+        public VfsStruct(byte[] data, boolean readonly) {
+            this.data = data;
+            this.readonly = true;
+        }
     }
 
     @Override
@@ -129,30 +165,65 @@ public class RuntimeFileService implements IRuntimeFileService {
         private String encoding;
         private BufferedReader reader;
         private BufferedWriter writer;
+        private boolean vfs;
+        private ByteArrayOutputStream baos;
 
-        FileStruct(String filename, int mode, String encoding) {
+        FileStruct(String filename, int mode, String encoding, Map<String, VfsStruct> mapVfs) {
             this.name = filename;
             this.mode = mode;
             this.encoding = encoding;
             this.status = FileStatus.ERROR;
+            this.vfs = false;
             if (mode == 1) { // read
-                try {
-                    FileInputStream fis = new FileInputStream(filename);
-                    InputStreamReader isr = new InputStreamReader(fis, encoding);
-                    reader = new BufferedReader(isr);
-                    this.status = FileStatus.READING;
-                } catch (Exception e) {
-                    e.printStackTrace();
+                if (filename.startsWith(VFS_PREFIX)) {
+                    if (mapVfs.containsKey(filename)) {
+                        try {
+                            ByteArrayInputStream bais = new ByteArrayInputStream(mapVfs.get(filename).data);
+                            InputStreamReader isr = new InputStreamReader(bais, encoding);
+                            reader = new BufferedReader(isr);
+                            this.status = FileStatus.READING;
+                            this.vfs = true;
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                } else {
+                    try {
+                        FileInputStream fis = new FileInputStream(filename);
+                        InputStreamReader isr = new InputStreamReader(fis, encoding);
+                        reader = new BufferedReader(isr);
+                        this.status = FileStatus.READING;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             } else if ((mode & 2) != 0) { // write
-                try {
-                    // mode:2=truncate mode:3=append
-                    FileOutputStream fos = new FileOutputStream(filename, (mode & 1) != 0);
-                    OutputStreamWriter osw = new OutputStreamWriter(fos, encoding);
-                    writer = new BufferedWriter(osw);
-                    this.status = FileStatus.WRITING;
-                } catch (Exception e) {
-                    e.printStackTrace();
+                if (filename.startsWith(VFS_PREFIX)) {
+                    VfsStruct vs = mapVfs.get(filename);
+                    if (vs == null || !vs.readonly) {
+                        try {
+                            // mode:2=truncate mode:3=append
+                            baos = new ByteArrayOutputStream();
+                            if (mapVfs.containsKey(filename))
+                                baos.write(mapVfs.get(filename).data);
+                            OutputStreamWriter osw = new OutputStreamWriter(baos, encoding);
+                            writer = new BufferedWriter(osw);
+                            this.status = FileStatus.WRITING;
+                            this.vfs = true;
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                } else {
+                    try {
+                        // mode:2=truncate mode:3=append
+                        FileOutputStream fos = new FileOutputStream(filename, (mode & 1) != 0);
+                        OutputStreamWriter osw = new OutputStreamWriter(fos, encoding);
+                        writer = new BufferedWriter(osw);
+                        this.status = FileStatus.WRITING;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
@@ -212,6 +283,22 @@ public class RuntimeFileService implements IRuntimeFileService {
                 if (status == FileStatus.READING) {
                     reader.close();
                 } else if (status == FileStatus.WRITING) {
+                    writer.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        public void destroy(Map<String, VfsStruct> mapVfs) {
+            if (!vfs)
+                return;
+            try {
+                if (status == FileStatus.READING) {
+                    reader.close();
+                } else if (status == FileStatus.WRITING) {
+                    writer.flush();
+                    mapVfs.put(name, new VfsStruct(baos.toByteArray()));
                     writer.close();
                 }
             } catch (Exception e) {

@@ -172,7 +172,7 @@ var write_file_s = func ~(name, append, encoding, str) {
     var handle = call g_create_file_internal(name, append ? 3 : 2, encoding);
     if (call g_is_valid_handle(handle)) {
         call g_printdn("Writing file: ''" + name + "' -> #" + handle);
-        call g_write_file_internal(handle, str);
+        call g_write_file_string_internal(handle, str);
         call g_printdn("Writing file: ''" + name + "' -> #" + handle + " ok");
         return call g_destroy_file_internal(handle);
     } else {
