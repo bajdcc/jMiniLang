@@ -10,4 +10,6 @@ public interface IRuntimeService {
 	IRuntimePipeService getPipeService();
 	IRuntimeShareService getShareService();
 	IRuntimeProcessService getProcessService();
+
+    IRuntimeFileService getFileService();
 }

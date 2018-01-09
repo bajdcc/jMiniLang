@@ -12,11 +12,13 @@ public class RuntimeService implements IRuntimeService {
 	private RuntimeProcess process;
 	private RuntimePipeService pipe;
 	private RuntimeShareService share;
+    private RuntimeFileService file;
 
 	public RuntimeService(RuntimeProcess process) {
 		this.process = process;
 		this.pipe = new RuntimePipeService(this);
 		this.share = new RuntimeShareService(this);
+        this.file = new RuntimeFileService(this);
 	}
 
 	@Override
@@ -33,4 +35,9 @@ public class RuntimeService implements IRuntimeService {
 	public IRuntimeProcessService getProcessService() {
 		return process;
 	}
+
+    @Override
+    public IRuntimeFileService getFileService() {
+        return file;
+    }
 }

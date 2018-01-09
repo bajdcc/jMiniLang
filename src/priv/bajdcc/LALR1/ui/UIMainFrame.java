@@ -23,6 +23,9 @@ import priv.bajdcc.LALR1.interpret.os.ui.UIMain;
 import priv.bajdcc.LALR1.interpret.os.ui.UIMonitor;
 import priv.bajdcc.LALR1.interpret.os.user.UserMain;
 import priv.bajdcc.LALR1.interpret.os.user.routine.*;
+import priv.bajdcc.LALR1.interpret.os.user.routine.file.URFileAppend;
+import priv.bajdcc.LALR1.interpret.os.user.routine.file.URFileLoad;
+import priv.bajdcc.LALR1.interpret.os.user.routine.file.URFileSave;
 import priv.bajdcc.LALR1.syntax.handler.SyntaxException;
 import priv.bajdcc.LALR1.ui.drawing.UIGraphics;
 import priv.bajdcc.util.lexer.error.RegexException;
@@ -109,6 +112,10 @@ public class UIMainFrame extends JFrame {
 				new URCount(),
 				new URTest(),
                 new URMsg(),
+				// USER FILE
+				new URFileLoad(),
+				new URFileSave(),
+				new URFileAppend(),
 		};
 
 		try {

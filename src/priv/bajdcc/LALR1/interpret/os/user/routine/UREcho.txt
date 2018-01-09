@@ -28,5 +28,7 @@ if (call g_array_empty(args)) {
     }
 }
 
+call g_sleep(50);
+
 call g_destroy_pipe(out);
 call g_destroy_pipe(in);

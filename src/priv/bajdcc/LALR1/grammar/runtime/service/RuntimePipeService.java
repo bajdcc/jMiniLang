@@ -38,6 +38,7 @@ public class RuntimePipeService implements IRuntimePipeService {
 	}
 
 	private static Logger logger = Logger.getLogger("pipe");
+	private static final int OFFSET_PIPE = 10000;
 	private static final int MAX_PIPE = 1000;
 	private RuntimeService service;
 	private PipeStruct arrPipes[];
@@ -45,13 +46,21 @@ public class RuntimePipeService implements IRuntimePipeService {
 	private Map<String, Integer> mapPipeNames;
 	private int cyclePtr = 0;
 
+	private int encodeHandle(int handle) {
+		return handle + OFFSET_PIPE;
+	}
+
+	private int decodeHandle(int handle) {
+		return handle - OFFSET_PIPE;
+	}
+
 	@Override
 	public int create(String name) {
 		if (setPipeId.size() >= MAX_PIPE) {
 			return -1;
 		}
 		if (mapPipeNames.containsKey(name)) {
-			return mapPipeNames.get(name);
+			return encodeHandle(mapPipeNames.get(name));
 		}
 		int handle;
 		for (;;) {
@@ -71,11 +80,12 @@ public class RuntimePipeService implements IRuntimePipeService {
 			}
 		}
 		logger.debug("Pipe #" + handle + " '" + name + "' created");
-		return handle;
+		return encodeHandle(handle);
 	}
 
 	@Override
 	public boolean destroy(int handle) {
+		handle = decodeHandle(handle);
 		if (!setPipeId.contains(handle)) {
 			return false;
 		}
@@ -94,11 +104,12 @@ public class RuntimePipeService implements IRuntimePipeService {
 		if (!mapPipeNames.containsKey(name)) {
 			return false;
 		}
-		return destroy(mapPipeNames.get(name));
+		return destroy(encodeHandle(mapPipeNames.get(name)));
 	}
 
 	@Override
 	public char read(int pid, int handle) {
+		handle = decodeHandle(handle);
 		if (!setPipeId.contains(handle)) {
 			return '\uffff';
 		}
@@ -113,6 +124,7 @@ public class RuntimePipeService implements IRuntimePipeService {
 
 	@Override
 	public boolean write(int pid, int handle, char ch) {
+		handle = decodeHandle(handle);
 		if (setPipeId.contains(handle)) {
 			if (!arrPipes[handle].waiting_pids.isEmpty())
 				service.getProcessService().wakeup(arrPipes[handle].waiting_pids.poll());
@@ -123,6 +135,7 @@ public class RuntimePipeService implements IRuntimePipeService {
 
 	@Override
 	public boolean isEmpty(int handle) {
+		handle = decodeHandle(handle);
 		return !setPipeId.contains(handle) || arrPipes[handle].queue.isEmpty();
 	}
 

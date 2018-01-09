@@ -1,0 +1,205 @@
+import "sys.base";
+import "sys.proc";
+import "sys.list";
+import "sys.string";
+
+// READ
+var read_file = func ~(name, encoding, callback) {
+    var handle = call g_create_file_internal(name, 1, encoding);
+    if (call g_is_valid_handle(handle)) {
+        call g_printdn("Reading file: ''" + name + "' -> #" + handle);
+        var data = '\0';
+        for (;;) {
+            let data = call g_read_file_internal(handle);
+            if (call g_is_null(data)) {
+                break;
+            }
+            call callback(data);
+        }
+        call g_printdn("Reading file: ''" + name + "' -> #" + handle + " ok");
+        return call g_destroy_file_internal(handle);
+    } else {
+        return false;
+    }
+};
+var read_file_args = func ~(name, encoding, callback, args) {
+    var handle = call g_create_file_internal(name, 1, encoding);
+    if (call g_is_valid_handle(handle)) {
+        call g_printdn("Reading file: ''" + name + "' -> #" + handle);
+        var data = '\0';
+        for (;;) {
+            let data = call g_read_file_internal(handle);
+            if (call g_is_null(data)) {
+                break;
+            }
+            call callback(data, args);
+        }
+        call g_printdn("Reading file: ''" + name + "' -> #" + handle + " ok");
+        return call g_destroy_file_internal(handle);
+    } else {
+        return false;
+    }
+};
+var g_read_file_ascii = func ~(name, callback) {
+    return call read_file(name, "ASCII", callback);
+};
+export "g_read_file_ascii";
+var g_read_file_ascii_args = func ~(name, callback, args) {
+    return call read_file_args(name, "ASCII", callback, args);
+};
+export "g_read_file_ascii_args";
+var g_read_file_gbk = func ~(name, callback) {
+    return call read_file(name, "GBK", callback);
+};
+export "g_read_file_gbk";
+var g_read_file_gbk_args = func ~(name, callback, args) {
+    return call read_file_args(name, "GBK", callback, args);
+};
+export "g_read_file_gbk_args";
+var g_read_file_utf8 = func ~(name, callback) {
+    return call read_file(name, "UTF-8", callback);
+};
+export "g_read_file_utf8";
+var g_read_file_utf8_args = func ~(name, callback, args) {
+    return call read_file_args(name, "UTF-8", callback, args);
+};
+export "g_read_file_utf8_args";
+
+// READ LINE
+var read_file_s = func ~(name, encoding, callback) {
+    var handle = call g_create_file_internal(name, 1, encoding);
+    if (call g_is_valid_handle(handle)) {
+        call g_printdn("Reading file(Line): ''" + name + "' -> #" + handle);
+        var data = '\0';
+        for (;;) {
+            let data = call g_read_file_string_internal(handle);
+            if (call g_is_null(data)) {
+                break;
+            }
+            call callback(data);
+        }
+        call g_printdn("Reading file: ''" + name + "' -> #" + handle + " ok");
+        return call g_destroy_file_internal(handle);
+    } else {
+        return false;
+    }
+};
+var read_file_s_args = func ~(name, encoding, callback, args) {
+    var handle = call g_create_file_internal(name, 1, encoding);
+    if (call g_is_valid_handle(handle)) {
+        call g_printdn("Reading file(Line): ''" + name + "' -> #" + handle);
+        var data = '\0';
+        for (;;) {
+            let data = call g_read_file_string_internal(handle);
+            if (call g_is_null(data)) {
+                break;
+            }
+            call callback(data, args);
+        }
+        call g_printdn("Reading file: ''" + name + "' -> #" + handle + " ok");
+        return call g_destroy_file_internal(handle);
+    } else {
+        return false;
+    }
+};
+var g_read_file_s_ascii = func ~(name, callback) {
+    return call read_file_s(name, "ASCII", callback);
+};
+export "g_read_file_s_ascii";
+var g_read_file_s_ascii_args = func ~(name, callback, args) {
+    return call read_file_s_args(name, "ASCII", callback, args);
+};
+export "g_read_file_s_ascii_args";
+var g_read_file_s_gbk = func ~(name, callback) {
+    return call read_file_s(name, "GBK", callback);
+};
+export "g_read_file_s_gbk";
+var g_read_file_s_gbk_args = func ~(name, callback, args) {
+    return call read_file_s_args(name, "GBK", callback, args);
+};
+export "g_read_file_s_gbk_args";
+var g_read_file_s_utf8 = func ~(name, callback) {
+    return call read_file_s(name, "UTF-8", callback);
+};
+export "g_read_file_s_utf8";
+var g_read_file_s_utf8_args = func ~(name, callback, args) {
+    return call read_file_s_args(name, "UTF-8", callback, args);
+};
+export "g_read_file_s_utf8_args";
+
+// WRITE
+var write_file = func ~(name, append, encoding, in) {
+    var handle = call g_create_file_internal(name, append ? 3 : 2, encoding);
+    if (call g_is_valid_handle(handle)) {
+        call g_printdn("Writing file: ''" + name + "' -> #" + handle);
+        var pipe = func ~(ch, handle) {
+            call g_write_file_internal(handle, ch);
+        };
+        call g_read_pipe_args(in, pipe, handle);
+        call g_printdn("Writing file: ''" + name + "' -> #" + handle + " ok");
+        return call g_destroy_file_internal(handle);
+    } else {
+        return false;
+    }
+};
+var g_write_file_ascii = func ~(name, in) {
+    return call write_file(name, false, "ASCII", in);
+};
+export "g_write_file_ascii";
+var g_write_file_gbk = func ~(name, in) {
+    return call write_file(name, false, "GBK", in);
+};
+export "g_write_file_gbk";
+var g_write_file_utf8 = func ~(name, in) {
+    return call write_file(name, false, "UTF-8", in);
+};
+export "g_write_file_utf8";
+var g_write_file_a_ascii = func ~(name, in) {
+    return call write_file(name, true, "ASCII", in);
+};
+export "g_write_file_a_ascii";
+var g_write_file_a_gbk = func ~(name, in) {
+    return call write_file(name, true, "GBK", in);
+};
+export "g_write_file_a_gbk";
+var g_write_file_a_utf8 = func ~(name, in) {
+    return call write_file(name, true, "UTF-8", in);
+};
+export "g_write_file_a_utf8";
+
+// WRITE LINE
+var write_file_s = func ~(name, append, encoding, str) {
+    var handle = call g_create_file_internal(name, append ? 3 : 2, encoding);
+    if (call g_is_valid_handle(handle)) {
+        call g_printdn("Writing file: ''" + name + "' -> #" + handle);
+        call g_write_file_internal(handle, str);
+        call g_printdn("Writing file: ''" + name + "' -> #" + handle + " ok");
+        return call g_destroy_file_internal(handle);
+    } else {
+        return false;
+    }
+};
+var g_write_file_s_ascii = func ~(name, str) {
+    return call write_file_s(name, false, "ASCII", str);
+};
+export "g_write_file_s_ascii";
+var g_write_file_s_gbk = func ~(name, str) {
+    return call write_file_s(name, false, "GBK", str);
+};
+export "g_write_file_s_gbk";
+var g_write_file_s_utf8 = func ~(name, str) {
+    return call write_file_s(name, false, "UTF-8", str);
+};
+export "g_write_file_s_utf8";
+var g_write_file_sa_ascii = func ~(name, str) {
+    return call write_file_s(name, true, "ASCII", str);
+};
+export "g_write_file_sa_ascii";
+var g_write_file_sa_gbk = func ~(name, str) {
+    return call write_file_s(name, true, "GBK", str);
+};
+export "g_write_file_sa_gbk";
+var g_write_file_sa_utf8 = func ~(name, str) {
+    return call write_file_s(name, true, "UTF-8", str);
+};
+export "g_write_file_sa_utf8";

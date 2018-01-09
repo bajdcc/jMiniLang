@@ -1,0 +1,43 @@
+import "sys.base";
+import "sys.proc";
+import "sys.list";
+import "sys.file";
+
+call g_set_process_desc("append routinue");
+var pid = call g_get_pid();
+var share = call g_wait_share("PID#" + pid);
+call g_stop_share("PID#" + pid);
+var args = call g_map_get(share, "args");
+
+var in = call g_create_pipe("PIPEIN#" + pid);
+var out = call g_create_pipe("PIPEOUT#" + pid);
+
+var signal = "PIDSIG#" + pid;
+call g_start_share(signal, true);
+
+if (call g_array_empty(args)) {
+    call g_write_pipe(out, "USAGE: >> [filename] [encoding=u/g/a]\n");
+} else {
+    var filename = call g_array_get(args, 0);
+    var function = "g_write_file_a_utf8";
+    if (call g_array_size(args) > 1) {
+        var enc = call g_array_get(args, 1);
+        if (enc == "u") {
+            //let function = "g_write_file_a_utf8";
+        } else if (enc == "g") {
+            let function = "g_write_file_a_gbk";
+        } else if (enc == "a") {
+            let function = "g_write_file_a_ascii";
+        }
+    }
+    if (!call function(filename, in)) {
+        call g_write_pipe(out, "Error: Write file failed!");
+    }
+}
+
+call g_sleep(50);
+
+call g_stop_share(signal);
+
+call g_destroy_pipe(out);
+call g_destroy_pipe(in);
