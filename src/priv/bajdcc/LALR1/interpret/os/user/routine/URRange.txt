@@ -16,7 +16,7 @@ var signal = "PIDSIG#" + pid;
 call g_start_share(signal, true);
 
 if (call g_array_size(args) < 2) {
-    call g_write_pipe(out, "Error: missing arguments.\n");
+    call g_write_pipe_n(out, "Error: missing arguments.");
     call g_destroy_pipe(out);
     call g_destroy_pipe(in);
     return;
@@ -28,14 +28,14 @@ if (lower > upper) {
         foreach (var j : call g_range_string(call g_to_string(i))) {
             call g_write_pipe(out, j);
         }
-        call g_write_pipe(out, '\n');
+        call g_write_pipe(out, g_endl);
     }
 } else {
     for (var i = lower; i <= upper && call g_query_share(signal); i++) {
         foreach (var j : call g_range_string(call g_to_string(i))) {
             call g_write_pipe(out, j);
         }
-        call g_write_pipe(out, '\n');
+        call g_write_pipe(out, g_endl);
     }
 }
 call g_stop_share(signal);

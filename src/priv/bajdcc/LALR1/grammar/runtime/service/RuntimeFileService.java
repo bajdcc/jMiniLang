@@ -39,6 +39,11 @@ public class RuntimeFileService implements IRuntimeFileService {
         mapVfs.put(VFS_PREFIX + name, new VfsStruct(content.getBytes(), true));
     }
 
+    @Override
+    public String getVfs(String name) {
+        return mapVfs.containsKey(name) ? new String(mapVfs.get(name).data) : null;
+    }
+
     private int encodeHandle(int handle) {
         return handle + OFFSET_FILE;
     }

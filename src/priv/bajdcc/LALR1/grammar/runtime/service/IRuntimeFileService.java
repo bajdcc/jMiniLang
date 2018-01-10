@@ -15,6 +15,14 @@ public interface IRuntimeFileService {
      */
     void addVfs(String name, String content);
 
+	/**
+	 * 获取VFS代码页
+	 *
+	 * @param name 代码路径
+	 * @return 代码内容
+	 */
+	String getVfs(String name);
+
     /**
      * 创建管道
      *

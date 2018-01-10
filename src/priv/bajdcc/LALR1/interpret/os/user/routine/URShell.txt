@@ -34,7 +34,7 @@ var welcome = func ["WELCOME"] ~() {
             call g_sleep(10);
         }
         call g_write_file_s_ascii("$LOGO", logo_s);
-        call g_write_file_sa_ascii("$LOGO", "  ID: " + call g_task_get_fast("system", "guid") + "\n\n");
+        call g_write_file_sa_ascii("$LOGO", "  ID: " + call g_task_get_fast("system", "guid") + g_endl + g_endl);
         call g_read_file_s_ascii("$LOGO", print_logo);
     }
     call g_printn("Running...");

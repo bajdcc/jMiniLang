@@ -2,9 +2,13 @@ import "sys.base";
 import "sys.list";
 import "sys.string";
 var g_join_process = func ~(pid) {
+    if (pid == g_minus_1) {
+        return false;
+    }
     call g_printdn("Waiting proc: #" + call g_get_pid() + " -> #" + pid);
     while (call g_join_process_once(pid)) {}
     call g_printdn("Waiting proc: #" + call g_get_pid() + " -> #" + pid + " ok");
+    return true;
 };
 export "g_join_process";
 var g_join_process_array = func ~(pid) {
@@ -86,10 +90,16 @@ var g_write_pipe = func ~(handle, data) {
     }
 };
 export "g_write_pipe";
+var g_write_pipe_n = func ~(handle, data) {
+    call g_write_pipe(handle, data + g_endl);
+};
+export "g_write_pipe_n";
 var g_load_sync = func ~(fn) -> call g_join_process(call g_load(fn));
 export "g_load_sync";
 var g_load_sync_x = func ~(fn) -> call g_join_process(call g_load_x(fn));
 export "g_load_sync_x";
+var g_load_user_sync_x = func ~(fn) -> call g_join_process(call g_load_user_x(fn));
+export "g_load_user_sync_x";
 var g_wait_share = func ~(handle) {
     for (;;) {
         var share = call g_query_share(handle);

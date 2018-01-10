@@ -16,12 +16,12 @@ let count = call g_string_atoi(count);
 
 var buf = [];
 var pipe = func ["PIPE"] ~(ch, out) {
-    if (ch == '\n' || ch == '\r') {
+    if (ch == '\n'/* || ch == '\r'*/) {
         foreach (var i : call g_range(1, count)) {
             foreach (var j : call g_range_array(buf)) {
                 call g_write_pipe(out, j);
             }
-            call g_write_pipe(out, '\n');
+            call g_write_pipe(out, g_endl);
         }
         call g_array_clear(buf);
     } else {

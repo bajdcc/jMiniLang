@@ -33,11 +33,11 @@ var time = func ~(msg, caller) {
         call g_map_put(msg, "val", val);
     } else if (id == "pipe") {
         var val = call g_task_get_pipe_stat();
-        let val = call g_string_join_array(val, "\n");
+        let val = call g_string_join_array(val, g_endl);
         call g_map_put(msg, "val", val);
     } else if (id == "share") {
         var val = call g_task_get_share_stat();
-        let val = call g_string_join_array(val, "\n");
+        let val = call g_string_join_array(val, g_endl);
         call g_map_put(msg, "val", val);
     } else if (id == "guid") {
         var val = call g_task_get_guid();
@@ -58,6 +58,22 @@ var time = func ~(msg, caller) {
         call g_task_sleep(1);
         call g_write_pipe(handle, 'E');
         call g_map_put(msg, "val", "** System is going to power off! **");
+    } else if (id == "load") {
+        var arg = call g_map_get(msg, "arg");
+        var fn = call g_array_get(arg, 2);
+        if (call g_is_null(fn)) {
+            call g_map_put(msg, "error", "1");
+            call g_map_put(msg, "val", "Invalid path.");
+        } else {
+            var ret = call g_load_user_sync_x("$/usr/bin/" + fn);
+            if (ret) {
+                call g_map_put(msg, "val", "Process exit.");
+            } else {
+                call g_map_put(msg, "error", "1");
+                call g_ui_printn("Invalid path.");
+                call g_map_put(msg, "val", "Invalid path.");
+            }
+        }
     }
 };
 

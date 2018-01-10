@@ -14,7 +14,7 @@ var in = call g_create_pipe("PIPEIN#" + pid);
 var out = call g_create_pipe("PIPEOUT#" + pid);
 
 if (call g_array_size(args) < 2) {
-    call g_write_pipe(out, "Error: missing arguments.\n");
+    call g_write_pipe(out, "Error: missing arguments." + g_endl);
     call g_destroy_pipe(out);
     call g_destroy_pipe(in);
     return;
@@ -32,11 +32,9 @@ var error = call g_map_get(msg, "error");
 var val = call g_map_get(msg, "val");
 let val = call g_to_string(val);
 if (error == 1) {
-    call g_write_pipe(out, "Error: " + val);
-    call g_write_pipe(out, '\n');
+    call g_write_pipe_n(out, "Error: " + val);
 } else {
-    call g_write_pipe(out, val);
-    call g_write_pipe(out, '\n');
+    call g_write_pipe_n(out, val);
 }
 
 call g_destroy_pipe(out);

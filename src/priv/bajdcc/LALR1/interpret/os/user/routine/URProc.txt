@@ -25,7 +25,7 @@ foreach (var i : call g_range_array(arg1)) {
     foreach (var j : call g_range_string(call g_to_string(i))) {
         call g_write_pipe(out, j);
     }
-    call g_write_pipe(out, '\n');
+    call g_write_pipe(out, g_endl);
 }
 
 call g_destroy_pipe(out);

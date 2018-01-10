@@ -24,7 +24,7 @@ if (call g_is_null(arg1)) { // 无参：当前时间
         call g_write_pipe(out, "" + call get_time() + "\r");
         call g_task_sleep(1);
     }
-    call g_write_pipe(out, "\n");
+    call g_write_pipe(out, g_endl);
 } else { // 有参：程序运行计时
     var pipe = func ["PIPE"] ~(ch, out) {
         call g_write_pipe(out, ch);
@@ -34,7 +34,7 @@ if (call g_is_null(arg1)) { // 无参：当前时间
     var end_time = call g_task_get_fast_arg("system", "now", "timestamp");
     var period = end_time - begin_time;
     call g_printn("Running time: " + period + "ms");
-    call g_write_pipe(out, "\n ** Running time: " + period + "ms\n");
+    call g_write_pipe(out, g_endl + " ** Running time: " + period + "ms" + g_endl);
 
     /*
       # 比如，输入命令“range 1 1000 | grep 1 | count | time a”，一般打印出2500ms左右的结果。

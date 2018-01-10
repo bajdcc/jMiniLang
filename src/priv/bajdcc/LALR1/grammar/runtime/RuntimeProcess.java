@@ -4,7 +4,6 @@ import org.apache.log4j.Logger;
 import priv.bajdcc.LALR1.grammar.Grammar;
 import priv.bajdcc.LALR1.grammar.runtime.service.IRuntimeProcessService;
 import priv.bajdcc.LALR1.grammar.runtime.service.RuntimeService;
-import priv.bajdcc.LALR1.interpret.module.*;
 import priv.bajdcc.LALR1.syntax.handler.SyntaxException;
 
 import java.io.InputStream;
@@ -99,22 +98,23 @@ public class RuntimeProcess implements IRuntimeProcessService {
 	}
 
 	public RuntimeCodePage getPage(String name) throws Exception {
-		if (arrCodes.containsKey(name)) {
-			String code = arrCodes.get(name);
+		String vfs = null;
+		if (arrCodes.containsKey(name) || (vfs = service.getFileService().getVfs(name)) != null) {
+			String code = vfs == null ? arrCodes.get(name) : vfs;
 			if (arrPages.containsKey(code)) {
 				return arrPages.get(code);
 			} else {
 				logger.debug("Loading page: " + name);
-                Grammar grammar = null;
                 try {
-                    grammar = new Grammar(code);
+	                Grammar grammar = new Grammar(code);
+	                RuntimeCodePage page = grammar.getCodePage();
+	                service.getFileService().addVfs(name, code);
+	                arrPages.put(name, page);
+	                return page;
                 } catch (SyntaxException e) {
-                    System.err.println("#PAGE ERROR# --> " + name);
-                    throw e;
+	                System.err.println("#PAGE ERROR# --> " + name);
+	                throw e;
                 }
-                RuntimeCodePage page = grammar.getCodePage();
-				arrPages.put(name, page);
-				return page;
 			}
 		}
 		return null;
@@ -186,32 +186,10 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		this.setProcessId = new HashSet<>();
 		this.destroyedProcess = new HashSet<>();
 		this.service = new RuntimeService(this);
-		initModules();
 		RuntimeMachine machine = new RuntimeMachine(name, cyclePtr, -1, this);
 		machine.initStep(name, codePage, Collections.emptyList(), 0, null);
 		setProcessId.add(cyclePtr);
 		arrProcess[cyclePtr++] = new SchdProcess(machine);
-	}
-
-	private void initModules() {
-		IInterpreterModule[] modules = new IInterpreterModule[]{
-				ModuleBase.getInstance(),
-				ModuleMath.getInstance(),
-				ModuleList.getInstance(),
-				ModuleFunction.getInstance(),
-				ModuleString.getInstance(),
-				ModuleProc.getInstance(),
-				ModuleUI.getInstance(),
-				ModuleTask.getInstance(),
-				ModuleRemote.getInstance(),
-				ModuleLisp.getInstance(),
-				ModuleNet.getInstance(),
-				ModuleFile.getInstance(),
-		};
-
-		for (IInterpreterModule module : modules) {
-			service.getFileService().addVfs(module.getModuleName(), module.getModuleCode());
-		}
 	}
 
 	/**

@@ -25,7 +25,7 @@ var draw = func ~() {
     }
 
     var procs = call g_query_all_proc();
-    var text = call g_string_join_array(procs, "\n");
+    var text = call g_string_join_array(procs, g_endl);
     call g_task_get_fast_arg("ui", "path", "@M 0 0@@R 800 600@");
     call g_task_get_fast_arg("ui", "path", "@W 800@@M 0 20@$" + text + "$");
     call g_task_sleep_signal(1, "TASK#SLEEP");

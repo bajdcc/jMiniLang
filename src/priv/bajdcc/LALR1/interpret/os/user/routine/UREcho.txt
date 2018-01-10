@@ -24,7 +24,7 @@ if (call g_array_empty(args)) {
         foreach (var j : call g_range_string(i)) {
             call g_write_pipe(out, j);
         }
-        call g_write_pipe(out, '\n');
+        call g_write_pipe(out, g_endl);
     }
 }
 

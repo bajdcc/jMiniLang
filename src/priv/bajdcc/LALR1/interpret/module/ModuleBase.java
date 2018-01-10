@@ -48,10 +48,12 @@ public class ModuleBase implements IInterpreterModule {
 		RuntimeCodePage page = grammar.getCodePage();
 		IRuntimeDebugInfo info = page.getInfo();
 		info.addExternalValue("g_null", () -> new RuntimeObject(null));
-		info.addExternalValue("g_minus_1", () -> new RuntimeObject(new BigInteger("-1")));
-		info.addExternalValue("g_endl", () -> new RuntimeObject("\n"));
+		final BigInteger MINUS_ONE = new BigInteger("-1");
+		info.addExternalValue("g_minus_1", () -> new RuntimeObject(MINUS_ONE));
 		info.addExternalValue("g_true", () -> new RuntimeObject(true));
 		info.addExternalValue("g_false", () -> new RuntimeObject(false));
+		final String NEWLINE = System.lineSeparator();
+		info.addExternalValue("g_endl", () -> new RuntimeObject(NEWLINE));
 		info.addExternalFunc("g_is_null", new IRuntimeDebugExec() {
 			@Override
 			public String getDoc() {

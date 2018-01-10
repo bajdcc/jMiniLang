@@ -65,14 +65,14 @@ var nextarr = call next(pat);
 
 var buf = [];
 var pipe = func ["PIPE"] ~(ch, out) {
-    if (ch == '\n' || ch == '\r') {
+    if (ch == '\n'/* || ch == '\r'*/) {
         var str = call g_string_build(buf);
         var idx = call find(str, nextarr);
         if (idx != m1) {
             foreach (var i : call g_range_array(buf)) {
                 call g_write_pipe(out, i);
             }
-            call g_write_pipe(out, "\n");
+            call g_write_pipe(out, g_endl);
         }
         call g_array_clear(buf);
     } else {

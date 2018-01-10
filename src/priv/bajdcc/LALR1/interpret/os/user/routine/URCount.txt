@@ -11,7 +11,7 @@ var args = call g_map_get(share, "args");
 
 var count = 0;
 var pipe = func ["PIPE"] ~(ch, out) {
-    if (ch == '\n' || ch == '\r') {
+    if (ch == '\n'/* || ch == '\r'*/) {
         let count = count + 1;
         call g_write_pipe(out, "" + count + "\r");
     }
@@ -20,5 +20,5 @@ var pipe = func ["PIPE"] ~(ch, out) {
 var in = call g_create_pipe("PIPEIN#" + pid);
 var out = call g_create_pipe("PIPEOUT#" + pid);
 call g_read_pipe_args(in, pipe, out);
-call g_write_pipe(out, "" + count + "\n");
+call g_write_pipe_n(out, "" + count);
 call g_destroy_pipe(out);
