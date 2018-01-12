@@ -56,6 +56,7 @@ public class RuntimeProcess implements IRuntimeProcessService {
 	private Set<Integer> destroyedProcess;
 	private RuntimeService service;
 	private boolean isWaitingForUI = false;
+	private boolean needToExit = false;
 
 	public RuntimeProcess(String name, InputStream input) throws Exception {
 		runMainProcess(name, input);
@@ -130,6 +131,8 @@ public class RuntimeProcess implements IRuntimeProcessService {
 
 	private boolean schd() throws Exception {
 		if (setProcessId.isEmpty())
+			return false;
+		if (needToExit)
 			return false;
 		if (isWaitingForUI) {
 			Thread.sleep(CLOCK_WAIT_UI);
@@ -319,5 +322,9 @@ public class RuntimeProcess implements IRuntimeProcessService {
 	@Override
 	public void waitForUI() {
 		isWaitingForUI = true;
+	}
+
+	public void halt() {
+		needToExit = true;
 	}
 }

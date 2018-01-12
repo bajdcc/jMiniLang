@@ -44,12 +44,11 @@ public interface IRuntimePipeService {
 	/**
 	 * 管道写
 	 *
-	 * @param pid 进程ID
 	 * @param handle 管道句柄
 	 * @param ch 字符
 	 * @return 是否成功
 	 */
-	boolean write(int pid, int handle, char ch);
+	boolean write(int handle, char ch);
 
 	/**
 	 * 管道是否为空

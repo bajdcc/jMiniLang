@@ -123,7 +123,7 @@ public class RuntimePipeService implements IRuntimePipeService {
 	}
 
 	@Override
-	public boolean write(int pid, int handle, char ch) {
+	public boolean write(int handle, char ch) {
 		handle = decodeHandle(handle);
 		if (setPipeId.contains(handle)) {
 			if (!arrPipes[handle].waiting_pids.isEmpty())

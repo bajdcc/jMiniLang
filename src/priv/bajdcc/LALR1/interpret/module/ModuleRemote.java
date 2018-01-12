@@ -2,6 +2,7 @@ package priv.bajdcc.LALR1.interpret.module;
 
 import priv.bajdcc.LALR1.grammar.Grammar;
 import priv.bajdcc.LALR1.grammar.runtime.*;
+import priv.bajdcc.LALR1.ui.UIMainFrame;
 import priv.bajdcc.LALR1.ui.UIRemoteWindow;
 import priv.bajdcc.LALR1.ui.drawing.UIRemoteGraphics;
 import priv.bajdcc.util.ResourceLoader;
@@ -20,6 +21,7 @@ public class ModuleRemote implements IInterpreterModule {
 
 	private static ModuleRemote instance = new ModuleRemote();
 	private static boolean enable = false;
+	private static UIMainFrame mainFrame;
 	private UIRemoteWindow remote;
 	private UIRemoteGraphics graphics;
 	private Queue<Character> queue = new LinkedBlockingDeque<>(1024);
@@ -31,6 +33,15 @@ public class ModuleRemote implements IInterpreterModule {
 
 	public static void enabled() {
 		enable = true;
+	}
+
+	public static void setMainFrame(UIMainFrame frame) {
+		mainFrame = frame;
+	}
+
+	public static void showMainFrame() {
+		mainFrame.setVisible(true);
+		mainFrame.setFocus();
 	}
 
 	public void setGraphics() {

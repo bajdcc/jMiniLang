@@ -477,7 +477,7 @@ public class ModuleProc implements IInterpreterModule {
 												  IRuntimeStatus status) throws Exception {
 				int handle = (int) args.get(0).getObj();
 				char ch = (char) args.get(1).getObj();
-				return new RuntimeObject(status.getService().getPipeService().write(status.getPid(), handle, ch));
+				return new RuntimeObject(status.getService().getPipeService().write(handle, ch));
 			}
 		});
 	}

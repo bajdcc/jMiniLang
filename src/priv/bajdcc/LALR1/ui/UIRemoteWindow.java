@@ -1,5 +1,6 @@
 package priv.bajdcc.LALR1.ui;
 
+import priv.bajdcc.LALR1.interpret.module.ModuleRemote;
 import priv.bajdcc.LALR1.ui.drawing.UIRemoteGraphics;
 
 import javax.swing.*;
@@ -29,6 +30,7 @@ public class UIRemoteWindow extends JFrame {
 		this.setResizable(false);
 		this.setVisible(true);
 		this.setTimer();
+		ModuleRemote.showMainFrame();
 	}
 
 	private void close() {

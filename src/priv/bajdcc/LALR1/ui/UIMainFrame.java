@@ -1,5 +1,6 @@
 package priv.bajdcc.LALR1.ui;
 
+import org.apache.log4j.Logger;
 import priv.bajdcc.LALR1.grammar.Grammar;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeCodePage;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeException;
@@ -32,6 +33,7 @@ import priv.bajdcc.util.lexer.error.RegexException;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -42,8 +44,12 @@ import java.io.ByteArrayOutputStream;
  * @author bajdcc
  */
 public class UIMainFrame extends JFrame {
+
+	private static Logger logger = Logger.getLogger("window");
+
 	private UIPanel panel;
-	private Timer delayShow;
+	private boolean isExitNormally = false;
+	private Interpreter interpreter;
 
 	public UIPanel getPanel() {
 		return panel;
@@ -52,25 +58,52 @@ public class UIMainFrame extends JFrame {
 	public UIMainFrame() {
 		panel = new UIPanel();
 		this.setTitle("jMiniLang Command Window");
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		this.setPreferredSize(new Dimension(800, 610));
 		this.setContentPane(panel);
 		this.pack();
 		this.setLocationRelativeTo(null);
 		this.setAlwaysOnTop(true);
 		this.setResizable(false);
-		this.setVisible(true);
+		this.setVisible(false);
+		this.addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
+				if (isExitNormally) {
+					logger.info("Exit.");
+				} else {
+					logger.info("Exit by window closing.");
+					UIMainFrame.this.stopOS();
+				}
+			}
+		});
 	}
 
 	public static void main(String[] args) {
 		UIMainFrame frame = new UIMainFrame();
 		ModuleRemote.enabled();
+		ModuleRemote.setMainFrame(frame);
 		frame.setTimer();
-		startOS(frame.getPanel().getUIGraphics());
-		frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+		frame.startOS(frame.getPanel().getUIGraphics());
+		frame.exit();
 	}
 
-	private static void startOS(UIGraphics g) {
+	private void stopOS() {
+		interpreter.stop();
+	}
+
+	private void exit() {
+		isExitNormally = true;
+		UIMainFrame.this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
+	}
+
+	private void setTimer() {
+		new Timer(33, e -> {
+			panel.repaint();
+		}).start();
+	}
+
+	private void startOS(UIGraphics g) {
 		IOSCodePage pages[] = new IOSCodePage[]{
 				// OS
 				new OSEntry(),
@@ -118,7 +151,7 @@ public class UIMainFrame extends JFrame {
 					"import \"sys.proc\";\n" +
 					"call g_load_sync_x(\"/kern/entry\");\n";
 
-			Interpreter interpreter = new Interpreter();
+			interpreter = new Interpreter();
 
 			for (IOSCodePage page : pages) {
 				interpreter.load(page.getName(), page.getCode());
@@ -154,15 +187,7 @@ public class UIMainFrame extends JFrame {
 		}
 	}
 
-	private void setTimer() {
-		new Timer(33, e -> {
-			panel.repaint();
-		}).start();
-		delayShow = new Timer(1000, e -> {
-			this.setVisible(true);
-			delayShow.stop();
-			delayShow = null;
-		});
-		delayShow.start();
+	public void setFocus() {
+		panel.setFocusable(true);
 	}
 }

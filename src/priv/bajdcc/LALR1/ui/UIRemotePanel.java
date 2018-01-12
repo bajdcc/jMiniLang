@@ -16,7 +16,7 @@ public class UIRemotePanel extends JPanel {
 
 	public UIRemotePanel() {
 		this.graphics = new UIRemoteGraphics(800, 600);
-		this.setFocusable(true);
+        this.setFocusable(false);
 	}
 
 	public UIRemoteGraphics getUIGraphics() {

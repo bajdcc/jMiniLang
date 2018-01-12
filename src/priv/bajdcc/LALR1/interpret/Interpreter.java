@@ -1,11 +1,6 @@
 package priv.bajdcc.LALR1.interpret;
 
-import priv.bajdcc.LALR1.grammar.runtime.RuntimeMachine;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeProcess;
-import priv.bajdcc.LALR1.interpret.module.IInterpreterModule;
-import priv.bajdcc.LALR1.interpret.module.ModuleBase;
-import priv.bajdcc.LALR1.interpret.module.ModuleList;
-import priv.bajdcc.LALR1.interpret.module.ModuleMath;
 
 import java.io.InputStream;
 import java.util.HashMap;
@@ -37,5 +32,12 @@ public class Interpreter {
 	 */
 	public void load(String name, String code) {
 		arrCodes.put(name, code);
+	}
+
+	/**
+	 * 发送停机命令
+	 */
+	public void stop() {
+		rtProcess.halt();
 	}
 }
