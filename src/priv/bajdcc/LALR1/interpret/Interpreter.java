@@ -1,6 +1,7 @@
 package priv.bajdcc.LALR1.interpret;
 
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeProcess;
+import priv.bajdcc.LALR1.interpret.os.IOSCodePage;
 
 import java.io.InputStream;
 import java.util.HashMap;
@@ -15,9 +16,10 @@ public class Interpreter {
 
 	private RuntimeProcess rtProcess;
 	private Map<String, String> arrCodes = new HashMap<>();
+	private Map<String, String> arrFiles = new HashMap<>();
 
 	public void run(String name, InputStream input) throws Exception {
-		rtProcess = new RuntimeProcess(name, input);
+		rtProcess = new RuntimeProcess(name, input, arrFiles);
 		for (Map.Entry<String, String> entry : arrCodes.entrySet()) {
 			rtProcess.addCodePage(entry.getKey(), entry.getValue());
 		}
@@ -27,11 +29,11 @@ public class Interpreter {
 
 	/**
 	 * 添加代码页
-	 * @param name 页名
-	 * @param code 代码
+	 * @param codePage 代码页
 	 */
-	public void load(String name, String code) {
-		arrCodes.put(name, code);
+	public void load(IOSCodePage codePage) {
+		arrCodes.put(codePage.getName(), codePage.getCode());
+		arrFiles.put(codePage.getName(), codePage.getClass().getSimpleName());
 	}
 
 	/**

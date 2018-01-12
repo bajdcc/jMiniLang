@@ -31,6 +31,9 @@ var time = func ~(msg, caller) {
            let val = call g_task_get_time("yyyy-MM-dd HH:mm:ss");
         }
         call g_map_put(msg, "val", val);
+    } else if (id == "speed") {
+        var val = call g_task_sys_speed();
+        call g_map_put(msg, "val", val);
     } else if (id == "pipe") {
         var val = call g_task_get_pipe_stat();
         let val = call g_string_join_array(val, g_endl);

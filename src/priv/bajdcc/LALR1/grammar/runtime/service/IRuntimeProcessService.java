@@ -59,4 +59,11 @@ public interface IRuntimeProcessService {
 	 * 让解释器等待一段时间，让UI刷新
 	 */
 	void waitForUI();
+
+    /**
+     * 虚拟机运行频率
+     *
+     * @return 运行频率
+     */
+    String getSpeed();
 }

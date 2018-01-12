@@ -154,7 +154,7 @@ public class UIMainFrame extends JFrame {
 			interpreter = new Interpreter();
 
 			for (IOSCodePage page : pages) {
-				interpreter.load(page.getName(), page.getCode());
+                interpreter.load(page);
 			}
 
 			Grammar grammar = new Grammar(code);

@@ -57,8 +57,12 @@ public class RuntimeProcess implements IRuntimeProcessService {
 	private RuntimeService service;
 	private boolean isWaitingForUI = false;
 	private boolean needToExit = false;
+	private Map<String, String> pageFileMap;
+	private float speed;
+	private int cycles;
 
-	public RuntimeProcess(String name, InputStream input) throws Exception {
+	public RuntimeProcess(String name, InputStream input, Map<String, String> pageFileMap) throws Exception {
+		this.pageFileMap = pageFileMap;
 		runMainProcess(name, input);
 	}
 
@@ -113,6 +117,9 @@ public class RuntimeProcess implements IRuntimeProcessService {
 	                arrPages.put(name, page);
 	                return page;
                 } catch (SyntaxException e) {
+					String filename = pageFileMap.get(name);
+					e.setFileName(filename == null ? "Unknown Source" : (filename + ".txt"));
+					e.setPageName(name);
 	                System.err.println("#PAGE ERROR# --> " + name);
 	                throw e;
                 }
@@ -122,7 +129,16 @@ public class RuntimeProcess implements IRuntimeProcessService {
 	}
 
 	public void run() throws Exception {
-		while (schd()) ;
+		long last_time = System.currentTimeMillis();
+		cycles = 0;
+		while (schd()) {
+			long span = System.currentTimeMillis() - last_time;
+			if (span > 1000) {
+				speed = 1000f * cycles / span;
+				cycles = 0;
+				last_time = System.currentTimeMillis();
+			}
+		}
 	}
 
 	private void runMainProcess(String name, InputStream input) throws Exception {
@@ -153,6 +169,7 @@ public class RuntimeProcess implements IRuntimeProcessService {
 						break;
 					}
 					if (process.runnable) {
+						cycles++;
 						switch (process.machine.runStep()) {
 							case 1:
 								return false;
@@ -165,7 +182,7 @@ public class RuntimeProcess implements IRuntimeProcessService {
 				sleep++;
 			}
 		}
-		if (sleep == pids.size()) { // 都在休眠，等待并关掉休眠时间
+		if (sleep == pids.size()) { // 都在休眠，等待并减掉休眠时间
 			for (int pid : pids) {
 				SchdProcess process = arrProcess[pid];
 				if (process.runnable) {
@@ -322,6 +339,11 @@ public class RuntimeProcess implements IRuntimeProcessService {
 	@Override
 	public void waitForUI() {
 		isWaitingForUI = true;
+	}
+
+	@Override
+	public String getSpeed() {
+		return String.valueOf(speed);
 	}
 
 	public void halt() {

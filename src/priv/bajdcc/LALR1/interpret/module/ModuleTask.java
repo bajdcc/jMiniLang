@@ -166,6 +166,23 @@ public class ModuleTask implements IInterpreterModule {
 				return new RuntimeObject(guid.toString());
 			}
 		});
+		info.addExternalFunc("g_task_sys_speed", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "获取虚拟机运行速度";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return null;
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+												  IRuntimeStatus status) throws Exception {
+				return new RuntimeObject(status.getService().getProcessService().getSpeed());
+			}
+		});
 	}
 
 	private void buildUtilMethod(IRuntimeDebugInfo info) {

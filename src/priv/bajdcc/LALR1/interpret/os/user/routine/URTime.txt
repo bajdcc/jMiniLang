@@ -25,9 +25,9 @@ if (call g_is_null(arg1)) { // 无参：当前时间
         call g_task_sleep(1);
     }
     call g_write_pipe(out, g_endl);
-} else { // 有参：程序运行计时
+} else if (arg1 == "a") { // 有参：程序运行计时
     var begin_time = call g_task_get_fast_arg("system", "now", "timestamp");
-    call g_read_pipe_args(in, lambda(ch, out) { call g_write_pipe(out, ch); call g_sleep(time); }, out);
+    call g_read_pipe_args(in, lambda(ch, out) -> call g_write_pipe(out, ch), out);
     var end_time = call g_task_get_fast_arg("system", "now", "timestamp");
     var period = end_time - begin_time;
     call g_printn("Running time: " + period + "ms");
@@ -36,6 +36,15 @@ if (call g_is_null(arg1)) { // 无参：当前时间
     /*
       # 比如，输入命令“range 1 1000 | grep 1 | count | time a”，一般打印出2500ms左右的结果。
     */
+} else if (arg1 == "sys") {
+    var get_time = func ~() -> call g_task_get_fast("system", "speed");
+    for (; call g_query_share(signal);) {
+        call g_write_pipe(out, "" + call get_time() + "\r");
+        call g_task_sleep(1);
+    }
+    call g_write_pipe(out, g_endl);
+} else {
+    call g_writeln_pipe(out, "Invalid command");
 }
 
 call g_stop_share(signal);
