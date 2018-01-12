@@ -7,4 +7,5 @@ package priv.bajdcc.LALR1.grammar.tree;
  */
 public interface IStmt extends ICommon {
 
+
 }

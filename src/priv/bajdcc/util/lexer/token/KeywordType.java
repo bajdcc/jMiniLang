@@ -16,7 +16,7 @@ public enum KeywordType {
 			"union"), UNSIGNED("unsigned"), VOID("void"), VOLATILE("volatile"), WHILE(
 			"while"), VARIABLE("var"), FUNCTION("func"), LET("let"), CALL(
 			"call"), IMPORT("import"), EXPORT("export"), YIELD("yield"), FOREACH(
-			"foreach");
+			"foreach"), LAMBDA("lambda");
 
 	private String name;
 

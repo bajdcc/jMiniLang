@@ -558,7 +558,7 @@ public class Semantic extends Syntax implements IErrorHandler {
 		if (!arrErrors.isEmpty()) {
 			System.err.println(getTrackerError());
 			throw new SyntaxException(SyntaxError.COMPILE_ERROR,
-					new Position(), "出现语法错误");
+					arrErrors.get(0).position, "出现语法错误");
 		}
 		/* 规则集合 */
 		ArrayList<RuleItem> items = npa.getRuleItems();
@@ -578,8 +578,7 @@ public class Semantic extends Syntax implements IErrorHandler {
 		object = machine.getObject();
 		if (object != null) {
 			Function entry = (Function) object;
-            manage.getManageScopeService().registerFunc(entry.getRealName(),
-                    entry);
+			manage.getManageScopeService().registerFunc(entry);
 		}
 	}
 

@@ -29,6 +29,7 @@ public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
 	private HashListMap<Object> symbolList = new HashListMap<>();
 	private HashListMapEx<String, Function> funcMap = new HashListMapEx<>();
 	private ArrayList<HashSet<String>> stkScope = new ArrayList<>();
+	private Stack<Integer> stkLambdaId = new Stack<>();
 	private HashSet<String> symbolsInFutureBlock = new HashSet<>();
 	private HashMap<BlockType, Integer> blockLevel = new HashMap<>();
 	private Stack<BlockType> blockStack = new Stack<>();
@@ -129,19 +130,33 @@ public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
 	}
 
 	@Override
+	public Function getLambda() {
+		int lambdaId = stkLambdaId.pop();
+		return funcMap.get(LAMBDA_PREFIX + lambdaId);
+	}
+
+	@Override
 	public void registerSymbol(String name) {
 		stkScope.get(0).add(name);
 		symbolList.add(name);
 	}
 
 	@Override
-    public void registerFunc(String name, Function func) {
-        if (func.getName().kToken == TokenType.ID) {
+	public void registerFunc(Function func) {
+		if (func.getName().kToken == TokenType.ID) {
 			func.setRealName(func.getName().toRealString());
 			symbolList.add(func.getRealName());
 		} else {
 			func.setRealName(LAMBDA_PREFIX + lambdaId++);
 		}
+		funcMap.add(func.getRealName(), func);
+	}
+
+	@Override
+	public void registerLambda(Function func) {
+		stkLambdaId.push(lambdaId);
+		func.getName().kToken = TokenType.ID;
+		func.setRealName(LAMBDA_PREFIX + lambdaId++);
 		funcMap.add(func.getRealName(), func);
 	}
 

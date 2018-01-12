@@ -59,8 +59,7 @@ public class SemanticHandler {
             }
             Function func = new Function();
             func.setName(token);
-            manage.getManageScopeService().registerFunc(
-                    token.toRealString(), func);
+			manage.getManageScopeService().registerFunc(func);
             if (token.kToken != TokenType.ID) {
                 token.object = func.getRealName();
                 token.kToken = TokenType.ID;
@@ -110,6 +109,15 @@ public class SemanticHandler {
         });
 		/* 循环体 */
 		mapSemanticAction.put("do_enter_cycle", (indexed, manage, access, recorder) -> manage.getQueryBlockService().enterBlock(BlockType.kCycle));
+		/* 匿名函数处理 */
+		mapSemanticAction.put("lambda", (indexed, manage, access, recorder) -> {
+			manage.getManageScopeService().clearFutureArgs();
+			Token token = access.relativeGet(0);
+			Function func = new Function();
+			func.setName(token);
+			manage.getManageScopeService().registerLambda(func);
+			token.object = func.getRealName();
+		});
 	}
 
 	/**
@@ -157,14 +165,16 @@ public class SemanticHandler {
         });
 		/* 基本数据结构 */
 		mapSemanticAnalyzier.put("type", (indexed, query, recorder) -> {
-            if (indexed.exists(1)) {
-                return indexed.get(1).object;
-            } else {
-                ExpValue value = new ExpValue();
-                Token token = indexed.get(0).token;
-                value.setToken(token);
-                return value;
-            }
+			if (indexed.exists(1)) {
+				return indexed.get(1).object;
+			} else if (indexed.exists(2)) {
+				return indexed.get(2).object;
+			} else {
+				ExpValue value = new ExpValue();
+				Token token = indexed.get(0).token;
+				value.setToken(token);
+				return value;
+			}
         });
 		/* 入口 */
 		mapSemanticAnalyzier.put("main", (indexed, query, recorder) -> {
@@ -270,8 +280,8 @@ public class SemanticHandler {
 		/* 过程 */
 		mapSemanticAnalyzier.put("func", (indexed, query, recorder) -> {
             Token token = indexed.get(1).token;
-            Function func = query.getQueryScopeService().getFuncByName(
-                    token.toRealString());
+			Function func = query.getQueryScopeService().getFuncByName(
+					token.toRealString());
             if (!indexed.exists(10)) {
                 func.setYield(true);
                 query.getQueryBlockService().leaveBlock(BlockType.kYield);
@@ -294,11 +304,39 @@ public class SemanticHandler {
                 func.setBlock(block);
             } else {
                 Block block = (Block) indexed.get(4).object;
-                block.getStmts().add(ret);
+	            List<IStmt> stmts = block.getStmts();
+	            if (!stmts.isEmpty() && !(stmts.get(stmts.size() - 1) instanceof StmtReturn))
+		            stmts.add(ret);
                 func.setBlock(block);
             }
             return func;
         });
+		/* 匿名函数 */
+		mapSemanticAnalyzier.put("lambda", (indexed, query, recorder) -> {
+			Token token = indexed.get(1).token;
+			Function func = query.getQueryScopeService().getLambda();
+			if (indexed.exists(2)) {
+				func.setParams((ArrayList<Token>) indexed.get(2).object);
+			}
+			StmtReturn ret = new StmtReturn();
+			if (indexed.exists(3)) {
+				List<IStmt> stmts = new ArrayList<>();
+				ret.setExp((IExp) indexed.get(3).object);
+				stmts.add(ret);
+				Block block = new Block(stmts);
+				func.setBlock(block);
+			} else {
+				Block block = (Block) indexed.get(4).object;
+				List<IStmt> stmts = block.getStmts();
+				if (!stmts.isEmpty() && !(stmts.get(stmts.size() - 1) instanceof StmtReturn))
+					stmts.add(ret);
+				func.setBlock(block);
+			}
+			ExpFunc exp = new ExpFunc();
+			exp.setFunc(func);
+			exp.genClosure();
+			return exp;
+		});
 		/* 返回语句 */
 		mapSemanticAnalyzier.put("return", (indexed, query, recorder) -> {
             StmtReturn ret = new StmtReturn();

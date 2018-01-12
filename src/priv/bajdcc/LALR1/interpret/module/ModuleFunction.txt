@@ -130,10 +130,7 @@ var g_func_applyr_arg = func ~(name, list, arg) ->
 export "g_func_applyr_arg";
 // ----------------------------------------------
 var g_func_apply_gen = func ~(name) {
-    var lambda = func ~(args) {
-        return call g_func_apply(name, args);
-    };
-    return lambda;
+    return lambda(args) -> call g_func_apply(name, args);
 };
 export "g_func_apply_gen";
 // ----------------------------------------------

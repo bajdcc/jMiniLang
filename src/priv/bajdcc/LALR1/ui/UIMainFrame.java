@@ -43,6 +43,7 @@ import java.io.ByteArrayOutputStream;
  */
 public class UIMainFrame extends JFrame {
 	private UIPanel panel;
+	private Timer delayShow;
 
 	public UIPanel getPanel() {
 		return panel;
@@ -67,12 +68,6 @@ public class UIMainFrame extends JFrame {
 		frame.setTimer();
 		startOS(frame.getPanel().getUIGraphics());
 		frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
-	}
-
-	private void setTimer() {
-		new Timer(33, e -> {
-			panel.repaint();
-		}).start();
 	}
 
 	private static void startOS(UIGraphics g) {
@@ -144,8 +139,9 @@ public class UIMainFrame extends JFrame {
 			e.printStackTrace();
 		} catch (SyntaxException e) {
 			System.err.println();
-			System.err.println(e.getPosition() + "," + e.getMessage() + " "
-					+ e.getInfo());
+			System.err.println(String.format("模块名：%s. 位置：%s. 错误：%s-%s(%s:%d)",
+					e.getPageName(), e.getPosition(), e.getMessage(),
+					e.getInfo(), e.getFileName(), e.getPosition().iLine + 1));
 			e.printStackTrace();
 		} catch (RuntimeException e) {
 			System.err.println();
@@ -156,5 +152,17 @@ public class UIMainFrame extends JFrame {
 			System.err.println(e.getMessage());
 			e.printStackTrace();
 		}
+	}
+
+	private void setTimer() {
+		new Timer(33, e -> {
+			panel.repaint();
+		}).start();
+		delayShow = new Timer(1000, e -> {
+			this.setVisible(true);
+			delayShow.stop();
+			delayShow = null;
+		});
+		delayShow.start();
 	}
 }

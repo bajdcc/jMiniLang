@@ -79,4 +79,45 @@ public class SyntaxException extends Exception {
 	public String getInfo() {
 		return info;
 	}
+
+	/**
+	 * 代码页
+	 */
+	private String pageName = "";
+	/**
+	 * 文件名
+	 */
+	private String fileName = "";
+
+	/**
+	 * @return 代码页
+	 */
+	public String getPageName() {
+		return pageName;
+	}
+
+	/**
+	 * 设置代码页
+	 *
+	 * @param pageName 代码页
+	 */
+	public void setPageName(String pageName) {
+		this.pageName = pageName;
+	}
+
+	/**
+	 * @return 文件名
+	 */
+	public String getFileName() {
+		return fileName;
+	}
+
+	/**
+	 * 设置文件名
+	 *
+	 * @param fileName 文件名
+	 */
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
 }

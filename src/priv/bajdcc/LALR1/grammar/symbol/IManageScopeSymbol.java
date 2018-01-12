@@ -34,13 +34,18 @@ public interface IManageScopeSymbol {
 
 	/**
 	 * 注册过程
-	 * 
-	 * @param name
-	 *            过程名
+	 *
 	 * @param func
 	 *            过程
 	 */
-    void registerFunc(String name, Function func);
+	void registerFunc(Function func);
+
+	/**
+	 * 注册函数过程
+	 *
+	 * @param func 过程
+	 */
+	void registerLambda(Function func);
 
 	/**
 	 * 注册下个块的参数表

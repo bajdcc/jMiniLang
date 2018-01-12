@@ -99,34 +99,31 @@ var standard_env = func [
     call bind("min", "g_func_min");
     // 内置方法
     var bind_1st = func ~(op, name) {
-        var lambda = func ~(args) {
+        call g_map_put(env, op, lambda(args) {
             var val = call name(call g_array_get(args, 0));
             if (call g_is_null(val)) {
                 return "Function: " + op;
             }
             return val;
-        };
-        call g_map_put(env, op, lambda);
+        });
     };
     var bind_1st_map = func ~(op, name, f) {
-        var lambda = func ~(args) {
+        call g_map_put(env, op, lambda(args) {
             var val = call name(call g_array_get(args, 0));
             if (call g_is_null(val)) {
                 return "Function: " + op;
             }
             return call f(val);
-        };
-        call g_map_put(env, op, lambda);
+        });
     };
     var bind_1st_curry = func ~(op, name, f, arg) {
-        var lambda = func ~(args) {
+        call g_map_put(env, op, lambda(args) {
             var val = call name(call g_array_get(args, 0));
             if (call g_is_null(val)) {
                 return "Function: " + op;
             }
             return call f(val, arg);
-        };
-        call g_map_put(env, op, lambda);
+        });
     };
     call bind_1st_map("print", "g_print", string);
     call bind_1st_map("printn", "g_printn", string);
@@ -358,7 +355,7 @@ var eval = func [
             // (_, vars, exp) = x
             var vars = call g_array_get(x, 1);
             var exp = call g_array_get(x, 2);
-            var lambda = func ~(args) {
+            return lambda(args) {
                 var env_new = call g_new(env); // deep copy
                 call g_map_put(env_new, "#PARENT#", env);
                 if (call is_list(vars)) {                  // (lambda (var*) exp)
@@ -375,7 +372,6 @@ var eval = func [
                 }
                 return call eval(exp, env_new);
             };
-            return lambda;
         } else if (call g_string_equal(head, "begin")) {   // begin (begin exp*)
             var size = call g_array_size(x);
             var val = g_null;

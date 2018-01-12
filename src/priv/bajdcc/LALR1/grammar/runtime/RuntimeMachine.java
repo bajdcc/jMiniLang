@@ -9,6 +9,7 @@ import priv.bajdcc.LALR1.grammar.runtime.data.RuntimeMap;
 import priv.bajdcc.LALR1.grammar.runtime.service.IRuntimeService;
 import priv.bajdcc.LALR1.grammar.type.TokenTools;
 import priv.bajdcc.LALR1.interpret.module.*;
+import priv.bajdcc.LALR1.syntax.handler.SyntaxException;
 import priv.bajdcc.util.HashListMapEx;
 import priv.bajdcc.util.lexer.token.OperatorType;
 import priv.bajdcc.util.lexer.token.Token;
@@ -63,7 +64,13 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 		}
 
 		for (IInterpreterModule module : modules) {
-			run(module.getModuleName(), module.getCodePage());
+			try {
+				run(module.getModuleName(), module.getCodePage());
+			} catch (SyntaxException e) {
+				e.setPageName(module.getModuleName());
+				e.setFileName(module.getClass().getSimpleName() + ".txt");
+				throw e;
+			}
 		}
 	}
 

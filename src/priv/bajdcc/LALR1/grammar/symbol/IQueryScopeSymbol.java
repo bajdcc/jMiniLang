@@ -72,6 +72,13 @@ public interface IQueryScopeSymbol {
 	Function getFuncByRealName(String name);
 
 	/**
+	 * 得到当前的匿名函数
+	 *
+	 * @return 过程对象
+	 */
+	Function getLambda();
+
+	/**
 	 * 过程名是否已被占用
 	 * 
 	 * @param name
