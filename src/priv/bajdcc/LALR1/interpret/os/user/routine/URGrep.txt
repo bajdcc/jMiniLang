@@ -11,12 +11,9 @@ call g_stop_share("PID#" + pid);
 var args = call g_map_get(share, "args");
 var pat = call g_array_get(args, 0);
 if (call g_is_null(pat)) {
-    var _pipe = func ["PIPE"] ~(ch, out) {
-        call g_write_pipe(out, ch);
-    };
     var _in = call g_create_pipe("PIPEIN#" + pid);
     var _out = call g_create_pipe("PIPEOUT#" + pid);
-    call g_read_pipe_args(_in, _pipe, _out);
+    call g_read_pipe_args(_in, lambda(ch, out) -> call g_write_pipe(out, ch), _out);
     call g_destroy_pipe(_out);
     return;
 }

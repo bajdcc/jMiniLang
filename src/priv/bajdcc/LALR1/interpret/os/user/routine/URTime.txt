@@ -26,11 +26,8 @@ if (call g_is_null(arg1)) { // 无参：当前时间
     }
     call g_write_pipe(out, g_endl);
 } else { // 有参：程序运行计时
-    var pipe = func ["PIPE"] ~(ch, out) {
-        call g_write_pipe(out, ch);
-    };
     var begin_time = call g_task_get_fast_arg("system", "now", "timestamp");
-    call g_read_pipe_args(in, pipe, out);
+    call g_read_pipe_args(in, lambda(ch, out) { call g_write_pipe(out, ch); call g_sleep(time); }, out);
     var end_time = call g_task_get_fast_arg("system", "now", "timestamp");
     var period = end_time - begin_time;
     call g_printn("Running time: " + period + "ms");

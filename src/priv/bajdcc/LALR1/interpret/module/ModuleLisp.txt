@@ -223,13 +223,12 @@ var tokenize = func [
     let s = call g_string_replace(s, "'", " ' ");
     let s = call g_string_trim(s);
     let s = call g_string_split(s, "\\s+");
-    var _rep = func ~(str) {
+    let s = call g_func_map(s, lambda(str) {
         if (call g_string_start_with(str, "\"")) {
             let s = call g_string_replace(s, "_", " ");
         }
         return str;
-    };
-    let s = call g_func_map(s, _rep);
+    });
     return s;
 };
 
@@ -389,9 +388,8 @@ var eval = func [
             if (call g_is_null(proc)) {
                 return call error("undefined function " + head);
             }
-            var _eval = func ~(arg) -> call eval(arg, env);
             var x_1 = call g_func_drop(x, 1); // take x[-1]
-            var args = call g_func_map(x_1, _eval);
+            var args = call g_func_map(x_1, lambda(arg) -> call eval(arg, env));
             return call proc(args);
         }
     } else {

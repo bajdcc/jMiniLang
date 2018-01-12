@@ -31,15 +31,9 @@ export "g_func_div";
 export "g_func_and";
 export "g_func_or";
 export "g_func_mod";
-var g_func_curry = func ~(a, b) {
-    var _curry = func ~(c) -> call a(b, c);
-    return _curry;
-};
-var g_func_swap = func ~(a) {
-    var _swap = func ~(b, c) -> call a(c, b);
-    return _swap;
-};
+var g_func_curry = func ~(a, b) -> lambda(c) -> call a(b, c);
 export "g_func_curry";
+var g_func_swap = func ~(a) -> lambda(b, c) -> call a(c, b);
 export "g_func_swap";
 var g_func_1 = func ~(a) -> a;
 export "g_func_1";
@@ -51,26 +45,22 @@ export "g_func_always_true";
 var g_func_xsl = func ["数组遍历闭包-foldl"] ~(l) {
     var len = call g_array_size(l);
     var idx = 0;
-    var _xsl = func ~() {
+    return lambda() {
         if (idx == len) { return g__; }
         var d = call g_array_get(l, idx);
         idx++;
-        var _xsl_ = func ~() -> d;
-        return _xsl_;
+        return lambda() -> d;
     };
-    return _xsl;
 };
 export "g_func_xsl";
 var g_func_xsr = func ["数组遍历闭包-foldr"] ~(l) {
     var idx = call g_array_size(l) - 1;
-    var _xsr = func ~() {
+    return lambda() {
         if (idx < 0) { return g__; }
         var d = call g_array_get(l, idx);
         idx--;
-        var _xsr_ = func ~() -> d;
-        return _xsr_;
+        return lambda() -> d;
     };
-    return _xsr;
 };
 export "g_func_xsr";
 // ----------------------------------------------
@@ -153,14 +143,12 @@ export "g_func_filter";
 var take_filter = func ~(n) {//取数组前N个元素
     var idx = 0;
     var end = n;
-    var _take_filter = func ~(a) -> idx++ <= end;
-    return _take_filter;
+    return lambda(a) -> idx++ <= end;
 };
 var drop_filter = func ~(n) {//取数组后len-N个元素
     var idx = 0;
     var end = n;
-    var _drop_filter = func ~(a) -> idx++ > end;
-    return _drop_filter;
+    return lambda(a) -> idx++ > end;
 };
 var g_func_take = func ~(list, n) ->
     call g_func_fold("g_array_add", list, g_new_array, "g_func_xsl", "g_func_1", "g_func_1", call take_filter(n));
