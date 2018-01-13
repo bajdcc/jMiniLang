@@ -1,11 +1,11 @@
 package priv.bajdcc.LALR1.grammar.runtime;
 
+import priv.bajdcc.util.HashListMapEx2;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import priv.bajdcc.util.HashListMapEx2;
 
 /**
  * 【运行时】调用函数基本单位
@@ -78,6 +78,11 @@ public class RuntimeFunc {
 
 	public String getName() {
 		return name;
+	}
+
+	public String getSimpleName() {
+		String[] s = name.split("\\$");
+		return s[s.length - 1];
 	}
 
 	public void setName(String name) {

@@ -56,10 +56,13 @@ var time = func ~(msg, caller) {
     } else if (id == "halt") {
         call g_ui_printn("** System is going to power off! **");
         call g_net_msg_server_send_error("Server shutdown");
-        var handle = call g_create_pipe("int#3");
-        call g_start_share("CMD#EXIT", true);
-        call g_task_sleep(1);
-        call g_write_pipe(handle, 'E');
+        var shutdown_proc = func ~() {
+            call g_sleep(100);
+            var handle = call g_create_pipe("int#3");
+            call g_start_share("CMD#EXIT", true);
+            call g_write_pipe(handle, 'E');
+        };
+        call g_create_user_process(shutdown_proc);
         call g_map_put(msg, "val", "** System is going to power off! **");
     } else if (id == "load") {
         var arg = call g_map_get(msg, "arg");

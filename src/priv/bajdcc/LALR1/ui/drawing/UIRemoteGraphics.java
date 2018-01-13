@@ -26,6 +26,7 @@ public class UIRemoteGraphics {
 	private Graphics gimage;
 	private Color bg, fg;
 	private static Pattern pat = Pattern.compile("(\\w)\\s*([0-9-]+)?\\s*([0-9-]+)?");
+	private StringBuilder cache;
 
 	public UIRemoteGraphics(int width, int height) {
 		this.width = width;
@@ -38,6 +39,8 @@ public class UIRemoteGraphics {
 		this.svgmode = false;
 		this.stringmode = false;
 		this.queue = new LinkedBlockingQueue<>();
+		this.cache = new StringBuilder(1024);
+		this.sb = new StringBuilder(1024);
 		this.bg = Color.white;
 		this.fg = Color.black;
 		this.image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
@@ -56,25 +59,37 @@ public class UIRemoteGraphics {
 	}
 
 	public void paint(Graphics2D g) {
-		for (; ; ) {
+		final char cmd_c = '\uffee';
+		final char cmd_l = '\uffed';
+		final char cmd_ml = '\uffec';
+		while (true) {
 			Character c = this.queue.poll();
-			if (c == null)
+			if (c == null) {
+				g.drawImage(image, 0, 0, null);
+				return;
+			}
+			if (c == '`')
 				break;
-			if (c == '@' && !this.stringmode) {
+			cache.append(c);
+		}
+		String cmd = cache.toString();
+		for (int i = 0; i < cmd.length(); i++) {
+			char c = cmd.charAt(i);
+			if (c == cmd_c && !this.stringmode) {
 				if (this.svgmode) {
 					drawSVGPath(sb.toString());
 				} else {
-					sb = new StringBuilder();
+					sb.delete(0, sb.length());
 				}
 				this.svgmode = !this.svgmode;
-			} else if ((c == '#' || c == '$') && !this.svgmode) {
+			} else if ((c == cmd_l || c == cmd_ml) && !this.svgmode) {
 				if (this.stringmode) {
-					if (c == '#')
+					if (c == cmd_l)
 						drawString(sb.toString());
 					else
 						drawStringMultiLine(sb.toString());
 				} else {
-					sb = new StringBuilder();
+					sb.delete(0, sb.length());
 				}
 				this.stringmode = !this.stringmode;
 			} else {
@@ -83,6 +98,7 @@ public class UIRemoteGraphics {
 				}
 			}
 		}
+		cache.delete(0, cache.length());
 		g.drawImage(image, 0, 0, null);
 	}
 
@@ -96,7 +112,7 @@ public class UIRemoteGraphics {
 	}
 
 	private void drawStringMultiLine(String text, FontMetrics m, int x, int y) {
-		String[] words = text.split("\n");
+		String[] words = text.split("\r?\n");
 		if (words.length > 1) {
 			for (String word : words) {
 				drawStringMultiLine(word, m, x, y);
@@ -106,14 +122,16 @@ public class UIRemoteGraphics {
 			this.gimage.drawString(text, x, y);
 		} else {
 			words = text.split("");
-			StringBuilder currentLine = new StringBuilder(words[0]);
+			StringBuilder currentLine = new StringBuilder(128);
+			currentLine.append(words[0]);
 			for (int i = 1; i < words.length; i++) {
 				if (m.stringWidth(currentLine + words[i]) < lineWidth) {
 					currentLine.append(words[i]);
 				} else {
 					this.gimage.drawString(currentLine.toString(), x, y);
 					y += m.getHeight();
-					currentLine = new StringBuilder(words[i]);
+					currentLine.delete(0, currentLine.length());
+					currentLine.append(words[i]);
 				}
 			}
 			if (currentLine.toString().trim().length() > 0) {

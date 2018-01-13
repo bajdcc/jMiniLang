@@ -210,7 +210,7 @@ public class ModuleBase implements IInterpreterModule {
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 					IRuntimeStatus status) throws Exception {
 				Object[] info = status.getProcInfo();
-				logger.info(String.format("#%03d [%s] %s", status.getPid(), info[1], args.get(0).getObj()));
+                logger.info(String.format("#%03d [%s] %s", status.getPid(), info[2], args.get(0).getObj()));
 				return null;
 			}
 		});
@@ -229,7 +229,7 @@ public class ModuleBase implements IInterpreterModule {
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) throws Exception {
 				Object[] info = status.getProcInfo();
-				logger.debug(String.format("#%03d [%s] %s", status.getPid(), info[1], args.get(0).getObj()));
+                logger.debug(String.format("#%03d [%s] %s", status.getPid(), info[2], args.get(0).getObj()));
 				return null;
 			}
 		});

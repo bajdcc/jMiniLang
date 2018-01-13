@@ -38,6 +38,11 @@ export "g_task_add_proc";
 /* 客户端向代理端发送消息 */
 var g_task_get = func ~(tid, msg) {
     var waiting_list = call g_query_share("TASK#LIST");
+    if (call g_is_null(waiting_list)) {
+        call g_map_put(msg, "error", "1");
+        call g_map_put(msg, "val", "Service shutdown.");
+        return;
+    }
     var pid = call g_get_pid();
     var m = {};
     call g_map_put(m, "pid", pid);
@@ -118,6 +123,9 @@ export "g_task_get_fast_args";
 /* 代理端处理客户端的消息 */
 var task_handler = func ~(ch) {
     var waiting_list = call g_query_share("TASK#LIST");
+    if (call g_is_null(waiting_list)) {
+        return;
+    }
     var task_table = call g_query_share("TASK#TABLE");
     call g_lock_share("TASK#LIST");                     // 锁定等待队列
     var pid = call g_array_get(waiting_list, 0);        // 取最早等待的进程

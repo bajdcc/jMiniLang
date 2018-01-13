@@ -2,6 +2,7 @@ import "sys.base";
 import "sys.list";
 import "sys.proc";
 import "sys.remote";
+import "sys.task";
 
 // IRQ: 3
 var no = 3;
@@ -12,13 +13,17 @@ call g_printn("Running...");
 
 var destroy_int = func ~() {
     var tt = call g_query_share("TASK#TABLE");
+    var tn = call g_query_share("TASK#NAMELIST");
     // 确保任务和中断依次退出
     // 1. stop task
     call g_printn("Stopping service...");
+    call g_stop_share("TASK#LIST");
     foreach (var i : call g_range(0, 15)) { // ! ModuleTask.TASK_NUM - 1
         if (!call g_is_null(call g_array_get(tt, i))) {
-           var handle = call g_create_pipe("TASKSEND#" + i);
-           call g_write_pipe(handle, 'E');
+            var tid = call g_array_get(tn, i);
+            call g_task_get_fast(tid, "#SHUTDOWN#");
+            var handle = call g_create_pipe("TASKSEND#" + i);
+            call g_write_pipe(handle, 'E');
         }
     }
     call g_join_process_array(call g_query_share("TASK#PIDS"));

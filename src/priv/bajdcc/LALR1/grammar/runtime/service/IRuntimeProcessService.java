@@ -1,5 +1,7 @@
 package priv.bajdcc.LALR1.grammar.runtime.service;
 
+import java.util.List;
+
 /**
  * 【运行时】运行时进程服务接口
  *
@@ -66,4 +68,11 @@ public interface IRuntimeProcessService {
      * @return 运行频率
      */
     String getSpeed();
+
+    /**
+     * 获取当前进程信息（缓存）
+     *
+     * @return 进程信息
+     */
+    List<Object[]> getProcInfoCache();
 }

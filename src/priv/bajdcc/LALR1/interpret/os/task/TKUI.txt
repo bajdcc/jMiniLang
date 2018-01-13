@@ -35,7 +35,7 @@ var time = func ~(msg, caller) {
         foreach (var i : call g_range(2, len - 1)) {
             let str = str + call g_array_get(arg, i) + " ";
         }
-        call g_remote_print(str);
+        call g_remote_print(str + "`");
         call g_map_put(msg, "val", str);
     } else if (id == "on") {
         var arg = call g_map_get(msg, "arg");

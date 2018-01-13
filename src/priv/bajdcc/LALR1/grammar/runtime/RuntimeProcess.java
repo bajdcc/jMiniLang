@@ -58,8 +58,26 @@ public class RuntimeProcess implements IRuntimeProcessService {
 	private boolean isWaitingForUI = false;
 	private boolean needToExit = false;
 	private Map<String, String> pageFileMap;
-	private float speed;
-	private int cycles;
+
+    private SystemStat stat = new SystemStat();
+
+    public void run() throws Exception {
+        long last_time = System.currentTimeMillis();
+        stat.cycle = 0;
+        while (schd()) {
+            long span = System.currentTimeMillis() - last_time;
+            if (span > 1000) {
+                stat.speed = 1000f * stat.cycle / span;
+                stat.cycle = 0;
+                last_time = System.currentTimeMillis();
+                stat.procCache.clear();
+                Set<Integer> sorts = new TreeSet<>(setProcessId);
+                for (int pid : sorts) {
+                    stat.procCache.add(getProcInfoById(pid));
+                }
+            }
+        }
+    }
 
 	public RuntimeProcess(String name, InputStream input, Map<String, String> pageFileMap) throws Exception {
 		this.pageFileMap = pageFileMap;
@@ -128,23 +146,6 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		return null;
 	}
 
-	public void run() throws Exception {
-		long last_time = System.currentTimeMillis();
-		cycles = 0;
-		while (schd()) {
-			long span = System.currentTimeMillis() - last_time;
-			if (span > 1000) {
-				speed = 1000f * cycles / span;
-				cycles = 0;
-				last_time = System.currentTimeMillis();
-			}
-		}
-	}
-
-	private void runMainProcess(String name, InputStream input) throws Exception {
-		initMainProcess(name, input);
-	}
-
 	private boolean schd() throws Exception {
 		if (setProcessId.isEmpty())
 			return false;
@@ -169,7 +170,7 @@ public class RuntimeProcess implements IRuntimeProcessService {
 						break;
 					}
 					if (process.runnable) {
-						cycles++;
+                        stat.cycle++;
 						switch (process.machine.runStep()) {
 							case 1:
 								return false;
@@ -196,6 +197,14 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		}
 		return true;
 	}
+
+    private void runMainProcess(String name, InputStream input) throws Exception {
+        initMainProcess(name, input);
+    }
+
+    public boolean isBlock(int pid) {
+        return setProcessId.contains(pid) && !arrProcess[pid].runnable;
+    }
 
 	private void initMainProcess(String name, InputStream input) throws Exception {
 		this.arrProcess = new SchdProcess[MAX_PROCESS];
@@ -278,11 +287,9 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		return false;
 	}
 
-	public boolean isBlock(int pid) {
-		if (!setProcessId.contains(pid)) {
-			return false;
-		}
-		return !arrProcess[pid].runnable;
+    @Override
+    public String getSpeed() {
+        return String.valueOf(stat.speed);
 	}
 
 	@Override
@@ -342,8 +349,18 @@ public class RuntimeProcess implements IRuntimeProcessService {
 	}
 
 	@Override
-	public String getSpeed() {
-		return String.valueOf(speed);
+    public List<Object[]> getProcInfoCache() {
+        return stat.procCache;
+    }
+
+    private class SystemStat {
+        public float speed;
+        public int cycle;
+        public List<Object[]> procCache;
+
+        public SystemStat() {
+            procCache = new ArrayList<>();
+        }
 	}
 
 	public void halt() {

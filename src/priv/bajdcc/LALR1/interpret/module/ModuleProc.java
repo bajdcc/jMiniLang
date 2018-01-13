@@ -8,6 +8,7 @@ import priv.bajdcc.LALR1.grammar.runtime.data.RuntimeFuncObject;
 import priv.bajdcc.util.ResourceLoader;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -290,7 +291,7 @@ public class ModuleProc implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) throws Exception {
-				return new RuntimeObject(getProcInfo(status, status.getUsrProcs()));
+				return new RuntimeObject(ProcInfoHelper.getProcInfo(status, status.getUsrProcs()));
 			}
 		});
 		info.addExternalFunc("g_query_sys_proc", new IRuntimeDebugExec() {
@@ -307,7 +308,7 @@ public class ModuleProc implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) throws Exception {
-				return new RuntimeObject(getProcInfo(status, status.getSysProcs()));
+				return new RuntimeObject(ProcInfoHelper.getProcInfo(status, status.getSysProcs()));
 			}
 		});
 		info.addExternalFunc("g_query_all_proc", new IRuntimeDebugExec() {
@@ -324,7 +325,7 @@ public class ModuleProc implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) throws Exception {
-				return new RuntimeObject(getProcInfo(status, status.getAllProcs()));
+				return new RuntimeObject(ProcInfoHelper.getProcInfoAll(status));
 			}
 		});
 		info.addExternalFunc("g_set_process_desc", new IRuntimeDebugExec() {
@@ -633,15 +634,36 @@ public class ModuleProc implements IInterpreterModule {
 		});
 	}
 
-	private static RuntimeArray getProcInfo(IRuntimeStatus status, List<Integer> pids) {
-		RuntimeArray array = new RuntimeArray();
-		array.add(new RuntimeObject(String.format(" %s  %-5s   %-15s   %-20s   %s",
-                " ", "Pid", "Name", "Function", "Description")));
-        for (int pid : pids) {
-			Object[] objs = status.getProcInfoById(pid);
-			array.add(new RuntimeObject(String.format(" %s  %-5d   %-15s   %-20s   %s",
-					objs[0], pid, objs[1], objs[2], objs[3])));
+	static class ProcInfoHelper {
+		public static RuntimeArray getProcInfo(IRuntimeStatus status, List<Integer> pids) {
+			return getProcInfo2(status, getProcInfo3(status, pids));
 		}
-		return array;
+
+		public static RuntimeArray getProcInfoAll(IRuntimeStatus status) {
+			return getProcInfo2(status, getProcInfo4(status));
+		}
+
+		static RuntimeArray getProcInfo2(IRuntimeStatus status, List<Object[]> objs) {
+			RuntimeArray array = new RuntimeArray();
+			array.add(new RuntimeObject(String.format(" %s  %-5s   %-15s   %-20s   %s",
+					" ", "Pid", "Name", "Function", "Description")));
+			for (Object[] obj : objs) {
+				array.add(new RuntimeObject(String.format(" %s  %-5d   %-15s   %-20s   %s",
+						obj[0], (int) obj[1], obj[2], obj[3], obj[4])));
+			}
+			return array;
+		}
+
+		static List<Object[]> getProcInfo3(IRuntimeStatus status, List<Integer> pids) {
+			List<Object[]> objs = new ArrayList<>();
+			for (int pid : pids) {
+				objs.add(status.getProcInfoById(pid));
+			}
+			return objs;
+		}
+
+		static List<Object[]> getProcInfo4(IRuntimeStatus status) {
+			return status.getService().getProcessService().getProcInfoCache();
+		}
 	}
 }

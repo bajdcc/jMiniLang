@@ -11,10 +11,10 @@ call g_printn("Running...");
 
 var first = false;
 var init = func ~() {
-    call g_task_get_fast_arg("ui", "path", "@M 100 200@@l 500 0@@l 0 150@@l -500 0@@l 0 -150@");
+    call g_task_get_fast_arg("ui", "path", "\uffeeM 100 200\uffee\uffeel 500 0\uffee\uffeel 0 150\uffee\uffeel -500 0\uffee\uffeel 0 -150\uffee");
 };
 var destroy = func ~() {
-    call g_task_get_fast_arg("ui", "path", "@M 100 200@@R 601 351@");
+    call g_task_get_fast_arg("ui", "path", "\uffeeM 100 200\uffee\uffeeR 601 351\uffee");
 };
 
 var draw = func ~() {
@@ -26,7 +26,7 @@ var draw = func ~() {
     if (call g_is_null(obj)) { call g_task_sleep(10); return; }
     var text = " —— " + call g_map_get(obj, "from") + " —— \n" + call g_map_get(obj, "hitokoto");
     //var text = "test string for debug";
-    call g_task_get_fast_arg("ui", "path", "@M 101 201@@R 599 349@@M 140 230@@W 450@$" + text + "$");
+    call g_task_get_fast_arg("ui", "path", "\uffeeM 101 201\uffee\uffeeR 599 349\uffee\uffeeM 140 230\uffee\uffeeW 450\uffee\uffec" + text + "\uffec");
     call g_task_sleep_signal(8, "TASK#SLEEP");
 };
 var clear = func ~() {

@@ -121,6 +121,10 @@ public class RuntimeStack {
 		return stkCall.get(0).getName();
 	}
 
+    public String getFuncSimpleName() {
+        return stkCall.get(0).getSimpleName();
+    }
+
 	public RuntimeStack getYieldStack(String hash) {
 		return stkCall.get(0).getYields(hash);
 	}
