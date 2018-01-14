@@ -81,6 +81,8 @@ public class RuntimeFunc {
 	}
 
 	public String getSimpleName() {
+        if (name == null)
+            return "UNKNOWN";
 		String[] s = name.split("\\$");
 		return s[s.length - 1];
 	}

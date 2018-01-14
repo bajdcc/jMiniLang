@@ -15,7 +15,15 @@ public class UIGraphics {
 
 	private static final int CARET_TIME = 20;
     private static final int MAX_QUEUE_SIZE = 2000;
-	private int w, h, cols, rows, width, height, zoom, size;
+	private static final char FILL_FONT_SPAN = '\uffea';
+	private int w;
+	private int h;
+	private int cols;
+	private int rows;
+	private int width;
+	private int height;
+	private int zoom;
+	private int size;
 	private char[] data;
 	private int ptr_x, ptr_y;
 	private int ptr_mx, ptr_my;
@@ -90,9 +98,9 @@ public class UIGraphics {
 	}
 
 	private void showCaret(Graphics2D g) {
-		if (ptr_x == cols) {
+		if (ptr_x == getCols()) {
 			ptr_x = 0;
-			if (ptr_y == rows) {
+			if (ptr_y == getRows()) {
 				clear(g);
 			} else {
 				ptr_y++;
@@ -106,15 +114,22 @@ public class UIGraphics {
 	}
 
 	private void draw(Graphics2D g, char c) {
+		drawIntern(g, c);
+		if (UIFontImage.isWideChar(c)) {
+			drawIntern(g, FILL_FONT_SPAN);
+		}
+	}
+
+	private void drawIntern(Graphics2D g, char c) {
 		if (c == '\n') {
-			if (ptr_y == rows - 1) {
+			if (ptr_y == getRows() - 1) {
 				newline(g);
 			} else {
 				ptr_x = 0;
 				ptr_y++;
 			}
 		} else if (c == '\b') {
-			if (ptr_mx + ptr_my * cols < ptr_x + ptr_y * cols) {
+			if (ptr_mx + ptr_my * getCols() < ptr_x + ptr_y * getCols()) {
 				if (ptr_y == 0) {
 					if (ptr_x != 0) {
 						drawChar('\0');
@@ -126,15 +141,15 @@ public class UIGraphics {
 						ptr_x--;
 					} else {
 						drawChar('\0');
-						ptr_x = cols - 1;
+						ptr_x = getCols() - 1;
 						ptr_y--;
 					}
 				}
 			}
 		} else if (c == '\r') {
 			ptr_x = 0;
-		} else if (ptr_x == cols - 1) {
-			if (ptr_y == rows - 1) {
+		} else if (ptr_x == getCols() - 1) {
+			if (ptr_y == getRows() - 1) {
 				newline(g);
 				drawChar(c);
 				ptr_x++;
@@ -150,9 +165,11 @@ public class UIGraphics {
 	}
 
 	private void drawChar(char c) {
-		this.data[ptr_y * cols + ptr_x] = c;
-		image.getGraphics().drawImage(fontImage.getImage(c),
-				ptr_x * width, ptr_y * height, null);
+		this.data[ptr_y * getCols() + ptr_x] = c;
+		if (c != FILL_FONT_SPAN) {
+			image.getGraphics().drawImage(fontImage.getImage(c),
+					ptr_x * width, ptr_y * height, null);
+		}
 	}
 
 	public void clear(Graphics2D g) {
@@ -168,12 +185,12 @@ public class UIGraphics {
 
 	public void newline(Graphics2D g) {
 		this.ptr_x = 0;
-		int end = size - cols;
-        System.arraycopy(data, cols, data, 0, size - cols);
+		int end = size - getCols();
+		System.arraycopy(data, getCols(), data, 0, size - getCols());
         Arrays.fill(data, end, size - 1, '\0');
-        image.getGraphics().copyArea(0, height, w, (rows - 1) * height, 0, -height);
+		image.getGraphics().copyArea(0, height, w, (getRows() - 1) * height, 0, -height);
         image.getGraphics().setColor(Color.white);
-        image.getGraphics().fillRect(0, (rows - 1) * height, w, height);
+		image.getGraphics().fillRect(0, (getRows() - 1) * height, w, height);
         g.drawImage(image, 0, 0, null);
 	}
 
@@ -201,17 +218,29 @@ public class UIGraphics {
 
 	public void fallback() {
 		int x = ptr_x, y = ptr_y;
-		while (ptr_mx + ptr_my * cols < x + y * cols) {
+		while (ptr_mx + ptr_my * getCols() < x + y * getCols()) {
 			if (x == 0) {
-				x = cols - 1;
+				x = getCols() - 1;
 				y--;
 			}
-			this.data[y * cols + x] = '\0';
+			this.data[y * getCols() + x] = '\0';
 			image.getGraphics().drawImage(fontImage.getImage('\0'),
 					x * width, y * height, null);
 			x--;
 		}
 		ptr_x = x;
 		ptr_y = y;
+	}
+
+	public int getCols() {
+		return cols;
+	}
+
+	public int getRows() {
+		return rows;
+	}
+
+	public int calcWidth(String str) {
+		return UIFontImage.calcWidth(str);
 	}
 }

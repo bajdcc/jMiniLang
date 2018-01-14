@@ -5,6 +5,7 @@ import priv.bajdcc.LALR1.grammar.runtime.*;
 import priv.bajdcc.LALR1.ui.drawing.UIGraphics;
 import priv.bajdcc.util.ResourceLoader;
 
+import java.math.BigInteger;
 import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Queue;
@@ -232,6 +233,58 @@ public class ModuleUI implements IInterpreterModule {
 				sb = new StringBuilder();
 				graphics.fallback();
 				return null;
+			}
+		});
+		info.addExternalFunc("g_ui_cols", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "多少列";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return null;
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+												  IRuntimeStatus status) throws Exception {
+				return new RuntimeObject(BigInteger.valueOf(graphics.getCols()));
+			}
+		});
+		info.addExternalFunc("g_ui_rows", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "多少行";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return null;
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+												  IRuntimeStatus status) throws Exception {
+				return new RuntimeObject(BigInteger.valueOf(graphics.getRows()));
+			}
+		});
+		info.addExternalFunc("g_ui_text_length", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "一段文字宽度";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kString};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+												  IRuntimeStatus status) throws Exception {
+				String str = String.valueOf(args.get(0).getObj());
+				return new RuntimeObject(BigInteger.valueOf(graphics.calcWidth(str)));
 			}
 		});
 	}

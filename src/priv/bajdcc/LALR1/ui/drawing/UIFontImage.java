@@ -5,6 +5,8 @@ import sun.awt.SunHints;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 【界面】点阵文字位图
@@ -16,24 +18,50 @@ public class UIFontImage {
 	private static Logger logger = Logger.getLogger("font");
 
 	private int width, height;
-	private Image[] images;
+	private Image[] imagesASCII;
+	private Map<Integer, Image> imagesUnicode;
 
 	public UIFontImage(int width, int height) {
 		this.width = width;
 		this.height = height;
-		this.images = new BufferedImage[65536];
+		this.imagesASCII = new BufferedImage[256];
+		this.imagesUnicode = new HashMap<>();
+	}
+
+	public static boolean isWideChar(char c) {
+		return !Character.isISOControl(c) && c >= '\u00ff';
+	}
+
+	public static int calcWidth(String str) {
+		int len = 0;
+		for (int i = 0; i < str.length(); i++) {
+			char c = str.charAt(i);
+			if (isWideChar(c))
+				len += 2;
+			else
+				len++;
+		}
+		return len;
 	}
 
 	/**
 	 * 按需生成字符图像，免去数秒的初始化，节省时间
 	 *
 	 * @param i 字符的编码
+	 * @return 是否是原始宽度（不是汉字）
 	 */
-	private void drawImage(int i) {
-		Font asciiFont = new Font(Font.MONOSPACED, Font.PLAIN, 18);
-		Font unicodeFont = new Font(Font.SERIF, Font.PLAIN, 12);
-		this.images[i] = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-		Graphics g = this.images[i].getGraphics();
+	private boolean drawImage(int i) {
+		final Font asciiFont = new Font(Font.MONOSPACED, Font.PLAIN, 18);
+		final Font unicodeFont = new Font(Font.SERIF, Font.BOLD, 14);
+		boolean isWide = isWideChar((char) i);
+		int w = isWide ? (2 * width) : width;
+		BufferedImage bi = new BufferedImage(w, height, BufferedImage.TYPE_INT_RGB);
+		if (i < 256) {
+			this.imagesASCII[i] = bi;
+		} else {
+			this.imagesUnicode.put(i, bi);
+		}
+		Graphics g = bi.getGraphics();
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setRenderingHint(SunHints.KEY_ANTIALIASING, SunHints.VALUE_ANTIALIAS_ON);
 		g2d.setRenderingHint(SunHints.KEY_TEXT_ANTIALIASING, SunHints.VALUE_TEXT_ANTIALIAS_DEFAULT);
@@ -42,31 +70,39 @@ public class UIFontImage {
 		g2d.setRenderingHint(SunHints.KEY_FRACTIONALMETRICS, SunHints.VALUE_FRACTIONALMETRICS_OFF);
 		g2d.setRenderingHint(SunHints.KEY_RENDERING, SunHints.VALUE_RENDER_DEFAULT);
 		g.setColor(Color.white);
-		g.fillRect(0, 0, width, height);
+		g.fillRect(0, 0, w, height);
+		g.setColor(Color.black);
 		if (!Character.isISOControl((char) i)) {
-			g.setColor(Color.black);
 			if (i < 256) {
 				g.setFont(asciiFont);
 				String str = Character.toString((char) i);
-				int x = width / 2 - g.getFontMetrics().stringWidth(str) / 2;
+				int x = w / 2 - g.getFontMetrics().stringWidth(str) / 2;
 				int y = height / 2 + g.getFontMetrics().getHeight() / 3;
 				g.drawString(str, x, y);
 			} else {
 				g.setFont(unicodeFont);
 				String str = Character.toString((char) i);
-				int x = width / 2 - g.getFontMetrics().stringWidth(str) / 2;
-				int y = height / 2 + g.getFontMetrics().getHeight() / 2;
+				int x = w / 2 - g.getFontMetrics().stringWidth(str) / 2;
+				int y = height / 2 + g.getFontMetrics().getHeight() / 2 - 2;
 				g.drawString(str, x, y);
+				return true; // 假设是中文，比较宽
 			}
 		}
+		return true;
 	}
 
 	public Image getImage(int c) {
 		if (c >= 0 && c <= 65535) {
-			if (this.images[c] == null)
-				drawImage(c);
-			return this.images[c];
+			if (c < 256) {
+				if (this.imagesASCII[c] == null)
+					drawImage(c);
+				return this.imagesASCII[c];
+			} else {
+				if (this.imagesUnicode.get(c) == null)
+					drawImage(c);
+				return this.imagesUnicode.get(c);
+			}
 		}
-		return this.images[0];
+		return this.imagesASCII[0];
 	}
 }

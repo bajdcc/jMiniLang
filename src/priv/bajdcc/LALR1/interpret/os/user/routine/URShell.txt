@@ -145,6 +145,7 @@ var parse_cmd = func ["PARSE"] ~(cmd, parse) {
     var out = call g_wait_pipe("PIPEOUT#" + child);
     var handles = call g_query_share("PIPE#HANDLE");
     var ctrl = func ~() {
+        call g_set_process_desc("shell control");
         var fn = func ~(ch) {
             var hs = call g_query_share("PIPE#HANDLE");
             var kill = false;
@@ -175,7 +176,10 @@ var parse_cmd = func ["PARSE"] ~(cmd, parse) {
     };
     call g_array_add(handles, child);
     var ctrl_handle = call g_create_user_process(ctrl);
-    var inputd = func ~(arr) -> call g_ui_inputd("SYS#INPUT", arr);
+    var inputd = func ~(arr) {
+        call g_set_process_desc("shell input");
+        call g_ui_inputd("SYS#INPUT", arr);
+    };
     var inputd_handle = call g_create_user_process_args(inputd, array);
     call g_read_pipe(out, f);
     call g_join_process_array(handles);

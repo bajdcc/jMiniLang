@@ -53,7 +53,6 @@ public class RuntimeProcess implements IRuntimeProcessService {
 	private Map<String, RuntimeCodePage> arrPages;
 	private SchdProcess arrProcess[];
 	private Set<Integer> setProcessId;
-	private Set<Integer> destroyedProcess;
 	private RuntimeService service;
 	private boolean isWaitingForUI = false;
 	private boolean needToExit = false;
@@ -213,7 +212,6 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		this.arrCodes = new HashMap<>();
 		this.arrPages = new HashMap<>();
 		this.setProcessId = new HashSet<>();
-		this.destroyedProcess = new HashSet<>();
 		this.service = new RuntimeService(this);
 		RuntimeMachine machine = new RuntimeMachine(name, cyclePtr, -1, this);
 		machine.initStep(name, codePage, Collections.emptyList(), 0, null);
@@ -244,7 +242,7 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		}
 		int pid;
 		for (; ; ) {
-			if (arrProcess[cyclePtr] == null && !destroyedProcess.contains(cyclePtr)) {
+			if (arrProcess[cyclePtr] == null) {
 				RuntimeMachine machine = new RuntimeMachine(name, cyclePtr, creatorId, this);
 				machine.initStep(name, page, arrProcess[creatorId].machine.getPageRefers(name), pc, obj);
 				setProcessId.add(cyclePtr);
@@ -269,7 +267,6 @@ public class RuntimeProcess implements IRuntimeProcessService {
 			wakeup(pid);
 		}
 		arrProcess[processId] = null;
-		destroyedProcess.add(processId);
 		setProcessId.remove(processId);
 		logger.debug("Process #" + processId + " exit, " + setProcessId.size() + " left.");
 	}

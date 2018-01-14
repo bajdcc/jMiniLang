@@ -3,6 +3,7 @@ import "sys.list";
 import "sys.proc";
 import "sys.task";
 import "sys.string";
+import "sys.ui";
 import "module.lisp";
 
 call g_set_process_desc("test routinue");
@@ -62,6 +63,7 @@ var word_typewrite = func ~(str, span) {
         call put(c);
         call g_task_sleep_ms_signal(span, signal);
     }
+    call put('\n');
 };
 
 /* 清屏 */
@@ -403,6 +405,147 @@ var stage_lisp = func ~() {
     call comment("The end.                @bajdcc");
 };
 
+// ---------------------------------------------------------
+// 打印古诗
+
+var cols = call g_ui_cols();
+var rows = call g_ui_rows();
+
+/* 打字效果（空格不算） */
+var word_typewrite_fast = func ~(span, str) {
+    var l = call g_ui_text_length(str);
+    var space = (cols - l) / 2;
+    call puts(call g_string_rep(" ", space));
+    foreach (var c : call g_range_string(str)) {
+        call put(c);
+        call g_task_sleep_ms_signal(span, signal);
+    }
+    call put('\n');
+};
+
+/* 换页特效 */
+var stage_trans = func ~() {
+    call word_typewrite_fast(900, "...");
+    call put('\f');
+};
+
+/* 打印古诗 */
+var stage_font = func ~() {
+    call put('\f');
+    var text = "
+
+- 登幽州台歌 -
+
+陈子昂
+
+
+
+  前不见古人，
+
+  后不见来者。
+
+  念天地之悠悠，
+
+  独怆然而涕下！
+
+.
+
+- 春望 -
+
+杜甫
+
+
+
+  国破山河在，城春草木深。
+
+  感时花溅泪，恨别鸟惊心。
+
+  烽火连三月，家书抵万金。
+
+  白头搔更短，浑欲不胜簪。
+
+.
+
+- 如梦令·昨夜雨疏风骤 -
+
+李清照
+
+
+
+  昨夜雨疏风骤，
+
+  浓睡不消残酒。
+
+  试问卷帘人，
+
+  却道海棠依旧，
+
+  知否，知否？
+
+  应是绿肥红瘦。
+
+.
+
+- 龟虽寿 -
+
+曹操
+
+
+
+  神龟虽寿，犹有竟时。
+
+  螣蛇乘雾，终为土灰。
+
+  老骥伏枥，志在千里。
+
+  烈士暮年，壮心不已。
+
+  盈缩之期，不但在天。
+
+  养怡之福，可得永年。
+
+  幸甚至哉！歌以咏志。
+
+";
+    var t = call g_string_split(text, '\n');
+    foreach (var s : call g_range_array(t)) {
+        if (call g_string_start_with(s, ".")) {
+            call stage_trans();
+        } else {
+            call word_typewrite_fast(80, s);
+        }
+    }
+};
+
+// ---------------------------------------------
+// FORK
+
+var stage_fork = func ~() {
+    var fork_proc = func ~() {
+        call g_set_process_desc("fork job");
+        var fork_entry = func ~(arg) {
+            call g_set_process_desc("fork #" + arg);
+            call g_sleep(50);
+            var o = call g_create_pipe("FORK#COUNT");
+            call g_write_pipe(o, '*');
+        };
+        for (var i = 0; i < 20000; i++) {
+            call g_create_user_process_args(fork_entry, i);
+        }
+    };
+    call g_create_user_process(fork_proc);
+    var __in = call g_create_pipe("FORK#COUNT");
+    var count = 0;
+    call g_read_pipe_args(__in, lambda(ch, out) {
+        call puts("" + count + "\r");
+        count++;
+        if (count >= 20000) {
+            call puts("Tested 20000 process.\n");
+            call g_destroy_pipe(call g_create_pipe("FORK#COUNT"));
+        }
+    }, out);
+};
+
 var name = call g_array_get(args, 0);
 if (call g_is_null(name)) {
     call create_stage(stage_clear);
@@ -413,6 +556,12 @@ if (call g_is_null(name)) {
     call create_stage(stage_philo2);
 } else if (name == "lisp") {
     call create_stage(stage_lisp);
+} else if (name == "font") {
+    call stage_font();
+} else if (name == "fork") {
+    call stage_fork();
+} else {
+    call g_read_pipe_args(in, lambda(ch, out) -> call g_write_pipe(out, ch), out);
 }
 
 call g_stop_share(signal);
