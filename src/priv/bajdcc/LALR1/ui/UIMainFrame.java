@@ -32,11 +32,13 @@ import priv.bajdcc.LALR1.ui.drawing.UIGraphics;
 import priv.bajdcc.util.lexer.error.RegexException;
 
 import javax.swing.*;
+import javax.swing.plaf.FontUIResource;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.Enumeration;
 
 /**
  * 【界面】窗口
@@ -56,6 +58,7 @@ public class UIMainFrame extends JFrame {
 	}
 
 	public UIMainFrame() {
+		initGlobalFont();
 		panel = new UIPanel();
 		this.setTitle("jMiniLang Command Window");
 		this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -78,7 +81,19 @@ public class UIMainFrame extends JFrame {
 		});
 	}
 
+	private static void initGlobalFont() {
+		FontUIResource fontUIResource = new FontUIResource(new Font("楷体", Font.PLAIN, 18));
+		for (Enumeration keys = UIManager.getDefaults().keys(); keys.hasMoreElements(); ) {
+			Object key = keys.nextElement();
+			Object value = UIManager.get(key);
+			if (value instanceof FontUIResource) {
+				UIManager.put(key, fontUIResource);
+			}
+		}
+	}
+
 	public static void main(String[] args) {
+
 		UIMainFrame frame = new UIMainFrame();
 		ModuleRemote.enabled();
 		ModuleRemote.setMainFrame(frame);

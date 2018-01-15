@@ -52,7 +52,7 @@ public class UIFontImage {
 	 */
 	private boolean drawImage(int i) {
 		final Font asciiFont = new Font(Font.MONOSPACED, Font.PLAIN, 18);
-		final Font unicodeFont = new Font(Font.SERIF, Font.BOLD, 14);
+		final Font unicodeFont = new Font("楷体", Font.PLAIN, 18);
 		boolean isWide = isWideChar((char) i);
 		int w = isWide ? (2 * width) : width;
 		BufferedImage bi = new BufferedImage(w, height, BufferedImage.TYPE_INT_RGB);
@@ -83,7 +83,7 @@ public class UIFontImage {
 				g.setFont(unicodeFont);
 				String str = Character.toString((char) i);
 				int x = w / 2 - g.getFontMetrics().stringWidth(str) / 2;
-				int y = height / 2 + g.getFontMetrics().getHeight() / 2 - 2;
+				int y = height / 2 + g.getFontMetrics().getHeight() / 3;
 				g.drawString(str, x, y);
 				return true; // 假设是中文，比较宽
 			}
