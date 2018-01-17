@@ -7,6 +7,12 @@ import "sys.remote";
 call g_set_process_desc("clock ui");
 call g_set_process_priority(80);
 
+var uid = 1;
+var ui = call g_array_get(call g_query_share("UI#NAMELIST"), uid);
+var ui_name = "UI#" + ui;
+var switch_name = "UI_SWITCH#" + ui;
+var signal_name = "UI_SIGNAL#" + ui;
+
 call g_printn("Running...");
 
 var first = false;
@@ -33,18 +39,20 @@ var clear = func ~() {
     }
 };
 
-call g_start_share("UI_SWITCH#clock", g_false);
+call g_start_share(switch_name, g_false);
+var signal = call g_create_one_semaphore(signal_name);
 
-while (call g_query_share("UI#clock")) {
-    if (call g_query_share("UI_SWITCH#clock")) {
+while (call g_query_share(ui_name)) {
+    if (call g_query_share(switch_name)) {
         call draw();
     } else {
         call clear();
-        call g_task_sleep_signal(1, "TASK#SLEEP");
+        call g_lock_semaphore(signal);
     }
 }
 
-call g_stop_share("UI_SWITCH#clock");
-call g_stop_share("UI#clock");
+call g_stop_share(switch_name);
+call g_stop_share(ui_name);
+call g_destroy_semaphore(call g_use_semaphore(signal_name));
 
 call g_printn("Exit.");

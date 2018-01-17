@@ -133,13 +133,22 @@ var g_destroy_pipe = func ~(handle) {
 export "g_destroy_pipe";
 var g_create_semaphore = func ~(name, n) {
     if (call g_query_pipe(name)) {
-        return;
+        return call g_create_pipe(name);
     }
     var pipe = call g_create_pipe(name);
     call g_write_pipe(pipe, call g_string_rep("*", n));
     return pipe;
 };
 export "g_create_semaphore";
+var g_create_one_semaphore = func ~(name) {
+    if (call g_query_pipe(name)) {
+        return;
+    }
+    var pipe = call g_create_pipe(name);
+    call g_write_pipe(pipe, '*');
+    return pipe;
+};
+export "g_create_one_semaphore";
 var g_use_semaphore = func ~(name) {
     return call g_create_pipe(name);
 };

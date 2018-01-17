@@ -2,6 +2,7 @@ import "sys.base";
 import "sys.list";
 import "sys.string";
 import "sys.proc";
+import "sys.task";
 
 call g_set_process_desc("proc routinue");
 var pid = call g_get_pid();
@@ -18,8 +19,9 @@ if (call g_is_null(arg1)) {
 } else if (arg1 == "sys") {
     let arg1 = call g_query_sys_proc();
 } else {
-     let arg1 = call g_query_all_proc();
- }
+    let arg1 = call g_query_all_proc();
+}
+call g_write_pipe_n(out, "    Speed: " + call g_task_get_fast("system", "speed"));
 foreach (var i : call g_range_array(arg1)) {
     call g_printdn(call g_to_string(i));
     foreach (var j : call g_range_string(call g_to_string(i))) {

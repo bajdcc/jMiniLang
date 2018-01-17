@@ -55,6 +55,7 @@ var time = func ~(msg, caller) {
                     call g_map_put(msg, "val", target + " already ON");
                 } else {
                     call g_create_share(name, g_true);
+                    call g_unlock_semaphore(call g_use_semaphore("UI_SIGNAL#" + target));
                     call g_map_put(msg, "val", target + " ON");
                 }
             }
@@ -104,6 +105,7 @@ var handler = func ~(ch) {
             var ui_name = call g_array_get(ui_name_table, i);
             if (!call g_is_null(ui_name)) {
                 call g_create_share("UI#" + ui_name, false);
+                call g_unlock_semaphore(call g_use_semaphore("UI_SIGNAL#" + ui_name));
             }
         }
         call g_join_process_array(call g_query_share("UI#PIDS"));
