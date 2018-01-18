@@ -157,31 +157,31 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		}
 		List<Integer> pids = new ArrayList<>(setProcessId);
 		int sleep = 0;
-		for (int pid : pids) {
-			SchdProcess process = arrProcess[pid];
-			if (process.runnable) {
-				int cycle = MAX_CYCLE - process.priority;
-				CYCLE_FOR:
-				for (int i = 0; i < cycle; i++) {
-					if (process.sleep > 0) {
-						process.sleep--;
-						sleep++;
-						break;
-					}
-					if (process.runnable) {
+        LABEL_PID:
+        for (int pid : pids) {
+            SchdProcess process = arrProcess[pid];
+            if (process.runnable) {
+                int cycle = MAX_CYCLE - process.priority;
+                for (int i = 0; i < cycle; i++) {
+                    if (process.sleep > 0) {
+                        process.sleep--;
+                        sleep++;
+                        break;
+                    }
+                    if (process.runnable) {
                         stat.cycle++;
-						switch (process.machine.runStep()) {
-							case 1:
-								return false;
-							case 2:
-								break CYCLE_FOR;
-						}
-					}
-				}
-			} else {
-				sleep++;
-			}
-		}
+                        switch (process.machine.runStep()) {
+                            case 1:
+                                return false;
+                            case 2:
+                                break LABEL_PID;
+                        }
+                    }
+                }
+            } else {
+                sleep++;
+            }
+        }
 		if (sleep == pids.size()) { // 都在休眠，等待并减掉休眠时间
 			for (int pid : pids) {
 				SchdProcess process = arrProcess[pid];
