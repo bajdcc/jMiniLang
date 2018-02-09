@@ -60,6 +60,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 					ModuleLisp.getInstance(),
 					ModuleNet.getInstance(),
 					ModuleFile.getInstance(),
+					ModuleClass.getInstance(),
 			};
 		}
 
@@ -529,7 +530,8 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 		int idx = current();
 		next();
 		if (idx < 0 || idx >= stack.getFuncArgsCount()) {
-			err(RuntimeError.WRONG_ARGINVALID, String.valueOf(idx));
+			err(RuntimeError.WRONG_ARGINVALID, stack.getFuncSimpleName() + " has " +
+					(stack.getFuncArgsCount() - 1) + " args but got " + String.valueOf(idx));
 		}
 		store(stack.loadFuncArgs(idx));
 	}

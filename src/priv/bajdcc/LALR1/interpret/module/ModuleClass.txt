@@ -1,0 +1,94 @@
+import "sys.base";
+import "sys.list";
+
+var g_create_context = func ~() -> g_new_map;
+export "g_create_context";
+
+var g_create_property = func ~(class, name, property) {
+    call g_map_put(class, name, property);
+};
+export "g_create_property";
+var g_get_property = func ~(class, name) {
+    if (call g_map_contains(class, name)) {
+        return call g_map_get(class, name);
+    }
+    var base = call g_map_get(class, "__base__");
+    if (call g_is_null(base)) {
+        return;
+    }
+    return call g_has_property(base, name);
+};
+export "g_get_property";
+var g_has_property = func ~(class, name) {
+    if (call g_map_contains(class, name)) {
+        return true;
+    }
+    var base = call g_map_get(class, "__base__");
+    if (call g_is_null(base)) {
+        return false;
+    }
+    return call g_has_property(base, name);
+};
+export "g_has_property";
+var g_set_property = func ~(class, name, property) {
+    if (call g_map_contains(class, name)) {
+        call g_map_put(class, name, property);
+        return;
+    }
+    var base = call g_map_get(class, "__base__");
+    if (call g_is_null(base)) {
+        return;
+    }
+    return call g_set_property(base, name);
+};
+export "g_set_property";
+
+var g_create_method = func ~(class, name, method) {
+    call g_map_put(class, name, method);
+};
+export "g_create_method";
+var g_invoke_method = func ~(class, name) {
+    var method = call g_get_property(class, name);
+    if (call g_is_null(method)) {
+        return;
+    }
+    return call method(class);
+};
+export "g_invoke_method";
+var g_invoke_method_args = func ~(class, name, args) {
+    var method = call g_get_property(class, name);
+    if (call g_is_null(method)) {
+        return;
+    }
+    return call method(class, args);
+};
+export "g_invoke_method_args";
+
+var g_register_class = func ~(ctx, name, init, base) {
+    var class = {};
+    call g_create_property(class, "name", name);
+    if (!call g_is_null(base) && call g_map_contains(ctx, base)) {
+        call g_create_property(class, "base", base);
+    }
+    call g_create_method(class, "init", init);
+    call g_map_put(ctx, name, class);
+};
+export "g_register_class";
+
+var g_create_class = func ~(ctx, name) {
+    var prototype = call g_map_get(ctx, name);
+    if (call g_is_null(prototype)) {
+        return;
+    }
+    var class = {};
+    call g_create_property(class, "__type__", name);
+    if (call g_map_contains(prototype, "base")) {
+        call g_map_put(class, "__base__", call g_create_class(ctx, call g_map_get(prototype, "base")));
+    }
+    var init = call g_map_get(prototype, "init");
+    if (!call g_is_null(init)) {
+        call init(class);
+    }
+    return class;
+};
+export "g_create_class";
