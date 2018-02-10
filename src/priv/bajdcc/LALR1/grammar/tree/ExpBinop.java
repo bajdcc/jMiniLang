@@ -6,6 +6,7 @@ import priv.bajdcc.LALR1.grammar.runtime.RuntimeInstUnary;
 import priv.bajdcc.LALR1.grammar.semantic.ISemanticRecorder;
 import priv.bajdcc.LALR1.grammar.tree.closure.IClosureScope;
 import priv.bajdcc.LALR1.grammar.type.TokenTools;
+import priv.bajdcc.util.lexer.token.OperatorType;
 import priv.bajdcc.util.lexer.token.Token;
 import priv.bajdcc.util.lexer.token.TokenType;
 
@@ -88,6 +89,16 @@ public class ExpBinop implements IExp {
 
 	@Override
 	public void genCode(ICodegen codegen) {
+        if (token.kToken == TokenType.OPERATOR && token.object == OperatorType.DOT) {
+            codegen.genCode(RuntimeInst.iopena);
+            leftOperand.genCode(codegen);
+            codegen.genCode(RuntimeInst.ipusha);
+            rightOperand.genCode(codegen);
+            codegen.genCode(RuntimeInst.ipusha);
+            codegen.genCode(RuntimeInst.ipush, codegen.genDataRef("g_get_property"));
+            codegen.genCode(RuntimeInst.icallx);
+            return;
+        }
 		RuntimeInst inst = TokenTools.op2ins(token);
 		leftOperand.genCode(codegen);
 		RuntimeInstUnary jmp = null;

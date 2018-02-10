@@ -145,7 +145,7 @@ public class Grammar extends Semantic {
 		String[] nonTerminals = new String[] { "program", "stmt_list", "stmt",
 				"stmt_stmt", "stmt_ctrl", "stmt_exp", "func", "lambda", "var",
 				"var_list", "exp_list", "exp", "exp0", "exp1", "exp2", "exp3",
-				"exp4", "exp5", "exp6", "exp7", "exp8", "exp9", "type",
+				"exp4", "exp5", "exp6", "exp7", "exp8", "exp9", "exp10", "type",
 				"block", "call_exp", "call", "ret", "doc_list", "port", "if",
 				"for", "while", "foreach", "cycle_ctrl", "block_stmt", "array", "map" };
 		for (String string : nonTerminals) {
@@ -206,7 +206,8 @@ public class Grammar extends Semantic {
 				"exp7 -> [exp7[1] (@MUL[2] | @DIV[2] | @MOD[2])] exp8[0]");
 		infer(exp_handler, "exp8 -> (@NOT_OP[3] | @NOT[3]) exp8[1] | exp9[0]");
 		infer(exp_handler,
-				"exp9 -> (@INC_OP[3] | @DEC_OP[3]) exp9[1] | exp9[1] (@INC_OP[3] | @DEC_OP[3]) | type[0]");
+				"exp9 -> (@INC_OP[3] | @DEC_OP[3]) exp9[1] | exp9[1] (@INC_OP[3] | @DEC_OP[3]) | exp10[0]");
+		infer(exp_handler, "exp10 -> [exp10[1] @DOT[2]] type[0]");
 		/* 调用语句 */
 		infer(handler.getSemanticHandler("call_exp"),
 				"call -> @CALL (@LPA{lost_lpa} func[0]{lost_call} @RPA{lost_rpa} | @ID[1]{lost_call}) @LPA{lost_lpa} [exp_list[2]] @RPA{lost_rpa}");

@@ -16,7 +16,7 @@ var g_get_property = func ~(class, name) {
     if (call g_is_null(base)) {
         return;
     }
-    return call g_has_property(base, name);
+    return call g_get_property(base, name);
 };
 export "g_get_property";
 var g_has_property = func ~(class, name) {
@@ -33,13 +33,16 @@ export "g_has_property";
 var g_set_property = func ~(class, name, property) {
     if (call g_map_contains(class, name)) {
         call g_map_put(class, name, property);
-        return;
+        return true;
     }
     var base = call g_map_get(class, "__base__");
     if (call g_is_null(base)) {
-        return;
+        return false;
     }
-    return call g_set_property(base, name);
+    if (!call g_set_property(base, name, property)) {
+        call g_map_put(class, name, property);
+    }
+    return true;
 };
 export "g_set_property";
 

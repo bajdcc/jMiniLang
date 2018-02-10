@@ -69,12 +69,19 @@ public class TestInterpret13 {
                             "+ call g_invoke_method(square, \"get_area\"));\n" +
                             "var circle = call g_create_class(ctx, \"circle\");\n" +
                             "call g_set_property(circle, \"r\", 10);\n" +
+                            "call g_set_property(circle, \"s\", square);\n" +
                             "call g_printn(\"\" + call g_get_property(circle, \"type\")\n" +
                             "+ \" r=\" + call g_get_property(circle, \"r\")\n" +
                             "+ \" area=\"\n" +
                             "+ call g_invoke_method(circle, \"get_area\"));\n" +
                             "call g_printn(call g_invoke_method(square, \"to_string\"));\n" +
                             "call g_printn(call g_invoke_method(circle, \"to_string\"));\n" +
+                            "call g_printn(circle.\"r\");\n" +
+                            "call g_printn(circle.\"s\".\"__type__\");\n" +
+                            "call g_printn(circle.\"s\".\"a\");\n" +
+                            "call g_printn(circle.\"s\".\"b\");\n" +
+                            "call g_printn(circle.\"__type__\");\n" +
+                            "call g_printn(square.\"__type__\");\n" +
                             ""
             };
 

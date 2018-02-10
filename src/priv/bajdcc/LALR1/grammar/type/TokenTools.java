@@ -180,6 +180,11 @@ public class TokenTools {
 	 */
 	private static boolean bin(OperatorType type, Token lop, Token rop,
 			boolean init) {
+		if (type == OperatorType.DOT) {
+			ITokenConventer s = mapConverter.get(TokenType.STRING);
+			s.convert(rop);
+			return true;
+		}
 		if (init) {
 			switch (type) {
 				case LOGICAL_AND:
