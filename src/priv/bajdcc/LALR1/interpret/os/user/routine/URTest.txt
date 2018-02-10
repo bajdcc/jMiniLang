@@ -557,6 +557,7 @@ var stage_class = func ~() {
     call g_register_class(ctx, "shape", lambda(this) {
         call g_create_property(this, "type", "shape");
         call g_create_method(this, "get_area", lambda(this)->0);
+        call g_create_method(this, "get_index", lambda(this,i)->i);
     }, g_null);
     call g_register_class(ctx, "square", lambda(this) {
         call g_create_property(this, "type", "square");
@@ -610,12 +611,15 @@ var stage_class = func ~() {
     call print("" + square."type"
         + " a=" + square."a"
         + " b=" + square."b"
-        + " area=" + call g_invoke_method(square, "get_area"));
+        + " area=" + invoke square::"get_area"()
+        + " index=" + invoke square::"get_index"(1));
     call print("" + circle."type"
         + " r=" + circle."r"
         + " sa=" + circle."s"."a"
         + " sb=" + circle."s"."b"
-        + " area=" + call g_invoke_method(circle, "get_area"));
+        + " area=" + invoke circle::"get_area"()
+        + " sarea=" + invoke circle."s"::"get_area"()
+        + " index=" + invoke circle::"get_index"(2));
 };
 
 

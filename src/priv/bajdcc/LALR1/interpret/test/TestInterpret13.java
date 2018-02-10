@@ -27,6 +27,7 @@ public class TestInterpret13 {
                             "call g_register_class(ctx, \"shape\", lambda(this){\n" +
                             "call g_create_property(this, \"type\", \"shape\");\n" +
                             "call g_create_method(this, \"get_area\", lambda(this)->0);\n" +
+                            "call g_create_method(this, \"get_index\", lambda(this,i)->i);\n" +
                             "}, g_null);\n" +
                             "call g_register_class(ctx, \"square\", lambda(this){\n" +
                             "call g_create_property(this, \"type\", \"square\");\n" +
@@ -86,6 +87,10 @@ public class TestInterpret13 {
                             "set square::\"b\" = 120;\n" +
                             "call g_printn(circle.\"s\".\"a\");\n" +
                             "call g_printn(circle.\"s\".\"b\");\n" +
+                            "call g_printn(invoke circle::\"get_area\"());\n" +
+                            "call g_printn(invoke square::\"get_area\"());\n" +
+                            "call g_printn(invoke circle::\"get_index\"(1));\n" +
+                            "call g_printn(invoke square::\"get_index\"(2));\n" +
                             ""
             };
 

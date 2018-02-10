@@ -1,7 +1,5 @@
 package priv.bajdcc.LALR1.grammar.tree;
 
-import java.util.ArrayList;
-
 import priv.bajdcc.LALR1.grammar.codegen.ICodegen;
 import priv.bajdcc.LALR1.grammar.error.SemanticException.SemanticError;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeInst;
@@ -10,6 +8,8 @@ import priv.bajdcc.LALR1.grammar.semantic.ISemanticRecorder;
 import priv.bajdcc.LALR1.grammar.tree.closure.IClosureScope;
 import priv.bajdcc.util.lexer.token.KeywordType;
 import priv.bajdcc.util.lexer.token.Token;
+
+import java.util.ArrayList;
 
 /**
  * 【语义分析】函数调用表达式
@@ -121,6 +121,9 @@ public class ExpInvoke implements IExp {
 			if (func.isYield() ^ yield) {
 				recorder.add(SemanticError.WRONG_YIELD, name);
 			}
+		}
+		for (IExp exp : params) {
+			exp.analysis(recorder);
 		}
 	}
 

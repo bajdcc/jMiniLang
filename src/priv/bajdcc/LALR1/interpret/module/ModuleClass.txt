@@ -58,14 +58,60 @@ var g_invoke_method = func ~(class, name) {
     return call method(class);
 };
 export "g_invoke_method";
-var g_invoke_method_args = func ~(class, name, args) {
+var g_invoke_method_1 = func ~(class, name, arg1) {
     var method = call g_get_property(class, name);
-    if (call g_is_null(method)) {
-        return;
-    }
-    return call method(class, args);
+    if (call g_is_null(method)) { return; }
+    return call method(class, arg1);
 };
-export "g_invoke_method_args";
+export "g_invoke_method_1";
+var g_invoke_method_2 = func ~(class, name, arg1, arg2) {
+    var method = call g_get_property(class, name);
+    if (call g_is_null(method)) { return; }
+    return call method(class, arg1, arg2);
+};
+export "g_invoke_method_2";
+var g_invoke_method_3 = func ~(class, name, arg1, arg2, arg3) {
+    var method = call g_get_property(class, name);
+    if (call g_is_null(method)) { return; }
+    return call method(class, arg1, arg2, arg3);
+};
+export "g_invoke_method_3";
+var g_invoke_method_4 = func ~(class, name, arg1, arg2, arg3, arg4) {
+    var method = call g_get_property(class, name);
+    if (call g_is_null(method)) { return; }
+    return call method(class, arg1, arg2, arg3, arg4);
+};
+export "g_invoke_method_4";
+var g_invoke_method_5 = func ~(class, name, arg1, arg2, arg3, arg4, arg5) {
+    var method = call g_get_property(class, name);
+    if (call g_is_null(method)) { return; }
+    return call method(class, arg1, arg2, arg3, arg4, arg5);
+};
+export "g_invoke_method_5";
+var g_invoke_method_6 = func ~(class, name, arg1, arg2, arg3, arg4, arg5, arg6) {
+    var method = call g_get_property(class, name);
+    if (call g_is_null(method)) { return; }
+    return call method(class, arg1, arg2, arg3, arg4, arg5, arg6);
+};
+export "g_invoke_method_6";
+var g_invoke_method_7 = func ~(class, name, arg1, arg2, arg3, arg4, arg5, arg6, arg7) {
+    var method = call g_get_property(class, name);
+    if (call g_is_null(method)) { return; }
+    return call method(class, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+};
+export "g_invoke_method_7";
+var g_invoke_method_8 = func ~(class, name, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) {
+    var method = call g_get_property(class, name);
+    if (call g_is_null(method)) { return; }
+    return call method(class, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+};
+export "g_invoke_method_8";
+var g_invoke_method_9 = func ~(class, name, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) {
+    var method = call g_get_property(class, name);
+    if (call g_is_null(method)) { return; }
+    return call method(class, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
+};
+export "g_invoke_method_9";
 
 var g_register_class = func ~(ctx, name, init, base) {
     var class = {};

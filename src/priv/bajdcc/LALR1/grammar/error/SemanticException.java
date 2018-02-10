@@ -20,7 +20,7 @@ public class SemanticException extends Exception {
 				"变量未定义"), VARIABLE_REDECLARAED("变量重复定义"), VAR_FUN_CONFLICT(
 				"变量名与函数名冲突"), MISMATCH_ARGS("参数个数不匹配"), DUP_PARAM("参数重复定义"), WRONG_EXTERN_SYMBOL(
 				"导出符号不存在"), WRONG_CYCLE("缺少循环体"), WRONG_YIELD("非法调用"), WRONG_ENUMERABLE(
-				"要求枚举对象");
+                "要求枚举对象"), TOO_MANY_ARGS("参数个数太多");
 
 		private String message;
 

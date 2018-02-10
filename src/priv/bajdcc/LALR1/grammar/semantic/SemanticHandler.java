@@ -263,6 +263,17 @@ public class SemanticHandler {
             }
             return invoke;
         });
+        /* 类方法调用表达式 */
+        mapSemanticAnalyzier.put("invoke", (indexed, query, recorder) -> {
+            ExpInvokeProperty invoke = new ExpInvokeProperty();
+            invoke.setToken(indexed.get(0).token);
+            invoke.setObj((IExp) indexed.get(1).object);
+            invoke.setProperty((IExp) indexed.get(2).object);
+            if (indexed.exists(3)) {
+                invoke.setParams((ArrayList<IExp>) indexed.get(3).object);
+            }
+            return invoke;
+        });
 		/* 单词集合 */
 		mapSemanticAnalyzier.put("token_list", (indexed, query, recorder) -> {
             ArrayList<Token> tokens;

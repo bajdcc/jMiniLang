@@ -70,6 +70,8 @@ public class ExpAssignProperty implements IExp {
 
     @Override
     public void analysis(ISemanticRecorder recorder) {
+        obj.analysis(recorder);
+        property.analysis(recorder);
         exp.analysis(recorder);
     }
 

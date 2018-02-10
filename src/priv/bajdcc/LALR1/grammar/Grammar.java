@@ -148,7 +148,7 @@ public class Grammar extends Semantic {
 				"var_list", "exp_list", "exp", "exp0", "exp1", "exp2", "exp3",
 				"exp4", "exp5", "exp6", "exp7", "exp8", "exp9", "exp10", "type",
 				"block", "call_exp", "call", "ret", "doc_list", "port", "if",
-				"for", "while", "foreach", "cycle_ctrl", "block_stmt", "array", "map", "set"};
+				"for", "while", "foreach", "cycle_ctrl", "block_stmt", "array", "map", "set", "invoke"};
 		for (String string : nonTerminals) {
 			addNonTerminal(string);
 		}
@@ -189,6 +189,9 @@ public class Grammar extends Semantic {
 		/* 类属性赋值语句 */
 		infer(handler.getSemanticHandler("set"),
 				"set -> @SET exp[3]{lost_exp} @PROPERTY{lost_property} exp[4]{lost_exp} @ASSIGN{lost_assign} exp[2]{lost_exp}");
+		/* 类方法调用语句 */
+		infer(handler.getSemanticHandler("invoke"),
+				"invoke -> @INVOKE[0] exp[1]{lost_exp} @PROPERTY{lost_property} exp[2]{lost_exp} @LPA{lost_lpa} [exp_list[3]] @RPA{lost_rpa}");
 		/* 导入与导出语句 */
 		infer(handler.getSemanticHandler("port"),
 				"port -> (@IMPORT[1] | @EXPORT[2]) @LITERAL[0]{lost_string} @SEMI{lost_semi}");
@@ -230,7 +233,7 @@ public class Grammar extends Semantic {
 				"lambda -> @LAMBDA[1]#lambda# @LPA{lost_lpa} [var_list[2]] @RPA{lost_rpa} (@PTR_OP{lost_func_body} exp[3]{lost_exp} | block[4]{lost_func_body})");
 		/* 基本数据类型 */
 		infer(handler.getSemanticHandler("type"),
-				"type -> @ID[0] | @INTEGER[0] | @DECIMAL[0] | @LITERAL[0] | @CHARACTER[0] | @BOOLEAN[0] | @LPA exp[1]{lost_exp} @RPA{lost_rpa} | call[1] | lambda[2]");
+				"type -> @ID[0] | @INTEGER[0] | @DECIMAL[0] | @LITERAL[0] | @CHARACTER[0] | @BOOLEAN[0] | @LPA exp[1]{lost_exp} @RPA{lost_rpa} | call[1] | lambda[2] | invoke[1]");
 		/* 条件语句 */
 		infer(handler.getSemanticHandler("if"),
 				"if -> @IF @LPA{lost_lpa} exp[0]{lost_exp} @RPA{lost_rpa} block[1]{lost_block} [@ELSE (block[2]{lost_block} | if[3]{lost_block})]");
