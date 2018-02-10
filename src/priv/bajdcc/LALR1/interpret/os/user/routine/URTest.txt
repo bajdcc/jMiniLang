@@ -555,55 +555,32 @@ var stage_class = func ~() {
     var print = func ~(str) -> call word_typewrite(str, 10);
     var ctx = call g_create_context();
     call g_register_class(ctx, "shape", lambda(this) {
-        call g_create_property(this, "type", "shape");
-        call g_create_method(this, "get_area", lambda(this)->0);
-        call g_create_method(this, "get_index", lambda(this,i)->i);
+        set this::"type" = "shape";
+        set this::"get_area" = lambda(this) -> 0;
+        set this::"get_index" = lambda(this, i) -> i;
     }, g_null);
     call g_register_class(ctx, "square", lambda(this) {
-        call g_create_property(this, "type", "square");
-        call g_create_property(this, "a", 0);
-        call g_create_property(this, "b", 0);
-        call g_create_method(this, "get_area", lambda(this) {
-            return call g_get_property(this, "a") * call g_get_property(this, "b");
-        });
-        call g_create_method(this, "to_string", lambda(this) {
-            return "" + call g_get_property(this, "type")
-            + " a=" + call g_get_property(this, "a")
-            + " b=" + call g_get_property(this, "b")
-            + " area="
-            + call g_invoke_method(this, "get_area");
-        });
+        set this::"type" = "square";
+        set this::"a" = 0;
+        set this::"b" = 0;
+        set this::"get_area" = lambda(this) -> this."a" * this."b";
+        set this::"to_string" = lambda(this) -> this."type" + " a=" + this."a" + " b=" + this."b" + " area=" + invoke this::"get_area"();
     }, "shape");
-    call g_register_class(ctx, "circle", lambda(this){
-        call g_create_property(this, "type", "circle");
-        call g_create_property(this, "r", 0);
-        call g_create_method(this, "get_area", lambda(this){
-            var r = call g_get_property(this, "r");
-            return 3.14 * r * r;
-        });
-        call g_create_method(this, "to_string", lambda(this){
-            return "" + call g_get_property(this, "type")
-            + " r=" + call g_get_property(this, "r")
-            + " area="
-            + call g_invoke_method(this, "get_area");
-        });
+    call g_register_class(ctx, "circle", lambda(this) {
+        set this::"type" = "circle";
+        set this::"r" = 0;
+        set this::"get_area" = lambda(this) -> 3.14 * this."r" * this."r";
+        set this::"to_string" = lambda(this) -> this."type" + " r=" + this."r" + " area=" + invoke this::"get_area"();
     }, "shape");
 
     var square = call g_create_class(ctx, "square");
-    call g_set_property(square, "a", 5);
-    call g_set_property(square, "b", 6);
-    call print("" + call g_get_property(square, "type")
-        + " a=" + call g_get_property(square, "a")
-        + " b=" + call g_get_property(square, "b")
-        + " area=" + call g_invoke_method(square, "get_area"));
+    set square::"a" = 5;
+    set square::"b" = 6;
     var circle = call g_create_class(ctx, "circle");
-    call g_set_property(circle, "r", 10);
-    call g_set_property(circle, "s", square);
-    call print("" + call g_get_property(circle, "type")
-        + " r=" + call g_get_property(circle, "r")
-        + " area=" + call g_invoke_method(circle, "get_area"));
-    call print(call g_invoke_method(square, "to_string"));
-    call print(call g_invoke_method(circle, "to_string"));
+    set circle::"r" = 10;
+    set circle::"s" = square;
+    call print(invoke square::"to_string"());
+    call print(invoke circle::"to_string"());
 
     set square::"a" = 100;
     set circle."s"::"b" = 120;

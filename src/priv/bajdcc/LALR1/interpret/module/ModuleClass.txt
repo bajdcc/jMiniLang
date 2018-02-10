@@ -30,7 +30,7 @@ var g_has_property = func ~(class, name) {
     return call g_has_property(base, name);
 };
 export "g_has_property";
-var g_set_property = func ~(class, name, property) {
+var set_property_rec = func ~(class, name, property) {
     if (call g_map_contains(class, name)) {
         call g_map_put(class, name, property);
         return true;
@@ -39,7 +39,22 @@ var g_set_property = func ~(class, name, property) {
     if (call g_is_null(base)) {
         return false;
     }
-    if (!call g_set_property(base, name, property)) {
+    if (!call set_property_rec(base, name, property)) {
+        call g_map_put(class, name, property);
+    }
+    return true;
+};
+var g_set_property = func ~(class, name, property) {
+    if (call g_map_contains(class, name)) {
+        call g_map_put(class, name, property);
+        return true;
+    }
+    var base = call g_map_get(class, "__base__");
+    if (call g_is_null(base)) {
+        call g_map_put(class, name, property);
+        return false;
+    }
+    if (!call set_property_rec(base, name, property)) {
         call g_map_put(class, name, property);
     }
     return true;
