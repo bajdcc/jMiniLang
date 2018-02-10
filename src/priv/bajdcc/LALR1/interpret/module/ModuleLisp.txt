@@ -146,14 +146,14 @@ var standard_env = func [
     var _str = func ~(args) -> call string(call g_array_get(args, 0));
     call bind_direct("str", _str);
     // ------------------------
-    var set = func ~(name, value) -> call g_map_put(env, name, value);
+    var _set = func ~(name, value) -> call g_map_put(env, name, value);
     // ------------------------
     // 常量
-    call set("PI", g_PI);
-    call set("E", g_E);
-    call set("#s", " ");
-    call set("#t", g_true);
-    call set("#f", g_false);
+    call _set("PI", g_PI);
+    call _set("E", g_E);
+    call _set("#s", " ");
+    call _set("#t", g_true);
+    call _set("#f", g_false);
     call init(env);
     return env;
 };

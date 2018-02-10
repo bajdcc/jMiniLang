@@ -225,6 +225,14 @@ public class SemanticHandler {
             }
             return assign;
         });
+        /* 属性设置 */
+        mapSemanticAnalyzier.put("set", (indexed, query, recorder) -> {
+            ExpAssignProperty assign = new ExpAssignProperty();
+            assign.setObj((IExp) indexed.get(3).object);
+            assign.setProperty((IExp) indexed.get(4).object);
+            assign.setExp((IExp) indexed.get(2).object);
+            return assign;
+        });
 		/* 调用表达式 */
 		mapSemanticAnalyzier.put("call_exp", (indexed, query, recorder) -> {
             ExpInvoke invoke = new ExpInvoke();

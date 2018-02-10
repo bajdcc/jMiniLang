@@ -134,6 +134,7 @@ public class Grammar extends Semantic {
 		addTerminal("RSQ", TokenType.OPERATOR, OperatorType.RSQUARE);
 		addTerminal("LBR", TokenType.OPERATOR, OperatorType.LBRACE);
 		addTerminal("RBR", TokenType.OPERATOR, OperatorType.RBRACE);
+		addTerminal("PROPERTY", TokenType.OPERATOR, OperatorType.PROPERTY);
 	}
 
 	/**
@@ -147,7 +148,7 @@ public class Grammar extends Semantic {
 				"var_list", "exp_list", "exp", "exp0", "exp1", "exp2", "exp3",
 				"exp4", "exp5", "exp6", "exp7", "exp8", "exp9", "exp10", "type",
 				"block", "call_exp", "call", "ret", "doc_list", "port", "if",
-				"for", "while", "foreach", "cycle_ctrl", "block_stmt", "array", "map" };
+				"for", "while", "foreach", "cycle_ctrl", "block_stmt", "array", "map", "set"};
 		for (String string : nonTerminals) {
 			addNonTerminal(string);
 		}
@@ -172,7 +173,7 @@ public class Grammar extends Semantic {
 				"stmt_list -> stmt[0]{lost_stmt} [stmt_list[1]]");
 		/* 语句分为变量定义（赋值）、调用语句 */
 		infer(handler.getSemanticHandler("copy"),
-				"stmt_exp -> var[0] | call[0] | cycle_ctrl[0] | exp[0]");
+				"stmt_exp -> var[0] | call[0] | cycle_ctrl[0] | exp[0] | set[0]");
 		infer(handler.getSemanticHandler("copy"),
 				"stmt -> stmt_stmt[0] | stmt_ctrl[0] | block_stmt[0]");
 		infer(handler.getSemanticHandler("stmt_exp"),
@@ -185,6 +186,9 @@ public class Grammar extends Semantic {
 		/* 变量定义（赋值）语句（由于支持Lambda，函数定义皆为Lambda形式） */
 		infer(handler.getSemanticHandler("var"),
 				"var -> (@VARIABLE[11] | @LET[12]) @ID[0]#declear_variable#{lost_token} @ASSIGN{lost_assign} (func[1]{lost_func} | exp[2]{lost_exp} | array[2]{lost_array} | map[2]{lost_map})");
+		/* 类属性赋值语句 */
+		infer(handler.getSemanticHandler("set"),
+				"set -> @SET exp[3]{lost_exp} @PROPERTY{lost_property} exp[4]{lost_exp} @ASSIGN{lost_assign} exp[2]{lost_exp}");
 		/* 导入与导出语句 */
 		infer(handler.getSemanticHandler("port"),
 				"port -> (@IMPORT[1] | @EXPORT[2]) @LITERAL[0]{lost_string} @SEMI{lost_semi}");
@@ -278,6 +282,8 @@ public class Grammar extends Semantic {
 		addErrorHandler("lost_var", new LostHandler("赋值"));
 		addErrorHandler("lost_array", new LostHandler("数组'[]'"));
 		addErrorHandler("lost_map", new LostHandler("字典'{}'"));
+		addErrorHandler("lost_dot", new LostHandler("点号'.'"));
+		addErrorHandler("lost_property", new LostHandler("属性连接符'::'"));
 	}
 
 	/**

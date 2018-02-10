@@ -604,6 +604,9 @@ var stage_class = func ~() {
     call print(call g_invoke_method(square, "to_string"));
     call print(call g_invoke_method(circle, "to_string"));
 
+    set square::"a" = 100;
+    set circle."s"::"b" = 120;
+
     call print("" + square."type"
         + " a=" + square."a"
         + " b=" + square."b"

@@ -82,6 +82,10 @@ public class TestInterpret13 {
                             "call g_printn(circle.\"s\".\"b\");\n" +
                             "call g_printn(circle.\"__type__\");\n" +
                             "call g_printn(square.\"__type__\");\n" +
+                            "set square::\"a\" = 100;\n" +
+                            "set square::\"b\" = 120;\n" +
+                            "call g_printn(circle.\"s\".\"a\");\n" +
+                            "call g_printn(circle.\"s\".\"b\");\n" +
                             ""
             };
 
