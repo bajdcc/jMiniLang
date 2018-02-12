@@ -682,6 +682,16 @@ var stage_class = func ~() {
     call g_hook_remove_after(square, "get_area", after_2);
 
     call print("E " + square."type" + " area=" + invoke square::"get_area"());
+
+    let before_1 = lambda(class, name, this, next, arg1) {
+        call print("HOOKED BEFORE 5: " + class + "::" + name);
+        return 10000;
+    };
+    call g_hook_add_before(square, "get_index", before_1);
+
+    call print("F " + square."type" + " index=" + invoke square::"get_index"(1));
+
+    call g_hook_remove_before(square, "get_index", before_1);
 };
 
 

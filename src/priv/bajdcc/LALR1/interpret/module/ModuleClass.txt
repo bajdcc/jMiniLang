@@ -66,7 +66,7 @@ var g_create_method = func ~(class, name, method) {
 };
 export "g_create_method";
 var g_invoke_method = func ~(class, name) {
-    var method = call g_get_property(class, name);
+    var method = class.name;
     if (call g_is_null(method)) { return; }
     var flag = call g_get_flag(method);
     if ((flag & 1) > 0) {
@@ -112,57 +112,417 @@ var g_invoke_method = func ~(class, name) {
 };
 export "g_invoke_method";
 var g_invoke_method_1 = func ~(class, name, arg1) {
-    var method = call g_get_property(class, name);
+var method = class.name;
     if (call g_is_null(method)) { return; }
-    return call method(class, arg1);
+    var flag = call g_get_flag(method);
+    if ((flag & 1) > 0) {
+        var _before = class.(name + "__before");
+        var _cnt = call g_array_size(_before);
+        var _i = 0;
+        var _suc = false;
+        var __next = lambda() {
+            if (_i >= _cnt) {
+                let _suc = true;
+                return;
+            }
+            var __before = call g_array_get(_before, _i);
+            _i++;
+            return call __before(class."__type__", name, class, __next, arg1);
+        };
+        var ret = call __next();
+        if (!_suc) {
+            return ret;
+        }
+    }
+    var r = call method(class, arg1);
+    if ((flag & 2) > 0) {
+        var _after = class.(name + "__after");
+        var _cnt = call g_array_size(_after);
+        var _i = 0;
+        var _suc = false;
+        var __next = lambda() {
+            if (_i >= _cnt) {
+                let _suc = true;
+                return r;
+            }
+            var __after = call g_array_get(_after, _i);
+            _i++;
+            return call __after(class."__type__", name, class, r, __next, arg1);
+        };
+        var ret = call __next();
+        if (!_suc) {
+            return ret;
+        }
+    }
+    return r;
 };
 export "g_invoke_method_1";
 var g_invoke_method_2 = func ~(class, name, arg1, arg2) {
-    var method = call g_get_property(class, name);
+var method = class.name;
     if (call g_is_null(method)) { return; }
-    return call method(class, arg1, arg2);
+    var flag = call g_get_flag(method);
+    if ((flag & 1) > 0) {
+        var _before = class.(name + "__before");
+        var _cnt = call g_array_size(_before);
+        var _i = 0;
+        var _suc = false;
+        var __next = lambda() {
+            if (_i >= _cnt) {
+                let _suc = true;
+                return;
+            }
+            var __before = call g_array_get(_before, _i);
+            _i++;
+            return call __before(class."__type__", name, class, __next, arg1, arg2);
+        };
+        var ret = call __next();
+        if (!_suc) {
+            return ret;
+        }
+    }
+    var r = call method(class, arg1, arg2);
+    if ((flag & 2) > 0) {
+        var _after = class.(name + "__after");
+        var _cnt = call g_array_size(_after);
+        var _i = 0;
+        var _suc = false;
+        var __next = lambda() {
+            if (_i >= _cnt) {
+                let _suc = true;
+                return r;
+            }
+            var __after = call g_array_get(_after, _i);
+            _i++;
+            return call __after(class."__type__", name, class, r, __next, arg1, arg2);
+        };
+        var ret = call __next();
+        if (!_suc) {
+            return ret;
+        }
+    }
+    return r;
 };
 export "g_invoke_method_2";
 var g_invoke_method_3 = func ~(class, name, arg1, arg2, arg3) {
-    var method = call g_get_property(class, name);
+var method = class.name;
     if (call g_is_null(method)) { return; }
-    return call method(class, arg1, arg2, arg3);
+    var flag = call g_get_flag(method);
+    if ((flag & 1) > 0) {
+        var _before = class.(name + "__before");
+        var _cnt = call g_array_size(_before);
+        var _i = 0;
+        var _suc = false;
+        var __next = lambda() {
+            if (_i >= _cnt) {
+                let _suc = true;
+                return;
+            }
+            var __before = call g_array_get(_before, _i);
+            _i++;
+            return call __before(class."__type__", name, class, __next, arg1, arg2, arg3);
+        };
+        var ret = call __next();
+        if (!_suc) {
+            return ret;
+        }
+    }
+    var r = call method(class, arg1, arg2, arg3);
+    if ((flag & 2) > 0) {
+        var _after = class.(name + "__after");
+        var _cnt = call g_array_size(_after);
+        var _i = 0;
+        var _suc = false;
+        var __next = lambda() {
+            if (_i >= _cnt) {
+                let _suc = true;
+                return r;
+            }
+            var __after = call g_array_get(_after, _i);
+            _i++;
+            return call __after(class."__type__", name, class, r, __next, arg1, arg2, arg3);
+        };
+        var ret = call __next();
+        if (!_suc) {
+            return ret;
+        }
+    }
+    return r;
 };
 export "g_invoke_method_3";
 var g_invoke_method_4 = func ~(class, name, arg1, arg2, arg3, arg4) {
-    var method = call g_get_property(class, name);
+var method = class.name;
     if (call g_is_null(method)) { return; }
-    return call method(class, arg1, arg2, arg3, arg4);
+    var flag = call g_get_flag(method);
+    if ((flag & 1) > 0) {
+        var _before = class.(name + "__before");
+        var _cnt = call g_array_size(_before);
+        var _i = 0;
+        var _suc = false;
+        var __next = lambda() {
+            if (_i >= _cnt) {
+                let _suc = true;
+                return;
+            }
+            var __before = call g_array_get(_before, _i);
+            _i++;
+            return call __before(class."__type__", name, class, __next, arg1, arg2, arg3, arg4);
+        };
+        var ret = call __next();
+        if (!_suc) {
+            return ret;
+        }
+    }
+    var r = call method(class, arg1, arg2, arg3, arg4);
+    if ((flag & 2) > 0) {
+        var _after = class.(name + "__after");
+        var _cnt = call g_array_size(_after);
+        var _i = 0;
+        var _suc = false;
+        var __next = lambda() {
+            if (_i >= _cnt) {
+                let _suc = true;
+                return r;
+            }
+            var __after = call g_array_get(_after, _i);
+            _i++;
+            return call __after(class."__type__", name, class, r, __next, arg1, arg2, arg3, arg4);
+        };
+        var ret = call __next();
+        if (!_suc) {
+            return ret;
+        }
+    }
+    return r;
 };
 export "g_invoke_method_4";
 var g_invoke_method_5 = func ~(class, name, arg1, arg2, arg3, arg4, arg5) {
-    var method = call g_get_property(class, name);
+var method = class.name;
     if (call g_is_null(method)) { return; }
-    return call method(class, arg1, arg2, arg3, arg4, arg5);
+    var flag = call g_get_flag(method);
+    if ((flag & 1) > 0) {
+        var _before = class.(name + "__before");
+        var _cnt = call g_array_size(_before);
+        var _i = 0;
+        var _suc = false;
+        var __next = lambda() {
+            if (_i >= _cnt) {
+                let _suc = true;
+                return;
+            }
+            var __before = call g_array_get(_before, _i);
+            _i++;
+            return call __before(class."__type__", name, class, __next, arg1, arg2, arg3, arg4, arg5);
+        };
+        var ret = call __next();
+        if (!_suc) {
+            return ret;
+        }
+    }
+    var r = call method(class, arg1, arg2, arg3, arg4, arg5);
+    if ((flag & 2) > 0) {
+        var _after = class.(name + "__after");
+        var _cnt = call g_array_size(_after);
+        var _i = 0;
+        var _suc = false;
+        var __next = lambda() {
+            if (_i >= _cnt) {
+                let _suc = true;
+                return r;
+            }
+            var __after = call g_array_get(_after, _i);
+            _i++;
+            return call __after(class."__type__", name, class, r, __next, arg1, arg2, arg3, arg4, arg5);
+        };
+        var ret = call __next();
+        if (!_suc) {
+            return ret;
+        }
+    }
+    return r;
 };
 export "g_invoke_method_5";
 var g_invoke_method_6 = func ~(class, name, arg1, arg2, arg3, arg4, arg5, arg6) {
-    var method = call g_get_property(class, name);
+var method = class.name;
     if (call g_is_null(method)) { return; }
-    return call method(class, arg1, arg2, arg3, arg4, arg5, arg6);
+    var flag = call g_get_flag(method);
+    if ((flag & 1) > 0) {
+        var _before = class.(name + "__before");
+        var _cnt = call g_array_size(_before);
+        var _i = 0;
+        var _suc = false;
+        var __next = lambda() {
+            if (_i >= _cnt) {
+                let _suc = true;
+                return;
+            }
+            var __before = call g_array_get(_before, _i);
+            _i++;
+            return call __before(class."__type__", name, class, __next, arg1, arg2, arg3, arg4, arg5, arg6);
+        };
+        var ret = call __next();
+        if (!_suc) {
+            return ret;
+        }
+    }
+    var r = call method(class, arg1, arg2, arg3, arg4, arg5, arg6);
+    if ((flag & 2) > 0) {
+        var _after = class.(name + "__after");
+        var _cnt = call g_array_size(_after);
+        var _i = 0;
+        var _suc = false;
+        var __next = lambda() {
+            if (_i >= _cnt) {
+                let _suc = true;
+                return r;
+            }
+            var __after = call g_array_get(_after, _i);
+            _i++;
+            return call __after(class."__type__", name, class, r, __next, arg1, arg2, arg3, arg4, arg5, arg6);
+        };
+        var ret = call __next();
+        if (!_suc) {
+            return ret;
+        }
+    }
+    return r;
 };
 export "g_invoke_method_6";
 var g_invoke_method_7 = func ~(class, name, arg1, arg2, arg3, arg4, arg5, arg6, arg7) {
-    var method = call g_get_property(class, name);
+var method = class.name;
     if (call g_is_null(method)) { return; }
-    return call method(class, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+    var flag = call g_get_flag(method);
+    if ((flag & 1) > 0) {
+        var _before = class.(name + "__before");
+        var _cnt = call g_array_size(_before);
+        var _i = 0;
+        var _suc = false;
+        var __next = lambda() {
+            if (_i >= _cnt) {
+                let _suc = true;
+                return;
+            }
+            var __before = call g_array_get(_before, _i);
+            _i++;
+            return call __before(class."__type__", name, class, __next, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+        };
+        var ret = call __next();
+        if (!_suc) {
+            return ret;
+        }
+    }
+    var r = call method(class, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+    if ((flag & 2) > 0) {
+        var _after = class.(name + "__after");
+        var _cnt = call g_array_size(_after);
+        var _i = 0;
+        var _suc = false;
+        var __next = lambda() {
+            if (_i >= _cnt) {
+                let _suc = true;
+                return r;
+            }
+            var __after = call g_array_get(_after, _i);
+            _i++;
+            return call __after(class."__type__", name, class, r, __next, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+        };
+        var ret = call __next();
+        if (!_suc) {
+            return ret;
+        }
+    }
+    return r;
 };
 export "g_invoke_method_7";
 var g_invoke_method_8 = func ~(class, name, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) {
-    var method = call g_get_property(class, name);
+var method = class.name;
     if (call g_is_null(method)) { return; }
-    return call method(class, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+    var flag = call g_get_flag(method);
+    if ((flag & 1) > 0) {
+        var _before = class.(name + "__before");
+        var _cnt = call g_array_size(_before);
+        var _i = 0;
+        var _suc = false;
+        var __next = lambda() {
+            if (_i >= _cnt) {
+                let _suc = true;
+                return;
+            }
+            var __before = call g_array_get(_before, _i);
+            _i++;
+            return call __before(class."__type__", name, class, __next, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+        };
+        var ret = call __next();
+        if (!_suc) {
+            return ret;
+        }
+    }
+    var r = call method(class, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+    if ((flag & 2) > 0) {
+        var _after = class.(name + "__after");
+        var _cnt = call g_array_size(_after);
+        var _i = 0;
+        var _suc = false;
+        var __next = lambda() {
+            if (_i >= _cnt) {
+                let _suc = true;
+                return r;
+            }
+            var __after = call g_array_get(_after, _i);
+            _i++;
+            return call __after(class."__type__", name, class, r, __next, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+        };
+        var ret = call __next();
+        if (!_suc) {
+            return ret;
+        }
+    }
+    return r;
 };
 export "g_invoke_method_8";
 var g_invoke_method_9 = func ~(class, name, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) {
-    var method = call g_get_property(class, name);
+var method = class.name;
     if (call g_is_null(method)) { return; }
-    return call method(class, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
+    var flag = call g_get_flag(method);
+    if ((flag & 1) > 0) {
+        var _before = class.(name + "__before");
+        var _cnt = call g_array_size(_before);
+        var _i = 0;
+        var _suc = false;
+        var __next = lambda() {
+            if (_i >= _cnt) {
+                let _suc = true;
+                return;
+            }
+            var __before = call g_array_get(_before, _i);
+            _i++;
+            return call __before(class."__type__", name, class, __next, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
+        };
+        var ret = call __next();
+        if (!_suc) {
+            return ret;
+        }
+    }
+    var r = call method(class, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
+    if ((flag & 2) > 0) {
+        var _after = class.(name + "__after");
+        var _cnt = call g_array_size(_after);
+        var _i = 0;
+        var _suc = false;
+        var __next = lambda() {
+            if (_i >= _cnt) {
+                let _suc = true;
+                return r;
+            }
+            var __after = call g_array_get(_after, _i);
+            _i++;
+            return call __after(class."__type__", name, class, r, __next, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
+        };
+        var ret = call __next();
+        if (!_suc) {
+            return ret;
+        }
+    }
+    return r;
 };
 export "g_invoke_method_9";
 
