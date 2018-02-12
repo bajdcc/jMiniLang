@@ -75,4 +75,12 @@ public interface IRuntimeProcessService {
      * @return 进程信息
      */
     List<Object[]> getProcInfoCache();
+
+	/**
+	 * 设置是否输出调试信息（堆栈）
+	 *
+	 * @param pid   当前进程PID
+	 * @param debug 是否调试
+	 */
+	void setDebug(int pid, boolean debug);
 }

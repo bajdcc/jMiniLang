@@ -350,6 +350,13 @@ public class RuntimeProcess implements IRuntimeProcessService {
         return stat.procCache;
     }
 
+	@Override
+	public void setDebug(int pid, boolean debug) {
+		if (setProcessId.contains(pid)) {
+			arrProcess[pid].machine.setDebug(debug);
+		}
+	}
+
     private class SystemStat {
         public float speed;
         public int cycle;

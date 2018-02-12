@@ -170,7 +170,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	}
 
 	private void runInsts() throws Exception {
-		while (runByStep());
+		while (runByStep()) ;
 	}
 
 	public void initStep(String name, RuntimeCodePage page, List<RuntimeCodePage> refers, int pc, RuntimeObject obj) throws Exception {
@@ -204,10 +204,10 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 		if (inst == RuntimeInst.ihalt) {
 			return false;
 		}
-//		if (debug) {
-//			System.err.println();
-//			System.err.print(stack.reg.execId + ": " + inst.toString());
-//		}
+		if (debug) {
+			System.err.println();
+			System.err.print(stack.reg.execId + ": " + inst.toString());
+		}
 		OperatorType op = TokenTools.ins2op(inst);
 		nextInst();
 		if (op != null) {
@@ -221,13 +221,13 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 				}
 			}
 		}
-//		if (debug) {
-//			System.err.println();
-//			System.err.print(stack.toString());
+		if (debug) {
+			System.err.println();
+			System.err.print(stack.toString());
 //			System.err.print("协程栈：");
 //			System.err.print(stkYieldData.toString());
-//			System.err.println();
-//		}
+			System.err.println();
+		}
 		return true;
 	}
 
@@ -310,7 +310,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	}
 
 	private void next() throws RuntimeException {
-		if (debug) {
+		if (isDebug()) {
 			System.err.print(" " + current());
 		}
 		stack.reg.execId += 4;
@@ -404,10 +404,10 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	@Override
 	public Object[] getProcInfo() {
 		return new Object[]{
-                process.isBlock(pid) ? " " : "*",
-                pid,
+				process.isBlock(pid) ? " " : "*",
+				pid,
 				name,
-                stack.getFuncSimpleName(),
+				stack.getFuncSimpleName(),
 				description,
 		};
 	}
@@ -872,17 +872,17 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 		opOpenFunc();
 		loadYieldArgs(yieldSize - 2);
 		switch (type) {
-		case 1:
-			opCall();
-			break;
-		case 2:
-			opCallExtern(true);
-			break;
-		case 3:
-			opCallExtern(false);
-			break;
-		default:
-			break;
+			case 1:
+				opCall();
+				break;
+			case 2:
+				opCallExtern(true);
+				break;
+			case 3:
+				opCallExtern(false);
+				break;
+			default:
+				break;
 		}
 	}
 
@@ -910,5 +910,13 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	@Override
 	public void opMap() {
 		stack.pushData(new RuntimeObject(new RuntimeMap()));
+	}
+
+	public boolean isDebug() {
+		return debug;
+	}
+
+	public void setDebug(boolean debug) {
+		this.debug = debug;
 	}
 }

@@ -89,30 +89,28 @@ public class ExpBinop implements IExp {
 
 	@Override
 	public void genCode(ICodegen codegen) {
-        if (token.kToken == TokenType.OPERATOR && token.object == OperatorType.DOT) {
-            codegen.genCode(RuntimeInst.iopena);
-            leftOperand.genCode(codegen);
-            codegen.genCode(RuntimeInst.ipusha);
-            rightOperand.genCode(codegen);
-            codegen.genCode(RuntimeInst.ipusha);
-            codegen.genCode(RuntimeInst.ipush, codegen.genDataRef("g_get_property"));
-            codegen.genCode(RuntimeInst.icallx);
-            return;
-        }
+		if (token.kToken == TokenType.OPERATOR && token.object == OperatorType.DOT) {
+			codegen.genCode(RuntimeInst.iopena);
+			leftOperand.genCode(codegen);
+			codegen.genCode(RuntimeInst.ipusha);
+			rightOperand.genCode(codegen);
+			codegen.genCode(RuntimeInst.ipusha);
+			codegen.genCode(RuntimeInst.ipush, codegen.genDataRef("g_get_property"));
+			codegen.genCode(RuntimeInst.icallx);
+			return;
+		}
 		RuntimeInst inst = TokenTools.op2ins(token);
 		leftOperand.genCode(codegen);
 		RuntimeInstUnary jmp = null;
 		switch (inst) {
-		case iand:
-		case iandl:
-			jmp = codegen.genCode(RuntimeInst.ijfx, -1);
-			break;
-		case ior:
-		case iorl:
-			jmp = codegen.genCode(RuntimeInst.ijtx, -1);
-			break;
-		default:
-			break;
+			case iandl:
+				jmp = codegen.genCode(RuntimeInst.ijfx, -1);
+				break;
+			case iorl:
+				jmp = codegen.genCode(RuntimeInst.ijtx, -1);
+				break;
+			default:
+				break;
 		}
 		rightOperand.genCode(codegen);
 		codegen.genCode(inst);

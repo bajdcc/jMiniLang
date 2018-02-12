@@ -70,11 +70,9 @@ public class TokenTools {
 
 	/**
 	 * 单目运算
-	 * 
-	 * @param recorder
-	 *            错误记录
-	 * @param exp
-	 *            表达式
+	 *
+	 * @param recorder 错误记录
+	 * @param exp      表达式
 	 * @return 运算是否合法
 	 */
 	public static boolean sinop(ISemanticRecorder recorder, ExpSinop exp) {
@@ -90,63 +88,59 @@ public class TokenTools {
 
 	/**
 	 * 单目运算
-	 * 
-	 * @param type
-	 *            操作符
-	 * @param token
-	 *            操作数
+	 *
+	 * @param type  操作符
+	 * @param token 操作数
 	 * @return 运算是否合法
 	 */
 	public static boolean sin(OperatorType type, Token token) {
 		switch (type) {
-		case LOGICAL_NOT:
-			Token bool = mapConverter.get(TokenType.BOOL).convert(token);
-			if (bool.kToken == TokenType.BOOL) {
-				bool.object = !((boolean) bool.object);
-				return true;
-			}
-			break;
-		case BIT_NOT:
-			if (token.kToken == TokenType.INTEGER) {
-				token.object = ((BigInteger) token.object).xor(BigInteger.ZERO);
-				return true;
-			} else if (token.kToken == TokenType.DECIMAL) {
-				token.object = ((BigDecimal) token.object).negate();
-				return true;
-			}
-			break;
-		case PLUS_PLUS:
-			if (token.kToken == TokenType.INTEGER) {
-				token.object = ((BigInteger) token.object).add(BigInteger.ONE);
-				return true;
-			} else if (token.kToken == TokenType.DECIMAL) {
-				token.object = ((BigDecimal) token.object).add(BigDecimal.ONE);
-				return true;
-			}
-			break;
-		case MINUS_MINUS:
-			if (token.kToken == TokenType.INTEGER) {
-				token.object = ((BigInteger) token.object)
-						.subtract(BigInteger.ONE);
-				return true;
-			} else if (token.kToken == TokenType.DECIMAL) {
-				token.object = ((BigDecimal) token.object).add(BigDecimal.ONE);
-				return true;
-			}
-			break;
-		default:
-			break;
+			case LOGICAL_NOT:
+				Token bool = mapConverter.get(TokenType.BOOL).convert(token);
+				if (bool.kToken == TokenType.BOOL) {
+					bool.object = !((boolean) bool.object);
+					return true;
+				}
+				break;
+			case BIT_NOT:
+				if (token.kToken == TokenType.INTEGER) {
+					token.object = ((BigInteger) token.object).xor(BigInteger.ZERO);
+					return true;
+				} else if (token.kToken == TokenType.DECIMAL) {
+					token.object = ((BigDecimal) token.object).negate();
+					return true;
+				}
+				break;
+			case PLUS_PLUS:
+				if (token.kToken == TokenType.INTEGER) {
+					token.object = ((BigInteger) token.object).add(BigInteger.ONE);
+					return true;
+				} else if (token.kToken == TokenType.DECIMAL) {
+					token.object = ((BigDecimal) token.object).add(BigDecimal.ONE);
+					return true;
+				}
+				break;
+			case MINUS_MINUS:
+				if (token.kToken == TokenType.INTEGER) {
+					token.object = ((BigInteger) token.object)
+							.subtract(BigInteger.ONE);
+					return true;
+				} else if (token.kToken == TokenType.DECIMAL) {
+					token.object = ((BigDecimal) token.object).add(BigDecimal.ONE);
+					return true;
+				}
+				break;
+			default:
+				break;
 		}
 		return false;
 	}
 
 	/**
 	 * 双目运算
-	 * 
-	 * @param recorder
-	 *            错误记录
-	 * @param exp
-	 *            表达式
+	 *
+	 * @param recorder 错误记录
+	 * @param exp      表达式
 	 * @return 运算是否合法
 	 */
 	public static boolean binop(ISemanticRecorder recorder, ExpBinop exp) {
@@ -169,17 +163,14 @@ public class TokenTools {
 
 	/**
 	 * 二元运算（包含向上转换）
-	 * 
-	 * @param lop
-	 *            左操作数
-	 * @param rop
-	 *            右操作数
-	 * @param init
-	 *            操作数默认转型
+	 *
+	 * @param lop  左操作数
+	 * @param rop  右操作数
+	 * @param init 操作数默认转型
 	 * @return 运算是否合法
 	 */
 	private static boolean bin(OperatorType type, Token lop, Token rop,
-			boolean init) {
+	                           boolean init) {
 		if (type == OperatorType.DOT) {
 			ITokenConventer s = mapConverter.get(TokenType.STRING);
 			s.convert(rop);
@@ -422,11 +413,9 @@ public class TokenTools {
 
 	/**
 	 * 三目运算（当前只有一种形式）
-	 * 
-	 * @param recorder
-	 *            错误记录
-	 * @param exp
-	 *            表达式
+	 *
+	 * @param recorder 错误记录
+	 * @param exp      表达式
 	 * @return 运算是否合法
 	 */
 	public static int triop(ISemanticRecorder recorder, ExpTriop exp) {
@@ -443,13 +432,10 @@ public class TokenTools {
 
 	/**
 	 * 三目运算（当前只有一种形式）
-	 * 
-	 * @param op1
-	 *            操作符1
-	 * @param op2
-	 *            操作符2
-	 * @param token
-	 *            操作数
+	 *
+	 * @param op1   操作符1
+	 * @param op2   操作符2
+	 * @param token 操作数
 	 * @return 运算是否合法
 	 */
 	public static int tri(Token op1, Token op2, Token token) {
@@ -462,9 +448,8 @@ public class TokenTools {
 
 	/**
 	 * 三目运算（当前只有一种形式）
-	 * 
-	 * @param token
-	 *            操作数
+	 *
+	 * @param token 操作数
 	 * @return 运算是否合法
 	 */
 	public static int tri(Token token) {
@@ -477,24 +462,20 @@ public class TokenTools {
 
 	/**
 	 * 操作数提升（即向上转换），提升主要看左操作数（这样即隐含类型转换）
-	 * 
-	 * @param lop
-	 *            左操作数
-	 * @param rop
-	 *            右操作数
+	 *
+	 * @param lop 左操作数
+	 * @param rop 右操作数
 	 * @return 运算是否合法
 	 */
 	private static boolean promote(Token lop, Token rop) {
 		return promote(lop.kToken, rop);
 	}
-	
+
 	/**
 	 * 操作数提升（即向上转换），提升主要看左操作数（这样即隐含类型转换）
-	 * 
-	 * @param type
-	 *            左操作数类型
-	 * @param rop
-	 *            右操作数
+	 *
+	 * @param type 左操作数类型
+	 * @param rop  右操作数
 	 * @return 运算是否合法
 	 */
 	public static boolean promote(TokenType type, Token rop) {

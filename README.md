@@ -152,6 +152,84 @@ call print("" + circle."type"
     + " area=" + invoke circle::"get_area"()
     + " sarea=" + invoke circle."s"::"get_area"()
     + " index=" + invoke circle::"get_index"(2)); // dynamic args
+	
+// ----------------------- HOOKED METHOD!
+
+// 返回null，因为before回调中没有调用next()，直接拦截
+// 因此before_1后直接退出，before_2和after_1没有执行
+var before_1 = lambda(class, name, this, next) -> call print("HOOKED BEFORE 1: " + class + "::" + name);
+call g_hook_add_before(square, "get_area", before_1);
+var before_2 = lambda(class, name, this, next) -> call print("HOOKED BEFORE 2: " + class + "::" + name);
+call g_hook_add_before(square, "get_area", before_2);
+var after_1 = lambda(class, name, this, ret, next) -> call print("HOOKED AFTER 1: " + class + "::" + name);
+call g_hook_add_after(square, "get_area", after_1);
+
+call print("A " + square."type" + " area=" + invoke square::"get_area"()); // failed
+
+call g_hook_remove_before(square, "get_area", before_1);
+call g_hook_remove_before(square, "get_area", before_2);
+call g_hook_remove_after(square, "get_area", after_1);
+
+// 返回12000，因为before和after都调用next()，未拦截
+let before_1 = lambda(class, name, this, next) {
+    call print("HOOKED BEFORE 1: " + class + "::" + name);
+    return call next();
+};
+call g_hook_add_before(square, "get_area", before_1);
+let before_2 = lambda(class, name, this, next) {
+    call print("HOOKED BEFORE 2: " + class + "::" + name);
+    return call next();
+};
+call g_hook_add_before(square, "get_area", before_2);
+let after_1 = lambda(class, name, this, r, next) {
+    call print("HOOKED AFTER  3: " + class + "::" + name + "=" + r);
+    return call next();
+};
+call g_hook_add_after(square, "get_area", after_1);
+
+call print("B " + square."type" + " area=" + invoke square::"get_area"());
+
+call g_hook_remove_before(square, "get_area", before_1);
+call g_hook_remove_before(square, "get_area", before_2);
+call g_hook_remove_after(square, "get_area", after_1);
+
+// 返回12346，直接拦截了，因为before_2中没有调用next()
+// 因此返回12345+1，但当before_2返回next()+12345时
+// get_area还是返回12000，拦截没有效果，因为都调用了next()
+let before_1 = lambda(class, name, this, next) {
+    call print("HOOKED BEFORE 4: " + class + "::" + name);
+    return call next() + 1;
+};
+call g_hook_add_before(square, "get_area", before_1);
+let before_2 = lambda(class, name, this, next) {
+    call print("HOOKED BEFORE 5: " + class + "::" + name);
+    return 12345;
+};
+call g_hook_add_before(square, "get_area", before_2);
+let after_1 = lambda(class, name, this, r, next) {
+    call print("HOOKED AFTER  6: " + class + "::" + name + "=" + r);
+    return call next() + 10;
+};
+call g_hook_add_after(square, "get_area", after_1);
+
+call print("C " + square."type" + " area=" + invoke square::"get_area"());
+
+call g_hook_remove_before(square, "get_area", before_1);
+call g_hook_remove_before(square, "get_area", before_2);
+
+// 返回12010，因为有两个after，after_7没有调用next()，直接拦截
+var after_2 = lambda(class, name, this, r, next) {
+    call print("HOOKED AFTER  7: " + class + "::" + name + "=" + r);
+    return r;
+};
+call g_hook_add_after(square, "get_area", after_2);
+
+call print("D " + square."type" + " area=" + invoke square::"get_area"());
+
+call g_hook_remove_after(square, "get_area", after_1);
+call g_hook_remove_after(square, "get_area", after_2);
+
+call print("E " + square."type" + " area=" + invoke square::"get_area"());
 ```
 
 **1. Lambda: Y Combinator of Hanoi**

@@ -90,6 +90,10 @@ public class RuntimeArray implements Cloneable {
 		return null;
 	}
 
+	public RuntimeObject delete(RuntimeObject obj) {
+		return new RuntimeObject(array.remove(obj));
+	}
+
 	public void reverse() {
 		Collections.reverse(array);
 	}

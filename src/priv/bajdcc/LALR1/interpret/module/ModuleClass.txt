@@ -67,10 +67,48 @@ var g_create_method = func ~(class, name, method) {
 export "g_create_method";
 var g_invoke_method = func ~(class, name) {
     var method = call g_get_property(class, name);
-    if (call g_is_null(method)) {
-        return;
+    if (call g_is_null(method)) { return; }
+    var flag = call g_get_flag(method);
+    if ((flag & 1) > 0) {
+        var _before = class.(name + "__before");
+        var _cnt = call g_array_size(_before);
+        var _i = 0;
+        var _suc = false;
+        var __next = lambda() {
+            if (_i >= _cnt) {
+                let _suc = true;
+                return;
+            }
+            var __before = call g_array_get(_before, _i);
+            _i++;
+            return call __before(class."__type__", name, class, __next);
+        };
+        var ret = call __next();
+        if (!_suc) {
+            return ret;
+        }
     }
-    return call method(class);
+    var r = call method(class);
+    if ((flag & 2) > 0) {
+        var _after = class.(name + "__after");
+        var _cnt = call g_array_size(_after);
+        var _i = 0;
+        var _suc = false;
+        var __next = lambda() {
+            if (_i >= _cnt) {
+                let _suc = true;
+                return r;
+            }
+            var __after = call g_array_get(_after, _i);
+            _i++;
+            return call __after(class."__type__", name, class, r, __next);
+        };
+        var ret = call __next();
+        if (!_suc) {
+            return ret;
+        }
+    }
+    return r;
 };
 export "g_invoke_method";
 var g_invoke_method_1 = func ~(class, name, arg1) {
@@ -156,3 +194,78 @@ var g_create_class = func ~(ctx, name) {
     return class;
 };
 export "g_create_class";
+
+// ---- HOOK ----
+
+var g_hook_add_before = func ~(class, name, f) {
+    var old = class.name;
+    if (call g_is_null(old)) {
+        return false;
+    }
+    var flag = call g_get_flag(old);
+    if ((flag & 1) > 0) {
+        var _before = class.(name + "__before");
+        call g_array_add(_before, f);
+    } else {
+        var _before = [];
+        call g_array_add(_before, f);
+        set class::(name + "__before") = _before;
+        call g_set_flag(old, flag | 1);
+    }
+    return true;
+};
+export "g_hook_add_before";
+var g_hook_remove_before = func ~(class, name, f) {
+    var old = class.name;
+    if (call g_is_null(old)) {
+        return false;
+    }
+    var flag = call g_get_flag(old);
+    if ((flag & 1) > 0) {
+        var _before = class.(name + "__before");
+        var ret = call g_array_delete(_before, f);
+        if (call g_array_empty(_before)) {
+            set class::(name + "__before") = g_null;
+            call g_set_flag(old, flag - 1);
+        }
+        return ret;
+    }
+    return false;
+};
+export "g_hook_remove_before";
+var g_hook_add_after = func ~(class, name, f) {
+    var old = class.name;
+    if (call g_is_null(old)) {
+        return false;
+    }
+    var flag = call g_get_flag(old);
+    if ((flag & 2) > 0) {
+        var _after = class.(name + "__after");
+        call g_array_add(_after, f);
+    } else {
+        var _after = [];
+        call g_array_add(_after, f);
+        set class::(name + "__after") = _after;
+        call g_set_flag(old, flag | 2);
+    }
+    return true;
+};
+export "g_hook_add_after";
+var g_hook_remove_after = func ~(class, name, f) {
+    var old = class.name;
+    if (call g_is_null(old)) {
+        return false;
+    }
+    var flag = call g_get_flag(old);
+    if ((flag & 2) > 0) {
+        var _after = class.(name + "__after");
+        var ret = call g_array_delete(_after, f);
+        if (call g_array_empty(_after)) {
+            set class::(name + "__after") = g_null;
+            call g_set_flag(old, flag - 2);
+        }
+        return ret;
+    }
+    return false;
+};
+export "g_hook_remove_after";

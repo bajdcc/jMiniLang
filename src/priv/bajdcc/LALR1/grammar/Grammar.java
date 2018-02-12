@@ -56,7 +56,7 @@ public class Grammar extends Semantic {
 
 	/**
 	 * 初始化
-	 * 
+	 *
 	 * @throws SyntaxException
 	 */
 	private void initialize() throws SyntaxException {
@@ -71,7 +71,7 @@ public class Grammar extends Semantic {
 
 	/**
 	 * 声明终结符
-	 * 
+	 *
 	 * @throws SyntaxException 词法错误
 	 */
 	private void declareTerminal() throws SyntaxException {
@@ -139,11 +139,11 @@ public class Grammar extends Semantic {
 
 	/**
 	 * 声明非终结符
-	 * 
+	 *
 	 * @throws SyntaxException 词法错误
 	 */
 	private void declareNonTerminal() throws SyntaxException {
-		String[] nonTerminals = new String[] { "program", "stmt_list", "stmt",
+		String[] nonTerminals = new String[]{"program", "stmt_list", "stmt",
 				"stmt_stmt", "stmt_ctrl", "stmt_exp", "func", "lambda", "var",
 				"var_list", "exp_list", "exp", "exp0", "exp1", "exp2", "exp3",
 				"exp4", "exp5", "exp6", "exp7", "exp8", "exp9", "exp10", "type",
@@ -156,7 +156,7 @@ public class Grammar extends Semantic {
 
 	/**
 	 * 进行推导
-	 * 
+	 *
 	 * @throws SyntaxException 词法错误
 	 */
 	private void infer() throws SyntaxException {
@@ -227,7 +227,7 @@ public class Grammar extends Semantic {
 				"doc_list -> @LITERAL[0] [@COMMA doc_list[1]]");
 		/* 函数主体 */
 		infer(handler.getSemanticHandler("func"),
-                "func -> (@FUNCTION[10]#func_clearargs# | @YIELD#func_clearargs#) [@LSQ doc_list[0]{lost_doc} @RSQ] (@ID[1]#predeclear_funcname#{lost_func_name} | @NOT[1]#predeclear_funcname#{lost_func_name}) @LPA{lost_lpa} [var_list[2]] @RPA{lost_rpa} (@PTR_OP#do_enter_scope#{lost_func_body} exp[3]#do_leave_scope#{lost_exp} | block[4]{lost_func_body})");
+				"func -> (@FUNCTION[10]#func_clearargs# | @YIELD#func_clearargs#) [@LSQ doc_list[0]{lost_doc} @RSQ] (@ID[1]#predeclear_funcname#{lost_func_name} | @NOT[1]#predeclear_funcname#{lost_func_name}) @LPA{lost_lpa} [var_list[2]] @RPA{lost_rpa} (@PTR_OP#do_enter_scope#{lost_func_body} exp[3]#do_leave_scope#{lost_exp} | block[4]{lost_func_body})");
 		/* 匿名主体 */
 		infer(handler.getSemanticHandler("lambda"),
 				"lambda -> @LAMBDA[1]#lambda# @LPA{lost_lpa} [var_list[2]] @RPA{lost_rpa} (@PTR_OP{lost_func_body} exp[3]{lost_exp} | block[4]{lost_func_body})");
@@ -259,7 +259,7 @@ public class Grammar extends Semantic {
 
 	/**
 	 * 声明错误处理器
-	 * 
+	 *
 	 * @throws SyntaxException 词法错误
 	 */
 	private void declareErrorHandler() throws SyntaxException {
@@ -291,11 +291,11 @@ public class Grammar extends Semantic {
 
 	/**
 	 * 声明动作处理器
-	 * 
+	 *
 	 * @throws SyntaxException 词法错误
 	 */
 	private void declareActionHandler() throws SyntaxException {
-		String[] actionNames = new String[] { "do_enter_scope",
+		String[] actionNames = new String[]{"do_enter_scope",
 				"do_leave_scope", "predeclear_funcname", "declear_variable",
 				"declear_param", "func_clearargs", "do_enter_cycle", "lambda"};
 		for (String string : actionNames) {
@@ -305,7 +305,7 @@ public class Grammar extends Semantic {
 
 	/**
 	 * 语法树建成之后的详细语义检查
-	 * 
+	 *
 	 * @throws SyntaxException 词法错误
 	 */
 	private void check() throws SyntaxException {
@@ -314,7 +314,7 @@ public class Grammar extends Semantic {
 		} else {
 			System.err.println(getSemanticError());
 			throw new SyntaxException(SyntaxError.COMPILE_ERROR,
-                    recorder.getErrorList().get(0).getPosition().position, "请检查代码");
+					recorder.getErrorList().get(0).getPosition().position, "请检查代码");
 		}
 	}
 
@@ -363,9 +363,9 @@ public class Grammar extends Semantic {
 
 	/**
 	 * 生成目标代码
-	 * 
-	 * @throws SyntaxException 词法错误
+	 *
 	 * @return 目标代码页
+	 * @throws SyntaxException 词法错误
 	 */
 	public RuntimeCodePage getCodePage() throws SyntaxException {
 		if (!recorder.isCorrect()) {

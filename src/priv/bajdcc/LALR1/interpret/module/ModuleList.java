@@ -298,6 +298,25 @@ public class ModuleList implements IInterpreterModule {
 				return new RuntimeObject(array.remove(index.intValue()));
 			}
 		});
+		info.addExternalFunc("g_array_delete", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "数组移除";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kArray, RuntimeObjectType.kObject};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				RuntimeArray array = (RuntimeArray) args.get(0).getObj();
+				RuntimeObject obj = args.get(1);
+				return new RuntimeObject(array.delete(obj));
+			}
+		});
 		info.addExternalFunc("g_array_empty", new IRuntimeDebugExec() {
 			@Override
 			public String getDoc() {

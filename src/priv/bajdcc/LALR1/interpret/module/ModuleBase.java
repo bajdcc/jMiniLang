@@ -142,6 +142,25 @@ public class ModuleBase implements IInterpreterModule {
 				return new RuntimeObject(args.get(0).getFlag() == flag.longValue());
 			}
 		});
+		info.addExternalFunc("g_set_debug", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "输出调试信息";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kBool};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				boolean debug = (boolean) args.get(0).getObj();
+				status.getService().getProcessService().setDebug(status.getPid(), debug);
+				return null;
+			}
+		});
 		info.addExternalFunc("g_not_null", new IRuntimeDebugExec() {
 			@Override
 			public String getDoc() {
