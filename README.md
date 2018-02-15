@@ -57,6 +57,7 @@ Now has commands:
 - time
 - count
 - **msg**
+- **news**(refer: https://github.com/bajdcc/NewsApp)
 
 Tasks:
 - System

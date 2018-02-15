@@ -418,16 +418,9 @@ call g_register_class(ctx, "app::news::news.machine", lambda(this) {
         }
         call g_printn("Timer process exit");
     };
-    set this::"typewrite" = lambda(this, str, span) {
-        foreach (var c : call g_range_string(str)) {
-            invoke this."output"::"write"(c);
-            call g_task_sleep_ms_signal(span, signal);
-        }
-        invoke this."output"::"write"(g_endl);
-    };
     call g_hook_add_before(this, "marquee", lambda(class, name, this, next) {
         var msg = invoke this."msg_list"::"pop"();
-        invoke this::"typewrite"(msg."str", 300);
+        invoke this."output"::"writeln"(msg."str");
         call g_printn("Post message: " + msg."str");
         return 200 * invoke msg::"size"();
     });
@@ -462,7 +455,11 @@ var output = call g_create_class(ctx, "stream::output");
 set output::"handle" = in;
 invoke machine::"start"(output);
 
-call g_read_pipe_args(in, lambda(ch, out) -> call g_write_pipe(out, ch), out);
+var typewrite = lambda(out, ch) {
+    call g_write_pipe(out, ch);
+    call g_task_sleep_ms_signal(50, signal);
+};
+call g_read_pipe_args(in, lambda(ch, out) -> call typewrite(out, ch), out);
 
 call g_stop_share(signal);
 call g_destroy_pipe(out);
