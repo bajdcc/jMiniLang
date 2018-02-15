@@ -2,6 +2,7 @@ import "sys.base";
 import "sys.list";
 import "sys.proc";
 import "sys.task";
+import "sys.math";
 import "sys.string";
 import "sys.remote";
 
@@ -32,7 +33,16 @@ var draw = func ~() {
 
     var procs = call g_query_all_proc();
     var text = call g_string_join_array(procs, g_endl);
-    let text = "    Speed: " + call g_task_get_fast("system", "speed") + "\n" + text;
+    var speed = call g_task_get_fast("system", "speed");
+    var speed_text = "";
+    if (speed > 1.0e6) {
+        let speed_text = "" + call g_floor(speed / 1.0e6, 2) + "M";
+    } else if (speed > 1.0e3) {
+        let speed_text = "" + call g_floor(speed / 1.0e3, 2) + "K";
+    } else {
+        let speed_text = "" + call g_floor(speed, 2);
+    }
+    let text = "    Speed: " + speed_text + "\n" + text;
     call g_task_get_fast_arg("ui", "path", "\uffeeM 0 0\uffee\uffeeR 800 600\uffee\uffeeW 800\uffee\uffeeM 0 20\uffee\uffec" + text + "\uffec");
     call g_task_sleep_signal(1, "TASK#SLEEP");
 };

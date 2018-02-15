@@ -138,8 +138,8 @@ public class UIMainFrame extends JFrame {
 				new UIMain(),
 				new UIClock(),
 				new UIHitokoto(),
-                new UIMonitor(),
-                // USER
+				new UIMonitor(),
+				// USER
 				new UserMain(),
 				// USER ROUTINE
 				new URShell(),
@@ -154,7 +154,8 @@ public class UIMainFrame extends JFrame {
 				new URTime(),
 				new URCount(),
 				new URTest(),
-                new URMsg(),
+				new URMsg(),
+				new URNews(),
 				// USER FILE
 				new URFileLoad(),
 				new URFileSave(),
@@ -169,7 +170,7 @@ public class UIMainFrame extends JFrame {
 			interpreter = new Interpreter();
 
 			for (IOSCodePage page : pages) {
-                interpreter.load(page);
+				interpreter.load(page);
 			}
 
 			Grammar grammar = new Grammar(code);

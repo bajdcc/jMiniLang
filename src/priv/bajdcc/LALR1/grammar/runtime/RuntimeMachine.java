@@ -9,6 +9,7 @@ import priv.bajdcc.LALR1.grammar.runtime.data.RuntimeMap;
 import priv.bajdcc.LALR1.grammar.runtime.service.IRuntimeService;
 import priv.bajdcc.LALR1.grammar.type.TokenTools;
 import priv.bajdcc.LALR1.interpret.module.*;
+import priv.bajdcc.LALR1.interpret.module.std.ModuleStdBase;
 import priv.bajdcc.LALR1.syntax.handler.SyntaxException;
 import priv.bajdcc.util.HashListMapEx;
 import priv.bajdcc.util.lexer.token.OperatorType;
@@ -61,6 +62,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 					ModuleNet.getInstance(),
 					ModuleFile.getInstance(),
 					ModuleClass.getInstance(),
+					ModuleStdBase.getInstance(),
 			};
 		}
 
@@ -487,7 +489,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 		int envSize = loadInt();
 		for (int i = 0; i < envSize; i++) {
 			int id = loadInt();
-			func.addEnv(id, stack.findVariable(id));
+			func.addEnv(id, stack.findVariable(func.getPage(), id));
 		}
 		stack.pushData(obj);
 	}

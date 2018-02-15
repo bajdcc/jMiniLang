@@ -67,7 +67,7 @@ public interface IRuntimeProcessService {
      *
      * @return 运行频率
      */
-    String getSpeed();
+    double getSpeed();
 
     /**
      * 获取当前进程信息（缓存）

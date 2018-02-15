@@ -53,7 +53,7 @@ var real_repeat = func ~(_operation, _arg, _start, _end) {
 /* 打字效果 */
 var word_typewrite0 = func ~(str, span) {
     var print = func ~(a, n) {
-        call put(call g_string_char(a, n));
+        call put(call g_string_get(a, n));
         call g_task_sleep_ms_signal(span, signal);
     };
     call real_repeat(print, str, 0, call g_string_length(str));

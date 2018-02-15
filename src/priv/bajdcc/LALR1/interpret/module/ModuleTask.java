@@ -12,6 +12,7 @@ import priv.bajdcc.util.lexer.token.OperatorType;
 import priv.bajdcc.util.lexer.token.Token;
 import priv.bajdcc.util.lexer.token.TokenType;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -180,7 +181,7 @@ public class ModuleTask implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 												  IRuntimeStatus status) throws Exception {
-				return new RuntimeObject(status.getService().getProcessService().getSpeed());
+				return new RuntimeObject(BigDecimal.valueOf(status.getService().getProcessService().getSpeed()));
 			}
 		});
 	}

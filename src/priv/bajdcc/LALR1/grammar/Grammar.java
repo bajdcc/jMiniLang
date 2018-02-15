@@ -173,7 +173,7 @@ public class Grammar extends Semantic {
 				"stmt_list -> stmt[0]{lost_stmt} [stmt_list[1]]");
 		/* 语句分为变量定义（赋值）、调用语句 */
 		infer(handler.getSemanticHandler("copy"),
-				"stmt_exp -> var[0] | call[0] | cycle_ctrl[0] | exp[0] | set[0]");
+				"stmt_exp -> var[0] | call[0] | cycle_ctrl[0] | exp[0]");
 		infer(handler.getSemanticHandler("copy"),
 				"stmt -> stmt_stmt[0] | stmt_ctrl[0] | block_stmt[0]");
 		infer(handler.getSemanticHandler("stmt_exp"),
@@ -233,7 +233,7 @@ public class Grammar extends Semantic {
 				"lambda -> @LAMBDA[1]#lambda# @LPA{lost_lpa} [var_list[2]] @RPA{lost_rpa} (@PTR_OP{lost_func_body} exp[3]{lost_exp} | block[4]{lost_func_body})");
 		/* 基本数据类型 */
 		infer(handler.getSemanticHandler("type"),
-				"type -> @ID[0] | @INTEGER[0] | @DECIMAL[0] | @LITERAL[0] | @CHARACTER[0] | @BOOLEAN[0] | @LPA exp[1]{lost_exp} @RPA{lost_rpa} | call[1] | lambda[2] | invoke[1]");
+				"type -> @ID[0] | @INTEGER[0] | @DECIMAL[0] | @LITERAL[0] | @CHARACTER[0] | @BOOLEAN[0] | @LPA exp[1]{lost_exp} @RPA{lost_rpa} | call[1] | lambda[2] | set[1] | invoke[1]");
 		/* 条件语句 */
 		infer(handler.getSemanticHandler("if"),
 				"if -> @IF @LPA{lost_lpa} exp[0]{lost_exp} @RPA{lost_rpa} block[1]{lost_block} [@ELSE (block[2]{lost_block} | if[3]{lost_block})]");

@@ -155,24 +155,6 @@ public class ModuleString implements IInterpreterModule {
 				return new RuntimeObject(BigInteger.valueOf(str.length()));
 			}
 		});
-		info.addExternalFunc("g_string_char", new IRuntimeDebugExec() {
-			@Override
-			public String getDoc() {
-				return "字符串遍历";
-			}
-
-			@Override
-			public RuntimeObjectType[] getArgsType() {
-				return new RuntimeObjectType[]{RuntimeObjectType.kString, RuntimeObjectType.kInt};
-			}
-
-			@Override
-			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
-			                                      IRuntimeStatus status) throws Exception {
-				BigInteger index = (BigInteger) args.get(1).getObj();
-				return new RuntimeObject(args.get(0).getObj().toString().charAt(index.intValue()));
-			}
-		});
 		info.addExternalFunc("g_string_empty", new IRuntimeDebugExec() {
 			@Override
 			public String getDoc() {

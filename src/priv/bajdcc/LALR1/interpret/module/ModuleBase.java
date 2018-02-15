@@ -54,6 +54,7 @@ public class ModuleBase implements IInterpreterModule {
 		info.addExternalValue("g_false", () -> new RuntimeObject(false));
 		final String NEWLINE = System.lineSeparator();
 		info.addExternalValue("g_endl", () -> new RuntimeObject(NEWLINE));
+		info.addExternalValue("g_nullptr", () -> new RuntimeObject(-1));
 		info.addExternalFunc("g_is_null", new IRuntimeDebugExec() {
 			@Override
 			public String getDoc() {
@@ -62,12 +63,12 @@ public class ModuleBase implements IInterpreterModule {
 
 			@Override
 			public RuntimeObjectType[] getArgsType() {
-				return new RuntimeObjectType[] { RuntimeObjectType.kObject };
+				return new RuntimeObjectType[]{RuntimeObjectType.kObject};
 			}
 
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
-												  IRuntimeStatus status) throws Exception {
+			                                      IRuntimeStatus status) throws Exception {
 				return new RuntimeObject(args.get(0).getObj() == null);
 			}
 		});
@@ -84,7 +85,7 @@ public class ModuleBase implements IInterpreterModule {
 
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
-												  IRuntimeStatus status) throws Exception {
+			                                      IRuntimeStatus status) throws Exception {
 				return new RuntimeObject(((int) args.get(0).getObj()) >= 0);
 			}
 		});
@@ -101,7 +102,7 @@ public class ModuleBase implements IInterpreterModule {
 
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
-												  IRuntimeStatus status) throws Exception {
+			                                      IRuntimeStatus status) throws Exception {
 				BigInteger flag = (BigInteger) args.get(1).getObj();
 				args.get(0).setFlag(flag.longValue());
 				return args.get(0);
@@ -120,7 +121,7 @@ public class ModuleBase implements IInterpreterModule {
 
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
-												  IRuntimeStatus status) throws Exception {
+			                                      IRuntimeStatus status) throws Exception {
 				return new RuntimeObject(BigInteger.valueOf(args.get(0).getFlag()));
 			}
 		});
@@ -137,7 +138,7 @@ public class ModuleBase implements IInterpreterModule {
 
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
-												  IRuntimeStatus status) throws Exception {
+			                                      IRuntimeStatus status) throws Exception {
 				BigInteger flag = (BigInteger) args.get(1).getObj();
 				return new RuntimeObject(args.get(0).getFlag() == flag.longValue());
 			}
@@ -186,12 +187,12 @@ public class ModuleBase implements IInterpreterModule {
 
 			@Override
 			public RuntimeObjectType[] getArgsType() {
-				return new RuntimeObjectType[] { RuntimeObjectType.kObject };
+				return new RuntimeObjectType[]{RuntimeObjectType.kObject};
 			}
 
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
-					IRuntimeStatus status) throws Exception {
+			                                      IRuntimeStatus status) throws Exception {
 				logger.info(args.get(0).getObj());
 				return null;
 			}
@@ -209,7 +210,7 @@ public class ModuleBase implements IInterpreterModule {
 
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
-												  IRuntimeStatus status) throws Exception {
+			                                      IRuntimeStatus status) throws Exception {
 				logger.info(args.get(0));
 				return null;
 			}
@@ -222,14 +223,14 @@ public class ModuleBase implements IInterpreterModule {
 
 			@Override
 			public RuntimeObjectType[] getArgsType() {
-				return new RuntimeObjectType[] { RuntimeObjectType.kObject };
+				return new RuntimeObjectType[]{RuntimeObjectType.kObject};
 			}
 
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
-					IRuntimeStatus status) throws Exception {
+			                                      IRuntimeStatus status) throws Exception {
 				Object[] info = status.getProcInfo();
-                logger.info(String.format("#%03d [%s] %s", status.getPid(), info[2], args.get(0).getObj()));
+				logger.info(String.format("#%03d [%s] %s", status.getPid(), info[2], args.get(0).getObj()));
 				return null;
 			}
 		});
@@ -248,7 +249,7 @@ public class ModuleBase implements IInterpreterModule {
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) throws Exception {
 				Object[] info = status.getProcInfo();
-                logger.debug(String.format("#%03d [%s] %s", status.getPid(), info[2], args.get(0).getObj()));
+				logger.debug(String.format("#%03d [%s] %s", status.getPid(), info[2], args.get(0).getObj()));
 				return null;
 			}
 		});
@@ -260,12 +261,12 @@ public class ModuleBase implements IInterpreterModule {
 
 			@Override
 			public RuntimeObjectType[] getArgsType() {
-				return new RuntimeObjectType[] { RuntimeObjectType.kObject };
+				return new RuntimeObjectType[]{RuntimeObjectType.kObject};
 			}
 
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
-					IRuntimeStatus status) throws Exception {
+			                                      IRuntimeStatus status) throws Exception {
 				logger.error(args.get(0).getObj());
 				return null;
 			}
@@ -278,12 +279,12 @@ public class ModuleBase implements IInterpreterModule {
 
 			@Override
 			public RuntimeObjectType[] getArgsType() {
-				return new RuntimeObjectType[] { RuntimeObjectType.kObject };
+				return new RuntimeObjectType[]{RuntimeObjectType.kObject};
 			}
 
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
-					IRuntimeStatus status) {
+			                                      IRuntimeStatus status) {
 				RuntimeObject obj = args.get(0);
 				if (obj == null) {
 					return new RuntimeObject(null);
@@ -294,17 +295,17 @@ public class ModuleBase implements IInterpreterModule {
 		info.addExternalFunc("g_new", new IRuntimeDebugExec() {
 			@Override
 			public String getDoc() {
-                return "深拷贝";
-            }
+				return "深拷贝";
+			}
 
 			@Override
 			public RuntimeObjectType[] getArgsType() {
-				return new RuntimeObjectType[] { RuntimeObjectType.kObject };
+				return new RuntimeObjectType[]{RuntimeObjectType.kObject};
 			}
 
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
-					IRuntimeStatus status) throws Exception {
+			                                      IRuntimeStatus status) throws Exception {
 				return args.get(0).clone();
 			}
 		});
@@ -316,12 +317,12 @@ public class ModuleBase implements IInterpreterModule {
 
 			@Override
 			public RuntimeObjectType[] getArgsType() {
-				return new RuntimeObjectType[] { RuntimeObjectType.kString };
+				return new RuntimeObjectType[]{RuntimeObjectType.kString};
 			}
 
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
-					IRuntimeStatus status) throws Exception {
+			                                      IRuntimeStatus status) throws Exception {
 				return new RuntimeObject(status.getHelpString(args.get(0)
 						.getObj().toString()));
 			}
@@ -334,12 +335,12 @@ public class ModuleBase implements IInterpreterModule {
 
 			@Override
 			public RuntimeObjectType[] getArgsType() {
-				return new RuntimeObjectType[] { RuntimeObjectType.kObject };
+				return new RuntimeObjectType[]{RuntimeObjectType.kObject};
 			}
 
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
-					IRuntimeStatus status) throws Exception {
+			                                      IRuntimeStatus status) throws Exception {
 				return new RuntimeObject(args.get(0).getTypeName());
 			}
 		});
@@ -368,35 +369,35 @@ public class ModuleBase implements IInterpreterModule {
 
 			@Override
 			public RuntimeObjectType[] getArgsType() {
-				return new RuntimeObjectType[] { RuntimeObjectType.kObject };
+				return new RuntimeObjectType[]{RuntimeObjectType.kObject};
 			}
 
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
-												  IRuntimeStatus status) throws Exception {
+			                                      IRuntimeStatus status) throws Exception {
 				return new RuntimeObject(args.get(0).getTypeString());
 			}
 		});
-        info.addExternalFunc("g_hash", new IRuntimeDebugExec() {
-            @Override
-            public String getDoc() {
-                return "获取哈希";
-            }
+		info.addExternalFunc("g_hash", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "获取哈希";
+			}
 
-            @Override
-            public RuntimeObjectType[] getArgsType() {
-                return new RuntimeObjectType[]{RuntimeObjectType.kObject};
-            }
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kObject};
+			}
 
-            @Override
-            public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
-                                                  IRuntimeStatus status) throws Exception {
-                if (args.get(0).getObj() == null)
-                    return new RuntimeObject("NULL");
-                return new RuntimeObject(String.valueOf(args.get(0).getObj().hashCode()));
-            }
-        });
-        info.addExternalFunc("g_exit", new IRuntimeDebugExec() {
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				if (args.get(0).getObj() == null)
+					return new RuntimeObject("NULL");
+				return new RuntimeObject(String.valueOf(args.get(0).getObj().hashCode()));
+			}
+		});
+		info.addExternalFunc("g_exit", new IRuntimeDebugExec() {
 			@Override
 			public String getDoc() {
 				return "程序退出";
@@ -409,7 +410,7 @@ public class ModuleBase implements IInterpreterModule {
 
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
-					IRuntimeStatus status) throws Exception {
+			                                      IRuntimeStatus status) throws Exception {
 				throw new RuntimeException(RuntimeError.EXIT, -1, "用户自行退出");
 			}
 		});
@@ -421,12 +422,12 @@ public class ModuleBase implements IInterpreterModule {
 
 			@Override
 			public RuntimeObjectType[] getArgsType() {
-				return new RuntimeObjectType[] { RuntimeObjectType.kString };
+				return new RuntimeObjectType[]{RuntimeObjectType.kString};
 			}
 
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
-					IRuntimeStatus status) throws Exception {
+			                                      IRuntimeStatus status) throws Exception {
 				return new RuntimeObject(BigInteger.valueOf(status.runProcess(args.get(0).getObj().toString())));
 			}
 		});
@@ -438,7 +439,7 @@ public class ModuleBase implements IInterpreterModule {
 
 			@Override
 			public RuntimeObjectType[] getArgsType() {
-				return new RuntimeObjectType[] { RuntimeObjectType.kString };
+				return new RuntimeObjectType[]{RuntimeObjectType.kString};
 			}
 
 			@Override
@@ -455,7 +456,7 @@ public class ModuleBase implements IInterpreterModule {
 
 			@Override
 			public RuntimeObjectType[] getArgsType() {
-				return new RuntimeObjectType[] { RuntimeObjectType.kString };
+				return new RuntimeObjectType[]{RuntimeObjectType.kString};
 			}
 
 			@Override
@@ -472,7 +473,7 @@ public class ModuleBase implements IInterpreterModule {
 
 			@Override
 			public RuntimeObjectType[] getArgsType() {
-				return new RuntimeObjectType[] { RuntimeObjectType.kString };
+				return new RuntimeObjectType[]{RuntimeObjectType.kString};
 			}
 
 			@Override
@@ -489,12 +490,12 @@ public class ModuleBase implements IInterpreterModule {
 
 			@Override
 			public RuntimeObjectType[] getArgsType() {
-				return new RuntimeObjectType[] { RuntimeObjectType.kString };
+				return new RuntimeObjectType[]{RuntimeObjectType.kString};
 			}
 
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
-					IRuntimeStatus status) throws Exception {
+			                                      IRuntimeStatus status) throws Exception {
 				try {
 					BufferedReader br = new BufferedReader(new FileReader(args
 							.get(0).getObj().toString()));

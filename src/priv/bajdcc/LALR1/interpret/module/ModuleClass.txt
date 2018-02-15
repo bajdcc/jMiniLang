@@ -30,7 +30,7 @@ var g_has_property = func ~(class, name) {
     return call g_has_property(base, name);
 };
 export "g_has_property";
-var set_property_rec = func ~(class, name, property) {
+var g_set_property_rec = func ~(class, name, property) {
     if (call g_map_contains(class, name)) {
         call g_map_put(class, name, property);
         return true;
@@ -39,11 +39,12 @@ var set_property_rec = func ~(class, name, property) {
     if (call g_is_null(base)) {
         return false;
     }
-    if (!call set_property_rec(base, name, property)) {
+    if (!call g_set_property_rec(base, name, property)) {
         call g_map_put(class, name, property);
     }
     return true;
 };
+export "g_set_property_rec";
 var g_set_property = func ~(class, name, property) {
     if (call g_map_contains(class, name)) {
         call g_map_put(class, name, property);
@@ -54,7 +55,7 @@ var g_set_property = func ~(class, name, property) {
         call g_map_put(class, name, property);
         return false;
     }
-    if (!call set_property_rec(base, name, property)) {
+    if (!call g_set_property_rec(base, name, property)) {
         call g_map_put(class, name, property);
     }
     return true;
@@ -74,16 +75,16 @@ var g_invoke_method = func ~(class, name) {
         var _cnt = call g_array_size(_before);
         var _i = 0;
         var _suc = false;
-        var __next = lambda() {
+        var __next01 = func __next01() {
             if (_i >= _cnt) {
                 let _suc = true;
                 return;
             }
             var __before = call g_array_get(_before, _i);
             _i++;
-            return call __before(class."__type__", name, class, __next);
+            return call __before(class."__type__", name, class, __next01);
         };
-        var ret = call __next();
+        var ret = call __next01();
         if (!_suc) {
             return ret;
         }
@@ -94,16 +95,16 @@ var g_invoke_method = func ~(class, name) {
         var _cnt = call g_array_size(_after);
         var _i = 0;
         var _suc = false;
-        var __next = lambda() {
+        var __next02 = func __next02() {
             if (_i >= _cnt) {
                 let _suc = true;
                 return r;
             }
             var __after = call g_array_get(_after, _i);
             _i++;
-            return call __after(class."__type__", name, class, r, __next);
+            return call __after(class."__type__", name, class, r, __next02);
         };
-        var ret = call __next();
+        var ret = call __next02();
         if (!_suc) {
             return ret;
         }
@@ -120,16 +121,16 @@ var method = class.name;
         var _cnt = call g_array_size(_before);
         var _i = 0;
         var _suc = false;
-        var __next = lambda() {
+        var __next11 = func __next11() {
             if (_i >= _cnt) {
                 let _suc = true;
                 return;
             }
             var __before = call g_array_get(_before, _i);
             _i++;
-            return call __before(class."__type__", name, class, __next, arg1);
+            return call __before(class."__type__", name, class, __next11, arg1);
         };
-        var ret = call __next();
+        var ret = call __next11();
         if (!_suc) {
             return ret;
         }
@@ -140,16 +141,16 @@ var method = class.name;
         var _cnt = call g_array_size(_after);
         var _i = 0;
         var _suc = false;
-        var __next = lambda() {
+        var __next12 = func __next12() {
             if (_i >= _cnt) {
                 let _suc = true;
                 return r;
             }
             var __after = call g_array_get(_after, _i);
             _i++;
-            return call __after(class."__type__", name, class, r, __next, arg1);
+            return call __after(class."__type__", name, class, r, __next12, arg1);
         };
-        var ret = call __next();
+        var ret = call __next12();
         if (!_suc) {
             return ret;
         }
@@ -166,16 +167,16 @@ var method = class.name;
         var _cnt = call g_array_size(_before);
         var _i = 0;
         var _suc = false;
-        var __next = lambda() {
+        var __next21 = func __next21() {
             if (_i >= _cnt) {
                 let _suc = true;
                 return;
             }
             var __before = call g_array_get(_before, _i);
             _i++;
-            return call __before(class."__type__", name, class, __next, arg1, arg2);
+            return call __before(class."__type__", name, class, __next21, arg1, arg2);
         };
-        var ret = call __next();
+        var ret = call __next21();
         if (!_suc) {
             return ret;
         }
@@ -186,16 +187,16 @@ var method = class.name;
         var _cnt = call g_array_size(_after);
         var _i = 0;
         var _suc = false;
-        var __next = lambda() {
+        var __next22 = func __next22() {
             if (_i >= _cnt) {
                 let _suc = true;
                 return r;
             }
             var __after = call g_array_get(_after, _i);
             _i++;
-            return call __after(class."__type__", name, class, r, __next, arg1, arg2);
+            return call __after(class."__type__", name, class, r, __next22, arg1, arg2);
         };
-        var ret = call __next();
+        var ret = call __next22();
         if (!_suc) {
             return ret;
         }
@@ -212,16 +213,16 @@ var method = class.name;
         var _cnt = call g_array_size(_before);
         var _i = 0;
         var _suc = false;
-        var __next = lambda() {
+        var __next31 = func __next31() {
             if (_i >= _cnt) {
                 let _suc = true;
                 return;
             }
             var __before = call g_array_get(_before, _i);
             _i++;
-            return call __before(class."__type__", name, class, __next, arg1, arg2, arg3);
+            return call __before(class."__type__", name, class, __next31, arg1, arg2, arg3);
         };
-        var ret = call __next();
+        var ret = call __next31();
         if (!_suc) {
             return ret;
         }
@@ -232,16 +233,16 @@ var method = class.name;
         var _cnt = call g_array_size(_after);
         var _i = 0;
         var _suc = false;
-        var __next = lambda() {
+        var __next32 = func __next32() {
             if (_i >= _cnt) {
                 let _suc = true;
                 return r;
             }
             var __after = call g_array_get(_after, _i);
             _i++;
-            return call __after(class."__type__", name, class, r, __next, arg1, arg2, arg3);
+            return call __after(class."__type__", name, class, r, __next32, arg1, arg2, arg3);
         };
-        var ret = call __next();
+        var ret = call __next32();
         if (!_suc) {
             return ret;
         }
@@ -258,16 +259,16 @@ var method = class.name;
         var _cnt = call g_array_size(_before);
         var _i = 0;
         var _suc = false;
-        var __next = lambda() {
+        var __next41 = func __next41() {
             if (_i >= _cnt) {
                 let _suc = true;
                 return;
             }
             var __before = call g_array_get(_before, _i);
             _i++;
-            return call __before(class."__type__", name, class, __next, arg1, arg2, arg3, arg4);
+            return call __before(class."__type__", name, class, __next41, arg1, arg2, arg3, arg4);
         };
-        var ret = call __next();
+        var ret = call __next41();
         if (!_suc) {
             return ret;
         }
@@ -278,16 +279,16 @@ var method = class.name;
         var _cnt = call g_array_size(_after);
         var _i = 0;
         var _suc = false;
-        var __next = lambda() {
+        var __next42 = func __next42() {
             if (_i >= _cnt) {
                 let _suc = true;
                 return r;
             }
             var __after = call g_array_get(_after, _i);
             _i++;
-            return call __after(class."__type__", name, class, r, __next, arg1, arg2, arg3, arg4);
+            return call __after(class."__type__", name, class, r, __next42, arg1, arg2, arg3, arg4);
         };
-        var ret = call __next();
+        var ret = call __next42();
         if (!_suc) {
             return ret;
         }
@@ -304,16 +305,16 @@ var method = class.name;
         var _cnt = call g_array_size(_before);
         var _i = 0;
         var _suc = false;
-        var __next = lambda() {
+        var __next51 = func __next51() {
             if (_i >= _cnt) {
                 let _suc = true;
                 return;
             }
             var __before = call g_array_get(_before, _i);
             _i++;
-            return call __before(class."__type__", name, class, __next, arg1, arg2, arg3, arg4, arg5);
+            return call __before(class."__type__", name, class, __next51, arg1, arg2, arg3, arg4, arg5);
         };
-        var ret = call __next();
+        var ret = call __next51();
         if (!_suc) {
             return ret;
         }
@@ -324,16 +325,16 @@ var method = class.name;
         var _cnt = call g_array_size(_after);
         var _i = 0;
         var _suc = false;
-        var __next = lambda() {
+        var __next52 = func __next52() {
             if (_i >= _cnt) {
                 let _suc = true;
                 return r;
             }
             var __after = call g_array_get(_after, _i);
             _i++;
-            return call __after(class."__type__", name, class, r, __next, arg1, arg2, arg3, arg4, arg5);
+            return call __after(class."__type__", name, class, r, __next52, arg1, arg2, arg3, arg4, arg5);
         };
-        var ret = call __next();
+        var ret = call __next52();
         if (!_suc) {
             return ret;
         }
@@ -350,16 +351,16 @@ var method = class.name;
         var _cnt = call g_array_size(_before);
         var _i = 0;
         var _suc = false;
-        var __next = lambda() {
+        var __next61 = func __next61() {
             if (_i >= _cnt) {
                 let _suc = true;
                 return;
             }
             var __before = call g_array_get(_before, _i);
             _i++;
-            return call __before(class."__type__", name, class, __next, arg1, arg2, arg3, arg4, arg5, arg6);
+            return call __before(class."__type__", name, class, __next61, arg1, arg2, arg3, arg4, arg5, arg6);
         };
-        var ret = call __next();
+        var ret = call __next61();
         if (!_suc) {
             return ret;
         }
@@ -370,16 +371,16 @@ var method = class.name;
         var _cnt = call g_array_size(_after);
         var _i = 0;
         var _suc = false;
-        var __next = lambda() {
+        var __next62 = func __next62() {
             if (_i >= _cnt) {
                 let _suc = true;
                 return r;
             }
             var __after = call g_array_get(_after, _i);
             _i++;
-            return call __after(class."__type__", name, class, r, __next, arg1, arg2, arg3, arg4, arg5, arg6);
+            return call __after(class."__type__", name, class, r, __next62, arg1, arg2, arg3, arg4, arg5, arg6);
         };
-        var ret = call __next();
+        var ret = call __next62();
         if (!_suc) {
             return ret;
         }
@@ -396,16 +397,16 @@ var method = class.name;
         var _cnt = call g_array_size(_before);
         var _i = 0;
         var _suc = false;
-        var __next = lambda() {
+        var __next71 = func __next71() {
             if (_i >= _cnt) {
                 let _suc = true;
                 return;
             }
             var __before = call g_array_get(_before, _i);
             _i++;
-            return call __before(class."__type__", name, class, __next, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+            return call __before(class."__type__", name, class, __next71, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
         };
-        var ret = call __next();
+        var ret = call __next71();
         if (!_suc) {
             return ret;
         }
@@ -416,16 +417,16 @@ var method = class.name;
         var _cnt = call g_array_size(_after);
         var _i = 0;
         var _suc = false;
-        var __next = lambda() {
+        var __next72 = func __next72() {
             if (_i >= _cnt) {
                 let _suc = true;
                 return r;
             }
             var __after = call g_array_get(_after, _i);
             _i++;
-            return call __after(class."__type__", name, class, r, __next, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+            return call __after(class."__type__", name, class, r, __next72, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
         };
-        var ret = call __next();
+        var ret = call __next72();
         if (!_suc) {
             return ret;
         }
@@ -442,16 +443,16 @@ var method = class.name;
         var _cnt = call g_array_size(_before);
         var _i = 0;
         var _suc = false;
-        var __next = lambda() {
+        var __next81 = func __next81() {
             if (_i >= _cnt) {
                 let _suc = true;
                 return;
             }
             var __before = call g_array_get(_before, _i);
             _i++;
-            return call __before(class."__type__", name, class, __next, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+            return call __before(class."__type__", name, class, __next81, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
         };
-        var ret = call __next();
+        var ret = call __next81();
         if (!_suc) {
             return ret;
         }
@@ -462,16 +463,16 @@ var method = class.name;
         var _cnt = call g_array_size(_after);
         var _i = 0;
         var _suc = false;
-        var __next = lambda() {
+        var __next82 = func __next82() {
             if (_i >= _cnt) {
                 let _suc = true;
                 return r;
             }
             var __after = call g_array_get(_after, _i);
             _i++;
-            return call __after(class."__type__", name, class, r, __next, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+            return call __after(class."__type__", name, class, r, __next82, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
         };
-        var ret = call __next();
+        var ret = call __next82();
         if (!_suc) {
             return ret;
         }
@@ -488,16 +489,16 @@ var method = class.name;
         var _cnt = call g_array_size(_before);
         var _i = 0;
         var _suc = false;
-        var __next = lambda() {
+        var __next91 = func __next91() {
             if (_i >= _cnt) {
                 let _suc = true;
                 return;
             }
             var __before = call g_array_get(_before, _i);
             _i++;
-            return call __before(class."__type__", name, class, __next, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
+            return call __before(class."__type__", name, class, __next91, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
         };
-        var ret = call __next();
+        var ret = call __next91();
         if (!_suc) {
             return ret;
         }
@@ -508,16 +509,16 @@ var method = class.name;
         var _cnt = call g_array_size(_after);
         var _i = 0;
         var _suc = false;
-        var __next = lambda() {
+        var __next92 = func __next92() {
             if (_i >= _cnt) {
                 let _suc = true;
                 return r;
             }
             var __after = call g_array_get(_after, _i);
             _i++;
-            return call __after(class."__type__", name, class, r, __next, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
+            return call __after(class."__type__", name, class, r, __next92, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
         };
-        var ret = call __next();
+        var ret = call __next92();
         if (!_suc) {
             return ret;
         }

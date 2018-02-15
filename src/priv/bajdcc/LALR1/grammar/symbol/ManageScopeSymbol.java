@@ -30,6 +30,7 @@ public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
 	private HashListMapEx<String, Function> funcMap = new HashListMapEx<>();
 	private ArrayList<HashSet<String>> stkScope = new ArrayList<>();
 	private Stack<Integer> stkLambdaId = new Stack<>();
+	private Stack<Integer> stkLambdaLine = new Stack<>();
 	private HashSet<String> symbolsInFutureBlock = new HashSet<>();
 	private HashMap<BlockType, Integer> blockLevel = new HashMap<>();
 	private Stack<BlockType> blockStack = new Stack<>();
@@ -132,7 +133,8 @@ public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
 	@Override
 	public Function getLambda() {
 		int lambdaId = stkLambdaId.pop();
-		return funcMap.get(LAMBDA_PREFIX + lambdaId);
+		int lambdaLine = stkLambdaLine.pop();
+		return funcMap.get(LAMBDA_PREFIX + lambdaId + "!" + lambdaLine);
 	}
 
 	@Override
@@ -155,8 +157,9 @@ public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
 	@Override
 	public void registerLambda(Function func) {
 		stkLambdaId.push(lambdaId);
+		stkLambdaLine.push(func.getName().position.iLine);
 		func.getName().kToken = TokenType.ID;
-		func.setRealName(LAMBDA_PREFIX + lambdaId++);
+		func.setRealName(LAMBDA_PREFIX + (lambdaId++) + "!" + stkLambdaLine.peek());
 		funcMap.add(func.getRealName(), func);
 	}
 
@@ -226,16 +229,16 @@ public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
 	@Override
 	public void enterBlock(BlockType type) {
 		switch (type) {
-		case kCycle:
-			int level = blockLevel.get(type);
-			blockLevel.put(type, level + 1);
-			break;
-		case kFunc:
-		case kYield:
-			blockStack.push(type);
-			break;
-		default:
-			break;
+			case kCycle:
+				int level = blockLevel.get(type);
+				blockLevel.put(type, level + 1);
+				break;
+			case kFunc:
+			case kYield:
+				blockStack.push(type);
+				break;
+			default:
+				break;
 
 		}
 	}
@@ -243,31 +246,31 @@ public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
 	@Override
 	public void leaveBlock(BlockType type) {
 		switch (type) {
-		case kCycle:
-			int level = blockLevel.get(type);
-			blockLevel.put(type, level - 1);
-			break;
-		case kFunc:
-		case kYield:
-			if (blockStack.peek() == type) {
-				blockStack.pop();
-			}
-			break;
-		default:
-			break;
+			case kCycle:
+				int level = blockLevel.get(type);
+				blockLevel.put(type, level - 1);
+				break;
+			case kFunc:
+			case kYield:
+				if (blockStack.peek() == type) {
+					blockStack.pop();
+				}
+				break;
+			default:
+				break;
 		}
 	}
 
 	@Override
 	public boolean isInBlock(BlockType type) {
 		switch (type) {
-		case kCycle:
-			return blockLevel.get(type) > 0;
-		case kFunc:
-		case kYield:
-			return !blockStack.isEmpty() && (blockStack.peek() == type);
-		default:
-			break;
+			case kCycle:
+				return blockLevel.get(type) > 0;
+			case kFunc:
+			case kYield:
+				return !blockStack.isEmpty() && (blockStack.peek() == type);
+			default:
+				break;
 		}
 		return false;
 	}

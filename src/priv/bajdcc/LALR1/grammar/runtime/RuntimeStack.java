@@ -77,6 +77,26 @@ public class RuntimeStack {
 		return null;
 	}
 
+	public RuntimeObject findVariable(String codePage, int idx) {
+		for (RuntimeFunc func : stkCall) {
+			if (func.getCurrentPage().equals(codePage)) {
+				List<HashMap<Integer, RuntimeObject>> tmp = func.getTmp();
+				RuntimeObject obj;
+				for (Map<Integer, RuntimeObject> scope : tmp) {
+					obj = scope.get(idx);
+					if (obj != null) {
+						return obj;
+					}
+				}
+				obj = func.getClosure().get(idx);
+				if (obj != null) {
+					return obj;
+				}
+			}
+		}
+		return null;
+	}
+
 	public void storeVariableDirect(int idx, RuntimeObject obj) {
 		stkCall.get(0).addTmp(idx, obj);
 	}

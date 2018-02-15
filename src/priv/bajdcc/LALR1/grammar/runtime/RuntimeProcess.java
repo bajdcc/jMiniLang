@@ -66,7 +66,7 @@ public class RuntimeProcess implements IRuntimeProcessService {
         while (schd()) {
             long span = System.currentTimeMillis() - last_time;
             if (span > 1000) {
-                stat.speed = 1000f * stat.cycle / span;
+                stat.speed = 1000.0 * stat.cycle / span;
                 stat.cycle = 0;
                 last_time = System.currentTimeMillis();
                 stat.procCache.clear();
@@ -285,8 +285,8 @@ public class RuntimeProcess implements IRuntimeProcessService {
 	}
 
     @Override
-    public String getSpeed() {
-        return String.valueOf(stat.speed);
+    public double getSpeed() {
+        return stat.speed;
 	}
 
 	@Override
@@ -358,7 +358,7 @@ public class RuntimeProcess implements IRuntimeProcessService {
 	}
 
     private class SystemStat {
-        public float speed;
+        public double speed;
         public int cycle;
         public List<Object[]> procCache;
 
