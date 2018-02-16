@@ -90,8 +90,6 @@ call g_register_class(ctx, "app::news::state.base", lambda(this) { // 状态基�
 # CLASS [app::news::state.begin]
 ----------------------------------------------------------------- */
 call g_register_class(ctx, "app::news::state.begin", lambda(this) { // 起始状态
-    set this::"overlay_animation" = call g_create_class(ctx, "app::news::util.static_timer");
-    invoke this."overlay_animation"::"set_span"(6);
     set this::"overlay_animation_waiting" = call g_create_class(ctx, "app::news::util.static_timer");
     invoke this."overlay_animation_waiting"::"set_span"(1);
     call g_hook_add_before(this, "on_start", lambda(class, name, this, next) {
@@ -101,17 +99,13 @@ call g_register_class(ctx, "app::news::state.begin", lambda(this) { // 起始状
     });
     call g_hook_add_before(this, "on_timer", lambda(class, name, this, next) {
         if (this."is_start") {
-            if (this."context"."is_open_overlay") {
-                invoke this::"log"("[Overlay] Created window");
-                invoke this."overlay_animation"::"restart"();
-                set this."context"::"is_open_overlay" = false;
-            }
-
-            if (!call g_is_null(this."overlay_animation") && invoke this."overlay_animation"::"is_timeout"()) {
-                invoke this."context"::"start_state"("app::news::state.queue");
-            } else if (invoke this."overlay_animation_waiting"::"is_timeout"()) {
+            if (invoke this."overlay_animation_waiting"::"is_timeout"()) {
                 invoke this::"log"("[Overlay] Waiting for animation completed...");
                 invoke this."overlay_animation_waiting"::"restart"();
+                if (this."context"."is_open_overlay") {
+                    invoke this::"log"("[Overlay] Created window");
+                    invoke this."context"::"start_state"("app::news::state.queue");
+                }
             }
         }
         return call next();
@@ -121,25 +115,23 @@ call g_register_class(ctx, "app::news::state.begin", lambda(this) { // 起始状
 # CLASS [app::news::state.end]
 ----------------------------------------------------------------- */
 call g_register_class(ctx, "app::news::state.end", lambda(this) { // 结束状态
-    set this::"overlay_animation" = call g_create_class(ctx, "app::news::util.static_timer");
-    invoke this."overlay_animation"::"set_span"(6);
     set this::"overlay_animation_waiting" = call g_create_class(ctx, "app::news::util.static_timer");
     invoke this."overlay_animation_waiting"::"set_span"(1);
     call g_hook_add_before(this, "on_start", lambda(class, name, this, next) {
         set this::"is_start" = true;
-        invoke this."overlay_animation"::"restart"();
         invoke this::"log"("[Overlay] Waiting for close...");
         invoke this."context"::"close_overlay"();
         return call next();
     });
     call g_hook_add_before(this, "on_timer", lambda(class, name, this, next) {
         if (this."is_start") {
-            if (invoke this."overlay_animation"::"is_timeout"()) {
-                invoke this::"log"("==> Idle <==");
-                invoke this."context"::"start_state"("app::news::state.idle");
-            } else if (invoke this."overlay_animation_waiting"::"is_timeout"()) {
+            if (invoke this."overlay_animation_waiting"::"is_timeout"()) {
+                invoke this."overlay_animation_waiting"::"restart"();
                 if (invoke this."context"::"has_msg"()) {
                     invoke this::"log"("[Overlay] Waiting for animation completed...");
+                } else {
+                    invoke this::"log"("==> Idle <==");
+                    invoke this."context"::"start_state"("app::news::state.idle");
                 }
             }
         }
@@ -378,11 +370,73 @@ call g_register_class(ctx, "app::news::news.context", lambda(this) {
         invoke state::"on_start"();
     };
     set this::"is_open_overlay" = false;
-    set this::"open_overlay" = lambda(this) {
+    set this::"signal" = _;
+    set this::"open_overlay_callback" = lambda(this) {
+        call g_set_process_desc("news overlay");
+        call g_printn("Timer overlay started");
+        var ms = 400;
+        var begin = call g_task_get_timestamp();
+        var final = begin + 5000;
+        var end = begin + ms;
+        var signal = this."signal";
+        invoke this."output"::"write"("Loading...");
+        while (true) {
+            var s = call g_query_share(signal);
+            if (call g_is_null(s) || !s) {
+                call g_printdn("NewsApp Overlay interrupt: #" + call g_get_pid());
+                break;
+            }
+            let begin = call g_task_get_timestamp();
+            if (final < begin) {
+                break;
+            }
+            if (end < begin) {
+                invoke this."output"::"write"(".");
+                let end = begin + ms;
+            } else {
+                call g_sleep(50);
+            }
+        }
+        invoke this."output"::"write"("\v");
+        call g_printn("Timer overlay exit");
         set this::"is_open_overlay" = true;
     };
-    set this::"close_overlay" = lambda(this) {
+    set this::"open_overlay" = lambda(this) {
+        invoke call g_create_class(ctx, "system::process")::"start_args"(this."open_overlay_callback", this);
+    };
+    set this::"close_overlay_callback" = lambda(this) {
+        call g_set_process_desc("news overlay");
+        call g_printn("Timer overlay started");
+        var ms = 400;
+        var begin = call g_task_get_timestamp();
+        var final = begin + 5000;
+        var end = begin + ms;
+        var signal = this."signal";
+        invoke this."output"::"write"("\v");
+        invoke this."output"::"write"("Closing...");
+        while (true) {
+            var s = call g_query_share(signal);
+            if (call g_is_null(s) || !s) {
+                call g_printdn("NewsApp Overlay interrupt: #" + call g_get_pid());
+                break;
+            }
+            let begin = call g_task_get_timestamp();
+            if (final < begin) {
+                break;
+            }
+            if (end < begin) {
+                invoke this."output"::"write"(".");
+                let end = begin + ms;
+            } else {
+                call g_sleep(50);
+            }
+        }
+        invoke this."output"::"write"("\v");
+        call g_printn("Timer overlay exit");
         set this::"is_open_overlay" = false;
+    };
+    set this::"close_overlay" = lambda(this) {
+        invoke call g_create_class(ctx, "system::process")::"start_args"(this."close_overlay_callback", this);
     };
 }, "object");
 /* -----------------------------------------------------------------
@@ -407,20 +461,21 @@ call g_register_class(ctx, "app::news::news.machine", lambda(this) {
                 break;
             }
             let begin = call g_task_get_timestamp();
-            if (end > begin) {
+            if (end < begin) {
                 invoke this."state_main"::"on_timer"();
                 invoke this."state_transfer"::"on_timer"();
                 invoke this."state_crawler"::"on_timer"();
+                let end = begin + ms;
             } else {
                 call g_sleep(50);
             }
-            let end = begin + ms;
         }
         call g_printn("Timer process exit");
     };
     call g_hook_add_before(this, "marquee", lambda(class, name, this, next) {
         var msg = invoke this."msg_list"::"pop"();
-        invoke this."output"::"writeln"(msg."str");
+        invoke this."output"::"write"("\v");
+        invoke this."output"::"write"(msg."str");
         call g_printn("Post message: " + msg."str");
         return 200 * invoke msg::"size"();
     });

@@ -146,6 +146,11 @@ public class UIGraphics {
 					}
 				}
 			}
+		} else if (c == '\2') {
+			for (ptr_x--; ptr_x >= 0; ptr_x--) {
+				drawChar('\0');
+			}
+			ptr_x = 0;
 		} else if (c == '\r') {
 			ptr_x = 0;
 		} else if (ptr_x == getCols() - 1) {

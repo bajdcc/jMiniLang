@@ -40,6 +40,8 @@ public class RegexStringUtility {
 			ch = '\b';
 		} else if (ch == 'f') {
 			ch = '\f';
+		} else if (ch == 'v') {
+			ch = '\2';
 		} else if (ch == 'x') {
 			ch = fromDigit(16, 2, error);
 		} else if (ch == 'o') {
