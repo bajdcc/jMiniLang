@@ -4,6 +4,7 @@ import "sys.proc";
 import "sys.string";
 import "sys.class";
 import "sys.task";
+import "sys.ui";
 import "std.base";
 
 call g_set_process_desc("test routinue");
@@ -269,7 +270,49 @@ call g_register_class(ctx, "app::news::state.transfer", lambda(this) { // 传送
 ----------------------------------------------------------------- */
 call g_register_class(ctx, "app::news::state.crawler", lambda(this) { // 抓取
     set this::"idle_timer" = call g_create_class(ctx, "app::news::util.static_timer");
-    invoke this."idle_timer"::"set_span"(300);
+    invoke this."idle_timer"::"set_span"(60);
+    set this::"rss_index" = 0;
+    set this::"rss_end" = 0;
+    set this::"rss_list" = call g_create_class(ctx, "list::array");
+    invoke this."rss_list"::"add"("http://news.baidu.com/n?cmd=1&class=civilnews&tn=rss");
+    invoke this."rss_list"::"add"("http://news.baidu.com/n?cmd=1&class=internews&tn=rss");
+    invoke this."rss_list"::"add"("http://news.baidu.com/n?cmd=1&class=mil&tn=rss");
+    invoke this."rss_list"::"add"("http://news.baidu.com/n?cmd=1&class=finannews&tn=rss");
+    invoke this."rss_list"::"add"("http://news.baidu.com/n?cmd=1&class=internet&tn=rss");
+    invoke this."rss_list"::"add"("http://news.baidu.com/n?cmd=1&class=housenews&tn=rss");
+    invoke this."rss_list"::"add"("http://news.baidu.com/n?cmd=1&class=autonews&tn=rss");
+    invoke this."rss_list"::"add"("http://news.baidu.com/n?cmd=1&class=sportnews&tn=rss");
+    invoke this."rss_list"::"add"("http://news.baidu.com/n?cmd=1&class=enternews&tn=rss");
+    invoke this."rss_list"::"add"("http://news.baidu.com/n?cmd=1&class=gamenews&tn=rss");
+    invoke this."rss_list"::"add"("http://news.baidu.com/n?cmd=1&class=edunews&tn=rss");
+    invoke this."rss_list"::"add"("http://news.baidu.com/n?cmd=1&class=technnews&tn=rss");
+    invoke this."rss_list"::"add"("http://news.baidu.com/n?cmd=1&class=socianews&tn=rss");
+    invoke this."rss_list"::"add"("http://news.baidu.com/n?cmd=1&class=shyf&tn=rss");
+    invoke this."rss_list"::"add"("http://news.baidu.com/n?cmd=1&class=shwx&tn=rss");
+    invoke this."rss_list"::"add"("http://news.baidu.com/n?cmd=1&class=zqsk&tn=rss");
+    invoke this."rss_list"::"add"("http://news.baidu.com/n?cmd=1&class=qwys&tn=rss");
+    invoke this."rss_list"::"add"("http://news.baidu.com/n?cmd=4&class=civilnews&tn=rss");
+    invoke this."rss_list"::"add"("http://news.baidu.com/n?cmd=4&class=internews&tn=rss");
+    invoke this."rss_list"::"add"("http://news.baidu.com/n?cmd=4&class=mil&tn=rss");
+    invoke this."rss_list"::"add"("http://news.baidu.com/n?cmd=4&class=finannews&tn=rss");
+    invoke this."rss_list"::"add"("http://news.baidu.com/n?cmd=4&class=internet&tn=rss");
+    invoke this."rss_list"::"add"("http://news.baidu.com/n?cmd=4&class=housenews&tn=rss");
+    invoke this."rss_list"::"add"("http://news.baidu.com/n?cmd=4&class=autonews&tn=rss");
+    invoke this."rss_list"::"add"("http://news.baidu.com/n?cmd=4&class=sportnews&tn=rss");
+    invoke this."rss_list"::"add"("http://news.baidu.com/n?cmd=4&class=enternews&tn=rss");
+    invoke this."rss_list"::"add"("http://news.baidu.com/n?cmd=4&class=gamenews&tn=rss");
+    invoke this."rss_list"::"add"("http://news.baidu.com/n?cmd=4&class=edunews&tn=rss");
+    invoke this."rss_list"::"add"("http://news.baidu.com/n?cmd=4&class=technnews&tn=rss");
+    invoke this."rss_list"::"add"("http://news.baidu.com/n?cmd=4&class=socianews&tn=rss");
+    set this::"rss_end" = invoke this."rss_list"::"size"();
+    set this::"get_rss" = lambda(this) {
+        if (this."rss_index" == this."rss_end") {
+            set this::"rss_index" = 0;
+        }
+        var idx = this."rss_index";
+        set this::"rss_index" = this."rss_index" + 1;
+        return invoke this."rss_list"::"get"(idx);
+    };
     call g_hook_add_before(this, "on_reset", lambda(class, name, this, next) {
         invoke this."idle_timer"::"reset"();
         return call next();
@@ -284,14 +327,25 @@ call g_register_class(ctx, "app::news::state.crawler", lambda(this) { // 抓取
         if (this."is_start" && invoke this."idle_timer"::"is_timeout_once"()) {
             invoke this."idle_timer"::"restart"();
             if (!invoke this."context"::"has_msg"()) {
+                var arr = call g_create_class(ctx, "list::array");
                 invoke this::"log"("[Crawler] Working...");
-                for (var i = 0; i < 10; i++) {
-                    var msg = call g_create_class(ctx, "string");
-                    set msg::"str" = "test message " + i;
-                    invoke this."context"."state_transfer"::"on_message"(msg);
-                    call g_sleep(100);
+                set arr::"array" = call g_task_get_fast_arg("net", "rss", invoke this::"get_rss"());
+                if (invoke arr::"empty"()) {
+                    invoke this::"log"("[Crawler] Failed!");
+                } else {
+                    invoke this::"log"("[Crawler] Fetched rss");
+                    var title = invoke arr::"get"(0);
+                    var len = invoke arr::"size"();
+                    for (var i = 1; i < len; i++) {
+                        var msg = call g_create_class(ctx, "string");
+                        set msg::"str" = invoke arr::"get"(i);
+                        i++;
+                        set msg::"title" = title;
+                        set msg::"desc" = invoke arr::"get"(i);
+                        invoke this."context"."state_transfer"::"on_message"(msg);
+                    }
+                    invoke this::"log"("[Crawler] Completed");
                 }
-                invoke this::"log"("[Crawler] Completed");
             }
         }
         return call next();
@@ -329,7 +383,7 @@ call g_register_class(ctx, "app::news::news.context", lambda(this) {
     };
     set this::"marquee" = lambda(this) -> _;
     set this::"idle_timer" = call g_create_class(ctx, "app::news::util.static_timer");
-    invoke this."idle_timer"::"set_span"(12);
+    invoke this."idle_timer"::"set_span"(5);
     set this::"on_error" = lambda(this, error) -> _;
     set this::"on_finish" = lambda(this) -> _;
     set this::"on_progress" = lambda(this, progress) -> _;
@@ -397,7 +451,7 @@ call g_register_class(ctx, "app::news::news.context", lambda(this) {
                 call g_sleep(50);
             }
         }
-        invoke this."output"::"write"("\v");
+        invoke this."output"::"write"("\f");
         call g_printn("Timer overlay exit");
         set this::"is_open_overlay" = true;
     };
@@ -431,7 +485,7 @@ call g_register_class(ctx, "app::news::news.context", lambda(this) {
                 call g_sleep(50);
             }
         }
-        invoke this."output"::"write"("\v");
+        invoke this."output"::"write"("\f");
         call g_printn("Timer overlay exit");
         set this::"is_open_overlay" = false;
     };
@@ -472,12 +526,20 @@ call g_register_class(ctx, "app::news::news.machine", lambda(this) {
         }
         call g_printn("Timer process exit");
     };
+    set this::"center" = lambda(this, str) {
+        var l = call g_ui_text_length(str);
+        var space = (70 - l) / 2;
+        return call g_string_rep(" ", space) + str;
+    };
     call g_hook_add_before(this, "marquee", lambda(class, name, this, next) {
         var msg = invoke this."msg_list"::"pop"();
-        invoke this."output"::"write"("\v");
-        invoke this."output"::"write"(msg."str");
+        invoke this."output"::"writeln"("\f" + g_endl);
+        invoke this."output"::"writeln"(invoke this::"center"("【" + msg."title" + "】") + g_endl + g_endl);
+        invoke this."output"::"writeln"("    " + msg."str" + g_endl);
+        invoke this."output"::"writeln"("    " + msg."desc" + g_endl);
+        invoke this."output"::"write"("    \ufff8 \ufff8 \ufff8 \ufff8 \ufff8");
         call g_printn("Post message: " + msg."str");
-        return 200 * invoke msg::"size"();
+        return 5000;
     });
     call g_hook_add_before(this, "start", lambda(class, name, this, next, output) {
         set this::"output" = output;
@@ -511,8 +573,12 @@ set output::"handle" = in;
 invoke machine::"start"(output);
 
 var typewrite = lambda(out, ch) {
+    if (ch == '\ufff8') {
+        call g_write_pipe(out, '.');
+        call g_task_sleep_signal(1, signal);
+        return;
+    }
     call g_write_pipe(out, ch);
-    call g_task_sleep_ms_signal(50, signal);
 };
 call g_read_pipe_args(in, lambda(ch, out) -> call typewrite(out, ch), out);
 

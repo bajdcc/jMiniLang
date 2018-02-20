@@ -115,7 +115,7 @@ public class UIGraphics {
 
 	private void draw(Graphics2D g, char c) {
 		drawIntern(g, c);
-		if (UIFontImage.isWideChar(c)) {
+		if (ptr_x > 0 && UIFontImage.isWideChar(c)) {
 			drawIntern(g, FILL_FONT_SPAN);
 		}
 	}

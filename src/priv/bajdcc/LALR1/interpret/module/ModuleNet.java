@@ -4,6 +4,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.log4j.Logger;
+import org.dom4j.Document;
+import org.dom4j.Node;
+import org.dom4j.io.SAXReader;
 import priv.bajdcc.LALR1.grammar.Grammar;
 import priv.bajdcc.LALR1.grammar.runtime.*;
 import priv.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
@@ -17,7 +20,10 @@ import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 【模块】网络
@@ -505,6 +511,50 @@ public class ModuleNet implements IInterpreterModule {
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 												  IRuntimeStatus status) {
 				return parseJsonSafe(String.valueOf(args.get(0).getObj()));
+			}
+		});
+		info.addExternalFunc("g_net_get_rss", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "RSS GET(BAIDU)";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kString};
+			}
+
+			@SuppressWarnings("unchecked")
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				String text = "";
+				String txt = String.valueOf(args.get(0).getObj());
+				logger.debug("Request url(rss): " + txt);
+				RuntimeArray array = new RuntimeArray();
+				final Pattern pattern = Pattern.compile("<br>(.*)<br />");
+				try {
+					SAXReader reader = new SAXReader();
+					Document document = reader.read(txt);
+					Node title = document.selectSingleNode("//title");
+					array.add(new RuntimeObject(title.getText()));
+					List<Node> list = document.selectNodes("//item");
+					for (Node item : list) {
+						String itemTitle = item.valueOf("title");
+						array.add(new RuntimeObject(itemTitle));
+						String itemDescription = item.valueOf("description");
+						Matcher matcher = pattern.matcher(itemDescription);
+						if (matcher.find()) {
+							array.add(new RuntimeObject(matcher.group(1)));
+						} else {
+							array.add(new RuntimeObject(itemDescription.replace("<br />", "")));
+						}
+					}
+					return new RuntimeObject(array);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				return new RuntimeObject(array);
 			}
 		});
 	}
