@@ -37,7 +37,8 @@ var g_live_process_array = func ~(pid) {
 };
 export "g_live_process_array";
 var g_lock_share = func ~(name) {
-    while (call g_try_lock_share(name)) {}};
+    while (call g_try_lock_share(name)) {}
+};
 export "g_lock_share";
 var g_read_pipe = func ~(handle, callback) {
     call g_printdn("Reading pipe: #" + call g_get_pid() + " -> #" + handle);

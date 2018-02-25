@@ -17,6 +17,7 @@ import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.util.concurrent.GlobalEventExecutor;
 
+import java.nio.charset.Charset;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -74,8 +75,8 @@ public class ModuleNetServer extends Thread {
                             ch.pipeline()
                                     .addLast("decoder", new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4))
                                     .addLast("encoder", new LengthFieldPrepender(4, false))
-                                    .addLast(new StringDecoder())
-                                    .addLast(new StringEncoder())
+                                    .addLast(new StringDecoder(Charset.forName("utf-8")))
+                                    .addLast(new StringEncoder(Charset.forName("utf-8")))
                                     .addLast(new ModuleNetServerHandler(msgQueue));
                         }
                     })

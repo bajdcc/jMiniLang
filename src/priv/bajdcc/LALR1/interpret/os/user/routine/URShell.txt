@@ -192,6 +192,7 @@ var parse_cmd = func ["PARSE"] ~(cmd, parse) {
 };
 
 var task_native = func ~(tid, msg, arg) {
+    if (call g_is_null(tid) || call g_is_null(msg)) { return; }
     if (tid == "net") {
         if (msg == "sshd") {
             return call g_to_string(call g_net_sshd(arg));

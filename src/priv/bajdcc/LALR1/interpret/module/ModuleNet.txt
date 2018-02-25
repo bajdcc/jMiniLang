@@ -117,7 +117,7 @@ var msg_send = func ~(in, out, signal, addr) {
     }
     var buf = [];
     var pipe = func ["PIPE"] ~(ch, out) {
-        if (ch == '\n' || ch == '\r') {
+        if (ch == '\n') {
             var str = call g_string_build(buf);
             call g_printn("Sending msg: " + str);
             call g_net_msg_client_send(str);
