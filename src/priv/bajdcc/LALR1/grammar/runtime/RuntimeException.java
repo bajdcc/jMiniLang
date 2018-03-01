@@ -32,6 +32,7 @@ public class RuntimeException extends Exception {
 		ARG_OVERFLOW("参数过多"),
 		UNDEFINED_CONVERT("未定义的强制转换"),
 		INVALID_INDEX("索引无效"),
+		INVALID_VARIABLE("变量查询失败"),
 		PROCESS_OVERFLOW("进程数量已达最大值"),
 		EMPTY_CALLSTACK("调用栈为空"),
 		MAX_HANDLE("句柄不足"),

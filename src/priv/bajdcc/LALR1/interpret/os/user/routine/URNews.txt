@@ -7,7 +7,7 @@ import "sys.task";
 import "sys.ui";
 import "std.base";
 
-call g_set_process_desc("test routinue");
+call g_set_process_desc("news routinue");
 var pid = call g_get_pid();
 var share = call g_wait_share("PID#" + pid);
 call g_stop_share("PID#" + pid);

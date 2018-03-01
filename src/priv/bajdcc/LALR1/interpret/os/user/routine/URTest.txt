@@ -7,6 +7,8 @@ import "sys.class";
 import "sys.math";
 import "sys.ui";
 import "module.lisp";
+import "std.base";
+import "std.shell";
 
 call g_set_process_desc("test routinue");
 var pid = call g_get_pid();
@@ -694,6 +696,24 @@ var stage_class = func ~() {
     call g_hook_remove_before(square, "get_index", before_1);
 };
 
+// ---------------------------------------------
+// BASH
+
+var stage_bash = func ~() {
+    var ctx = call g_create_context();
+    call g_import_std_base(ctx);
+    call g_import_std_shell(ctx);
+    var shell = call g_create_class(ctx, "system::shell");
+    invoke shell::"exec"("@ui on monitor");
+    invoke shell::"exec"("range 1 10");
+    invoke shell::"exec"("range 1 10 | dup 2 | grep 2");
+    invoke shell::"exec"("range 1 10 | > &");
+    invoke shell::"exec"("range 1 100 | > $/tmp/a");
+    invoke shell::"exec"("< $/tmp/a | dup 2 | grep 2 | > &");
+    invoke shell::"exec"("< $/tmp/a | dup 2 | grep 2 | count | > &");
+    invoke shell::"exec"("< $/tmp/a | sleep 1 | pipe 10 | > &");
+    invoke shell::"exec"("echo Made_by_bajdcc | > &&");
+};
 
 var name = call g_array_get(args, 0);
 if (call g_is_null(name)) {
@@ -711,6 +731,8 @@ if (call g_is_null(name)) {
     call stage_fork();
 } else if (name == "class") {
     call stage_class();
+} else if (name == "bash") {
+    call stage_bash();
 } else {
     call g_read_pipe_args(in, lambda(ch, out) -> call g_write_pipe(out, ch), out);
 }

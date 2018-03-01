@@ -52,7 +52,7 @@ var parse_cmd_1 = func ["PARSE"] ~(arg) {
     let exe = call g_string_trim(exe);
     var _args = call g_string_split(exe, " ");
     var args = [];
-    foreach (var s :call g_range_array(_args)) {
+    foreach (var s : call g_range_array(_args)) {
         var ss = call g_string_trim(s);
         if (!call g_string_empty(ss)) {
             call g_array_add(args, ss);

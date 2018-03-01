@@ -10,6 +10,7 @@ import priv.bajdcc.LALR1.grammar.runtime.service.IRuntimeService;
 import priv.bajdcc.LALR1.grammar.type.TokenTools;
 import priv.bajdcc.LALR1.interpret.module.*;
 import priv.bajdcc.LALR1.interpret.module.std.ModuleStdBase;
+import priv.bajdcc.LALR1.interpret.module.std.ModuleStdShell;
 import priv.bajdcc.LALR1.syntax.handler.SyntaxException;
 import priv.bajdcc.util.HashListMapEx;
 import priv.bajdcc.util.lexer.token.OperatorType;
@@ -63,6 +64,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 					ModuleFile.getInstance(),
 					ModuleClass.getInstance(),
 					ModuleStdBase.getInstance(),
+					ModuleStdShell.getInstance(),
 			};
 		}
 
@@ -153,8 +155,10 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	}
 
 	public void add(String name, RuntimeCodePage page) throws Exception {
+		if (pageName != null && name != null && pageName.equals(name))
+			return;
 		if (pageMap.contains(name)) {
-			throw new RuntimeException(RuntimeError.DUP_PAGENAME, -1, "请更改名称");
+			err(RuntimeError.DUP_PAGENAME, "代码页 " + pageName + " 加载 " + name);
 		}
 		pageMap.add(name, page);
 		pageRefer.put(name, new ArrayList<>());
@@ -167,6 +171,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 		currentPage = page;
 		stack.reg.pageId = name;
 		stack.reg.execId = 0;
+		stack.setMachine(this);
 		switchPage();
 		runInsts();
 	}
@@ -489,7 +494,23 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 		int envSize = loadInt();
 		for (int i = 0; i < envSize; i++) {
 			int id = loadInt();
-			func.addEnv(id, stack.findVariable(func.getPage(), id));
+			if (id == -1) {
+				id = loadInt();
+				String name = fetchFromGlobalData(id).getObj().toString();
+				List<RuntimeCodePage> refers = pageRefer.get(currentPage.getInfo()
+						.getDataMap().get("name").toString());
+				for (RuntimeCodePage page : refers) {
+					IRuntimeDebugValue value = page.getInfo().getValueCallByName(name);
+					if (value != null) {
+						func.addEnv(id, value.getRuntimeObject());
+						stack.pushData(obj);
+						return;
+					}
+				}
+				err(RuntimeError.WRONG_LOAD_EXTERN, name);
+			} else {
+				func.addEnv(id, stack.findVariable(func.getPage(), id));
+			}
 		}
 		stack.pushData(obj);
 	}

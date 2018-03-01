@@ -7,6 +7,7 @@ import priv.bajdcc.LALR1.grammar.runtime.RuntimeInst;
 import priv.bajdcc.LALR1.grammar.semantic.ISemanticRecorder;
 import priv.bajdcc.LALR1.grammar.tree.closure.ClosureScope;
 import priv.bajdcc.LALR1.grammar.tree.closure.IClosureScope;
+import priv.bajdcc.LALR1.grammar.type.TokenTools;
 
 /**
  * 【语义分析】函数定义表达式
@@ -65,6 +66,8 @@ public class ExpFunc extends ClosureScope implements IExp {
 		} else {
 			for (Object obj : closure) {
 				codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(obj));
+				if (obj instanceof String && TokenTools.isExternalName(String.valueOf(obj)))
+					codegen.genCode(RuntimeInst.ipush, -1); // iloadx
 			}
 			codegen.genCode(RuntimeInst.ipush, closure.size());
 		}

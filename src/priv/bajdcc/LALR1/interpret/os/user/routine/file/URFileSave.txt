@@ -2,6 +2,7 @@ import "sys.base";
 import "sys.proc";
 import "sys.list";
 import "sys.file";
+import "sys.ui";
 
 call g_set_process_desc("save routinue");
 var pid = call g_get_pid();
@@ -17,21 +18,29 @@ call g_start_share(signal, true);
 
 if (call g_array_empty(args)) {
     call g_write_pipe(out, "USAGE: > [filename] [encoding=u/g/a]" + g_endl);
+    call g_write_pipe(out, "       > & (redirect to stdout)" + g_endl);
 } else {
     var filename = call g_array_get(args, 0);
-    var function = "g_write_file_utf8";
-    if (call g_array_size(args) > 1) {
-        var enc = call g_array_get(args, 1);
-        if (enc == "u") {
-            //let function = "g_write_file_utf8";
-        } else if (enc == "g") {
-            let function = "g_write_file_gbk";
-        } else if (enc == "a") {
-            let function = "g_write_file_ascii";
+    if (filename == "&") {
+        call g_read_pipe(in, lambda(ch) -> call g_ui_print(ch));
+    } else if (filename == "&&") {
+        call g_read_pipe(in, lambda(ch) -> call g_ui_print(ch));
+        call g_ui_print(g_endl);
+    } else {
+        var function = "g_write_file_utf8";
+        if (call g_array_size(args) > 1) {
+            var enc = call g_array_get(args, 1);
+            if (enc == "u") {
+                //let function = "g_write_file_utf8";
+            } else if (enc == "g") {
+                let function = "g_write_file_gbk";
+            } else if (enc == "a") {
+                let function = "g_write_file_ascii";
+            }
         }
-    }
-    if (!call function(filename, in)) {
-        call g_write_pipe(out, "Error: Write file failed!" + g_endl);
+        if (!call function(filename, in)) {
+            call g_write_pipe(out, "Error: Write file failed!" + g_endl);
+        }
     }
 }
 

@@ -1,0 +1,172 @@
+import "sys.base";
+import "sys.proc";
+import "sys.list";
+import "sys.string";
+import "sys.class";
+import "sys.proc";
+import "sys.task";
+import "sys.ui";
+import "sys.net";
+import "sys.file";
+
+var import_shell_class = func ~(ctx) {
+    var parse_cmd_1 = func ["PARSE"] ~(arg) {
+        var pid = call g_get_pid();
+        var parse = call g_map_get(arg, "parse");
+        var cmd = call g_map_get(arg, "args");
+        var parent = call g_map_get(arg, "parent");
+        var exe = call g_array_pop(cmd);
+        let exe = call g_string_trim(exe);
+        var _args = call g_string_split(exe, " ");
+        var args = [];
+        foreach (var s : call g_range_array(_args)) {
+            var ss = call g_string_trim(s);
+            if (!call g_string_empty(ss)) {
+                call g_array_add(args, ss);
+            }
+        }
+        var exec = call g_array_get(args, 0);
+        call g_array_remove(args, 0);
+        var share = {};
+        call g_map_put(share, "args", args);
+        call g_set_process_desc("shell: " + exec);
+        var path = "/usr/p/" + exec;
+        var child = call g_load_user_x(path);
+        if (child+1 == 0) {
+            call g_printn("Cannot execute '"+path+"'.");
+            var p = call g_wait_pipe("PIPEIN#" + parent);
+            call g_sleep(50);
+            call g_destroy_pipe(p);
+            return;
+        }
+        call g_start_share("PID#" + child, share);
+        call g_map_put(share, "child", child);
+        var k = g_null;
+        if (call g_array_size(cmd) > 0) {
+            var _args_ = {};
+            call g_map_put(_args_, "parse", parse);
+            call g_map_put(_args_, "args", cmd);
+            call g_map_put(_args_, "parent", child);
+            let k = call g_create_user_process_args(parse, _args_);
+        }
+        var in = call g_create_pipe("PIPEIN#" + parent);
+        var out = call g_create_pipe("PIPEOUT#" + child);
+        var handles = call g_query_share("PIPE#HANDLE");
+        call g_array_add(handles, child);
+        var f1 = func ~(ch, in) {
+            call g_write_pipe(in, ch);
+        };
+        call g_read_pipe_args(out, f1, in);
+        call g_join_process(child);
+        if (!call g_is_null(k)) {
+            call g_join_process(k);
+        }
+        call g_destroy_pipe_once(in);
+    };
+
+    var parse_cmd = func ["PARSE"] ~(cmd, parse) {
+        var pid = call g_get_pid();
+        var exe = call g_array_pop(cmd);
+        let exe = call g_string_trim(exe);
+        var _args = call g_string_split(exe, " ");
+        var args = [];
+        foreach (var s : call g_range_array(_args)) {
+            var ss = call g_string_trim(s);
+            if (!call g_string_empty(ss)) {
+                call g_array_add(args, ss);
+            }
+        }
+        var exec = call g_array_get(args, 0);
+        call g_array_remove(args, 0);
+        var share = {};
+        call g_map_put(share, "args", args);
+        call g_set_process_desc("shell: " + exec);
+        var path = "/usr/p/" + exec;
+        var child = call g_load_user_x(path);
+        if (child+1 == 0) {
+            call g_printn("Cannot execute '"+path+"'.");
+            return;
+        }
+        call g_start_share("PID#" + child, share);
+        call g_create_share("PIPE#HANDLE", g_new_array);
+        var k = g_null;
+        if (call g_array_size(cmd) > 0) {
+            var _args_ = {};
+            call g_map_put(_args_, "parse", parse);
+            call g_map_put(_args_, "args", cmd);
+            call g_map_put(_args_, "parent", child);
+            let k = call g_create_user_process_args(parse, _args_);
+        }
+        var f = func ~(ch) -> true;
+        var out = call g_wait_pipe("PIPEOUT#" + child);
+        var handles = call g_query_share("PIPE#HANDLE");
+        call g_array_add(handles, child);
+        call g_read_pipe(out, f);
+        call g_join_process_array(handles);
+        if (!call g_is_null(k)) {
+            call g_join_process(k);
+        }
+    };
+
+    var task_native = func ~(tid, msg, arg) {
+        if (call g_is_null(tid) || call g_is_null(msg)) { return; }
+        if (tid == "net") {
+            if (msg == "sshd") {
+                return call g_to_string(call g_net_sshd(arg));
+            }
+        }
+    };
+
+    // TASK FAST INVOKER
+    var task_fast_invoker = func ~(cmd, arg) {
+        let cmd = call g_string_right(cmd, 1);
+        call g_array_remove(arg, 0);
+        if (call g_array_size(arg) == 1) {
+            return call g_task_get_fast(cmd, call g_array_get(arg, 0));
+        } else if (call g_array_size(arg) == 2) {
+            var ret = call task_native(cmd, call g_array_get(arg, 0), call g_array_get(arg, 1));
+            if (call g_is_null(ret)) {
+                return call g_task_get_fast_arg(cmd, call g_array_get(arg, 0), call g_array_get(arg, 1));
+            }
+            return ret;
+        } else {
+            var msg = call g_array_get(arg, 0);
+            call g_array_remove(arg, 0);
+            var ret = call task_native(cmd, msg, arg);
+            if (call g_is_null(ret)) {
+                return call g_task_get_fast_args(cmd, msg, arg);
+            }
+            return ret;
+        }
+    };
+
+    // TASK COMMAND
+    var handle_task_command = func ~(arg) {
+        var arr = call g_string_split(arg, " ");
+        var cmd = call g_array_get(arr, 0);
+        if (call g_string_start_with(cmd, "@")) {
+            return call task_fast_invoker(cmd, arr);
+        }
+    };
+
+    call g_register_class(ctx, "system::shell", lambda(this) {
+        set this::"parse0" = parse_cmd;
+        set this::"parse1" = parse_cmd_1;
+        set this::"exec" = lambda(this, cmd) {
+            call g_printn("*** Shell: " + cmd);
+            let cmd = call g_string_trim(cmd);
+            if (call g_string_start_with(cmd, "@")) {
+                call handle_task_command(cmd);
+            } else {
+                let cmd = call g_string_split(cmd, "\\|");
+                var _parse = this."parse0";
+                call _parse(cmd, this."parse1");
+            }
+        };
+    }, "object");
+};
+
+var g_import_std_shell = func ~(ctx) {
+    call import_shell_class(ctx);
+};
+export "g_import_std_shell";

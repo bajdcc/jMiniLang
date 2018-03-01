@@ -13,6 +13,12 @@ public class RuntimeStack {
 	private static final int MAX_CALLSTACKSIZE = 100;
 	private static final int MAX_ARGSIZE = 12;
 
+	private RuntimeMachine machine = null;
+
+	public void setMachine(RuntimeMachine machine) {
+		this.machine = machine;
+	}
+
 	public RuntimeStack prev = null;
 	public int level = 0;
 
@@ -77,7 +83,7 @@ public class RuntimeStack {
 		return null;
 	}
 
-	public RuntimeObject findVariable(String codePage, int idx) {
+	public RuntimeObject findVariable(String codePage, int idx) throws RuntimeException {
 		for (RuntimeFunc func : stkCall) {
 			if (func.getCurrentPage().equals(codePage)) {
 				List<HashMap<Integer, RuntimeObject>> tmp = func.getTmp();
@@ -94,6 +100,7 @@ public class RuntimeStack {
 				}
 			}
 		}
+		machine.err(RuntimeException.RuntimeError.INVALID_VARIABLE, codePage + " " + idx);
 		return null;
 	}
 

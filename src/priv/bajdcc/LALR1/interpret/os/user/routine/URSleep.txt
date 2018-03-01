@@ -31,5 +31,5 @@ while (begin < end && call g_query_share(signal)) {
 }
 
 call g_stop_share(signal);
-call g_read_pipe_args(in, lambda(ch, out) { call g_write_pipe(out, ch); call g_sleep(time); }, out);
+call g_read_pipe(in, lambda(ch) -> call g_write_pipe(out, ch), out);
 call g_destroy_pipe(out);

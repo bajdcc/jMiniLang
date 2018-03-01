@@ -156,6 +156,7 @@ public class UIMainFrame extends JFrame {
 				new URTest(),
 				new URMsg(),
 				new URNews(),
+				new URBash(),
 				// USER FILE
 				new URFileLoad(),
 				new URFileSave(),
@@ -194,7 +195,7 @@ public class UIMainFrame extends JFrame {
 			e.printStackTrace();
 		} catch (RuntimeException e) {
 			System.err.println();
-			System.err.println(e.getPosition() + ": " + e.getInfo());
+			System.err.println(e.getkError().getMessage() + " " + e.getPosition() + ": " + e.getInfo());
 			e.printStackTrace();
 		} catch (Exception e) {
 			System.err.println();
