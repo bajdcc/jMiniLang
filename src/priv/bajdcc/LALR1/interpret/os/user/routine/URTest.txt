@@ -277,8 +277,8 @@ var stage_lisp = func ~() {
             call word_typewrite(val + "\n", 30);
         }
     };
-    var comment = func~(str) -> call word_typewrite(g_endl + "    " + str + g_endl + g_endl, 40);
-    var out_call = func~(strs) -> call word_typewrite(call g_array_get(strs, 0), 35);
+    var comment = func~(str) -> call word_typewrite("\n    " + str + "\n\n", 40);
+    var out_call = func~(strs) -> call word_typewrite(call g_array_get(strs, 0) + "\n", 35);
     call g_map_put(env, "out", out_call);
     var builtin = func~(str) {
         call puts("\n");
@@ -287,6 +287,8 @@ var stage_lisp = func ~() {
     };
     // eval code
     // ##########################
+    call eval("(list 1 2 3 4 5)");
+        call eval("(range 1 10)");
     call comment("1. Lambda");
     call eval("(define circle-area
     (lambda (r)
@@ -716,7 +718,7 @@ var stage_bash = func ~() {
     invoke shell::"exec"("< $/tmp/a | sleep 1 | pipe 10 | > &");
     invoke shell::"exec"("range 1 10 | replace 1 $ 2 $ 3 | > &");
     invoke shell::"exec"("range 1 10 | replace task util calc $ * $ | bash | > &");
-    invoke shell::"exec"("echo Made_by_bajdcc | > &&");
+    invoke shell::"exec"("echo Made_by_bajdcc | > &");
 };
 
 var name = call g_array_get(args, 0);

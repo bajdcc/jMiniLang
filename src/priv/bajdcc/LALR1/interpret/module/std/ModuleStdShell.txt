@@ -33,7 +33,7 @@ var import_shell_class = func ~(ctx) {
         call g_set_process_desc("shell: " + exec);
         var path = "/usr/p/" + exec;
         var child = call g_load_user_x(path);
-        if (child+1 == 0) {
+        if (child == g_minus_1) {
             call g_printn("Cannot execute '"+path+"'.");
             var p = call g_wait_pipe("PIPEIN#" + parent);
             call g_sleep(50);
@@ -53,17 +53,12 @@ var import_shell_class = func ~(ctx) {
         }
         var in = call g_create_pipe("PIPEIN#" + parent);
         var out = call g_create_pipe("PIPEOUT#" + child);
-        var handles = call g_query_share("PIPE#HANDLE");
-        call g_array_add(handles, child);
-        var f1 = func ~(ch, in) {
-            call g_write_pipe(in, ch);
-        };
-        call g_read_pipe_args(out, f1, in);
+        call g_read_pipe_args(out, lambda(ch, in) -> call g_write_pipe(in, ch), in);
         call g_join_process(child);
         if (!call g_is_null(k)) {
             call g_join_process(k);
         }
-        call g_destroy_pipe_once(in);
+        call g_destroy_pipe(in);
     };
 
     var parse_cmd = func ["PARSE"] ~(cmd, o, parse) {
@@ -85,12 +80,11 @@ var import_shell_class = func ~(ctx) {
         call g_set_process_desc("shell: " + exec);
         var path = "/usr/p/" + exec;
         var child = call g_load_user_x(path);
-        if (child+1 == 0) {
+        if (child == g_minus_1) {
             call g_printn("Cannot execute '"+path+"'.");
             return;
         }
         call g_start_share("PID#" + child, share);
-        call g_create_share("PIPE#HANDLE", g_new_array);
         var k = g_null;
         if (call g_array_size(cmd) > 0) {
             var _args_ = {};
@@ -101,10 +95,8 @@ var import_shell_class = func ~(ctx) {
             let k = call g_create_user_process_args(parse, _args_);
         }
         var out = call g_wait_pipe("PIPEOUT#" + child);
-        var handles = call g_query_share("PIPE#HANDLE");
-        call g_array_add(handles, child);
         call g_read_pipe_args(out, lambda(ch, _out) -> call g_write_pipe(_out, ch), o);
-        call g_join_process_array(handles);
+        call g_join_process(child);
         if (!call g_is_null(k)) {
             call g_join_process(k);
         }
