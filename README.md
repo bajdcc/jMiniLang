@@ -29,7 +29,9 @@
 16. **Functional programming**.
 17. **LISP**.
 18. **Socket stream**.
-18. **Class prototype**.
+19. Save/Load file or VFS.
+20. **Class prototype**.
+21. **Bash Interface**.
 
 #### What it generates
 
@@ -58,6 +60,9 @@ Now has commands:
 - count
 - **msg**
 - **news**(refer: https://github.com/bajdcc/NewsApp)
+- **bash**
+- replace
+- util
 
 Tasks:
 - System
@@ -89,6 +94,14 @@ Utility:
 - `task util product ...`
 - `task util palindrome ...`
 
+Tests:
+- `test philo/philo2`: Multi-processing and synchronization
+- `test lisp`: [LISP language](https://zhuanlan.zhihu.com/p/29243574)
+- `test font`: Support Chinese Language(wide font)
+- `test fork`: Test fork
+- `test class`: Test AOP and Prototype for class
+- `test bash`: Test bash interface
+
 Implemented MSG, usage:
 - Create server: `msg server PORT | filter pipe`
 - Create client: `other pipe | msg connect IP:PORT`
@@ -98,6 +111,25 @@ Implemented MSG, usage:
 [*Simplified Chinese Version*](https://raw.githubusercontent.com/bajdcc/jMiniLang/master/%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.pdf "Manual - Simplified Chinese")
 
 #### Example
+
+**Bash Example**
+
+See `test bash` command.
+```bash
+@ui on monitor
+range 1 10
+range 1 10 | dup 2 | grep 2
+range 1 10 | > &
+range 1 10 | > $/tmp/a
+< $/tmp/a | dup 2 | grep 2 | > &
+< $/tmp/a | dup 2 | grep 2 | count | > &
+< $/tmp/a | sleep 1 | pipe 10 | > &
+range 1 10 | replace 1 $ 2 $ 3 | > &
+range 1 10 | replace task util calc $ * $ | bash | > &
+range 1 10 | replace task util calc $ + 1 | bash | util product | > &
+range -5 10 | replace task util calc $ * $ * $ | bash | util sum | > &
+echo Made_by_bajdcc | > &
+```
 
 **0. Class**
 
