@@ -160,7 +160,7 @@ public class SemanticHandler {
 								value.getToken());
 					}
 				}
-				return indexed.get(0).object;
+				return obj;
 			}
 		});
 		/* 基本数据结构 */
@@ -387,7 +387,7 @@ public class SemanticHandler {
 			if (!indexed.exists(1)) {
 				port.setImported(false);
 				Function func = query.getQueryScopeService()
-						.getFuncByRealName(token.object.toString());
+						.getFuncByName(token.object.toString());
 				if (func == null) {
 					recorder.add(SemanticError.WRONG_EXTERN_SYMBOL, token);
 				} else {

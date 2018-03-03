@@ -24,8 +24,7 @@ var string = func [
     "Convert `RuntimeObject` back into a Lisp-readable string."
     ] string(exp) {
     if (call is_list(exp)) {
-        var _string = func ~(exp) -> call string(exp);
-        return "(" + call g_string_join_array(call g_func_map(exp, _string), " ") + ")";
+        return "(" + call g_string_join_array(call g_func_map(exp, string), " ") + ")";
     } else {
         return call g_to_string(exp);
     }

@@ -143,6 +143,10 @@ public class Function implements IExp {
 	public void genCode(ICodegen codegen) {
 		codegen.genFuncEntry(getRefName());
 		codegen.genCode(RuntimeInst.inop);
+		if (name.toRealString().equals(realName)) {
+			codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(realName));
+			codegen.genCode(RuntimeInst.irefun);
+		}
 		int start = codegen.getCodeIndex();
 		int i = 0;
 		for (Token token : params) {

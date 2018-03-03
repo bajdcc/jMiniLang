@@ -131,6 +131,9 @@ public class RuntimeTools {
 		case ildfun:
 			stk.opLoadFunc();
 			break;
+		case irefun:
+			stk.opReloadFunc();
+			break;
 		case iload:
 			stk.opLoad();
 			break;

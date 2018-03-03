@@ -17,8 +17,8 @@ import java.util.List;
  */
 public class Codegen implements ICodegen, ICodegenBlock, ICodegenByteWriter {
 
-	private HashListMap<Object> symbolList = new HashListMap<>();
-	private HashListMapEx<String, Function> funcMap = new HashListMapEx<>();
+	private HashListMap<Object> symbolList;
+	private HashListMap<Function> funcMap = new HashListMap<>();
 	private CodegenData data = new CodegenData();
 	private RuntimeDebugInfo info = new RuntimeDebugInfo();
 	private List<Byte> insts = null;
@@ -26,7 +26,11 @@ public class Codegen implements ICodegen, ICodegenBlock, ICodegenByteWriter {
 
 	public Codegen(SymbolTable symbol) {
 		symbolList = symbol.getManageDataService().getSymbolList();
-		funcMap = symbol.getManageDataService().getFuncMap();
+		for (ArrayList<Function> funcs : symbol.getManageDataService().getFuncMap().list) {
+			for (Function func : funcs) {
+				funcMap.add(func);
+			}
+		}
 	}
 
 	@Override

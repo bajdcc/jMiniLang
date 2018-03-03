@@ -11,13 +11,7 @@ public class RuntimeStack {
 
 	private static final int MAX_DATASTACKSIZE = 100;
 	private static final int MAX_CALLSTACKSIZE = 100;
-	private static final int MAX_ARGSIZE = 12;
-
-	private RuntimeMachine machine = null;
-
-	public void setMachine(RuntimeMachine machine) {
-		this.machine = machine;
-	}
+	private static final int MAX_ARGSIZE = 16;
 
 	public RuntimeStack prev = null;
 	public int level = 0;
@@ -65,25 +59,7 @@ public class RuntimeStack {
 		return stkData.isEmpty();
 	}
 
-	public RuntimeObject findVariable(int idx) {
-		for (RuntimeFunc func : stkCall) {
-			List<HashMap<Integer, RuntimeObject>> tmp = func.getTmp();
-			RuntimeObject obj;
-			for (Map<Integer, RuntimeObject> scope : tmp) {
-				obj = scope.get(idx);
-				if (obj != null) {
-					return obj;
-				}
-			}
-			obj = func.getClosure().get(idx);
-			if (obj != null) {
-				return obj;
-			}
-		}
-		return null;
-	}
-
-	public RuntimeObject findVariable(String codePage, int idx) throws RuntimeException {
+	public RuntimeObject findVariable(String codePage, int idx) {
 		for (RuntimeFunc func : stkCall) {
 			if (func.getCurrentPage().equals(codePage)) {
 				List<HashMap<Integer, RuntimeObject>> tmp = func.getTmp();
@@ -100,8 +76,7 @@ public class RuntimeStack {
 				}
 			}
 		}
-		machine.err(RuntimeException.RuntimeError.INVALID_VARIABLE, codePage + " " + idx);
-		return null;
+		return new RuntimeObject(null);
 	}
 
 	public void storeVariableDirect(int idx, RuntimeObject obj) {

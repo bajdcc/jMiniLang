@@ -171,7 +171,6 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 		currentPage = page;
 		stack.reg.pageId = name;
 		stack.reg.execId = 0;
-		stack.setMachine(this);
 		switchPage();
 		runInsts();
 	}
@@ -492,19 +491,35 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 		RuntimeFuncObject func = new RuntimeFuncObject(pageName, idx);
 		RuntimeObject obj = new RuntimeObject(func);
 		int envSize = loadInt();
+		FOR_LOOP:
 		for (int i = 0; i < envSize; i++) {
 			int id = loadInt();
 			if (id == -1) {
 				id = loadInt();
 				String name = fetchFromGlobalData(id).getObj().toString();
+				IRuntimeDebugValue value = currentPage.getInfo().getValueCallByName(name);
+				if (value != null) {
+					func.addEnv(id, value.getRuntimeObject());
+					continue;
+				}
+				int index = currentPage.getInfo().getAddressOfExportFunc(name);
+				if (index != -1) {
+					func.addEnv(id, new RuntimeObject(new RuntimeFuncObject(pageName, index)));
+					continue;
+				}
 				List<RuntimeCodePage> refers = pageRefer.get(currentPage.getInfo()
 						.getDataMap().get("name").toString());
 				for (RuntimeCodePage page : refers) {
-					IRuntimeDebugValue value = page.getInfo().getValueCallByName(name);
+					value = page.getInfo().getValueCallByName(name);
 					if (value != null) {
 						func.addEnv(id, value.getRuntimeObject());
-						stack.pushData(obj);
-						return;
+						continue FOR_LOOP;
+					}
+					index = page.getInfo().getAddressOfExportFunc(name);
+					if (index != -1) {
+						func.addEnv(id, new RuntimeObject(new RuntimeFuncObject(page.getInfo()
+								.getDataMap().get("name").toString(), index)));
+						continue FOR_LOOP;
 					}
 				}
 				err(RuntimeError.WRONG_LOAD_EXTERN, name);
@@ -516,10 +531,19 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	}
 
 	@Override
+	public void opReloadFunc() throws RuntimeException {
+		int idx = loadInt();
+		RuntimeFuncObject func = new RuntimeFuncObject(stack.reg.pageId, stack.reg.execId);
+		RuntimeObject obj = new RuntimeObject(func);
+		obj.setSymbol(currentPage.getData().get(idx));
+		stack.storeVariableDirect(idx, obj);
+	}
+
+	@Override
 	public void opStore() throws RuntimeException {
 		int idx = loadInt();
 		RuntimeObject obj = load();
-		RuntimeObject target = stack.findVariable(idx);
+		RuntimeObject target = stack.findVariable(pageName, idx);
 		if (target == null) {
 			err(RuntimeError.WRONG_OPERATOR);
 		}
@@ -614,7 +638,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	@Override
 	public void opLoadVar() throws RuntimeException {
 		int idx = loadInt();
-		store(RuntimeObject.createObject((stack.findVariable(idx))));
+		store(RuntimeObject.createObject((stack.findVariable(pageName, idx))));
 	}
 
 	@Override
@@ -689,12 +713,28 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 		int idx = loadInt();
 		RuntimeObject obj = fetchFromGlobalData(idx);
 		String name = obj.getObj().toString();
+		IRuntimeDebugValue value = currentPage.getInfo().getValueCallByName(name);
+		if (value != null) {
+			stack.pushData(value.getRuntimeObject());
+			return;
+		}
+		int index = currentPage.getInfo().getAddressOfExportFunc(name);
+		if (index != -1) {
+			stack.pushData(new RuntimeObject(new RuntimeFuncObject(pageName, index)));
+			return;
+		}
 		List<RuntimeCodePage> refers = pageRefer.get(currentPage.getInfo()
 				.getDataMap().get("name").toString());
 		for (RuntimeCodePage page : refers) {
-			IRuntimeDebugValue value = page.getInfo().getValueCallByName(name);
+			value = page.getInfo().getValueCallByName(name);
 			if (value != null) {
-				store(value.getRuntimeObject());
+				stack.pushData(value.getRuntimeObject());
+				return;
+			}
+			index = page.getInfo().getAddressOfExportFunc(name);
+			if (index != -1) {
+				stack.pushData(new RuntimeObject(new RuntimeFuncObject(page.getInfo()
+						.getDataMap().get("name").toString(), index)));
 				return;
 			}
 		}
@@ -709,7 +749,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 			RuntimeStack itStack = stack;
 			RuntimeObject obj = null;
 			while (obj == null && itStack != null) {
-				obj = itStack.findVariable(idx);
+				obj = itStack.findVariable(pageName, idx);
 				itStack = itStack.prev;
 			}
 			if (obj == null) {

@@ -157,6 +157,7 @@ public class UIMainFrame extends JFrame {
 				new URMsg(),
 				new URNews(),
 				new URBash(),
+				new URReplace(),
 				// USER FILE
 				new URFileLoad(),
 				new URFileSave(),

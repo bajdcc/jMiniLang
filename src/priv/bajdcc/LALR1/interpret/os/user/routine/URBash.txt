@@ -22,10 +22,9 @@ var ctx = call g_create_context();
 call g_import_std_base(ctx);
 call g_import_std_shell(ctx);
 
-var _ = g_null;
-
 var buf = [];
 var shell = call g_create_class(ctx, "system::shell");
+set shell::"out" = out;
 var pipe = func ["PIPE"] ~(ch, out) {
     if (ch == '\n') {
         var cmd = call g_string_build(buf);

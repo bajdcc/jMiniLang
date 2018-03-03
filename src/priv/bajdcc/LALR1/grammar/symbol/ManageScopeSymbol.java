@@ -10,10 +10,7 @@ import priv.bajdcc.util.Position;
 import priv.bajdcc.util.lexer.token.Token;
 import priv.bajdcc.util.lexer.token.TokenType;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Stack;
+import java.util.*;
 
 /**
  * 命名空间管理
@@ -27,7 +24,8 @@ public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
 	private static String LAMBDA_PREFIX = "~lambda#";
 	private int lambdaId = 0;
 	private HashListMap<Object> symbolList = new HashListMap<>();
-	private HashListMapEx<String, Function> funcMap = new HashListMapEx<>();
+	private HashListMapEx<String, ArrayList<Function>> funcMap = new HashListMapEx<>();
+	private ArrayList<HashMap<String, Function>> funcScope = new ArrayList<>();
 	private ArrayList<HashSet<String>> stkScope = new ArrayList<>();
 	private Stack<Integer> stkLambdaId = new Stack<>();
 	private Stack<Integer> stkLambdaLine = new Stack<>();
@@ -37,7 +35,9 @@ public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
 
 	public ManageScopeSymbol() {
 		enterScope();
-		funcMap.add(ENTRY_NAME, new Function());
+		ArrayList<Function> entry = new ArrayList<>();
+		entry.add(new Function());
+		funcMap.add(ENTRY_NAME, entry);
 		for (BlockType type : BlockType.values()) {
 			blockLevel.put(type, 0);
 		}
@@ -46,6 +46,7 @@ public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
 	@Override
 	public void enterScope() {
 		stkScope.add(0, new HashSet<>());
+		funcScope.add(new HashMap<>());
 		symbolsInFutureBlock.forEach(this::registerSymbol);
 		clearFutureArgs();
 	}
@@ -53,6 +54,7 @@ public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
 	@Override
 	public void leaveScope() {
 		stkScope.remove(0);
+		funcScope.remove(funcScope.size() - 1);
 		clearFutureArgs();
 	}
 
@@ -104,27 +106,16 @@ public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
 
 	@Override
 	public Function getFuncByName(String name) {
-		Function func = funcMap.get(name);
-		if (func != null) {
-			return func;
-		}
-		int count = 0;
-		for (Function function : funcMap.list) {
-			String funcName = function.getRealName();
-			if (funcName != null && funcName.equals(name)) {
-				func = function;
-				count++;
-			}
-		}
-		// count=1 即无歧义, count>1 有歧义
-		return (count == 1) ? func : null;
-	}
-
-	@Override
-	public Function getFuncByRealName(String name) {
-		for (Function func : funcMap.list) {
-			if (name.equals(func.getRealName())) {
-				return func;
+		for (int i = funcScope.size() - 1; i >= 0; i--) {
+			HashMap<String, Function> f = funcScope.get(i);
+			Function f1 = f.get(name);
+			if (f1 != null)
+				return f1;
+			for (Function func : f.values()) {
+				String funcName = func.getRealName();
+				if (funcName != null && funcName.equals(name)) {
+					return func;
+				}
 			}
 		}
 		return null;
@@ -134,7 +125,7 @@ public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
 	public Function getLambda() {
 		int lambdaId = stkLambdaId.pop();
 		int lambdaLine = stkLambdaLine.pop();
-		return funcMap.get(LAMBDA_PREFIX + lambdaId + "!" + lambdaLine);
+		return funcMap.get(LAMBDA_PREFIX + lambdaId + "!" + lambdaLine).get(0);
 	}
 
 	@Override
@@ -151,7 +142,10 @@ public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
 		} else {
 			func.setRealName(LAMBDA_PREFIX + lambdaId++);
 		}
-		funcMap.add(func.getRealName(), func);
+		ArrayList<Function> f = new ArrayList<>();
+		f.add(func);
+		funcMap.add(func.getRealName(), f);
+		funcScope.get(funcScope.size() - 1).put(func.getRealName(), func);
 	}
 
 	@Override
@@ -160,13 +154,16 @@ public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
 		stkLambdaLine.push(func.getName().position.iLine);
 		func.getName().kToken = TokenType.ID;
 		func.setRealName(LAMBDA_PREFIX + (lambdaId++) + "!" + stkLambdaLine.peek());
-		funcMap.add(func.getRealName(), func);
+		funcScope.get(funcScope.size() - 1).put(func.getRealName(), func);
+		ArrayList<Function> f = new ArrayList<>();
+		f.add(func);
+		funcMap.add(func.getRealName(), f);
 	}
 
 	@Override
 	public boolean isRegisteredFunc(String name) {
-		Function func = funcMap.get(name);
-		return func != null && func.getRealName() != null;
+		ArrayList<Function> funcs = funcMap.get(name);
+		return funcs != null && !funcs.isEmpty();
 	}
 
 	@Override
@@ -175,8 +172,10 @@ public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
 	}
 
 	public void check(ISemanticRecorder recorder) {
-		for (Function func : funcMap.list) {
-			func.analysis(recorder);
+		for (ArrayList<Function> funcs : funcMap.list) {
+			for (Function func : funcs) {
+				func.analysis(recorder);
+			}
 		}
 	}
 
@@ -186,7 +185,7 @@ public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
 	}
 
 	@Override
-	public HashListMapEx<String, Function> getFuncMap() {
+	public HashListMapEx<String, ArrayList<Function>> getFuncMap() {
 		return funcMap;
 	}
 
@@ -208,13 +207,15 @@ public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
 		sb.append("#### 过程表 ####");
 		sb.append(System.lineSeparator());
 		int i = 0;
-		for (Function func : funcMap.list) {
-			sb.append("----==== #").append(i).append(" ====----");
-			sb.append(System.lineSeparator());
-			sb.append(func.toString());
-			sb.append(System.lineSeparator());
-			sb.append(System.lineSeparator());
-			i++;
+		for (ArrayList<Function> funcs : funcMap.list) {
+			for (Function func : funcs) {
+				sb.append("----==== #").append(i).append(" ====----");
+				sb.append(System.lineSeparator());
+				sb.append(func.toString());
+				sb.append(System.lineSeparator());
+				sb.append(System.lineSeparator());
+				i++;
+			}
 		}
 		return sb.toString();
 	}

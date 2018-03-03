@@ -12,9 +12,10 @@ import "sys.file";
 var import_shell_class = func ~(ctx) {
     var parse_cmd_1 = func ["PARSE"] ~(arg) {
         var pid = call g_get_pid();
-        var parse = call g_map_get(arg, "parse");
         var cmd = call g_map_get(arg, "args");
         var parent = call g_map_get(arg, "parent");
+        var parse = call g_map_get(arg, "parse");
+        var o = call g_map_get(arg, "out");
         var exe = call g_array_pop(cmd);
         let exe = call g_string_trim(exe);
         var _args = call g_string_split(exe, " ");
@@ -44,8 +45,9 @@ var import_shell_class = func ~(ctx) {
         var k = g_null;
         if (call g_array_size(cmd) > 0) {
             var _args_ = {};
-            call g_map_put(_args_, "parse", parse);
             call g_map_put(_args_, "args", cmd);
+            call g_map_put(_args_, "out", o);
+            call g_map_put(_args_, "parse", parse);
             call g_map_put(_args_, "parent", child);
             let k = call g_create_user_process_args(parse, _args_);
         }
@@ -64,7 +66,7 @@ var import_shell_class = func ~(ctx) {
         call g_destroy_pipe_once(in);
     };
 
-    var parse_cmd = func ["PARSE"] ~(cmd, parse) {
+    var parse_cmd = func ["PARSE"] ~(cmd, o, parse) {
         var pid = call g_get_pid();
         var exe = call g_array_pop(cmd);
         let exe = call g_string_trim(exe);
@@ -92,16 +94,16 @@ var import_shell_class = func ~(ctx) {
         var k = g_null;
         if (call g_array_size(cmd) > 0) {
             var _args_ = {};
-            call g_map_put(_args_, "parse", parse);
             call g_map_put(_args_, "args", cmd);
+            call g_map_put(_args_, "parse", parse);
+            call g_map_put(_args_, "out", o);
             call g_map_put(_args_, "parent", child);
             let k = call g_create_user_process_args(parse, _args_);
         }
-        var f = func ~(ch) -> true;
         var out = call g_wait_pipe("PIPEOUT#" + child);
         var handles = call g_query_share("PIPE#HANDLE");
         call g_array_add(handles, child);
-        call g_read_pipe(out, f);
+        call g_read_pipe_args(out, lambda(ch, _out) -> call g_write_pipe(_out, ch), o);
         call g_join_process_array(handles);
         if (!call g_is_null(k)) {
             call g_join_process(k);
@@ -150,8 +152,8 @@ var import_shell_class = func ~(ctx) {
     };
 
     call g_register_class(ctx, "system::shell", lambda(this) {
-        set this::"parse0" = parse_cmd;
-        set this::"parse1" = parse_cmd_1;
+        set this::"out" = g_null;
+        set this::"parse" = parse_cmd_1;
         set this::"exec" = lambda(this, cmd) {
             call g_printn("*** Shell: " + cmd);
             let cmd = call g_string_trim(cmd);
@@ -159,8 +161,7 @@ var import_shell_class = func ~(ctx) {
                 call handle_task_command(cmd);
             } else {
                 let cmd = call g_string_split(cmd, "\\|");
-                var _parse = this."parse0";
-                call _parse(cmd, this."parse1");
+                call parse_cmd(cmd, this."out", this."parse");
             }
         };
     }, "object");

@@ -13,6 +13,7 @@ public interface IRuntimeStack {
 	void pop() throws RuntimeException;
 	void opLoad() throws RuntimeException;
 	void opLoadFunc() throws RuntimeException;
+	void opReloadFunc() throws RuntimeException;
 	void opStore() throws RuntimeException;
 	void opStoreDirect() throws RuntimeException;
 	void opOpenFunc() throws RuntimeException;

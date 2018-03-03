@@ -35,6 +35,7 @@ public enum RuntimeInst {
     iloadv,           // 变量载入
     iloadx,           // 外部变量载入
     ildfun,           // 函数地址载入
+    irefun,           // 声明递归函数
     istore,           // 栈顶[top]数据存入[top-1]索引指向的位置（引用）
     ialloc,           // 栈顶[top]数据存入[top-1]索引指向的位置（新建）
 
