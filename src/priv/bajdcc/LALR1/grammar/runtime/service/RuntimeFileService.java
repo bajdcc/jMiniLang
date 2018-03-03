@@ -209,8 +209,9 @@ public class RuntimeFileService implements IRuntimeFileService {
                         try {
                             // mode:2=truncate mode:3=append
                             baos = new ByteArrayOutputStream();
-                            if (mapVfs.containsKey(filename))
-                                baos.write(mapVfs.get(filename).data);
+                            if (mapVfs.containsKey(filename) && mode == 3) {
+                            	baos.write(mapVfs.get(filename).data);
+                            }
                             OutputStreamWriter osw = new OutputStreamWriter(baos, encoding);
                             writer = new BufferedWriter(osw);
                             this.status = FileStatus.WRITING;

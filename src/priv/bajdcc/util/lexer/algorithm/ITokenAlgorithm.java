@@ -44,9 +44,11 @@ public interface ITokenAlgorithm {
 	 *            匹配的字符串
 	 * @param token
 	 *            输入的单词
+	 * @param iterator
+	 *            迭代器
 	 * @return 输出的单词
 	 */
-	Token getToken(String string, Token token);
+	Token getToken(String string, Token token, IRegexStringIterator iterator);
 	
 	/**
 	 * 返回正则表达式描述

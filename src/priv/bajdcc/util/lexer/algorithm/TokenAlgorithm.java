@@ -65,10 +65,14 @@ public abstract class TokenAlgorithm implements ITokenAlgorithm,
 			return true;
 		}
 		token.position = new Position(iterator.position());
+		iterator.snapshot();
 		if (regex.match(iterator, this)) {// 匹配成功
-			getToken(strMatch, token);// 自动转换单词
-			return true;
+			if (getToken(strMatch, token, iterator) != null) {// 自动转换单词
+				iterator.discard();
+				return true;
+			}
 		}
+		iterator.restore();
 		return false;
 	}
 

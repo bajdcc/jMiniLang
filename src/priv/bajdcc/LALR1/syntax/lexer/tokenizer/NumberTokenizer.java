@@ -3,6 +3,7 @@ package priv.bajdcc.LALR1.syntax.lexer.tokenizer;
 import priv.bajdcc.util.lexer.algorithm.TokenAlgorithm;
 import priv.bajdcc.util.lexer.algorithm.filter.StringPairFilter;
 import priv.bajdcc.util.lexer.error.RegexException;
+import priv.bajdcc.util.lexer.regex.IRegexStringIterator;
 import priv.bajdcc.util.lexer.token.MetaType;
 import priv.bajdcc.util.lexer.token.Token;
 import priv.bajdcc.util.lexer.token.TokenType;
@@ -36,7 +37,7 @@ public class NumberTokenizer extends TokenAlgorithm {
 	 * priv.bajdcc.lexer.token.Token)
 	 */
 	@Override
-	public Token getToken(String string, Token token) {
+	public Token getToken(String string, Token token, IRegexStringIterator iterator) {
 		token.kToken = TokenType.INTEGER;
 		token.object = Integer.parseInt(string);
 		return token;

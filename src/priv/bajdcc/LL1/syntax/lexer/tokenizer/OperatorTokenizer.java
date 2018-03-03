@@ -5,6 +5,7 @@ import java.util.HashMap;
 import priv.bajdcc.LL1.syntax.token.OperatorType;
 import priv.bajdcc.util.lexer.algorithm.TokenAlgorithm;
 import priv.bajdcc.util.lexer.error.RegexException;
+import priv.bajdcc.util.lexer.regex.IRegexStringIterator;
 import priv.bajdcc.util.lexer.token.Token;
 import priv.bajdcc.util.lexer.token.TokenType;
 
@@ -52,7 +53,7 @@ public class OperatorTokenizer extends TokenAlgorithm {
 	 * priv.bajdcc.lexer.token.Token)
 	 */
 	@Override
-	public Token getToken(String string, Token token) {
+	public Token getToken(String string, Token token, IRegexStringIterator iterator) {
 		token.kToken = TokenType.OPERATOR;
 		token.object = hashOperator.get(string);
 		return token;

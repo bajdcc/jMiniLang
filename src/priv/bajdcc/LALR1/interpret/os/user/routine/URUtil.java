@@ -1,17 +1,17 @@
-package priv.bajdcc.LALR1.interpret.os.user.routine.file;
+package priv.bajdcc.LALR1.interpret.os.user.routine;
 
 import priv.bajdcc.LALR1.interpret.os.IOSCodePage;
 import priv.bajdcc.util.ResourceLoader;
 
 /**
- * 【用户态】写文件
+ * 【用户态】辅助功能
  *
  * @author bajdcc
  */
-public class URFileSave implements IOSCodePage {
+public class URUtil implements IOSCodePage {
 	@Override
 	public String getName() {
-		return "/usr/p/>";
+		return "/usr/p/util";
 	}
 
 	@Override

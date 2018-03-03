@@ -1,0 +1,63 @@
+import "sys.base";
+import "sys.proc";
+import "sys.list";
+import "sys.func";
+import "sys.string";
+
+call g_set_process_desc("util routinue");
+var pid = call g_get_pid();
+var share = call g_wait_share("PID#" + pid);
+call g_stop_share("PID#" + pid);
+var args = call g_map_get(share, "args");
+
+var in = call g_create_pipe("PIPEIN#" + pid);
+var out = call g_create_pipe("PIPEOUT#" + pid);
+
+var signal = "PIDSIG#" + pid;
+call g_start_share(signal, true);
+
+var name = call g_array_get(args, 0);
+if (call g_is_null(name)) {
+    call g_read_pipe_args(in, lambda(ch, out) -> call g_write_pipe(out, ch), out);
+    call g_destroy_pipe(out);
+    return;
+}
+
+var buf = [];
+if (name == "sum") {
+    var sum = 0;
+    call g_read_pipe_args(in, lambda(ch, out) {
+        if (ch == '\n') {
+            var num = call g_string_build(buf);
+            let sum = sum + num;
+            call g_write_pipe(out, "\v" + sum);
+            call g_array_clear(buf);
+        } else if (ch == '\r') {
+        } else {
+            call g_array_add(buf, ch);
+        }
+    }, out);
+    call g_write_pipe(out, g_endl);
+} else if (name == "product") {
+    var product = 1;
+    call g_read_pipe_args(in, lambda(ch, out) {
+        if (ch == '\n') {
+            var num = call g_string_build(buf);
+            let product = product * num;
+            call g_write_pipe(out, "\v" + product);
+            call g_array_clear(buf);
+        } else if (ch == '\r') {
+        } else {
+            call g_array_add(buf, ch);
+        }
+    }, out);
+    call g_write_pipe(out, g_endl);
+} else {
+    call g_read_pipe_args(in, lambda(ch, out) -> call g_write_pipe(out, ch), out);
+    call g_destroy_pipe(out);
+    return;
+}
+
+call g_stop_share(signal);
+call g_destroy_pipe(out);
+call g_destroy_pipe(in);

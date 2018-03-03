@@ -2,6 +2,7 @@ package priv.bajdcc.LALR1.syntax.lexer.tokenizer;
 
 import priv.bajdcc.util.lexer.algorithm.TokenAlgorithm;
 import priv.bajdcc.util.lexer.error.RegexException;
+import priv.bajdcc.util.lexer.regex.IRegexStringIterator;
 import priv.bajdcc.util.lexer.token.Token;
 import priv.bajdcc.util.lexer.token.TokenType;
 
@@ -34,7 +35,7 @@ public class NonTerminalTokenizer extends TokenAlgorithm {
 	 * priv.bajdcc.lexer.token.Token)
 	 */
 	@Override
-	public Token getToken(String string, Token token) {
+	public Token getToken(String string, Token token, IRegexStringIterator iterator) {
 		token.kToken = TokenType.ID;
 		token.object = string;
 		return token;

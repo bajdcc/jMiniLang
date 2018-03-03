@@ -708,17 +708,24 @@ var stage_bash = func ~() {
     var shell = call g_create_class(ctx, "system::shell");
     set shell::"out" = out;
 
-    invoke shell::"exec"("@ui on monitor");
-    invoke shell::"exec"("range 1 10");
-    invoke shell::"exec"("range 1 10 | dup 2 | grep 2");
-    invoke shell::"exec"("range 1 10 | > &");
-    invoke shell::"exec"("range 1 100 | > $/tmp/a");
-    invoke shell::"exec"("< $/tmp/a | dup 2 | grep 2 | > &");
-    invoke shell::"exec"("< $/tmp/a | dup 2 | grep 2 | count | > &");
-    invoke shell::"exec"("< $/tmp/a | sleep 1 | pipe 10 | > &");
-    invoke shell::"exec"("range 1 10 | replace 1 $ 2 $ 3 | > &");
-    invoke shell::"exec"("range 1 10 | replace task util calc $ * $ | bash | > &");
-    invoke shell::"exec"("echo Made_by_bajdcc | > &");
+    var exec = func ~(cmd) {
+        call g_write_pipe_n(out, g_endl + "# " + cmd + g_endl);
+        invoke shell::"exec"(cmd);
+        call g_task_sleep_ms_signal(600, signal);
+    };
+    call exec("@ui on monitor");
+    call exec("range 1 10");
+    call exec("range 1 10 | dup 2 | grep 2");
+    call exec("range 1 10 | > &");
+    call exec("range 1 10 | > $/tmp/a");
+    call exec("< $/tmp/a | dup 2 | grep 2 | > &");
+    call exec("< $/tmp/a | dup 2 | grep 2 | count | > &");
+    call exec("< $/tmp/a | sleep 1 | pipe 10 | > &");
+    call exec("range 1 10 | replace 1 $ 2 $ 3 | > &");
+    call exec("range 1 10 | replace task util calc $ * $ | bash | > &");
+    call exec("range 1 10 | replace task util calc $ + 1 | bash | util product | > &");
+    call exec("range -5 10 | replace task util calc $ * $ * $ | bash | util sum | > &");
+    call exec("echo Made_by_bajdcc | > &");
 };
 
 var name = call g_array_get(args, 0);

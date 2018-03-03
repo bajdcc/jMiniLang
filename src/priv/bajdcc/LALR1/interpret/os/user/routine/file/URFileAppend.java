@@ -9,13 +9,13 @@ import priv.bajdcc.util.ResourceLoader;
  * @author bajdcc
  */
 public class URFileAppend implements IOSCodePage {
-    @Override
-    public String getName() {
-        return "/usr/p/>>";
-    }
+	@Override
+	public String getName() {
+		return "/usr/p/>>";
+	}
 
-    @Override
-    public String getCode() {
-        return ResourceLoader.load(getClass());
-    }
+	@Override
+	public String getCode() {
+		return ResourceLoader.load(getClass());
+	}
 }

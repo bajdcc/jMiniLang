@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import priv.bajdcc.util.lexer.algorithm.TokenAlgorithm;
 import priv.bajdcc.util.lexer.error.RegexException;
+import priv.bajdcc.util.lexer.regex.IRegexStringIterator;
 import priv.bajdcc.util.lexer.token.KeywordType;
 import priv.bajdcc.util.lexer.token.Token;
 import priv.bajdcc.util.lexer.token.TokenType;
@@ -52,7 +53,7 @@ public class IdentifierTokenizer extends TokenAlgorithm {
 	 * priv.bajdcc.lexer.token.Token)
 	 */
 	@Override
-	public Token getToken(String string, Token token) {
+	public Token getToken(String string, Token token, IRegexStringIterator iterator) {
 		if (mapKeywords.containsKey(string)) {
 			KeywordType kw = mapKeywords.get(string);
 			switch (kw) {

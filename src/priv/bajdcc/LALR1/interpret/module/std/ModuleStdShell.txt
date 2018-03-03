@@ -30,6 +30,7 @@ var import_shell_class = func ~(ctx) {
         call g_array_remove(args, 0);
         var share = {};
         call g_map_put(share, "args", args);
+        call g_map_put(share, "out", o);
         call g_set_process_desc("shell: " + exec);
         var path = "/usr/p/" + exec;
         var child = call g_load_user_x(path);
@@ -77,6 +78,7 @@ var import_shell_class = func ~(ctx) {
         call g_array_remove(args, 0);
         var share = {};
         call g_map_put(share, "args", args);
+        call g_map_put(share, "out", o);
         call g_set_process_desc("shell: " + exec);
         var path = "/usr/p/" + exec;
         var child = call g_load_user_x(path);
