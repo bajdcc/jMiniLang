@@ -89,7 +89,7 @@ public class ModuleString implements IInterpreterModule {
 				String str = (String) args.get(0).getObj();
 				String split = (String) args.get(1).getObj();
 				RuntimeArray arr = new RuntimeArray();
-				for (String item : str.split(split)) {
+				for (String item : str.split(split, Integer.MAX_VALUE)) {
 					arr.add(new RuntimeObject(item));
 				}
 				return new RuntimeObject(arr);
@@ -449,6 +449,25 @@ public class ModuleString implements IInterpreterModule {
                 String str = (String) args.get(0).getObj();
                 String cmp = (String) args.get(1).getObj();
                 return new RuntimeObject(str.startsWith(cmp));
+            }
+        });
+        info.addExternalFunc("g_string_end_with", new IRuntimeDebugExec() {
+            @Override
+            public String getDoc() {
+                return "字符串结尾比较";
+            }
+
+            @Override
+            public RuntimeObjectType[] getArgsType() {
+                return new RuntimeObjectType[]{RuntimeObjectType.kString, RuntimeObjectType.kString};
+            }
+
+            @Override
+            public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+                                                  IRuntimeStatus status) throws Exception {
+                String str = (String) args.get(0).getObj();
+                String cmp = (String) args.get(1).getObj();
+                return new RuntimeObject(str.endsWith(cmp));
             }
         });
         info.addExternalFunc("g_string_substr", new IRuntimeDebugExec() {

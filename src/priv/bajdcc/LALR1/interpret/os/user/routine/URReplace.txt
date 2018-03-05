@@ -20,38 +20,21 @@ if (call g_is_null(arg1)) {
 } else {
     var arg = call g_string_join_array(args, " ");
     var sp = call g_string_split(arg, "\\$");
-    if (call g_array_empty(sp)) {
+    var size = call g_array_size(sp);
+    if (size == 0) {
         call g_read_pipe_args(in, lambda(ch, out) -> call g_write_pipe(out, ch), out);
-    } else if (call g_array_size(sp) == 1 || call g_array_get(sp, 0) == "") {
-        if (arg1 == "$") {
-            var post = call g_array_get(sp, 1);
-            call g_read_pipe_args(in, lambda(ch, out) {
-                if (ch == '\n') {
-                    var cur = call g_string_build(buf);
-                    call g_write_pipe_n(out, cur + post);
-                    call g_array_clear(buf);
-                } else if (ch == '\r') {
-                } else {
-                    call g_array_add(buf, ch);
-                }
-            }, out);
-        } else {
-            var pre = call g_array_get(sp, 0);
-            call g_read_pipe_args(in, lambda(ch, out) {
-                if (ch == '\n') {
-                    var cur = call g_string_build(buf);
-                    call g_write_pipe_n(out, pre + cur);
-                    call g_array_clear(buf);
-                } else if (ch == '\r') {
-                } else {
-                    call g_array_add(buf, ch);
-                }
-            }, out);
-        }
+    } else if (size == 1) {
+        call g_read_pipe_args(in, lambda(ch, out) {
+            if (ch == '\n') {
+                var cur = call g_string_build(buf);
+                call g_write_pipe_n(out, arg);
+                call g_array_clear(buf);
+            } else if (ch == '\r') {
+            } else {
+                call g_array_add(buf, ch);
+            }
+        }, out);
     } else {
-        if (call g_array_get(args, call g_array_size(args) - 1) == "$") {
-            call g_array_add(sp, "");
-        }
         call g_read_pipe_args(in, lambda(ch, out) {
             if (ch == '\n') {
                 var cur = call g_string_build(buf);
