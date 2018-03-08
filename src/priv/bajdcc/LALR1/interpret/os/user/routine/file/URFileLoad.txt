@@ -23,11 +23,11 @@ if (call g_array_empty(args)) {
     if (call g_array_size(args) > 1) {
         var enc = call g_array_get(args, 1);
         if (enc == "u") {
-            //let function = "g_read_file_utf8_args";
+            //function := "g_read_file_utf8_args";
         } else if (enc == "g") {
-            let function = "g_read_file_gbk_args";
+            function := "g_read_file_gbk_args";
         } else if (enc == "a") {
-            let function = "g_read_file_ascii_args";
+            function := "g_read_file_ascii_args";
         }
     }
     var callback = func ~(ch, out) {

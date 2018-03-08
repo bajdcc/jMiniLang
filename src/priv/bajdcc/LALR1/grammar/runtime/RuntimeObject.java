@@ -237,6 +237,6 @@ public class RuntimeObject implements Cloneable {
 				(obj == null ? "(null)" : "(" + obj.toString() + ")") +
 				(readonly ? 'R' : 'r') +
 				(copyable ? 'C' : 'c') +
-				"#" + String.valueOf(flag[0]);
+				"#" + (flag == null ? "" : String.valueOf(flag[0]));
 	}
 }

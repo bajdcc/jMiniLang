@@ -26,9 +26,9 @@ var time = func ~(msg, caller) {
         var arg = call g_map_get(msg, "arg");
         var ts = call g_array_get(arg, 2);
         if (!call g_is_null(ts) && ts == "timestamp") {
-           let val = call g_task_get_timestamp();
+           val := call g_task_get_timestamp();
         } else {
-           let val = call g_task_get_time("yyyy-MM-dd HH:mm:ss");
+           val := call g_task_get_time("yyyy-MM-dd HH:mm:ss");
         }
         call g_map_put(msg, "val", val);
     } else if (id == "speed") {
@@ -36,11 +36,11 @@ var time = func ~(msg, caller) {
         call g_map_put(msg, "val", val);
     } else if (id == "pipe") {
         var val = call g_task_get_pipe_stat();
-        let val = call g_string_join_array(val, g_endl);
+        val := call g_string_join_array(val, g_endl);
         call g_map_put(msg, "val", val);
     } else if (id == "share") {
         var val = call g_task_get_share_stat();
-        let val = call g_string_join_array(val, g_endl);
+        val := call g_string_join_array(val, g_endl);
         call g_map_put(msg, "val", val);
     } else if (id == "guid") {
         var val = call g_task_get_guid();
@@ -48,9 +48,9 @@ var time = func ~(msg, caller) {
     } else if (id == "sleep") {
         var arg = call g_map_get(msg, "arg");
         var second = call g_array_get(arg, 2);
-        if (call g_is_null(second)) { let second = g_minus_1; }
-        else { let second = call g_string_atoi(second); }
-        if (second < 0) { let second = 1; }
+        if (call g_is_null(second)) { second := g_minus_1; }
+        else { second := call g_string_atoi(second); }
+        if (second < 0) { second := 1; }
         call g_task_sleep(second);
         call g_map_put(msg, "val", "Slept " + call g_to_string(second) + "s.");
     } else if (id == "halt") {

@@ -166,7 +166,7 @@ var atom = func [
     ] ~(token) {
     if (call g_string_start_with(token, "\"")) {
         var s = call g_string_substr(token, 1, call g_string_length(token) - 1);
-        let s = call g_string_replace(s, "_", " ");
+        s := call g_string_replace(s, "_", " ");
         return call str(s);
     }
     var number = call g_string_to_number(token);
@@ -217,14 +217,14 @@ var tokenize = func [
     "词法分析",
     "Convert a string into a list of tokens."
     ] ~(s) {
-    let s = call g_string_replace(s, "\\(", " ( "); // 以空格为定界符
-    let s = call g_string_replace(s, "\\)", " ) ");
-    let s = call g_string_replace(s, "'", " ' ");
-    let s = call g_string_trim(s);
-    let s = call g_string_split(s, "\\s+");
-    let s = call g_func_map(s, lambda(str) {
+    s := call g_string_replace(s, "\\(", " ( "); // 以空格为定界符
+    s := call g_string_replace(s, "\\)", " ) ");
+    s := call g_string_replace(s, "'", " ' ");
+    s := call g_string_trim(s);
+    s := call g_string_split(s, "\\s+");
+    s := call g_func_map(s, lambda(str) {
         if (call g_string_start_with(str, "\"")) {
-            let s = call g_string_replace(s, "_", " ");
+            s := call g_string_replace(s, "_", " ");
         }
         return str;
     });
@@ -375,7 +375,7 @@ var eval = func [
             var val = g_null;
             for (var j = 1; j < size; j++) {
                 var _v = call eval(call g_array_get(x, j), env);
-                let val = _v;
+                val := _v;
             }
             return val;
         } else if (call g_string_equal(head, "eval")) {    // eval (eval exp*)

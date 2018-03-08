@@ -83,23 +83,23 @@ var g_func_fold = func
     var x = g__;
     if (call g_is_null(init)) { // 没初值的话，取第一个元素为初值
         if (len == 1) { return call g_array_get(list, 0); }
-        let x = call xs(list);// 创建遍历闭包
-        let val = call x();// 取第一个元素
-        let val = call val();
-        let val = call map(val);// 对元素进行变换
+        x := call xs(list);// 创建遍历闭包
+        val := call x();// 取第一个元素
+        val := call val();
+        val := call map(val);// 对元素进行变换
     } else {
-        let x = call xs(list);
-        let val = init;
+        x := call xs(list);
+        val := init;
     }
     var n = name;// 对数组进行变换
-    let n = call arg(n);// 对卷积方式进行变换
+    n := call arg(n);// 对卷积方式进行变换
     for (;;) {// 遍历数组
         var v2 = call x();// 取得下一元素
         if (call g_is_null(v2)) { break; }// 没有下一元素，中止
-        let v2 = call v2();// 下一元素
-        let v2 = call map(v2);// 对下一元素进行变换
+        v2 := call v2();// 下一元素
+        v2 := call map(v2);// 对下一元素进行变换
         if (call filter(v2)) {// 过滤控制
-            let val = call n(val, v2);// 将两元素进行处理
+            val := call n(val, v2);// 将两元素进行处理
         }
     }
     return val;

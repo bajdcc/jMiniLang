@@ -440,13 +440,13 @@ call g_register_class(ctx, "app::news::news.context", lambda(this) {
                 call g_printdn("NewsApp Overlay interrupt: #" + call g_get_pid());
                 break;
             }
-            let begin = call g_task_get_timestamp();
+            begin := call g_task_get_timestamp();
             if (final < begin) {
                 break;
             }
             if (end < begin) {
                 invoke this."output"::"write"(".");
-                let end = begin + ms;
+                end += ms;
             } else {
                 call g_sleep(50);
             }
@@ -474,13 +474,13 @@ call g_register_class(ctx, "app::news::news.context", lambda(this) {
                 call g_printdn("NewsApp Overlay interrupt: #" + call g_get_pid());
                 break;
             }
-            let begin = call g_task_get_timestamp();
+            begin := call g_task_get_timestamp();
             if (final < begin) {
                 break;
             }
             if (end < begin) {
                 invoke this."output"::"write"(".");
-                let end = begin + ms;
+                end += ms;
             } else {
                 call g_sleep(50);
             }
@@ -514,12 +514,12 @@ call g_register_class(ctx, "app::news::news.machine", lambda(this) {
                 call g_printdn("NewsApp Timer interrupt: #" + call g_get_pid());
                 break;
             }
-            let begin = call g_task_get_timestamp();
+            begin := call g_task_get_timestamp();
             if (end < begin) {
                 invoke this."state_main"::"on_timer"();
                 invoke this."state_transfer"::"on_timer"();
                 invoke this."state_crawler"::"on_timer"();
-                let end = begin + ms;
+                end += ms;
             } else {
                 call g_sleep(50);
             }

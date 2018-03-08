@@ -47,7 +47,7 @@ var real_repeat = func ~(_operation, _arg, _start, _end) {
     var repear_f = func ~() -> call repeat(_operation, _arg, _start, _end);
     call(func ~(f) {
         while (!(call g_is_null(f)) && (call g_get_type_ordinal(f) == 8)) {
-            let f = call f();
+            f := call f();
         }
     })(repear_f);
 };
@@ -627,17 +627,17 @@ var stage_class = func ~() {
     call g_hook_remove_after(square, "get_area", after_1);
 
     // 返回12000，因为before和after都调用next()，未拦截
-    let before_1 = lambda(class, name, this, next) {
+    before_1 := lambda(class, name, this, next) {
         call print("HOOKED BEFORE 1: " + class + "::" + name);
         return call next();
     };
     call g_hook_add_before(square, "get_area", before_1);
-    let before_2 = lambda(class, name, this, next) {
+    before_2 := lambda(class, name, this, next) {
         call print("HOOKED BEFORE 2: " + class + "::" + name);
         return call next();
     };
     call g_hook_add_before(square, "get_area", before_2);
-    let after_1 = lambda(class, name, this, r, next) {
+    after_1 := lambda(class, name, this, r, next) {
         call print("HOOKED AFTER  3: " + class + "::" + name + "=" + r);
         return call next();
     };
@@ -652,17 +652,17 @@ var stage_class = func ~() {
     // 返回12346，直接拦截了，因为before_2中没有调用next()
     // 因此返回12345+1，但当before_2返回next()+12345时
     // get_area还是返回12000，拦截没有效果，因为都调用了next()
-    let before_1 = lambda(class, name, this, next) {
+    before_1 := lambda(class, name, this, next) {
         call print("HOOKED BEFORE 4: " + class + "::" + name);
         return call next() + 1;
     };
     call g_hook_add_before(square, "get_area", before_1);
-    let before_2 = lambda(class, name, this, next) {
+    before_2 := lambda(class, name, this, next) {
         call print("HOOKED BEFORE 5: " + class + "::" + name);
         return 12345;
     };
     call g_hook_add_before(square, "get_area", before_2);
-    let after_1 = lambda(class, name, this, r, next) {
+    after_1 := lambda(class, name, this, r, next) {
         call print("HOOKED AFTER  6: " + class + "::" + name + "=" + r);
         return call next() + 10;
     };
@@ -687,7 +687,7 @@ var stage_class = func ~() {
 
     call print("E " + square."type" + " area=" + invoke square::"get_area"());
 
-    let before_1 = lambda(class, name, this, next, arg1) {
+    before_1 := lambda(class, name, this, next, arg1) {
         call print("HOOKED BEFORE 5: " + class + "::" + name);
         return 10000;
     };

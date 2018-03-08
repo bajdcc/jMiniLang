@@ -6,7 +6,6 @@ import "sys.class";
 import "sys.proc";
 import "sys.task";
 import "sys.ui";
-import "sys.net";
 import "sys.file";
 
 var import_shell_class = func ~(ctx) {
@@ -17,7 +16,7 @@ var import_shell_class = func ~(ctx) {
         var parse = call g_map_get(arg, "parse");
         var o = call g_map_get(arg, "out");
         var exe = call g_array_pop(cmd);
-        let exe = call g_string_trim(exe);
+        exe := call g_string_trim(exe);
         var _args = call g_string_split(exe, " ");
         var args = [];
         foreach (var s : call g_range_array(_args)) {
@@ -50,7 +49,7 @@ var import_shell_class = func ~(ctx) {
             call g_map_put(_args_, "out", o);
             call g_map_put(_args_, "parse", parse);
             call g_map_put(_args_, "parent", child);
-            let k = call g_create_user_process_args(parse, _args_);
+            k := call g_create_user_process_args(parse, _args_);
         }
         var in = call g_create_pipe("PIPEIN#" + parent);
         var out = call g_create_pipe("PIPEOUT#" + child);
@@ -65,7 +64,7 @@ var import_shell_class = func ~(ctx) {
     var parse_cmd = func ["PARSE"] ~(cmd, o, parse) {
         var pid = call g_get_pid();
         var exe = call g_array_pop(cmd);
-        let exe = call g_string_trim(exe);
+        exe := call g_string_trim(exe);
         var _args = call g_string_split(exe, " ");
         var args = [];
         foreach (var s : call g_range_array(_args)) {
@@ -94,7 +93,7 @@ var import_shell_class = func ~(ctx) {
             call g_map_put(_args_, "parse", parse);
             call g_map_put(_args_, "out", o);
             call g_map_put(_args_, "parent", child);
-            let k = call g_create_user_process_args(parse, _args_);
+            k := call g_create_user_process_args(parse, _args_);
         }
         var out = call g_wait_pipe("PIPEOUT#" + child);
         call g_read_pipe_args(out, lambda(ch, _out) -> call g_write_pipe(_out, ch), o);
@@ -115,7 +114,7 @@ var import_shell_class = func ~(ctx) {
 
     // TASK FAST INVOKER
     var task_fast_invoker = func ~(cmd, arg) {
-        let cmd = call g_string_right(cmd, 1);
+        cmd := call g_string_right(cmd, 1);
         call g_array_remove(arg, 0);
         if (call g_array_size(arg) == 1) {
             return call g_task_get_fast(cmd, call g_array_get(arg, 0));
@@ -150,11 +149,11 @@ var import_shell_class = func ~(ctx) {
         set this::"parse" = parse_cmd_1;
         set this::"exec" = lambda(this, cmd) {
             call g_printn("*** Shell: " + cmd);
-            let cmd = call g_string_trim(cmd);
+            cmd := call g_string_trim(cmd);
             if (call g_string_start_with(cmd, "@")) {
                 call handle_task_command(cmd);
             } else {
-                let cmd = call g_string_split(cmd, "\\|");
+                cmd := call g_string_split(cmd, "\\|");
                 call parse_cmd(cmd, this."out", this."parse");
             }
         };

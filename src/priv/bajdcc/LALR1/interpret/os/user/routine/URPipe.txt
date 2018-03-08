@@ -17,8 +17,8 @@ if (call g_array_empty(args)) {
     call g_read_pipe_args(in, lambda(ch, out) -> call g_write_pipe(out, ch), out);
 } else {
     var time = call g_array_get(args, 0);
-    let time = call g_string_atoi(time);
-    if (time < 1) { let time = 1; }
+    time := call g_string_atoi(time);
+    if (time < 1) { time := 1; }
     call g_read_pipe_args(in, lambda(ch, out) { call g_write_pipe(out, ch); call g_sleep(time); }, out);
 }
 

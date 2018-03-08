@@ -10,7 +10,7 @@ var read_file = func ~(name, encoding, callback) {
         call g_printdn("Reading file: ''" + name + "' -> #" + handle);
         var data = '\0';
         for (;;) {
-            let data = call g_read_file_internal(handle);
+            data := call g_read_file_internal(handle);
             if (call g_is_null(data)) {
                 break;
             }
@@ -28,7 +28,7 @@ var read_file_args = func ~(name, encoding, callback, args) {
         call g_printdn("Reading file: ''" + name + "' -> #" + handle);
         var data = '\0';
         for (;;) {
-            let data = call g_read_file_internal(handle);
+            data := call g_read_file_internal(handle);
             if (call g_is_null(data)) {
                 break;
             }
@@ -72,7 +72,7 @@ var read_file_s = func ~(name, encoding, callback) {
         call g_printdn("Reading file(Line): ''" + name + "' -> #" + handle);
         var data = '\0';
         for (;;) {
-            let data = call g_read_file_string_internal(handle);
+            data := call g_read_file_string_internal(handle);
             if (call g_is_null(data)) {
                 break;
             }
@@ -90,7 +90,7 @@ var read_file_s_args = func ~(name, encoding, callback, args) {
         call g_printdn("Reading file(Line): ''" + name + "' -> #" + handle);
         var data = '\0';
         for (;;) {
-            let data = call g_read_file_string_internal(handle);
+            data := call g_read_file_string_internal(handle);
             if (call g_is_null(data)) {
                 break;
             }

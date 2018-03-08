@@ -30,7 +30,7 @@ call g_task_get(tid, msg);
 
 var error = call g_map_get(msg, "error");
 var val = call g_map_get(msg, "val");
-let val = call g_to_string(val);
+val := call g_to_string(val);
 if (error == 1) {
     call g_write_pipe_n(out, "Error: " + val);
 } else {

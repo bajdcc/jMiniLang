@@ -8,6 +8,7 @@ import "sys.string";
 import "sys.ui";
 import "module.lisp";
 
+
 // --------------------------------------------------------
 // SERVER
 var shutdown_server = func ~(out, signal, port, log) {
@@ -173,7 +174,7 @@ var sshd_shutdown_server = func ~(port) {
 };
 
 var task_fast_invoker = func ~(cmd, arg) {
-    let cmd = call g_string_right(cmd, 1);
+    cmd := call g_string_right(cmd, 1);
     call g_array_remove(arg, 0);
     if (call g_array_size(arg) == 1) {
         return call g_task_get_fast(cmd, call g_array_get(arg, 0));
@@ -197,7 +198,7 @@ var handle_task_command = func ~(arg) {
 
 var sshd_run_lisp = func ~(code) {
     var env = call g_lisp_env();
-    let code = call g_string_right(code, 1);
+    code := call g_string_right(code, 1);
     var val = call g_lisp_repl(env, code);
     return val;
 };
@@ -252,13 +253,36 @@ var sshd_msg_receive = func ~(port) {
                 call g_net_msg_server_send_with_origin(call g_to_string(ret), origin);
             }
         } else {
-            call g_net_msg_server_send_with_origin(content, origin);
+            import "sys.math";
+            import "sys.class";
+            import "std.base";
+            import "std.shell";
+            var ctx = call g_create_context();
+            call g_import_std_base(ctx);
+            call g_import_std_shell(ctx);
+            var shell = call g_create_class(ctx, "system::shell");
+            var out = call g_create_pipe("SSHD#BASH.OUT");
+            var buf = [];
+            var out_proc = func ~(buf) {
+                var o = call g_create_pipe("SSHD#BASH.OUT");
+                call g_read_pipe(o, lambda(ch) {
+                    call g_ui_print(ch);
+                    call g_array_add(buf, ch);
+                });
+            };
+            var out_pid = call g_create_user_process_args(out_proc, buf);
+            set shell::"out" = out;
+            invoke shell::"exec"(content);
+            var str = call g_string_build(buf);
+            call g_destroy_pipe(out);
+            call g_net_msg_server_send_with_origin(str, origin);
+            call g_join_process(out_pid);
         }
     }
 };
 
 var g_net_sshd = func ~(port) {
-    let port = call g_string_atoi(port);
+    port := call g_string_atoi(port);
     if (port == g_minus_1) {
         return "Error: Invalid port";
     }
@@ -359,7 +383,7 @@ var ssh_msg_send = func ~() {
 
         // SEND
         var cmd = call g_ui_input();
-        let cmd = call g_string_trim(cmd);
+        cmd := call g_string_trim(cmd);
         if (cmd == "exit") { break; }
         if (call g_string_length(cmd) > 0) {
             if (call g_array_empty(address)) {

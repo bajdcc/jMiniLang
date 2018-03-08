@@ -158,7 +158,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 		if (pageName != null && name != null && pageName.equals(name))
 			return;
 		if (pageMap.contains(name)) {
-			err(RuntimeError.DUP_PAGENAME, "代码页 " + pageName + " 加载 " + name);
+			warn(RuntimeError.DUP_PAGENAME, "代码页 " + pageName + " 加载 " + name);
 		}
 		pageMap.add(name, page);
 		pageRefer.put(name, new ArrayList<>());
@@ -335,6 +335,11 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	public void err(RuntimeError type, String message) throws RuntimeException {
 		System.err.println(stack);
 		throw new RuntimeException(type, stack.reg.execId, type.getMessage() + " " + message + "\n\n[ CODE ]\n" + currentPage.getDebugInfoByInc(stack.reg.execId));
+	}
+
+	@Override
+	public void warn(RuntimeError type, String message) {
+		logger.warn(String.format("#%03d [%s] %s %s", pid, pageName, type.getMessage(), message));
 	}
 
 	@Override
@@ -552,22 +557,6 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 		}
 		target.copyFrom(obj);
 		store(target);
-	}
-
-	@Override
-	public void opAssign() throws RuntimeException {
-		int idx = loadInt();
-		RuntimeObject obj = load();
-		RuntimeObject target = stack.findVariable(pageName, idx);
-		if (target == null) {
-			err(RuntimeError.WRONG_OPERATOR);
-		}
-		if (target.isReadonly()) {
-			err(RuntimeError.READONLY_VAR, target.toString());
-		}
-		target.copyFrom(obj);
-		store(target);
-		opPushObj(obj);
 	}
 
 	@Override

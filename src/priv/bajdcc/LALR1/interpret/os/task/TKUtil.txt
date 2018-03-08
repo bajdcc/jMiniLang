@@ -32,11 +32,11 @@ var time = func ~(msg, caller) {
         var val = call g_task_calc(str);
         call g_map_put(msg, "val", val);
     } else if (id == "sum") {
-        let arr = call g_func_fold("g_array_add", arr, g_new_array, "g_func_xsl", "g_string_atoi_s", "g_func_1", "g_not_null");
+        arr := call g_func_fold("g_array_add", arr, g_new_array, "g_func_xsl", "g_string_atoi_s", "g_func_1", "g_not_null");
         var val = call g_func_apply("g_func_add", arr);
         call g_map_put(msg, "val", val);
     } else if (id == "product") {
-        let arr = call g_func_fold("g_array_add", arr, g_new_array, "g_func_xsl", "g_string_atoi_s", "g_func_1", "g_not_null");
+        arr := call g_func_fold("g_array_add", arr, g_new_array, "g_func_xsl", "g_string_atoi_s", "g_func_1", "g_not_null");
         var val = call g_func_apply("g_func_mul", arr);
         call g_map_put(msg, "val", val);
     } else if (id == "reverse") {
@@ -48,16 +48,16 @@ var time = func ~(msg, caller) {
         var val = call g_func_applicative("g_func_eq", str, "g_string_reverse");
         call g_map_put(msg, "val", val);
     } else if (id == "toupper") {
-        let arr = call g_func_map(arr, "g_string_toupper");
+        arr := call g_func_map(arr, "g_string_toupper");
         var val = call g_string_join_array(arr, " ");
         call g_map_put(msg, "val", val);
     } else if (id == "tolower") {
-        let arr = call g_func_map(arr, "g_string_tolower");
+        arr := call g_func_map(arr, "g_string_tolower");
         var val = call g_string_join_array(arr, " ");
         call g_map_put(msg, "val", val);
     } else if (id == "doc") {
         var val = call g_string_join_array(arr, " ");
-        let val = call g_doc(val);
+        val := call g_doc(val);
         call g_map_put(msg, "val", val);
     } else if (id == "lisp") {
          var str = call g_string_join_array(arr, " ");

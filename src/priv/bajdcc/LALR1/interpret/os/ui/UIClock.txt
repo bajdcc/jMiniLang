@@ -26,7 +26,7 @@ var destroy = func ~() {
 var draw = func ~() {
     if (!first) {
         call init();
-        let first = true;
+        first := true;
     }
     var time = call g_task_get_fast("system", "now");
     call g_task_get_fast_arg("ui", "path", "\uffeeM 110 110\uffee\uffeeR 390 140\uffee\uffeeM 140 130\uffee\uffed" + time + "\uffed");
@@ -35,7 +35,7 @@ var draw = func ~() {
 var clear = func ~() {
     if (first) {
         call destroy();
-        let first = false;
+        first := false;
     }
 };
 

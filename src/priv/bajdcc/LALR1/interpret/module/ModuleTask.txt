@@ -176,7 +176,7 @@ var g_task_sleep = func ~(second) {
     var begin = call g_task_get_timestamp();
     var end = begin + second * 1000;
     while (begin < end) {
-        let begin = call g_task_get_timestamp();
+        begin := call g_task_get_timestamp();
         call g_sleep(500);
     }
 };
@@ -186,7 +186,7 @@ var g_task_sleep_signal = func ~(second, signal) {
     var begin = call g_task_get_timestamp();
     var end = begin + second * 1000;
     while (begin < end) {
-        let begin = call g_task_get_timestamp();
+        begin := call g_task_get_timestamp();
         var s = call g_query_share(signal);
         if (call g_is_null(s) || !s) {
             call g_printdn("Sleep_s interrupt: #" + call g_get_pid() + " -> " + signal);
@@ -201,7 +201,7 @@ var g_task_sleep_ms = func ~(ms) {
     var begin = call g_task_get_timestamp();
     var end = begin + ms;
     while (begin < end) {
-        let begin = call g_task_get_timestamp();
+        begin := call g_task_get_timestamp();
         call g_sleep(20);
     }
 };
@@ -211,7 +211,7 @@ var g_task_sleep_ms_signal = func ~(ms, signal) {
     var begin = call g_task_get_timestamp();
     var end = begin + ms;
     while (begin < end) {
-        let begin = call g_task_get_timestamp();
+        begin := call g_task_get_timestamp();
         var s = call g_query_share(signal);
         if (call g_is_null(s) || !s) {
             call g_printdn("Sleep_ms interrupt: #" + call g_get_pid() + " -> " + signal);

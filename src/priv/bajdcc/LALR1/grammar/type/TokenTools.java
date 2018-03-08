@@ -63,6 +63,9 @@ public class TokenTools {
 		mapOp2Ins.put(OperatorType.GREATER_THAN_OR_EQUAL, RuntimeInst.icge);
 		mapOp2Ins.put(OperatorType.EQUAL, RuntimeInst.ice);
 		mapOp2Ins.put(OperatorType.NOT_EQUAL, RuntimeInst.icne);
+		for (Entry<OperatorType, RuntimeInst> entry : mapOp2Ins.entrySet()) {
+			mapIns2Op.put(entry.getValue(), entry.getKey());
+		}
 		mapOp2Ins.put(OperatorType.PLUS_ASSIGN, RuntimeInst.iadd);
 		mapOp2Ins.put(OperatorType.MINUS_ASSIGN, RuntimeInst.isub);
 		mapOp2Ins.put(OperatorType.TIMES_ASSIGN, RuntimeInst.imul);
@@ -71,9 +74,7 @@ public class TokenTools {
 		mapOp2Ins.put(OperatorType.AND_ASSIGN, RuntimeInst.iand);
 		mapOp2Ins.put(OperatorType.OR_ASSIGN, RuntimeInst.ior);
 		mapOp2Ins.put(OperatorType.XOR_ASSIGN, RuntimeInst.ixor);
-		for (Entry<OperatorType, RuntimeInst> entry : mapOp2Ins.entrySet()) {
-			mapIns2Op.put(entry.getValue(), entry.getKey());
-		}
+		mapOp2Ins.put(OperatorType.EQ_ASSIGN, RuntimeInst.ice);
 	}
 
 	/**
@@ -519,5 +520,21 @@ public class TokenTools {
 
 	public static boolean isExternalName(String name) {
 		return name.startsWith("g_");
+	}
+
+	public static boolean isAssignment(OperatorType op) {
+		switch (op) {
+			case PLUS_ASSIGN:
+			case MINUS_ASSIGN:
+			case TIMES_ASSIGN:
+			case DIV_ASSIGN:
+			case AND_ASSIGN:
+			case OR_ASSIGN:
+			case XOR_ASSIGN:
+			case MOD_ASSIGN:
+			case EQ_ASSIGN:
+				return true;
+		}
+		return false;
 	}
 }

@@ -29,7 +29,7 @@ if (name == "sum") {
     call g_read_pipe_args(in, lambda(ch, out) {
         if (ch == '\n') {
             var num = call g_string_build(buf);
-            let sum = sum + num;
+            sum += num;
             call g_write_pipe(out, "\v" + sum);
             call g_array_clear(buf);
         } else if (ch == '\r') {
@@ -43,7 +43,7 @@ if (name == "sum") {
     call g_read_pipe_args(in, lambda(ch, out) {
         if (ch == '\n') {
             var num = call g_string_build(buf);
-            let product = product * num;
+            product := product * num;
             call g_write_pipe(out, "\v" + product);
             call g_array_clear(buf);
         } else if (ch == '\r') {

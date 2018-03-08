@@ -15,7 +15,6 @@ public interface IRuntimeStack {
 	void opLoadFunc() throws RuntimeException;
 	void opReloadFunc() throws RuntimeException;
 	void opStore() throws RuntimeException;
-	void opAssign() throws RuntimeException;
 	void opStoreDirect() throws RuntimeException;
 	void opOpenFunc() throws RuntimeException;
 	void opLoadArgs() throws RuntimeException;

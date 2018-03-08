@@ -82,6 +82,14 @@ public interface IRuntimeStatus {
 	void err(RuntimeException.RuntimeError type, String message) throws RuntimeException;
 
 	/**
+	 * 运行时警告
+	 * @param type 错误类型
+	 * @param message 补充信息
+	 * @throws RuntimeException 运行时异常
+     */
+	void warn(RuntimeException.RuntimeError type, String message);
+
+	/**
 	 * 创建进程
 	 * @param func 函数
 	 * @throws Exception 运行时异常

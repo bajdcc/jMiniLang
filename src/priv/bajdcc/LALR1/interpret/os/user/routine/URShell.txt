@@ -49,7 +49,7 @@ var parse_cmd_1 = func ["PARSE"] ~(arg) {
     var cmd = call g_map_get(arg, "args");
     var parent = call g_map_get(arg, "parent");
     var exe = call g_array_pop(cmd);
-    let exe = call g_string_trim(exe);
+    exe := call g_string_trim(exe);
     var _args = call g_string_split(exe, " ");
     var args = [];
     foreach (var s : call g_range_array(_args)) {
@@ -80,7 +80,7 @@ var parse_cmd_1 = func ["PARSE"] ~(arg) {
         call g_map_put(_args_, "parse", parse);
         call g_map_put(_args_, "args", cmd);
         call g_map_put(_args_, "parent", child);
-        let k = call g_create_user_process_args(parse, _args_);
+        k := call g_create_user_process_args(parse, _args_);
     }
     var in = call g_create_pipe("PIPEIN#" + parent);
     var out = call g_create_pipe("PIPEOUT#" + child);
@@ -109,7 +109,7 @@ var parse_cmd_1 = func ["PARSE"] ~(arg) {
 var parse_cmd = func ["PARSE"] ~(cmd, parse) {
     var pid = call g_get_pid();
     var exe = call g_array_pop(cmd);
-    let exe = call g_string_trim(exe);
+    exe := call g_string_trim(exe);
     var _args = call g_string_split(exe, " ");
     var args = [];
     foreach (var s :call g_range_array(_args)) {
@@ -139,7 +139,7 @@ var parse_cmd = func ["PARSE"] ~(cmd, parse) {
         call g_map_put(_args_, "parse", parse);
         call g_map_put(_args_, "args", cmd);
         call g_map_put(_args_, "parent", child);
-        let k = call g_create_user_process_args(parse, _args_);
+        k := call g_create_user_process_args(parse, _args_);
     }
     var f = func ~(ch) -> call g_ui_print(ch);
     var out = call g_wait_pipe("PIPEOUT#" + child);
@@ -149,9 +149,9 @@ var parse_cmd = func ["PARSE"] ~(cmd, parse) {
         var fn = func ~(ch) {
             var hs = call g_query_share("PIPE#HANDLE");
             var kill = false;
-            if (ch == 'C') { let kill = true; }
+            if (ch == 'C') { kill := true; }
             if (ch == 'A' && !call g_live_process_array(hs)) {
-                let ch = 'C';
+                ch := 'C';
             }
             if (ch == 'C') {
                 call g_printdn("#" + call g_get_pid() + " Force kill!");
@@ -202,7 +202,7 @@ var task_native = func ~(tid, msg, arg) {
 
 // TASK FAST INVOKER
 var task_fast_invoker = func ~(cmd, arg) {
-    let cmd = call g_string_right(cmd, 1);
+    cmd := call g_string_right(cmd, 1);
     call g_array_remove(arg, 0);
     if (call g_array_size(arg) == 1) {
         return call g_task_get_fast(cmd, call g_array_get(arg, 0));
@@ -240,7 +240,7 @@ var get_input = func ["INPUT"] ~(arg) {
     call g_ui_print("$ \uffef");
     call g_sleep(400);
     var cmd = call g_ui_input();
-    let cmd = call g_string_trim(cmd);
+    cmd := call g_string_trim(cmd);
     if (call g_string_length(cmd) == 0) {
         call g_ui_printn("Error: no cmd");
         call g_create_user_process_args(this, arg);
@@ -266,7 +266,7 @@ var get_input = func ["INPUT"] ~(arg) {
             call g_stop_share("CMD#EXIT");
         }
     } else {
-        let cmd = call g_string_split(cmd, "\\|");
+        cmd := call g_string_split(cmd, "\\|");
         call parse_cmd(cmd, parse);
         call g_create_user_process_args(this, arg);
     }

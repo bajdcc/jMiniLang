@@ -12,7 +12,7 @@ var args = call g_map_get(share, "args");
 var count = 0;
 var pipe = func ["PIPE"] ~(ch, out) {
     if (ch == '\n'/* || ch == '\r'*/) {
-        let count = count + 1;
+        count += 1;
         call g_write_pipe(out, "" + count + "\r");
     }
 };

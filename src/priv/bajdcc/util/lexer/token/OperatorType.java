@@ -18,7 +18,7 @@ public enum OperatorType {
 			"&="), OR_ASSIGN("|="), XOR_ASSIGN("^="), MOD_ASSIGN("%="), LESS_THAN_OR_EQUAL(
 			"<="), GREATER_THAN_OR_EQUAL(">="), LOGICAL_AND("&&"), LOGICAL_OR(
 			"||"), POINTER("->"), LEFT_SHIFT("<<"), RIGHT_SHIFT(">>"), LEFT_SHIFT_ASSIGN(
-			"<<="), RIGHT_SHIFT_ASSIGN(">>="), PROPERTY("::");
+			"<<="), RIGHT_SHIFT_ASSIGN(">>="), PROPERTY("::"), EQ_ASSIGN(":=");
 
 	private String name;
 

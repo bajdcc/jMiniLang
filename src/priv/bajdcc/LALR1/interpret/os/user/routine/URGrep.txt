@@ -35,7 +35,7 @@ var next = func ["CALC NEXT"] ~(str) {
             v++;
             call g_array_set(n, u, v);
         } else {
-            let v = call g_array_get(n, v);
+            v := call g_array_get(n, v);
         }
     }
     return n;
@@ -49,7 +49,7 @@ var find = func ["FIND WITH NEXT"] ~(str, n) {
         if (j == m1 || (call g_string_get(str, i) == call g_string_get(pat, j))) {
             i++; j++;
         } else {
-            let j = call g_array_get(n, j);
+            j := call g_array_get(n, j);
         }
     }
     if (j == patlen) {

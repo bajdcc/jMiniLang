@@ -15,11 +15,11 @@ var out = call g_create_pipe("PIPEOUT#" + pid);
 
 var arg1 = call g_array_get(args, 0);
 if (call g_is_null(arg1)) {
-    let arg1 = call g_query_usr_proc();
+    arg1 := call g_query_usr_proc();
 } else if (arg1 == "sys") {
-    let arg1 = call g_query_sys_proc();
+    arg1 := call g_query_sys_proc();
 } else {
-    let arg1 = call g_query_all_proc();
+    arg1 := call g_query_all_proc();
 }
 call g_write_pipe_n(out, "    Speed: " + call g_task_get_fast("system", "speed"));
 foreach (var i : call g_range_array(arg1)) {

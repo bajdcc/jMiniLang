@@ -28,7 +28,7 @@ var destroy = func ~() {
 var draw = func ~() {
     if (!first) {
         call init();
-        let first = true;
+        first := true;
     }
 
     var procs = call g_query_all_proc();
@@ -36,20 +36,20 @@ var draw = func ~() {
     var speed = call g_task_get_fast("system", "speed");
     var speed_text = "";
     if (speed > 1.0e6) {
-        let speed_text = "" + call g_floor(speed / 1.0e6, 2) + "M";
+        speed_text := "" + call g_floor(speed / 1.0e6, 2) + "M";
     } else if (speed > 1.0e3) {
-        let speed_text = "" + call g_floor(speed / 1.0e3, 2) + "K";
+        speed_text := "" + call g_floor(speed / 1.0e3, 2) + "K";
     } else {
-        let speed_text = "" + call g_floor(speed, 2);
+        speed_text := "" + call g_floor(speed, 2);
     }
-    let text = "    Speed: " + speed_text + "\n" + text;
+    text := "    Speed: " + speed_text + "\n" + text;
     call g_task_get_fast_arg("ui", "path", "\uffeeM 0 0\uffee\uffeeR 800 600\uffee\uffeeW 800\uffee\uffeeM 0 20\uffee\uffec" + text + "\uffec");
     call g_task_sleep_signal(1, "TASK#SLEEP");
 };
 var clear = func ~() {
     if (first) {
         call destroy();
-        let first = false;
+        first := false;
     }
 };
 

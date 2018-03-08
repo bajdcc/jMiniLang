@@ -10,9 +10,9 @@ call g_stop_share("PID#" + pid);
 var args = call g_map_get(share, "args");
 var count = call g_array_get(args, 0);
 if (call g_is_null(count)) {
-    let count = "2";
+    count := "2";
 }
-let count = call g_string_atoi(count);
+count := call g_string_atoi(count);
 
 var buf = [];
 var pipe = func ["PIPE"] ~(ch, out) {

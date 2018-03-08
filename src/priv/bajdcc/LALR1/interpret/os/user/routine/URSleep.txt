@@ -18,15 +18,15 @@ call g_start_share(signal, true);
 
 var second = call g_array_get(args, 0);
 if (call g_is_null(second)) {
-    let second = "0";
+    second := "0";
 }
-let second = call g_string_atoi(second);
+second := call g_string_atoi(second);
 
 //var get_tick = func ~() -> call g_task_get_fast_arg("system", "now", "timestamp");
 var begin = call g_task_get_timestamp();
 var end = begin + second * 1000;
 while (begin < end && call g_query_share(signal)) {
-    let begin = call g_task_get_timestamp();
+    begin := call g_task_get_timestamp();
     call g_sleep(50);
 }
 

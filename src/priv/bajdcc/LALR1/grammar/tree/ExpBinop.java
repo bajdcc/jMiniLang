@@ -86,19 +86,10 @@ public class ExpBinop implements IExp {
 	public void analysis(ISemanticRecorder recorder) {
 		if (token.kToken == TokenType.OPERATOR) {
 			OperatorType op = (OperatorType) token.object;
-			switch (op) {
-				case PLUS_ASSIGN:
-				case MINUS_ASSIGN:
-				case TIMES_ASSIGN:
-				case DIV_ASSIGN:
-				case AND_ASSIGN:
-				case OR_ASSIGN:
-				case XOR_ASSIGN:
-				case MOD_ASSIGN:
+			if (TokenTools.isAssignment(op)) {
 				if (!(leftOperand instanceof ExpValue)) {
 					recorder.add(SemanticException.SemanticError.INVALID_ASSIGNMENT, token);
 				}
-				break;
 			}
 		}
 		leftOperand.analysis(recorder);
@@ -119,26 +110,20 @@ public class ExpBinop implements IExp {
 		}
 		if (token.kToken == TokenType.OPERATOR) {
 			OperatorType op = (OperatorType) token.object;
-			boolean assign = false;
-			switch (op) {
-				case PLUS_ASSIGN:
-				case MINUS_ASSIGN:
-				case TIMES_ASSIGN:
-				case DIV_ASSIGN:
-				case AND_ASSIGN:
-				case OR_ASSIGN:
-				case XOR_ASSIGN:
-				case MOD_ASSIGN:
-					assign = true;
-					break;
-			}
-			if (assign) {
+			if (TokenTools.isAssignment(op)) {
+				RuntimeInst ins = TokenTools.op2ins(token);
+				ExpValue left = (ExpValue) leftOperand;
+				if (ins == RuntimeInst.ice) {
+					rightOperand.genCode(codegen);
+					codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(left.getToken().object));
+					codegen.genCode(RuntimeInst.istore);
+					return;
+				}
 				leftOperand.genCode(codegen);
 				rightOperand.genCode(codegen);
-				codegen.genCode(TokenTools.op2ins(token));
-				ExpValue left = (ExpValue) leftOperand;
+				codegen.genCode(ins);
 				codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(left.getToken().object));
-				codegen.genCode(RuntimeInst.iassign);
+				codegen.genCode(RuntimeInst.istore);
 				return;
 			}
 		}

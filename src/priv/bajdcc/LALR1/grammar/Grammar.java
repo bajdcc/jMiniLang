@@ -110,6 +110,7 @@ public class Grammar extends Semantic {
 		addTerminal("AND_ASSIGN", TokenType.OPERATOR, OperatorType.AND_ASSIGN);
 		addTerminal("XOR_ASSIGN", TokenType.OPERATOR, OperatorType.XOR_ASSIGN);
 		addTerminal("OR_ASSIGN", TokenType.OPERATOR, OperatorType.OR_ASSIGN);
+		addTerminal("EQ_ASSIGN", TokenType.OPERATOR, OperatorType.EQ_ASSIGN);
 		addTerminal("ADD", TokenType.OPERATOR, OperatorType.PLUS);
 		addTerminal("SUB", TokenType.OPERATOR, OperatorType.MINUS);
 		addTerminal("MUL", TokenType.OPERATOR, OperatorType.TIMES);
@@ -200,7 +201,7 @@ public class Grammar extends Semantic {
 		ISemanticAnalyzer exp_handler = handler.getSemanticHandler("exp");
 		infer(exp_handler, "exp -> exp01[0]");
 		infer(exp_handler,
-				"exp01 -> [exp01[1] (@ADD_ASSIGN[2] | @SUB_ASSIGN[2] | @MUL_ASSIGN[2] | @DIV_ASSIGN[2] | @AND_ASSIGN[2] | @OR_ASSIGN[2] | @XOR_ASSIGN[2] | @MOD_ASSIGN[2])] exp0[0]");
+				"exp01 -> [exp01[1] (@EQ_ASSIGN[2] | @ADD_ASSIGN[2] | @SUB_ASSIGN[2] | @MUL_ASSIGN[2] | @DIV_ASSIGN[2] | @AND_ASSIGN[2] | @OR_ASSIGN[2] | @XOR_ASSIGN[2] | @MOD_ASSIGN[2])] exp0[0]");
 		infer(exp_handler,
 				"exp0 -> exp1[0] [@QUERY[4] exp0[6] @COLON[5]{lost_colon} exp0[7]]");
 		infer(exp_handler, "exp1 -> [exp1[1] (@AND_OP[2] | @OR_OP[2])] exp2[0]");
