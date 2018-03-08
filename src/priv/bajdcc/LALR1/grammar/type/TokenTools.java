@@ -63,6 +63,14 @@ public class TokenTools {
 		mapOp2Ins.put(OperatorType.GREATER_THAN_OR_EQUAL, RuntimeInst.icge);
 		mapOp2Ins.put(OperatorType.EQUAL, RuntimeInst.ice);
 		mapOp2Ins.put(OperatorType.NOT_EQUAL, RuntimeInst.icne);
+		mapOp2Ins.put(OperatorType.PLUS_ASSIGN, RuntimeInst.iadd);
+		mapOp2Ins.put(OperatorType.MINUS_ASSIGN, RuntimeInst.isub);
+		mapOp2Ins.put(OperatorType.TIMES_ASSIGN, RuntimeInst.imul);
+		mapOp2Ins.put(OperatorType.DIV_ASSIGN, RuntimeInst.idiv);
+		mapOp2Ins.put(OperatorType.MOD_ASSIGN, RuntimeInst.imod);
+		mapOp2Ins.put(OperatorType.AND_ASSIGN, RuntimeInst.iand);
+		mapOp2Ins.put(OperatorType.OR_ASSIGN, RuntimeInst.ior);
+		mapOp2Ins.put(OperatorType.XOR_ASSIGN, RuntimeInst.ixor);
 		for (Entry<OperatorType, RuntimeInst> entry : mapOp2Ins.entrySet()) {
 			mapIns2Op.put(entry.getValue(), entry.getKey());
 		}

@@ -1,6 +1,7 @@
 package priv.bajdcc.LALR1.grammar.tree;
 
 import priv.bajdcc.LALR1.grammar.codegen.ICodegen;
+import priv.bajdcc.LALR1.grammar.error.SemanticException;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeInst;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeInstUnary;
 import priv.bajdcc.LALR1.grammar.semantic.ISemanticRecorder;
@@ -83,6 +84,23 @@ public class ExpBinop implements IExp {
 
 	@Override
 	public void analysis(ISemanticRecorder recorder) {
+		if (token.kToken == TokenType.OPERATOR) {
+			OperatorType op = (OperatorType) token.object;
+			switch (op) {
+				case PLUS_ASSIGN:
+				case MINUS_ASSIGN:
+				case TIMES_ASSIGN:
+				case DIV_ASSIGN:
+				case AND_ASSIGN:
+				case OR_ASSIGN:
+				case XOR_ASSIGN:
+				case MOD_ASSIGN:
+				if (!(leftOperand instanceof ExpValue)) {
+					recorder.add(SemanticException.SemanticError.INVALID_ASSIGNMENT, token);
+				}
+				break;
+			}
+		}
 		leftOperand.analysis(recorder);
 		rightOperand.analysis(recorder);
 	}
@@ -98,6 +116,31 @@ public class ExpBinop implements IExp {
 			codegen.genCode(RuntimeInst.ipush, codegen.genDataRef("g_get_property"));
 			codegen.genCode(RuntimeInst.icallx);
 			return;
+		}
+		if (token.kToken == TokenType.OPERATOR) {
+			OperatorType op = (OperatorType) token.object;
+			boolean assign = false;
+			switch (op) {
+				case PLUS_ASSIGN:
+				case MINUS_ASSIGN:
+				case TIMES_ASSIGN:
+				case DIV_ASSIGN:
+				case AND_ASSIGN:
+				case OR_ASSIGN:
+				case XOR_ASSIGN:
+				case MOD_ASSIGN:
+					assign = true;
+					break;
+			}
+			if (assign) {
+				leftOperand.genCode(codegen);
+				rightOperand.genCode(codegen);
+				codegen.genCode(TokenTools.op2ins(token));
+				ExpValue left = (ExpValue) leftOperand;
+				codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(left.getToken().object));
+				codegen.genCode(RuntimeInst.iassign);
+				return;
+			}
 		}
 		RuntimeInst inst = TokenTools.op2ins(token);
 		leftOperand.genCode(codegen);

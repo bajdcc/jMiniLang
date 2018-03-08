@@ -148,7 +148,8 @@ public class Grammar extends Semantic {
 				"var_list", "exp_list", "exp", "exp0", "exp1", "exp2", "exp3",
 				"exp4", "exp5", "exp6", "exp7", "exp8", "exp9", "exp10", "type",
 				"block", "call_exp", "call", "ret", "doc_list", "port", "if",
-				"for", "while", "foreach", "cycle_ctrl", "block_stmt", "array", "map", "set", "invoke"};
+				"for", "while", "foreach", "cycle_ctrl", "block_stmt", "array", "map", "set", "invoke",
+				"exp01"};
 		for (String string : nonTerminals) {
 			addNonTerminal(string);
 		}
@@ -197,7 +198,9 @@ public class Grammar extends Semantic {
 				"port -> (@IMPORT[1] | @EXPORT[2]) @LITERAL[0]{lost_string} @SEMI{lost_semi}");
 		/* 表达式（算符文法） */
 		ISemanticAnalyzer exp_handler = handler.getSemanticHandler("exp");
-		infer(exp_handler, "exp -> exp0[0]");
+		infer(exp_handler, "exp -> exp01[0]");
+		infer(exp_handler,
+				"exp01 -> [exp01[1] (@ADD_ASSIGN[2] | @SUB_ASSIGN[2] | @MUL_ASSIGN[2] | @DIV_ASSIGN[2] | @AND_ASSIGN[2] | @OR_ASSIGN[2] | @XOR_ASSIGN[2] | @MOD_ASSIGN[2])] exp0[0]");
 		infer(exp_handler,
 				"exp0 -> exp1[0] [@QUERY[4] exp0[6] @COLON[5]{lost_colon} exp0[7]]");
 		infer(exp_handler, "exp1 -> [exp1[1] (@AND_OP[2] | @OR_OP[2])] exp2[0]");

@@ -555,6 +555,22 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	}
 
 	@Override
+	public void opAssign() throws RuntimeException {
+		int idx = loadInt();
+		RuntimeObject obj = load();
+		RuntimeObject target = stack.findVariable(pageName, idx);
+		if (target == null) {
+			err(RuntimeError.WRONG_OPERATOR);
+		}
+		if (target.isReadonly()) {
+			err(RuntimeError.READONLY_VAR, target.toString());
+		}
+		target.copyFrom(obj);
+		store(target);
+		opPushObj(obj);
+	}
+
+	@Override
 	public void opStoreDirect() throws RuntimeException {
 		int idx = loadInt();
 		RuntimeObject obj = load();

@@ -36,8 +36,9 @@ public enum RuntimeInst {
     iloadx,           // 外部变量载入
     ildfun,           // 函数地址载入
     irefun,           // 声明递归函数
-    istore,           // 栈顶[top]数据存入[top-1]索引指向的位置（引用）
-    ialloc,           // 栈顶[top]数据存入[top-1]索引指向的位置（新建）
+	istore,           // 栈顶[top]数据存入[top-1]索引指向的位置（引用）
+	iassign,          // 栈顶[top]数据存入[top-1]索引指向的位置（引用）
+	ialloc,           // 栈顶[top]数据存入[top-1]索引指向的位置（新建）
 
     iimp,             // 导入[top]
 
@@ -77,5 +78,5 @@ public enum RuntimeInst {
     icne,             // 不等于，[top]!=[top-1]
 
     iarr,             // 生成数组于[top]
-    imap              // 生成字典于[top]
+    imap,             // 生成字典于[top]
 }
