@@ -20,16 +20,10 @@ public class RuntimeObject implements Cloneable {
 	private RuntimeObjectType type = RuntimeObjectType.kNull;
 	private boolean readonly = false;
 	private boolean copyable = true;
-	private long[] flag = new long[1];
+	private long[] flag = null;
 
 	public RuntimeObject(Object obj) {
 		this.obj = obj;
-		calcTypeFromObject();
-	}
-
-	public RuntimeObject(Object obj, long flag) {
-		this.obj = obj;
-		this.flag[0] = flag;
 		calcTypeFromObject();
 	}
 
@@ -68,7 +62,10 @@ public class RuntimeObject implements Cloneable {
 			this.readonly = obj.readonly;
 			this.copyable = obj.copyable;
 			this.type = obj.type;
-			this.flag = obj.flag;
+			if (obj.flag != null)
+				this.flag = obj.flag;
+			else
+				this.flag = obj.flag = new long[1];
 		} else {
 			calcTypeFromObject();
 		}
@@ -140,10 +137,12 @@ public class RuntimeObject implements Cloneable {
 	}
 
 	public long getFlag() {
-		return flag[0];
+		return flag == null ? 0 : flag[0];
 	}
 
 	public void setFlag(long flag) {
+		if (this.flag == null)
+			this.flag = new long[1];
 		this.flag[0] = flag;
 	}
 
