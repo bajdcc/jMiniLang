@@ -1,5 +1,5 @@
 // USER MAIN BY BAJDCC
 import "sys.base";
 import "sys.proc";
-call g_printn("Running shell...");
-call g_load_user_x("/usr/p/sh");
+g_printn("Running shell...");
+g_load_user_x("/usr/p/sh");

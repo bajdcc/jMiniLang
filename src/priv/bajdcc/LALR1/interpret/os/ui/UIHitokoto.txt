@@ -4,58 +4,58 @@ import "sys.proc";
 import "sys.task";
 import "sys.remote";
 
-call g_set_process_desc("hitokoto ui");
-call g_set_process_priority(81);
+g_set_process_desc("hitokoto ui");
+g_set_process_priority(81);
 
 var uid = 2;
-var ui = call g_array_get(call g_query_share("UI#NAMELIST"), uid);
+var ui = g_array_get(g_query_share("UI#NAMELIST"), uid);
 var ui_name = "UI#" + ui;
 var switch_name = "UI_SWITCH#" + ui;
 var signal_name = "UI_SIGNAL#" + ui;
 
-call g_printn("Running...");
+g_printn("Running...");
 
 var first = false;
 var init = func ~() {
-    call g_task_get_fast_arg("ui", "path", "\uffeeM 100 200\uffee\uffeel 500 0\uffee\uffeel 0 150\uffee\uffeel -500 0\uffee\uffeel 0 -150\uffee");
+    g_task_get_fast_arg("ui", "path", "\uffeeM 100 200\uffee\uffeel 500 0\uffee\uffeel 0 150\uffee\uffeel -500 0\uffee\uffeel 0 -150\uffee");
 };
 var destroy = func ~() {
-    call g_task_get_fast_arg("ui", "path", "\uffeeM 100 200\uffee\uffeeR 601 351\uffee");
+    g_task_get_fast_arg("ui", "path", "\uffeeM 100 200\uffee\uffeeR 601 351\uffee");
 };
 
 var draw = func ~() {
     if (!first) {
-        call init();
+        init();
         first := true;
     }
-    var obj = call g_task_get_fast_arg("net", "get_json", "http://api.hitokoto.cn/?c=a&encode=json");
-    if (call g_is_null(obj)) { call g_task_sleep(10); return; }
-    var text = " —— " + call g_map_get(obj, "from") + " —— \n" + call g_map_get(obj, "hitokoto");
+    var obj = g_task_get_fast_arg("net", "get_json", "http://api.hitokoto.cn/?c=a&encode=json");
+    if (g_is_null(obj)) { g_task_sleep(10); return; }
+    var text = " —— " + g_map_get(obj, "from") + " —— \n" + g_map_get(obj, "hitokoto");
     //var text = "test string for debug";
-    call g_task_get_fast_arg("ui", "path", "\uffeeM 101 201\uffee\uffeeR 599 349\uffee\uffeeM 140 230\uffee\uffeeW 450\uffee\uffec" + text + "\uffec");
-    call g_task_sleep_signal(8, "TASK#SLEEP");
+    g_task_get_fast_arg("ui", "path", "\uffeeM 101 201\uffee\uffeeR 599 349\uffee\uffeeM 140 230\uffee\uffeeW 450\uffee\uffec" + text + "\uffec");
+    g_task_sleep_signal(8, "TASK#SLEEP");
 };
 var clear = func ~() {
     if (first) {
-        call destroy();
+        destroy();
         first := false;
     }
 };
 
-call g_start_share(switch_name, g_false);
-var signal = call g_create_one_semaphore(signal_name);
+g_start_share(switch_name, g_false);
+var signal = g_create_one_semaphore(signal_name);
 
-while (call g_query_share(ui_name)) {
-    if (call g_query_share(switch_name)) {
-        call draw();
+while (g_query_share(ui_name)) {
+    if (g_query_share(switch_name)) {
+        draw();
     } else {
-        call clear();
-        call g_lock_semaphore(signal);
+        clear();
+        g_lock_semaphore(signal);
     }
 }
 
-call g_stop_share(switch_name);
-call g_stop_share(ui_name);
-call g_destroy_semaphore(call g_use_semaphore(signal_name));
+g_stop_share(switch_name);
+g_stop_share(ui_name);
+g_destroy_semaphore(g_use_semaphore(signal_name));
 
-call g_printn("Exit.");
+g_printn("Exit.");

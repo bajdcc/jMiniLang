@@ -3,42 +3,42 @@ import "sys.list";
 import "sys.string";
 import "sys.proc";
 
-call g_set_process_desc("range routinue");
-var pid = call g_get_pid();
-var share = call g_wait_share("PID#" + pid);
-call g_stop_share("PID#" + pid);
-var args = call g_map_get(share, "args");
+g_set_process_desc("range routinue");
+var pid = g_get_pid();
+var share = g_wait_share("PID#" + pid);
+g_stop_share("PID#" + pid);
+var args = g_map_get(share, "args");
 
-var in = call g_create_pipe("PIPEIN#" + pid);
-var out = call g_create_pipe("PIPEOUT#" + pid);
+var in = g_create_pipe("PIPEIN#" + pid);
+var out = g_create_pipe("PIPEOUT#" + pid);
 
 var signal = "PIDSIG#" + pid;
-call g_start_share(signal, true);
+g_start_share(signal, true);
 
-if (call g_array_size(args) < 2) {
-    call g_write_pipe_n(out, "Error: missing arguments.");
-    call g_destroy_pipe(out);
-    call g_destroy_pipe(in);
+if (g_array_size(args) < 2) {
+    g_write_pipe_n(out, "Error: missing arguments.");
+    g_destroy_pipe(out);
+    g_destroy_pipe(in);
     return;
 }
-var lower = call g_string_atoi(call g_array_get(args, 0));
-var upper = call g_string_atoi(call g_array_get(args, 1));
+var lower = g_string_atoi(g_array_get(args, 0));
+var upper = g_string_atoi(g_array_get(args, 1));
 if (lower > upper) {
-    for (var i = lower; i >= upper && call g_query_share(signal); i--) {
-        foreach (var j : call g_range_string(call g_to_string(i))) {
-            call g_write_pipe(out, j);
+    for (var i = lower; i >= upper && g_query_share(signal); i--) {
+        foreach (var j : g_range_string(g_to_string(i))) {
+            g_write_pipe(out, j);
         }
-        call g_write_pipe(out, g_endl);
+        g_write_pipe(out, g_endl);
     }
 } else {
-    for (var i = lower; i <= upper && call g_query_share(signal); i++) {
-        foreach (var j : call g_range_string(call g_to_string(i))) {
-            call g_write_pipe(out, j);
+    for (var i = lower; i <= upper && g_query_share(signal); i++) {
+        foreach (var j : g_range_string(g_to_string(i))) {
+            g_write_pipe(out, j);
         }
-        call g_write_pipe(out, g_endl);
+        g_write_pipe(out, g_endl);
     }
 }
-call g_stop_share(signal);
+g_stop_share(signal);
 
-call g_destroy_pipe(out);
-call g_destroy_pipe(in);
+g_destroy_pipe(out);
+g_destroy_pipe(in);

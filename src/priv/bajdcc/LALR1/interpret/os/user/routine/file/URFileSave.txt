@@ -4,41 +4,41 @@ import "sys.list";
 import "sys.file";
 import "sys.ui";
 
-call g_set_process_desc("save routinue");
-var pid = call g_get_pid();
-var share = call g_wait_share("PID#" + pid);
-call g_stop_share("PID#" + pid);
-var args = call g_map_get(share, "args");
-var o = call g_map_get(share, "out");
+g_set_process_desc("save routinue");
+var pid = g_get_pid();
+var share = g_wait_share("PID#" + pid);
+g_stop_share("PID#" + pid);
+var args = g_map_get(share, "args");
+var o = g_map_get(share, "out");
 
-var in = call g_create_pipe("PIPEIN#" + pid);
-var out = call g_create_pipe("PIPEOUT#" + pid);
+var in = g_create_pipe("PIPEIN#" + pid);
+var out = g_create_pipe("PIPEOUT#" + pid);
 
 var signal = "PIDSIG#" + pid;
-call g_start_share(signal, true);
+g_start_share(signal, true);
 
-if (call g_array_empty(args)) {
-    call g_write_pipe(out, "USAGE: > [filename] [encoding=u/g/a]" + g_endl);
-    call g_write_pipe(out, "       > & (redirect to stdout)" + g_endl);
+if (g_array_empty(args)) {
+    g_write_pipe(out, "USAGE: > [filename] [encoding=u/g/a]" + g_endl);
+    g_write_pipe(out, "       > & (redirect to stdout)" + g_endl);
 } else {
-    var filename = call g_array_get(args, 0);
+    var filename = g_array_get(args, 0);
     if (filename == "&") {
-        if (call g_is_null(o)) {
-            call g_read_pipe(in, lambda(ch) -> call g_ui_print(ch));
+        if (g_is_null(o)) {
+            g_read_pipe(in, lambda(ch) -> g_ui_print(ch));
         } else {
-            call g_read_pipe_args(in, lambda(ch, o) -> call g_write_pipe(o, ch), o);
+            g_read_pipe_args(in, lambda(ch, o) -> g_write_pipe(o, ch), o);
         }
     } else if (filename == "&&") {
-        if (call g_is_null(o)) {
-            call g_read_pipe(in, lambda(ch) -> call g_ui_print(ch));
+        if (g_is_null(o)) {
+            g_read_pipe(in, lambda(ch) -> g_ui_print(ch));
         } else {
-            call g_read_pipe_args(in, lambda(ch, o) -> call g_write_pipe(o, ch), o);
-            call g_write_pipe(o, g_endl);
+            g_read_pipe_args(in, lambda(ch, o) -> g_write_pipe(o, ch), o);
+            g_write_pipe(o, g_endl);
         }
     } else {
         var function = "g_write_file_utf8";
-        if (call g_array_size(args) > 1) {
-            var enc = call g_array_get(args, 1);
+        if (g_array_size(args) > 1) {
+            var enc = g_array_get(args, 1);
             if (enc == "u") {
                 //function := "g_write_file_utf8";
             } else if (enc == "g") {
@@ -47,15 +47,15 @@ if (call g_array_empty(args)) {
                 function := "g_write_file_ascii";
             }
         }
-        if (!call function(filename, in)) {
-            call g_write_pipe(out, "Error: Write file failed!" + g_endl);
+        if (!function(filename, in)) {
+            g_write_pipe(out, "Error: Write file failed!" + g_endl);
         }
     }
 }
 
-call g_sleep(50);
+g_sleep(50);
 
-call g_stop_share(signal);
+g_stop_share(signal);
 
-call g_destroy_pipe(out);
-call g_destroy_pipe(in);
+g_destroy_pipe(out);
+g_destroy_pipe(in);

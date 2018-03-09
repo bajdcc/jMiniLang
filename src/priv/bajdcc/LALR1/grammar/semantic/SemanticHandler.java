@@ -169,6 +169,29 @@ public class SemanticHandler {
 				return indexed.get(1).object;
 			} else if (indexed.exists(2)) {
 				return indexed.get(2).object;
+			} else if (indexed.exists(3)) {
+				ExpInvoke invoke = new ExpInvoke();
+				Token token = indexed.get(0).token;
+				invoke.setName(token);
+				Function func = query.getQueryScopeService().getFuncByName(
+						token.toRealString());
+				if (func == null) {
+					if (TokenTools.isExternalName(token)) {
+						invoke.setExtern(token);
+					} else if (query.getQueryScopeService()
+							.findDeclaredSymbol(token.toRealString())) {
+						invoke.setExtern(token);
+						invoke.setInvoke(true);
+					} else {
+						recorder.add(SemanticError.MISSING_FUNCNAME, token);
+					}
+				} else {
+					invoke.setFunc(func);
+				}
+				if (indexed.exists(4)) {
+					invoke.setParams((ArrayList<IExp>) indexed.get(4).object);
+				}
+				return invoke;
 			} else {
 				ExpValue value = new ExpValue();
 				Token token = indexed.get(0).token;

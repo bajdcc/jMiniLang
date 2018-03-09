@@ -3,49 +3,49 @@ import "sys.list";
 import "sys.proc";
 import "sys.string";
 
-call g_set_process_desc("replace routinue");
+g_set_process_desc("replace routinue");
 
-var pid = call g_get_pid();
-var in = call g_create_pipe("PIPEIN#" + pid);
-var out = call g_create_pipe("PIPEOUT#" + pid);
+var pid = g_get_pid();
+var in = g_create_pipe("PIPEIN#" + pid);
+var out = g_create_pipe("PIPEOUT#" + pid);
 
-var share = call g_wait_share("PID#" + pid);
-call g_stop_share("PID#" + pid);
-var args = call g_map_get(share, "args");
-var arg1 = call g_array_get(args, 0);
+var share = g_wait_share("PID#" + pid);
+g_stop_share("PID#" + pid);
+var args = g_map_get(share, "args");
+var arg1 = g_array_get(args, 0);
 
 var buf = [];
-if (call g_is_null(arg1)) {
-    call g_read_pipe_args(in, lambda(ch, out) -> call g_write_pipe(out, ch), out);
+if (g_is_null(arg1)) {
+    g_read_pipe_args(in, lambda(ch, out) -> g_write_pipe(out, ch), out);
 } else {
-    var arg = call g_string_join_array(args, " ");
-    var sp = call g_string_split(arg, "\\$");
-    var size = call g_array_size(sp);
+    var arg = g_string_join_array(args, " ");
+    var sp = g_string_split(arg, "\\$");
+    var size = g_array_size(sp);
     if (size == 0) {
-        call g_read_pipe_args(in, lambda(ch, out) -> call g_write_pipe(out, ch), out);
+        g_read_pipe_args(in, lambda(ch, out) -> g_write_pipe(out, ch), out);
     } else if (size == 1) {
-        call g_read_pipe_args(in, lambda(ch, out) {
+        g_read_pipe_args(in, lambda(ch, out) {
             if (ch == '\n') {
-                var cur = call g_string_build(buf);
-                call g_write_pipe_n(out, arg);
-                call g_array_clear(buf);
+                var cur = g_string_build(buf);
+                g_write_pipe_n(out, arg);
+                g_array_clear(buf);
             } else if (ch == '\r') {
             } else {
-                call g_array_add(buf, ch);
+                g_array_add(buf, ch);
             }
         }, out);
     } else {
-        call g_read_pipe_args(in, lambda(ch, out) {
+        g_read_pipe_args(in, lambda(ch, out) {
             if (ch == '\n') {
-                var cur = call g_string_build(buf);
-                call g_write_pipe_n(out, call g_string_join_array(sp, cur));
-                call g_array_clear(buf);
+                var cur = g_string_build(buf);
+                g_write_pipe_n(out, g_string_join_array(sp, cur));
+                g_array_clear(buf);
             } else if (ch == '\r') {
             } else {
-                call g_array_add(buf, ch);
+                g_array_add(buf, ch);
             }
         }, out);
     }
 }
 
-call g_destroy_pipe(out);
+g_destroy_pipe(out);

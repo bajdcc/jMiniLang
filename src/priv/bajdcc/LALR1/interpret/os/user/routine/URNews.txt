@@ -7,32 +7,32 @@ import "sys.task";
 import "sys.ui";
 import "std.base";
 
-call g_set_process_desc("news routinue");
-var pid = call g_get_pid();
-var share = call g_wait_share("PID#" + pid);
-call g_stop_share("PID#" + pid);
-var args = call g_map_get(share, "args");
+g_set_process_desc("news routinue");
+var pid = g_get_pid();
+var share = g_wait_share("PID#" + pid);
+g_stop_share("PID#" + pid);
+var args = g_map_get(share, "args");
 
-var in = call g_create_pipe("PIPEIN#" + pid);
-var out = call g_create_pipe("PIPEOUT#" + pid);
+var in = g_create_pipe("PIPEIN#" + pid);
+var out = g_create_pipe("PIPEOUT#" + pid);
 
 var signal = "PIDSIG#" + pid;
-call g_start_share(signal, true);
+g_start_share(signal, true);
 
 // -----------------------------------------------------------------------------------------
 // State Machine Design and Implementation using Class
 // * Reference: https://github.com/bajdcc/NewsApp
 // ---- CODE BEGIN ----
 
-var ctx = call g_create_context();
-call g_import_std_base(ctx);
+var ctx = g_create_context();
+g_import_std_base(ctx);
 
 var _ = g_null;
 
 /* -----------------------------------------------------------------
 # CLASS [app::news::util.static_timer]
 ----------------------------------------------------------------- */
-call g_register_class(ctx, "app::news::util.static_timer", lambda(this) { // 定时器
+g_register_class(ctx, "app::news::util.static_timer", lambda(this) { // 定时器
     set this::"span" = _;
     set this::"time" = _;
     set this::"first" = _;
@@ -46,13 +46,13 @@ call g_register_class(ctx, "app::news::util.static_timer", lambda(this) { // 定
     };
     set this::"is_timeout" = lambda(this) {
         if (!this."first") { return false; }
-        var flag = call g_task_get_timestamp() >= this."time";
+        var flag = g_task_get_timestamp() >= this."time";
         if (flag) { set this::"first" = false; }
         return flag;
     };
-    set this::"is_timeout_once" = lambda(this) -> call g_task_get_timestamp() >= this."time";
+    set this::"is_timeout_once" = lambda(this) -> g_task_get_timestamp() >= this."time";
     set this::"restart" = lambda(this) {
-        set this::"time" = call g_task_get_timestamp() + this."span";
+        set this::"time" = g_task_get_timestamp() + this."span";
         set this::"first" = true;
     };
     set this::"reset" = lambda(this) -> set this::"time" = 0;
@@ -60,7 +60,7 @@ call g_register_class(ctx, "app::news::util.static_timer", lambda(this) { // 定
 /* -----------------------------------------------------------------
 # CLASS [app::news::state.interface]
 ----------------------------------------------------------------- */
-call g_register_class(ctx, "app::news::state.interface", lambda(this) { // 状态基类
+g_register_class(ctx, "app::news::state.interface", lambda(this) { // 状态基类
     // 子类使用监听模式以重写方法(AOP)
     // 如果需要返回值，还是用方法覆盖
     set this::"context" = _;
@@ -77,28 +77,28 @@ call g_register_class(ctx, "app::news::state.interface", lambda(this) { // 状�
 /* -----------------------------------------------------------------
 # CLASS [app::news::state.base]
 ----------------------------------------------------------------- */
-call g_register_class(ctx, "app::news::state.base", lambda(this) { // 状态基类
-    call g_hook_add_before(this, "on_cancel", lambda(class, name, this, next, shutdown) {
+g_register_class(ctx, "app::news::state.base", lambda(this) { // 状态基类
+    g_hook_add_before(this, "on_cancel", lambda(class, name, this, next, shutdown) {
         if (shutdown) {
             invoke this."context"::"start_state"("app::news::state.idle");
         } else {
             invoke this."context"::"start_state"("app::news::state.end");
         }
-        return call next();
+        return next();
     });
 }, "app::news::state.interface");
 /* -----------------------------------------------------------------
 # CLASS [app::news::state.begin]
 ----------------------------------------------------------------- */
-call g_register_class(ctx, "app::news::state.begin", lambda(this) { // 起始状态
-    set this::"overlay_animation_waiting" = call g_create_class(ctx, "app::news::util.static_timer");
+g_register_class(ctx, "app::news::state.begin", lambda(this) { // 起始状态
+    set this::"overlay_animation_waiting" = g_create_class(ctx, "app::news::util.static_timer");
     invoke this."overlay_animation_waiting"::"set_span"(1);
-    call g_hook_add_before(this, "on_start", lambda(class, name, this, next) {
+    g_hook_add_before(this, "on_start", lambda(class, name, this, next) {
         set this::"is_start" = true;
         invoke this."context"::"open_overlay"();
-        return call next();
+        return next();
     });
-    call g_hook_add_before(this, "on_timer", lambda(class, name, this, next) {
+    g_hook_add_before(this, "on_timer", lambda(class, name, this, next) {
         if (this."is_start") {
             if (invoke this."overlay_animation_waiting"::"is_timeout"()) {
                 invoke this::"log"("[Overlay] Waiting for animation completed...");
@@ -109,22 +109,22 @@ call g_register_class(ctx, "app::news::state.begin", lambda(this) { // 起始状
                 }
             }
         }
-        return call next();
+        return next();
     });
 }, "app::news::state.base");
 /* -----------------------------------------------------------------
 # CLASS [app::news::state.end]
 ----------------------------------------------------------------- */
-call g_register_class(ctx, "app::news::state.end", lambda(this) { // 结束状态
-    set this::"overlay_animation_waiting" = call g_create_class(ctx, "app::news::util.static_timer");
+g_register_class(ctx, "app::news::state.end", lambda(this) { // 结束状态
+    set this::"overlay_animation_waiting" = g_create_class(ctx, "app::news::util.static_timer");
     invoke this."overlay_animation_waiting"::"set_span"(1);
-    call g_hook_add_before(this, "on_start", lambda(class, name, this, next) {
+    g_hook_add_before(this, "on_start", lambda(class, name, this, next) {
         set this::"is_start" = true;
         invoke this::"log"("[Overlay] Waiting for close...");
         invoke this."context"::"close_overlay"();
-        return call next();
+        return next();
     });
-    call g_hook_add_before(this, "on_timer", lambda(class, name, this, next) {
+    g_hook_add_before(this, "on_timer", lambda(class, name, this, next) {
         if (this."is_start") {
             if (invoke this."overlay_animation_waiting"::"is_timeout"()) {
                 invoke this."overlay_animation_waiting"::"restart"();
@@ -136,27 +136,27 @@ call g_register_class(ctx, "app::news::state.end", lambda(this) { // 结束状�
                 }
             }
         }
-        return call next();
+        return next();
     });
 }, "app::news::state.base");
 /* -----------------------------------------------------------------
 # CLASS [app::news::state.idle]
 ----------------------------------------------------------------- */
-call g_register_class(ctx, "app::news::state.idle", lambda(this) { // 空闲状态
-    set this::"idle_timer" = call g_create_class(ctx, "app::news::util.static_timer");
+g_register_class(ctx, "app::news::state.idle", lambda(this) { // 空闲状态
+    set this::"idle_timer" = g_create_class(ctx, "app::news::util.static_timer");
     invoke this."idle_timer"::"set_span"(5);
-    call g_hook_add_before(this, "on_start", lambda(class, name, this, next) {
+    g_hook_add_before(this, "on_start", lambda(class, name, this, next) {
         set this::"is_start" = true;
         invoke this."idle_timer"::"restart"();
-        return call next();
+        return next();
     });
-    call g_hook_add_before(this, "on_message", lambda(class, name, this, next, msg) {
+    g_hook_add_before(this, "on_message", lambda(class, name, this, next, msg) {
         if (this."is_start") {
-            return call next();
+            return next();
         }
         // else block msg
     });
-    call g_hook_add_before(this, "on_timer", lambda(class, name, this, next) {
+    g_hook_add_before(this, "on_timer", lambda(class, name, this, next) {
         if (this."is_start") {
             if (invoke this."idle_timer"::"is_timeout"()) {
                 invoke this::"log"("Idle...");
@@ -170,32 +170,32 @@ call g_register_class(ctx, "app::news::state.idle", lambda(this) { // 空闲状�
                 }
             }
         }
-        return call next();
+        return next();
     });
 }, "app::news::state.base");
 /* -----------------------------------------------------------------
 # CLASS [app::news::state.waiting]
 ----------------------------------------------------------------- */
-call g_register_class(ctx, "app::news::state.waiting", lambda(this) { // 等待状态
+g_register_class(ctx, "app::news::state.waiting", lambda(this) { // 等待状态
     set this::"time" = _;
     set this::"retries" = 0;
     set this::"max_retries" = 5;
     set this::"idle_timer" = _;
     set this::"retries_timer" = _;
-    call g_hook_add_before(this, "on_start", lambda(class, name, this, next) {
+    g_hook_add_before(this, "on_start", lambda(class, name, this, next) {
         set this::"is_start" = true;
-        set this::"idle_timer" = call g_create_class(ctx, "app::news::util.static_timer");
+        set this::"idle_timer" = g_create_class(ctx, "app::news::util.static_timer");
         invoke this."idle_timer"::"set_span_ms"(this."time");
-        set this::"retries_timer" = call g_create_class(ctx, "app::news::util.static_timer");
+        set this::"retries_timer" = g_create_class(ctx, "app::news::util.static_timer");
         invoke this."retries_timer"::"set_span"(1);
-        return call next();
+        return next();
     });
-    call g_hook_add_before(this, "on_message", lambda(class, name, this, next, msg) {
+    g_hook_add_before(this, "on_message", lambda(class, name, this, next, msg) {
         invoke this."idle_timer"::"restart"();
         set this::"retries" = 0;
-        return call next();
+        return next();
     });
-    call g_hook_add_before(this, "on_timer", lambda(class, name, this, next) {
+    g_hook_add_before(this, "on_timer", lambda(class, name, this, next) {
         if (invoke this."idle_timer"::"is_timeout_once"()) {
             if (invoke this."context"::"has_msg"()) {
                 invoke this::"log"("[Overlay] Ready for queue...");
@@ -211,48 +211,48 @@ call g_register_class(ctx, "app::news::state.waiting", lambda(this) { // 等待�
                 }
             }
         }
-        return call next();
+        return next();
     });
 }, "app::news::state.base");
 /* -----------------------------------------------------------------
 # CLASS [app::news::state.queue]
 ----------------------------------------------------------------- */
-call g_register_class(ctx, "app::news::state.queue", lambda(this) { // 队列
-    call g_hook_add_before(this, "on_start", lambda(class, name, this, next) {
+g_register_class(ctx, "app::news::state.queue", lambda(this) { // 队列
+    g_hook_add_before(this, "on_start", lambda(class, name, this, next) {
         set this::"is_start" = true;
         invoke this::"log"("[Overlay] Ready for marquee...");
-        return call next();
+        return next();
     });
-    call g_hook_add_before(this, "on_timer", lambda(class, name, this, next) {
+    g_hook_add_before(this, "on_timer", lambda(class, name, this, next) {
         if (this."is_start" && invoke this."context"::"has_msg"()) {
             var time = invoke this."context"::"marquee"();
             invoke this::"log"("[Overlay] Marquee completed, time for waiting: " + time + "ms");
-            var state = call g_create_class(ctx, "app::news::state.waiting");
+            var state = g_create_class(ctx, "app::news::state.waiting");
             invoke state::"set_context"(this."context");
             set state::"time" = time;
             invoke this."context"::"set_state"(state);
         }
-        return call next();
+        return next();
     });
 }, "app::news::state.base");
 /* -----------------------------------------------------------------
 # CLASS [app::news::state.transfer]
 ----------------------------------------------------------------- */
-call g_register_class(ctx, "app::news::state.transfer", lambda(this) { // 传送
-    set this::"idle_timer" = call g_create_class(ctx, "app::news::util.static_timer");
+g_register_class(ctx, "app::news::state.transfer", lambda(this) { // 传送
+    set this::"idle_timer" = g_create_class(ctx, "app::news::util.static_timer");
     invoke this."idle_timer"::"set_span"(6);
-    set this::"msg_queue" = call g_create_class(ctx, "list::array");
-    call g_hook_add_before(this, "on_start", lambda(class, name, this, next) {
+    set this::"msg_queue" = g_create_class(ctx, "list::array");
+    g_hook_add_before(this, "on_start", lambda(class, name, this, next) {
         set this::"is_start" = true;
         invoke this."idle_timer"::"restart"();
         invoke this::"log"("[Transfer] Started");
-        return call next();
+        return next();
     });
-    call g_hook_add_before(this, "on_message", lambda(class, name, this, next, msg) {
+    g_hook_add_before(this, "on_message", lambda(class, name, this, next, msg) {
         invoke this."msg_queue"::"insert"(0, msg);
-        return call next();
+        return next();
     });
-    call g_hook_add_before(this, "on_timer", lambda(class, name, this, next) {
+    g_hook_add_before(this, "on_timer", lambda(class, name, this, next) {
         if (this."is_start" && invoke this."idle_timer"::"is_timeout_once"()) {
             invoke this."idle_timer"::"restart"();
             if (!invoke this."msg_queue"::"empty"()) {
@@ -262,18 +262,18 @@ call g_register_class(ctx, "app::news::state.transfer", lambda(this) { // 传送
                 invoke this."context"::"add_msg"(msg);
             }
         }
-        return call next();
+        return next();
     });
 }, "app::news::state.base");
 /* -----------------------------------------------------------------
 # CLASS [app::news::state.crawler]
 ----------------------------------------------------------------- */
-call g_register_class(ctx, "app::news::state.crawler", lambda(this) { // 抓取
-    set this::"idle_timer" = call g_create_class(ctx, "app::news::util.static_timer");
+g_register_class(ctx, "app::news::state.crawler", lambda(this) { // 抓取
+    set this::"idle_timer" = g_create_class(ctx, "app::news::util.static_timer");
     invoke this."idle_timer"::"set_span"(60);
     set this::"rss_index" = 0;
     set this::"rss_end" = 0;
-    set this::"rss_list" = call g_create_class(ctx, "list::array");
+    set this::"rss_list" = g_create_class(ctx, "list::array");
     invoke this."rss_list"::"add"("http://news.baidu.com/n?cmd=1&class=civilnews&tn=rss");
     invoke this."rss_list"::"add"("http://news.baidu.com/n?cmd=1&class=internews&tn=rss");
     invoke this."rss_list"::"add"("http://news.baidu.com/n?cmd=1&class=mil&tn=rss");
@@ -313,23 +313,23 @@ call g_register_class(ctx, "app::news::state.crawler", lambda(this) { // 抓取
         set this::"rss_index" = this."rss_index" + 1;
         return invoke this."rss_list"::"get"(idx);
     };
-    call g_hook_add_before(this, "on_reset", lambda(class, name, this, next) {
+    g_hook_add_before(this, "on_reset", lambda(class, name, this, next) {
         invoke this."idle_timer"::"reset"();
-        return call next();
+        return next();
     });
-    call g_hook_add_before(this, "on_start", lambda(class, name, this, next) {
+    g_hook_add_before(this, "on_start", lambda(class, name, this, next) {
         set this::"is_start" = true;
         invoke this."idle_timer"::"reset"();
         invoke this::"log"("[Crawler] Started");
-        return call next();
+        return next();
     });
-    call g_hook_add_before(this, "on_timer", lambda(class, name, this, next) {
+    g_hook_add_before(this, "on_timer", lambda(class, name, this, next) {
         if (this."is_start" && invoke this."idle_timer"::"is_timeout_once"()) {
             invoke this."idle_timer"::"restart"();
             if (!invoke this."context"::"has_msg"()) {
-                var arr = call g_create_class(ctx, "list::array");
+                var arr = g_create_class(ctx, "list::array");
                 invoke this::"log"("[Crawler] Working...");
-                set arr::"array" = call g_task_get_fast_arg("net", "rss", invoke this::"get_rss"());
+                set arr::"array" = g_task_get_fast_arg("net", "rss", invoke this::"get_rss"());
                 if (invoke arr::"empty"()) {
                     invoke this::"log"("[Crawler] Failed!");
                 } else {
@@ -337,7 +337,7 @@ call g_register_class(ctx, "app::news::state.crawler", lambda(this) { // 抓取
                     var title = invoke arr::"get"(0);
                     var len = invoke arr::"size"();
                     for (var i = 1; i < len; i++) {
-                        var msg = call g_create_class(ctx, "string");
+                        var msg = g_create_class(ctx, "string");
                         set msg::"str" = invoke arr::"get"(i);
                         i++;
                         set msg::"title" = title;
@@ -348,30 +348,30 @@ call g_register_class(ctx, "app::news::state.crawler", lambda(this) { // 抓取
                 }
             }
         }
-        return call next();
+        return next();
     });
 }, "app::news::state.base");
 /* -----------------------------------------------------------------
 # CLASS [app::news::news.context]
 ----------------------------------------------------------------- */
-call g_register_class(ctx, "app::news::news.context", lambda(this) {
+g_register_class(ctx, "app::news::news.context", lambda(this) {
     set this::"state_main" = _;
     set this::"state_transfer" = _;
     set this::"state_crawler" = _;
-    set this::"msg_list" = call g_create_class(ctx, "list::array");
+    set this::"msg_list" = g_create_class(ctx, "list::array");
     set this::"add_msg" = lambda(this, msg) -> invoke this."msg_list"::"insert"(0, msg);
     set this::"has_msg" = lambda(this) -> !invoke this."msg_list"::"empty"();
     set this::"start" = lambda(this, output) {
         invoke this."state_main"::"on_start"();
-        if (call g_is_null(this."state_transfer")) {
-            var transfer = call g_create_class(ctx, "app::news::state.transfer");
+        if (g_is_null(this."state_transfer")) {
+            var transfer = g_create_class(ctx, "app::news::state.transfer");
             invoke transfer::"set_context"(this);
             set this::"state_transfer" = transfer;
             invoke this::"hook_state"(transfer);
             invoke transfer::"on_start"();
         }
-        if (call g_is_null(this."state_crawler")) {
-            var crawler = call g_create_class(ctx, "app::news::state.crawler");
+        if (g_is_null(this."state_crawler")) {
+            var crawler = g_create_class(ctx, "app::news::state.crawler");
             invoke crawler::"set_context"(this);
             set this::"state_crawler" = crawler;
             invoke this::"hook_state"(crawler);
@@ -382,39 +382,39 @@ call g_register_class(ctx, "app::news::news.context", lambda(this) {
         invoke this."state_base"::"on_cancel"(shutdown);
     };
     set this::"marquee" = lambda(this) -> _;
-    set this::"idle_timer" = call g_create_class(ctx, "app::news::util.static_timer");
+    set this::"idle_timer" = g_create_class(ctx, "app::news::util.static_timer");
     invoke this."idle_timer"::"set_span"(5);
     set this::"on_error" = lambda(this, error) -> _;
     set this::"on_finish" = lambda(this) -> _;
     set this::"on_progress" = lambda(this, progress) -> _;
     set this::"on_log" = lambda(this, msg) -> _;
     set this::"start_state" = lambda(this, state) {
-        var _state = call g_create_class(ctx, state);
+        var _state = g_create_class(ctx, state);
         invoke _state::"set_context"(this);
         invoke this::"set_state"(_state);
     };
     set this::"hook_state" = lambda(this, state) {
         // 监听并打印日志
-        call g_hook_add_before(state, "on_cancel", lambda(class, name, this, next, shutdown) {
-            call g_printn(class + "::" + name); return call next();
+        g_hook_add_before(state, "on_cancel", lambda(class, name, this, next, shutdown) {
+            g_printn(class + "::" + name); return next();
         });
-        call g_hook_add_before(state, "on_message", lambda(class, name, this, next, msg) {
-            call g_printn(class + "::" + name + " " + msg."str"); return call next();
+        g_hook_add_before(state, "on_message", lambda(class, name, this, next, msg) {
+            g_printn(class + "::" + name + " " + msg."str"); return next();
         });
-        call g_hook_add_before(state, "on_reset", lambda(class, name, this, next) {
-            call g_printn(class + "::" + name); return call next();
+        g_hook_add_before(state, "on_reset", lambda(class, name, this, next) {
+            g_printn(class + "::" + name); return next();
         });
-        call g_hook_add_before(state, "on_start", lambda(class, name, this, next) {
-            call g_printn(class + "::" + name); return call next();
+        g_hook_add_before(state, "on_start", lambda(class, name, this, next) {
+            g_printn(class + "::" + name); return next();
         });
-        call g_hook_add_before(state, "on_enter", lambda(class, name, this, next) {
-            call g_printn(class + "::" + name); return call next();
+        g_hook_add_before(state, "on_enter", lambda(class, name, this, next) {
+            g_printn(class + "::" + name); return next();
         });
-        call g_hook_add_before(state, "on_timer", lambda(class, name, this, next) {
-            return call next();
+        g_hook_add_before(state, "on_timer", lambda(class, name, this, next) {
+            return next();
         });
-        call g_hook_add_before(state, "log", lambda(class, name, this, next, msg) {
-            invoke this."context"::"on_log"(class + "::" + name + " " + msg); return call next();
+        g_hook_add_before(state, "log", lambda(class, name, this, next, msg) {
+            invoke this."context"::"on_log"(class + "::" + name + " " + msg); return next();
         });
     };
     set this::"set_state" = lambda(this, state) {
@@ -426,21 +426,21 @@ call g_register_class(ctx, "app::news::news.context", lambda(this) {
     set this::"is_open_overlay" = false;
     set this::"signal" = _;
     set this::"open_overlay_callback" = lambda(this) {
-        call g_set_process_desc("news overlay");
-        call g_printn("Timer overlay started");
+        g_set_process_desc("news overlay");
+        g_printn("Timer overlay started");
         var ms = 400;
-        var begin = call g_task_get_timestamp();
+        var begin = g_task_get_timestamp();
         var final = begin + 5000;
         var end = begin + ms;
         var signal = this."signal";
         invoke this."output"::"write"("Loading...");
         while (true) {
-            var s = call g_query_share(signal);
-            if (call g_is_null(s) || !s) {
-                call g_printdn("NewsApp Overlay interrupt: #" + call g_get_pid());
+            var s = g_query_share(signal);
+            if (g_is_null(s) || !s) {
+                g_printdn("NewsApp Overlay interrupt: #" + g_get_pid());
                 break;
             }
-            begin := call g_task_get_timestamp();
+            begin := g_task_get_timestamp();
             if (final < begin) {
                 break;
             }
@@ -448,33 +448,33 @@ call g_register_class(ctx, "app::news::news.context", lambda(this) {
                 invoke this."output"::"write"(".");
                 end += ms;
             } else {
-                call g_sleep(50);
+                g_sleep(50);
             }
         }
         invoke this."output"::"write"("\f");
-        call g_printn("Timer overlay exit");
+        g_printn("Timer overlay exit");
         set this::"is_open_overlay" = true;
     };
     set this::"open_overlay" = lambda(this) {
-        invoke call g_create_class(ctx, "system::process")::"start_args"(this."open_overlay_callback", this);
+        invoke g_create_class(ctx, "system::process")::"start_args"(this."open_overlay_callback", this);
     };
     set this::"close_overlay_callback" = lambda(this) {
-        call g_set_process_desc("news overlay");
-        call g_printn("Timer overlay started");
+        g_set_process_desc("news overlay");
+        g_printn("Timer overlay started");
         var ms = 400;
-        var begin = call g_task_get_timestamp();
+        var begin = g_task_get_timestamp();
         var final = begin + 5000;
         var end = begin + ms;
         var signal = this."signal";
         invoke this."output"::"write"("\v");
         invoke this."output"::"write"("Closing...");
         while (true) {
-            var s = call g_query_share(signal);
-            if (call g_is_null(s) || !s) {
-                call g_printdn("NewsApp Overlay interrupt: #" + call g_get_pid());
+            var s = g_query_share(signal);
+            if (g_is_null(s) || !s) {
+                g_printdn("NewsApp Overlay interrupt: #" + g_get_pid());
                 break;
             }
-            begin := call g_task_get_timestamp();
+            begin := g_task_get_timestamp();
             if (final < begin) {
                 break;
             }
@@ -482,80 +482,80 @@ call g_register_class(ctx, "app::news::news.context", lambda(this) {
                 invoke this."output"::"write"(".");
                 end += ms;
             } else {
-                call g_sleep(50);
+                g_sleep(50);
             }
         }
         invoke this."output"::"write"("\f");
-        call g_printn("Timer overlay exit");
+        g_printn("Timer overlay exit");
         set this::"is_open_overlay" = false;
     };
     set this::"close_overlay" = lambda(this) {
-        invoke call g_create_class(ctx, "system::process")::"start_args"(this."close_overlay_callback", this);
+        invoke g_create_class(ctx, "system::process")::"start_args"(this."close_overlay_callback", this);
     };
 }, "object");
 /* -----------------------------------------------------------------
 # CLASS [app::news::news.machine]
 ----------------------------------------------------------------- */
-call g_register_class(ctx, "app::news::news.machine", lambda(this) {
-    set this::"timer_thread" = call g_create_class(ctx, "system::process");
+g_register_class(ctx, "app::news::news.machine", lambda(this) {
+    set this::"timer_thread" = g_create_class(ctx, "system::process");
     set this::"timer_span" = 500;
     set this::"output" = _;
     set this::"signal" = signal;
     set this::"timer_callback" = lambda(this) {
-        call g_set_process_desc("news timer");
-        call g_printn("Timer process started");
+        g_set_process_desc("news timer");
+        g_printn("Timer process started");
         var ms = this."timer_span";
-        var begin = call g_task_get_timestamp();
+        var begin = g_task_get_timestamp();
         var end = begin + ms;
         var signal = this."signal";
         while (true) {
-            var s = call g_query_share(signal);
-            if (call g_is_null(s) || !s) {
-                call g_printdn("NewsApp Timer interrupt: #" + call g_get_pid());
+            var s = g_query_share(signal);
+            if (g_is_null(s) || !s) {
+                g_printdn("NewsApp Timer interrupt: #" + g_get_pid());
                 break;
             }
-            begin := call g_task_get_timestamp();
+            begin := g_task_get_timestamp();
             if (end < begin) {
                 invoke this."state_main"::"on_timer"();
                 invoke this."state_transfer"::"on_timer"();
                 invoke this."state_crawler"::"on_timer"();
                 end += ms;
             } else {
-                call g_sleep(50);
+                g_sleep(50);
             }
         }
-        call g_printn("Timer process exit");
+        g_printn("Timer process exit");
     };
     set this::"center" = lambda(this, str) {
-        var l = call g_ui_text_length(str);
+        var l = g_ui_text_length(str);
         var space = (70 - l) / 2;
-        return call g_string_rep(" ", space) + str;
+        return g_string_rep(" ", space) + str;
     };
-    call g_hook_add_before(this, "marquee", lambda(class, name, this, next) {
+    g_hook_add_before(this, "marquee", lambda(class, name, this, next) {
         var msg = invoke this."msg_list"::"pop"();
         invoke this."output"::"writeln"("\f" + g_endl);
         invoke this."output"::"writeln"(invoke this::"center"("【" + msg."title" + "】") + g_endl + g_endl);
         invoke this."output"::"writeln"("    " + msg."str" + g_endl);
         invoke this."output"::"writeln"("    " + msg."desc" + g_endl);
         invoke this."output"::"write"("    \ufff8 \ufff8 \ufff8 \ufff8 \ufff8");
-        call g_printn("Post message: " + msg."str");
+        g_printn("Post message: " + msg."str");
         return 5000;
     });
-    call g_hook_add_before(this, "start", lambda(class, name, this, next, output) {
+    g_hook_add_before(this, "start", lambda(class, name, this, next, output) {
         set this::"output" = output;
         invoke this::"start_state"("app::news::state.idle");
-        return call next();
+        return next();
     });
-    call g_hook_add_after(this, "start", lambda(class, name, this, ret, next, output) {
+    g_hook_add_after(this, "start", lambda(class, name, this, ret, next, output) {
         invoke this."timer_thread"::"start_args"(this."timer_callback", this);
-        return call next();
+        return next();
     });
-    call g_hook_add_before(this, "cancel", lambda(class, name, this, next, shutdown) {
+    g_hook_add_before(this, "cancel", lambda(class, name, this, next, shutdown) {
         invoke this."idle_timer"::"reset"();
-        return call next();
+        return next();
     });
-    call g_hook_add_before(this, "on_log", lambda(class, name, this, next, msg) {
-        call g_printn(msg); return call next();
+    g_hook_add_before(this, "on_log", lambda(class, name, this, next, msg) {
+        g_printn(msg); return next();
     });
     set this::"reset" = lambda(this) {
         invoke this."idle_timer"::"reset"();
@@ -567,21 +567,21 @@ call g_register_class(ctx, "app::news::news.machine", lambda(this) {
 // ---- CODE END ----
 // -----------------------------------------------------------------------------------------
 
-var machine = call g_create_class(ctx, "app::news::news.machine");
-var output = call g_create_class(ctx, "stream::output");
+var machine = g_create_class(ctx, "app::news::news.machine");
+var output = g_create_class(ctx, "stream::output");
 set output::"handle" = in;
 invoke machine::"start"(output);
 
 var typewrite = lambda(out, ch) {
     if (ch == '\ufff8') {
-        call g_write_pipe(out, '.');
-        call g_task_sleep_signal(1, signal);
+        g_write_pipe(out, '.');
+        g_task_sleep_signal(1, signal);
         return;
     }
-    call g_write_pipe(out, ch);
+    g_write_pipe(out, ch);
 };
-call g_read_pipe_args(in, lambda(ch, out) -> call typewrite(out, ch), out);
+g_read_pipe_args(in, lambda(ch, out) -> typewrite(out, ch), out);
 
-call g_stop_share(signal);
-call g_destroy_pipe(out);
-call g_destroy_pipe(in);
+g_stop_share(signal);
+g_destroy_pipe(out);
+g_destroy_pipe(in);

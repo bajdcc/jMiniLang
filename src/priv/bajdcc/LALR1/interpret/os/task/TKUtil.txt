@@ -6,81 +6,81 @@ import "sys.string";
 import "sys.func";
 import "module.lisp";
 
-call g_set_process_desc("util service");
-call g_set_process_priority(73);
+g_set_process_desc("util service");
+g_set_process_priority(73);
 
-call g_printn("Running...");
+g_printn("Running...");
 
 var tid = 2;
-var handle = call g_create_pipe("TASKSEND#" + tid);
+var handle = g_create_pipe("TASKSEND#" + tid);
 
-call g_func_import_string_module();
-var env = call g_lisp_env();
+g_func_import_string_module();
+var env = g_lisp_env();
 
 var time = func ~(msg, caller) {
-    var id = call g_map_get(msg, "id");
-    if (call g_is_null(id)) {
-        call g_map_put(msg, "error", 1);
-        call g_map_put(msg, "val", "invalid task argument - id");
+    var id = g_map_get(msg, "id");
+    if (g_is_null(id)) {
+        g_map_put(msg, "error", 1);
+        g_map_put(msg, "val", "invalid task argument - id");
         return;
     }
-    var arg = call g_map_get(msg, "arg");
-    var arr = call g_func_drop(arg, 2);
-    if (call g_array_empty(arr)) { return; }
+    var arg = g_map_get(msg, "arg");
+    var arr = g_func_drop(arg, 2);
+    if (g_array_empty(arr)) { return; }
     if (id == "calc") {
-        var str = call g_string_join_array(arr, "");
-        var val = call g_task_calc(str);
-        call g_map_put(msg, "val", val);
+        var str = g_string_join_array(arr, "");
+        var val = g_task_calc(str);
+        g_map_put(msg, "val", val);
     } else if (id == "sum") {
-        arr := call g_func_fold("g_array_add", arr, g_new_array, "g_func_xsl", "g_string_atoi_s", "g_func_1", "g_not_null");
-        var val = call g_func_apply("g_func_add", arr);
-        call g_map_put(msg, "val", val);
+        arr := g_func_fold("g_array_add", arr, g_new_array, "g_func_xsl", "g_string_atoi_s", "g_func_1", "g_not_null");
+        var val = g_func_apply("g_func_add", arr);
+        g_map_put(msg, "val", val);
     } else if (id == "product") {
-        arr := call g_func_fold("g_array_add", arr, g_new_array, "g_func_xsl", "g_string_atoi_s", "g_func_1", "g_not_null");
-        var val = call g_func_apply("g_func_mul", arr);
-        call g_map_put(msg, "val", val);
+        arr := g_func_fold("g_array_add", arr, g_new_array, "g_func_xsl", "g_string_atoi_s", "g_func_1", "g_not_null");
+        var val = g_func_apply("g_func_mul", arr);
+        g_map_put(msg, "val", val);
     } else if (id == "reverse") {
-        var str = call g_string_join_array(arr, " ");
-        var val = call g_string_reverse(str);
-        call g_map_put(msg, "val", val);
+        var str = g_string_join_array(arr, " ");
+        var val = g_string_reverse(str);
+        g_map_put(msg, "val", val);
     } else if (id == "palindrome") {
-        var str = call g_string_join_array(arr, " ");
-        var val = call g_func_applicative("g_func_eq", str, "g_string_reverse");
-        call g_map_put(msg, "val", val);
+        var str = g_string_join_array(arr, " ");
+        var val = g_func_applicative("g_func_eq", str, "g_string_reverse");
+        g_map_put(msg, "val", val);
     } else if (id == "toupper") {
-        arr := call g_func_map(arr, "g_string_toupper");
-        var val = call g_string_join_array(arr, " ");
-        call g_map_put(msg, "val", val);
+        arr := g_func_map(arr, "g_string_toupper");
+        var val = g_string_join_array(arr, " ");
+        g_map_put(msg, "val", val);
     } else if (id == "tolower") {
-        arr := call g_func_map(arr, "g_string_tolower");
-        var val = call g_string_join_array(arr, " ");
-        call g_map_put(msg, "val", val);
+        arr := g_func_map(arr, "g_string_tolower");
+        var val = g_string_join_array(arr, " ");
+        g_map_put(msg, "val", val);
     } else if (id == "doc") {
-        var val = call g_string_join_array(arr, " ");
-        val := call g_doc(val);
-        call g_map_put(msg, "val", val);
+        var val = g_string_join_array(arr, " ");
+        val := g_doc(val);
+        g_map_put(msg, "val", val);
     } else if (id == "lisp") {
-         var str = call g_string_join_array(arr, " ");
-         var val = call g_lisp_repl(env, str);
-         call g_map_put(msg, "val", val);
+         var str = g_string_join_array(arr, " ");
+         var val = g_lisp_repl(env, str);
+         g_map_put(msg, "val", val);
     }
 };
 
 var handler = func ~(ch) {
     if (ch == 'E') {
-        call g_destroy_pipe(handle);
+        g_destroy_pipe(handle);
         return;
     }
-    var msg = call g_query_share("TASKDATA#" + tid);
-    var caller = call g_query_share("TASKCALLER#" + tid);
-    call time(msg, caller);
-    var handle = call g_create_pipe("TASKRECV#" + tid);
-    call g_write_pipe(handle, 'E');
+    var msg = g_query_share("TASKDATA#" + tid);
+    var caller = g_query_share("TASKCALLER#" + tid);
+    time(msg, caller);
+    var handle = g_create_pipe("TASKRECV#" + tid);
+    g_write_pipe(handle, 'E');
 };
 
 var data = {};
-call g_task_add_proc(2, data);
+g_task_add_proc(2, data);
 
-call g_read_pipe(handle, handler);
+g_read_pipe(handle, handler);
 
-call g_printn("Exit.");
+g_printn("Exit.");

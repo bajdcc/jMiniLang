@@ -6,16 +6,16 @@ import "sys.func";
 import "sys.math";
 import "sys.ui";
 
-var symbol = func ~(s) -> call g_set_flag(s, 1);
-var str = func ~(s) -> call g_set_flag(s, 2);
-var error = func ~(s) { call g_set_flag(s, 3); return "Error: " + s; };
+var symbol = func ~(s) -> g_set_flag(s, 1);
+var str = func ~(s) -> g_set_flag(s, 2);
+var error = func ~(s) { g_set_flag(s, 3); return "Error: " + s; };
 
-var is_symbol = func ~(exp) -> call g_get_type_ordinal(exp) == 6 && call g_is_flag(exp, 1);
-var is_string = func ~(exp) -> call g_get_type_ordinal(exp) == 6 && call g_is_flag(exp, 2);
-var is_error = func ~(exp) -> call g_get_type_ordinal(exp) == 6 && call g_is_flag(exp, 3);
+var is_symbol = func ~(exp) -> g_get_type_ordinal(exp) == 6 && g_is_flag(exp, 1);
+var is_string = func ~(exp) -> g_get_type_ordinal(exp) == 6 && g_is_flag(exp, 2);
+var is_error = func ~(exp) -> g_get_type_ordinal(exp) == 6 && g_is_flag(exp, 3);
 
 var is_list = func ~(exp) {
-    var type = call g_get_type_ordinal(exp);
+    var type = g_get_type_ordinal(exp);
     return type == 9;
 };
 
@@ -23,10 +23,10 @@ var string = func [
     "序列化",
     "Convert `RuntimeObject` back into a Lisp-readable string."
     ] string(exp) {
-    if (call is_list(exp)) {
-        return "(" + call g_string_join_array(call g_func_map(exp, string), " ") + ")";
+    if (is_list(exp)) {
+        return "(" + g_string_join_array(g_func_map(exp, string), " ") + ")";
     } else {
-        return call g_to_string(exp);
+        return g_to_string(exp);
     }
 };
 
@@ -68,7 +68,7 @@ var init = func ~(env) {
         )
     )
     ";
-    call g_lisp_repl(env, code);
+    g_lisp_repl(env, code);
 };
 
 var standard_env = func [
@@ -77,139 +77,139 @@ var standard_env = func [
     ] ~() {
     var env = {};
     // ------------------------
-    var bind = func ~(op, name) -> call g_map_put(env, op, call g_func_apply_gen(name));
-    var bind_direct = func ~(op, name) -> call g_map_put(env, op, name);
+    var bind = func ~(op, name) -> g_map_put(env, op, g_func_apply_gen(name));
+    var bind_direct = func ~(op, name) -> g_map_put(env, op, name);
     // ------------------------
     // 基本运算
-    call bind("+", "g_func_add");
-    call bind("-", "g_func_sub");
-    call bind("*", "g_func_mul");
-    call bind("/", "g_func_div");
-    call bind("%", "g_func_mod");
-    call bind("==", "g_func_eq");
-    call bind("!=", "g_func_neq");
-    call bind("<", "g_func_lt");
-    call bind(">", "g_func_gt");
-    call bind("<=", "g_func_lte");
-    call bind(">=", "g_func_gte");
-    call bind("&&", "g_func_and");
-    call bind("||", "g_func_or");
-    call bind("max", "g_func_max");
-    call bind("min", "g_func_min");
+    bind("+", "g_func_add");
+    bind("-", "g_func_sub");
+    bind("*", "g_func_mul");
+    bind("/", "g_func_div");
+    bind("%", "g_func_mod");
+    bind("==", "g_func_eq");
+    bind("!=", "g_func_neq");
+    bind("<", "g_func_lt");
+    bind(">", "g_func_gt");
+    bind("<=", "g_func_lte");
+    bind(">=", "g_func_gte");
+    bind("&&", "g_func_and");
+    bind("||", "g_func_or");
+    bind("max", "g_func_max");
+    bind("min", "g_func_min");
     // 内置方法
     var bind_1st = func ~(op, name) {
-        call g_map_put(env, op, lambda(args) {
-            var val = call name(call g_array_get(args, 0));
-            if (call g_is_null(val)) {
+        g_map_put(env, op, lambda(args) {
+            var val = name(g_array_get(args, 0));
+            if (g_is_null(val)) {
                 return "Function: " + op;
             }
             return val;
         });
     };
     var bind_1st_map = func ~(op, name, f) {
-        call g_map_put(env, op, lambda(args) {
-            var val = call name(call g_array_get(args, 0));
-            if (call g_is_null(val)) {
+        g_map_put(env, op, lambda(args) {
+            var val = name(g_array_get(args, 0));
+            if (g_is_null(val)) {
                 return "Function: " + op;
             }
-            return call f(val);
+            return f(val);
         });
     };
     var bind_1st_curry = func ~(op, name, f, arg) {
-        call g_map_put(env, op, lambda(args) {
-            var val = call name(call g_array_get(args, 0));
-            if (call g_is_null(val)) {
+        g_map_put(env, op, lambda(args) {
+            var val = name(g_array_get(args, 0));
+            if (g_is_null(val)) {
                 return "Function: " + op;
             }
-            return call f(val, arg);
+            return f(val, arg);
         });
     };
-    call bind_1st_map("print", "g_print", string);
-    call bind_1st_map("printn", "g_printn", string);
-    call bind_1st_map("ui/print", "g_ui_print", string);
-    call bind_1st_map("ui/printn", "g_ui_printn", string);
-    call bind_1st("type", "g_type");
-    call bind_1st("type_ord", "g_get_type_ordinal");
-    call bind_1st("empty", "g_array_empty");
-    call bind_1st("length", "g_array_size");
-    call bind_1st("not", "g_func_not");
-    call bind_1st_curry("car", "g_func_1", "g_array_get", 0);
-    call bind_1st_curry("cdr", "g_func_1", "g_func_drop", 1);
+    bind_1st_map("print", "g_print", string);
+    bind_1st_map("printn", "g_printn", string);
+    bind_1st_map("ui/print", "g_ui_print", string);
+    bind_1st_map("ui/printn", "g_ui_printn", string);
+    bind_1st("type", "g_type");
+    bind_1st("type_ord", "g_get_type_ordinal");
+    bind_1st("empty", "g_array_empty");
+    bind_1st("length", "g_array_size");
+    bind_1st("not", "g_func_not");
+    bind_1st_curry("car", "g_func_1", "g_array_get", 0);
+    bind_1st_curry("cdr", "g_func_1", "g_func_drop", 1);
     // map
     var _map = func ~(args) ->
-        call g_func_map(call g_array_get(args, 1), call g_array_get(args, 0));
-    call bind_direct("map", _map);
+        g_func_map(g_array_get(args, 1), g_array_get(args, 0));
+    bind_direct("map", _map);
     // append
-    call bind_direct("append", "g_func_apply_array");
+    bind_direct("append", "g_func_apply_array");
     // str
-    var _str = func ~(args) -> call string(call g_array_get(args, 0));
-    call bind_direct("str", _str);
+    var _str = func ~(args) -> string(g_array_get(args, 0));
+    bind_direct("str", _str);
     // ------------------------
-    var _set = func ~(name, value) -> call g_map_put(env, name, value);
+    var _set = func ~(name, value) -> g_map_put(env, name, value);
     // ------------------------
     // 常量
-    call _set("PI", g_PI);
-    call _set("E", g_E);
-    call _set("#s", " ");
-    call _set("#t", g_true);
-    call _set("#f", g_false);
-    call init(env);
+    _set("PI", g_PI);
+    _set("E", g_E);
+    _set("#s", " ");
+    _set("#t", g_true);
+    _set("#f", g_false);
+    init(env);
     return env;
 };
 
-var g_lisp_env = func ~() -> call standard_env();
+var g_lisp_env = func ~() -> standard_env();
 export "g_lisp_env";
 
 var atom = func [
     "构造原子",
     "Numbers become numbers; every other token is a symbol."
     ] ~(token) {
-    if (call g_string_start_with(token, "\"")) {
-        var s = call g_string_substr(token, 1, call g_string_length(token) - 1);
-        s := call g_string_replace(s, "_", " ");
-        return call str(s);
+    if (g_string_start_with(token, "\"")) {
+        var s = g_string_substr(token, 1, g_string_length(token) - 1);
+        s := g_string_replace(s, "_", " ");
+        return str(s);
     }
-    var number = call g_string_to_number(token);
-    if (call g_is_null(number)) {
-        return call symbol(token);
+    var number = g_string_to_number(token);
+    if (g_is_null(number)) {
+        return symbol(token);
     } else {
         return number;
     }
 };
 
-var not_equal = func ~(a, b) -> !call g_is_null(a) && call g_string_not_equal(a, b);
+var not_equal = func ~(a, b) -> !g_is_null(a) && g_string_not_equal(a, b);
 
 var read_from = func [
     "语法分析",
     "Read an expression from a sequence of tokens."
     ] read_from(tokens) {
-        if (call g_array_empty(tokens)) {
-            return call error("unexpected EOF while reading");
+        if (g_array_empty(tokens)) {
+            return error("unexpected EOF while reading");
         }
-        var token = call g_array_remove(tokens, 0); // first token
-        if (call g_string_equal(token, "(")) {
-            if (call g_array_empty(tokens)) {
-                return call error("missing )");
+        var token = g_array_remove(tokens, 0); // first token
+        if (g_string_equal(token, "(")) {
+            if (g_array_empty(tokens)) {
+                return error("missing )");
             }
             var L = [];
-            while (call not_equal(call g_array_get(tokens, 0), ")")) {
-                call g_array_add(L, call read_from(tokens));
+            while (not_equal(g_array_get(tokens, 0), ")")) {
+                g_array_add(L, read_from(tokens));
             }
-            if (call g_array_empty(tokens)) {
-                return call error("missing )");
+            if (g_array_empty(tokens)) {
+                return error("missing )");
             } else {
-                call g_array_remove(tokens, 0); // pop off ')'
+                g_array_remove(tokens, 0); // pop off ')'
             }
             return L;
-        } else if (call g_string_equal(token, ")")) {
-            return call error("unexpected )");
-        } else if (call g_string_equal(token, "'")) {
+        } else if (g_string_equal(token, ")")) {
+            return error("unexpected )");
+        } else if (g_string_equal(token, "'")) {
             var L = [];
-            call g_array_add(L, call symbol("quote"));
-            call g_array_add(L, call read_from(tokens));
+            g_array_add(L, symbol("quote"));
+            g_array_add(L, read_from(tokens));
             return L;
         } else  {
-            return call atom(token);
+            return atom(token);
         }
 };
 
@@ -217,14 +217,14 @@ var tokenize = func [
     "词法分析",
     "Convert a string into a list of tokens."
     ] ~(s) {
-    s := call g_string_replace(s, "\\(", " ( "); // 以空格为定界符
-    s := call g_string_replace(s, "\\)", " ) ");
-    s := call g_string_replace(s, "'", " ' ");
-    s := call g_string_trim(s);
-    s := call g_string_split(s, "\\s+");
-    s := call g_func_map(s, lambda(str) {
-        if (call g_string_start_with(str, "\"")) {
-            s := call g_string_replace(s, "_", " ");
+    s := g_string_replace(s, "\\(", " ( "); // 以空格为定界符
+    s := g_string_replace(s, "\\)", " ) ");
+    s := g_string_replace(s, "'", " ' ");
+    s := g_string_trim(s);
+    s := g_string_split(s, "\\s+");
+    s := g_func_map(s, lambda(str) {
+        if (g_string_start_with(str, "\"")) {
+            s := g_string_replace(s, "_", " ");
         }
         return str;
     });
@@ -234,16 +234,16 @@ var tokenize = func [
 var read = func [
     "读取原始代码",
     "Read a Scheme expression from a string."
-    ] ~(s) -> call read_from(call tokenize(s));
+    ] ~(s) -> read_from(tokenize(s));
 
 var find = func find(exp, env) {
-    var val = call g_map_get(env, exp);
-    if (call g_is_null(val)) {
-        var outer = call g_map_get(env, "#PARENT#");
-        if (call g_is_null(outer)) {
+    var val = g_map_get(env, exp);
+    if (g_is_null(val)) {
+        var outer = g_map_get(env, "#PARENT#");
+        if (g_is_null(outer)) {
             return;
         }
-        return call find(exp, outer);
+        return find(exp, outer);
     }
     return env;
 };
@@ -252,144 +252,144 @@ var eval = func [
     "运行表达式",
     "Evaluate an expression in an environment."
     ] eval(x, env) {
-    if (call is_symbol(x)) {         // variable reference
-        var _env = call find(x, env);
-        if (call g_is_null(_env)) {
-            return call error("undefined symbol " + x);
+    if (is_symbol(x)) {         // variable reference
+        var _env = find(x, env);
+        if (g_is_null(_env)) {
+            return error("undefined symbol " + x);
         }
-        return call g_map_get(_env, x);
-    } else if (!call is_list(x)) {   // constant literal
+        return g_map_get(_env, x);
+    } else if (!is_list(x)) {   // constant literal
         return x;
-    } else if (!call g_array_empty(x)) {
-        var head = call g_array_get(x, 0);
-        if (call g_string_equal(head, "quote")) {          // quotation (quote exp)
+    } else if (!g_array_empty(x)) {
+        var head = g_array_get(x, 0);
+        if (g_string_equal(head, "quote")) {          // quotation (quote exp)
             // (_, exp) = x
-            return call g_array_get(x, 1);
-        } else if (call g_string_equal(head, "cons")) {    // construct (cons a b)
+            return g_array_get(x, 1);
+        } else if (g_string_equal(head, "cons")) {    // construct (cons a b)
             // (_, a, b) = x
-            var a = call eval(call g_array_get(x, 1), env);
-            var b = call eval(call g_array_get(x, 2), env);
-            var val = call g_new(b);
-            call g_array_insert(val, 0, a);
+            var a = eval(g_array_get(x, 1), env);
+            var b = eval(g_array_get(x, 2), env);
+            var val = g_new(b);
+            g_array_insert(val, 0, a);
             return val;
-        } else if (call g_string_equal(head, "while")) {   // while (while test action)
+        } else if (g_string_equal(head, "while")) {   // while (while test action)
             // (_, test, action) = x
-            var test = call g_array_get(x, 1);
-            var action = call g_array_get(x, 2);
+            var test = g_array_get(x, 1);
+            var action = g_array_get(x, 2);
             for (;;) {
-                var cond = call eval(test, env);
-                if (call is_error(cond)) {
+                var cond = eval(test, env);
+                if (is_error(cond)) {
                     return cond;
                 }
-                if (call is_list(cond)) {
-                    return call error("invalid while: test " + call string(cond));
+                if (is_list(cond)) {
+                    return error("invalid while: test " + string(cond));
                 } else if (cond) {
-                    call eval(action, env);
+                    eval(action, env);
                 } else {
                     break;
                 }
             }
-        } else if (call g_string_equal(head, "if")) {      // conditional (if test conseq alt)
+        } else if (g_string_equal(head, "if")) {      // conditional (if test conseq alt)
             // (_, test, conseq, alt) = x
-            var test = call g_array_get(x, 1);
-            var conseq = call g_array_get(x, 2);
-            var alt = call g_array_get(x, 3);
-            var cond = call eval(test, env);
-            if (call is_error(cond)) {
+            var test = g_array_get(x, 1);
+            var conseq = g_array_get(x, 2);
+            var alt = g_array_get(x, 3);
+            var cond = eval(test, env);
+            if (is_error(cond)) {
                 return cond;
             }
-            if (call is_list(cond)) {
-                return call eval(call g_array_empty(cond) ? alt : conseq, env);
+            if (is_list(cond)) {
+                return eval(g_array_empty(cond) ? alt : conseq, env);
             } else {
-                return call eval(cond ? conseq : alt, env);
+                return eval(cond ? conseq : alt, env);
             }
-        } else if (call g_string_equal(head, "cond")) {    // conditional (cond (test_i action_i)*)
+        } else if (g_string_equal(head, "cond")) {    // conditional (cond (test_i action_i)*)
             // (_, (test_i action_i)*) = x
-            var size = call g_array_size(x);
+            var size = g_array_size(x);
             for (var j = 1; j < size; j++) {
-                var pair = call g_array_get(x, j);
-                if (!call is_list(pair) || call g_array_size(pair) != 2) {
-                    return call error("invalid cond: " + call string(pair));
+                var pair = g_array_get(x, j);
+                if (!is_list(pair) || g_array_size(pair) != 2) {
+                    return error("invalid cond: " + string(pair));
                 }
-                var _test = call eval(call g_array_get(pair, 0), env); // eval test_i
+                var _test = eval(g_array_get(pair, 0), env); // eval test_i
                 if (_test) {
-                    return call eval(call g_array_get(pair, 1), env); // return eval action_i
+                    return eval(g_array_get(pair, 1), env); // return eval action_i
                 }
             }
-        } else if (call g_string_equal(head, "case")) {    // case (cond key (key_i action_i)*)
+        } else if (g_string_equal(head, "case")) {    // case (cond key (key_i action_i)*)
             // (_, key, (key_i action_i)*) = x
-            var key = call eval(call g_array_get(x, 1), env);
-            if (call g_is_null(key)) {
-                return call error("invalid case: null " + call g_array_get(x, 1));
+            var key = eval(g_array_get(x, 1), env);
+            if (g_is_null(key)) {
+                return error("invalid case: null " + g_array_get(x, 1));
             }
-            var size = call g_array_size(x);
+            var size = g_array_size(x);
             for (var j = 2; j < size; j++) {
-                var pair = call g_array_get(x, j);
-                if (!call is_list(pair) || call g_array_size(pair) != 2) {
-                    return call error("invalid case: " + call string(pair));
+                var pair = g_array_get(x, j);
+                if (!is_list(pair) || g_array_size(pair) != 2) {
+                    return error("invalid case: " + string(pair));
                 }
-                var _key = call eval(call g_array_get(pair, 0), env); // eval key_i
-                if (call is_list(_key)) {
-                    if (call g_array_contains(_key, key)) {
-                        return call eval(call g_array_get(pair, 1), env); // return eval action_i
+                var _key = eval(g_array_get(pair, 0), env); // eval key_i
+                if (is_list(_key)) {
+                    if (g_array_contains(_key, key)) {
+                        return eval(g_array_get(pair, 1), env); // return eval action_i
                     }
                 } else {
                     if (key == _key) {
-                        return call eval(call g_array_get(pair, 1), env); // return eval action_i
+                        return eval(g_array_get(pair, 1), env); // return eval action_i
                     }
                 }
             }
-        } else if (call g_string_equal(head, "set!")) {    // definition (set! var exp)
+        } else if (g_string_equal(head, "set!")) {    // definition (set! var exp)
             // (_, var, exp) = x
-            var _var = call g_array_get(x, 1);
-            var exp = call g_array_get(x, 2);
-            call g_map_put(call find(_var, env), _var, call eval(exp, env));
-        } else if (call g_string_equal(head, "define")) {  // assignment (define var exp)
+            var _var = g_array_get(x, 1);
+            var exp = g_array_get(x, 2);
+            g_map_put(find(_var, env), _var, eval(exp, env));
+        } else if (g_string_equal(head, "define")) {  // assignment (define var exp)
             // (_, var, exp) = x
-            var _var = call g_array_get(x, 1);
-            var exp = call g_array_get(x, 2);
-            call g_map_put(env, _var, call eval(exp, env));
-        } else if (call g_string_equal(head, "lambda")) {  // procedure (lambda (var*) exp)
+            var _var = g_array_get(x, 1);
+            var exp = g_array_get(x, 2);
+            g_map_put(env, _var, eval(exp, env));
+        } else if (g_string_equal(head, "lambda")) {  // procedure (lambda (var*) exp)
             // (_, vars, exp) = x
-            var vars = call g_array_get(x, 1);
-            var exp = call g_array_get(x, 2);
+            var vars = g_array_get(x, 1);
+            var exp = g_array_get(x, 2);
             return lambda(args) {
-                var env_new = call g_new(env); // deep copy
-                call g_map_put(env_new, "#PARENT#", env);
-                if (call is_list(vars)) {                  // (lambda (var*) exp)
-                    if (call is_list(args)) {
-                        var size = call g_array_size(vars);
+                var env_new = g_new(env); // deep copy
+                g_map_put(env_new, "#PARENT#", env);
+                if (is_list(vars)) {                  // (lambda (var*) exp)
+                    if (is_list(args)) {
+                        var size = g_array_size(vars);
                         for (var i = 0; i < size; i++) {
-                            call g_map_put(env_new, call g_array_get(vars, i), call g_array_get(args, i));
+                            g_map_put(env_new, g_array_get(vars, i), g_array_get(args, i));
                         }
                     } else {
-                        call g_map_put(env_new, call g_array_get(vars, 0), args);
+                        g_map_put(env_new, g_array_get(vars, 0), args);
                     }
-                } else if (call is_symbol(vars)) {
-                    call g_map_put(env_new, vars, args);   // (lambda var exp)
+                } else if (is_symbol(vars)) {
+                    g_map_put(env_new, vars, args);   // (lambda var exp)
                 }
-                return call eval(exp, env_new);
+                return eval(exp, env_new);
             };
-        } else if (call g_string_equal(head, "begin")) {   // begin (begin exp*)
-            var size = call g_array_size(x);
+        } else if (g_string_equal(head, "begin")) {   // begin (begin exp*)
+            var size = g_array_size(x);
             var val = g_null;
             for (var j = 1; j < size; j++) {
-                var _v = call eval(call g_array_get(x, j), env);
+                var _v = eval(g_array_get(x, j), env);
                 val := _v;
             }
             return val;
-        } else if (call g_string_equal(head, "eval")) {    // eval (eval exp*)
-            var exp = call g_array_get(x, 1);
-            var exp1 = call eval(exp, env); // 第一次返回一个函数指针
-            return call eval(exp1, env); // 再次调用
-        } else {                                           // procedure call (proc exp*)
-            var proc = call eval(head, env);
-            if (call g_is_null(proc)) {
-                return call error("undefined function " + head);
+        } else if (g_string_equal(head, "eval")) {    // eval (eval exp*)
+            var exp = g_array_get(x, 1);
+            var exp1 = eval(exp, env); // 第一次返回一个函数指针
+            return eval(exp1, env); // 再次调用
+        } else {                                           // procedure (proc exp*)
+            var proc = eval(head, env);
+            if (g_is_null(proc)) {
+                return error("undefined function " + head);
             }
-            var x_1 = call g_func_drop(x, 1); // take x[-1]
-            var args = call g_func_map(x_1, lambda(arg) -> call eval(arg, env));
-            return call proc(args);
+            var x_1 = g_func_drop(x, 1); // take x[-1]
+            var args = g_func_map(x_1, lambda(arg) -> eval(arg, env));
+            return proc(args);
         }
     } else {
         return "Error";
@@ -400,10 +400,10 @@ var g_lisp_repl = func [
     "解释器",
     "A prompt-read-eval-print loop."
     ] ~(env, s) {
-    var r = call read(s);
-    if (call is_error(r)) {
+    var r = read(s);
+    if (is_error(r)) {
         return r;
     }
-    return call string(call eval(r, env));
+    return string(eval(r, env));
 };
 export "g_lisp_repl";

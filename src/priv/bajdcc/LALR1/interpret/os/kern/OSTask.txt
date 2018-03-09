@@ -2,29 +2,29 @@
 import "sys.base";
 import "sys.list";
 import "sys.proc";
-call g_set_process_desc("task host");
+g_set_process_desc("task host");
 var task_num = 16; // ! ModuleTask.TASK_NUM
 var task_name_table = [];
-call g_start_share("TASK#NAMELIST", task_name_table);
+g_start_share("TASK#NAMELIST", task_name_table);
 
-call g_printn("Setting task...");
-foreach (var i : call g_range(0, task_num - 1)) {
-    call g_array_add(task_name_table, g_null);
+g_printn("Setting task...");
+foreach (var i : g_range(0, task_num - 1)) {
+    g_array_add(task_name_table, g_null);
 }
 
-call g_array_set(task_name_table, 1, "system");
-call g_array_set(task_name_table, 2, "util");
-call g_array_set(task_name_table, 3, "ui");
-call g_array_set(task_name_table, 4, "net");
+g_array_set(task_name_table, 1, "system");
+g_array_set(task_name_table, 2, "util");
+g_array_set(task_name_table, 3, "ui");
+g_array_set(task_name_table, 4, "net");
 
 var handles = [];
-call g_start_share("TASK#PIDS", handles);
+g_start_share("TASK#PIDS", handles);
 
-foreach (var j : call g_range(0, task_num - 1)) {
-    var t = call g_array_get(task_name_table, j);
-    if (!call g_is_null(t)) {
-        call g_printn("Create service: " + t);
-        var pid = call g_load_x("/task/" + t);
-        call g_array_add(handles, pid);
+foreach (var j : g_range(0, task_num - 1)) {
+    var t = g_array_get(task_name_table, j);
+    if (!g_is_null(t)) {
+        g_printn("Create service: " + t);
+        var pid = g_load_x("/task/" + t);
+        g_array_add(handles, pid);
     }
 }

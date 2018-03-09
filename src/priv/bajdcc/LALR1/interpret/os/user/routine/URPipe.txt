@@ -3,23 +3,23 @@ import "sys.proc";
 import "sys.list";
 import "sys.string";
 
-call g_set_process_desc("pipe routinue");
+g_set_process_desc("pipe routinue");
 
-var pid = call g_get_pid();
-var in = call g_create_pipe("PIPEIN#" + pid);
-var out = call g_create_pipe("PIPEOUT#" + pid);
+var pid = g_get_pid();
+var in = g_create_pipe("PIPEIN#" + pid);
+var out = g_create_pipe("PIPEOUT#" + pid);
 
-var share = call g_wait_share("PID#" + pid);
-call g_stop_share("PID#" + pid);
-var args = call g_map_get(share, "args");
+var share = g_wait_share("PID#" + pid);
+g_stop_share("PID#" + pid);
+var args = g_map_get(share, "args");
 
-if (call g_array_empty(args)) {
-    call g_read_pipe_args(in, lambda(ch, out) -> call g_write_pipe(out, ch), out);
+if (g_array_empty(args)) {
+    g_read_pipe_args(in, lambda(ch, out) -> g_write_pipe(out, ch), out);
 } else {
-    var time = call g_array_get(args, 0);
-    time := call g_string_atoi(time);
+    var time = g_array_get(args, 0);
+    time := g_string_atoi(time);
     if (time < 1) { time := 1; }
-    call g_read_pipe_args(in, lambda(ch, out) { call g_write_pipe(out, ch); call g_sleep(time); }, out);
+    g_read_pipe_args(in, lambda(ch, out) { g_write_pipe(out, ch); g_sleep(time); }, out);
 }
 
-call g_destroy_pipe(out);
+g_destroy_pipe(out);

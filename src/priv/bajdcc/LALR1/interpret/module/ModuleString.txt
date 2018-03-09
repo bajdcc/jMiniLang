@@ -1,11 +1,11 @@
 import "sys.base";
 import "sys.func";
 var g_range_string = yield ~(a) {
-    var size = call g_string_length(a);
+    var size = g_string_length(a);
     for (var i = 0; i < size; i++) {
-        yield call g_string_get(a, i);
+        yield g_string_get(a, i);
     }
 };
 export "g_range_string";
-var g_string_reverse = func ~(str) -> call g_func_apply_arg("g_func_add", call g_string_split(str, ""), "g_func_swap");
+var g_string_reverse = func ~(str) -> g_func_apply_arg("g_func_add", g_string_split(str, ""), "g_func_swap");
 export "g_string_reverse";

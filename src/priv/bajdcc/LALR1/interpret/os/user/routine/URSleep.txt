@@ -4,32 +4,32 @@ import "sys.proc";
 import "sys.task";
 import "sys.string";
 
-call g_set_process_desc("sleep routinue");
-var pid = call g_get_pid();
-var share = call g_wait_share("PID#" + pid);
-call g_stop_share("PID#" + pid);
-var args = call g_map_get(share, "args");
+g_set_process_desc("sleep routinue");
+var pid = g_get_pid();
+var share = g_wait_share("PID#" + pid);
+g_stop_share("PID#" + pid);
+var args = g_map_get(share, "args");
 
-var in = call g_create_pipe("PIPEIN#" + pid);
-var out = call g_create_pipe("PIPEOUT#" + pid);
+var in = g_create_pipe("PIPEIN#" + pid);
+var out = g_create_pipe("PIPEOUT#" + pid);
 
 var signal = "PIDSIG#" + pid;
-call g_start_share(signal, true);
+g_start_share(signal, true);
 
-var second = call g_array_get(args, 0);
-if (call g_is_null(second)) {
+var second = g_array_get(args, 0);
+if (g_is_null(second)) {
     second := "0";
 }
-second := call g_string_atoi(second);
+second := g_string_atoi(second);
 
-//var get_tick = func ~() -> call g_task_get_fast_arg("system", "now", "timestamp");
-var begin = call g_task_get_timestamp();
+//var get_tick = func ~() -> g_task_get_fast_arg("system", "now", "timestamp");
+var begin = g_task_get_timestamp();
 var end = begin + second * 1000;
-while (begin < end && call g_query_share(signal)) {
-    begin := call g_task_get_timestamp();
-    call g_sleep(50);
+while (begin < end && g_query_share(signal)) {
+    begin := g_task_get_timestamp();
+    g_sleep(50);
 }
 
-call g_stop_share(signal);
-call g_read_pipe(in, lambda(ch) -> call g_write_pipe(out, ch), out);
-call g_destroy_pipe(out);
+g_stop_share(signal);
+g_read_pipe(in, lambda(ch) -> g_write_pipe(out, ch), out);
+g_destroy_pipe(out);

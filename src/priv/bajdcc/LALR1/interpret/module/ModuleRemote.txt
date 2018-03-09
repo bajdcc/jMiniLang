@@ -3,21 +3,21 @@ import "sys.list";
 import "sys.proc";
 import "sys.string";
 var g_remote_print = func ~(str) {
-    call g_lock_share("REMOTE#MUTEX");
-    var remote_int = call g_create_pipe("int#0");
-    foreach (var c : call g_range_string(str)) {
-        call g_write_pipe(remote_int, c);
+    g_lock_share("REMOTE#MUTEX");
+    var remote_int = g_create_pipe("int#0");
+    foreach (var c : g_range_string(str)) {
+        g_write_pipe(remote_int, c);
     }
-    call g_unlock_share("REMOTE#MUTEX");
+    g_unlock_share("REMOTE#MUTEX");
 };
 export "g_remote_print";
 var g_remote_printn = func ~(str) {
-    call g_remote_print(str);
-    call g_remote_println();
+    g_remote_print(str);
+    g_remote_println();
 };
 export "g_remote_printn";
 var g_remote_println = func ~() {
-    call g_remote_print(g_endl);
+    g_remote_print(g_endl);
 };
 export "g_remote_println";
-call g_remote_init();
+g_remote_init();

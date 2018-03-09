@@ -5,66 +5,66 @@ import "sys.task";
 import "sys.string";
 import "sys.net";
 
-call g_set_process_desc("time routinue");
-var pid = call g_get_pid();
-var share = call g_wait_share("PID#" + pid);
-call g_stop_share("PID#" + pid);
-var args = call g_map_get(share, "args");
+g_set_process_desc("time routinue");
+var pid = g_get_pid();
+var share = g_wait_share("PID#" + pid);
+g_stop_share("PID#" + pid);
+var args = g_map_get(share, "args");
 
-var in = call g_create_pipe("PIPEIN#" + pid);
-var out = call g_create_pipe("PIPEOUT#" + pid);
+var in = g_create_pipe("PIPEIN#" + pid);
+var out = g_create_pipe("PIPEOUT#" + pid);
 
 var signal = "PIDSIG#" + pid;
-call g_start_share(signal, true);
+g_start_share(signal, true);
 
 var help = func ["HELP"] ~(in, out) {
-    call g_write_pipe_n(out, "Usage:");
-    call g_write_pipe_n(out, "---- Create server ----");
-    call g_write_pipe_n(out, "    msg server [PORT]");
-    call g_write_pipe_n(out, "  # msg server 7777");
-    call g_write_pipe_n(out, "  # msg s 7777 (no debug info)");
-    call g_write_pipe_n(out, "---- Create client ----");
-    call g_write_pipe_n(out, "    msg connect [IP:PORT]");
-    call g_write_pipe_n(out, "  # msg connect 127.0.0.1:7777");
-    call g_destroy_pipe(out);
-    call g_destroy_pipe(in);
+    g_write_pipe_n(out, "Usage:");
+    g_write_pipe_n(out, "---- Create server ----");
+    g_write_pipe_n(out, "    msg server [PORT]");
+    g_write_pipe_n(out, "  # msg server 7777");
+    g_write_pipe_n(out, "  # msg s 7777 (no debug info)");
+    g_write_pipe_n(out, "---- Create client ----");
+    g_write_pipe_n(out, "    msg connect [IP:PORT]");
+    g_write_pipe_n(out, "  # msg connect 127.0.0.1:7777");
+    g_destroy_pipe(out);
+    g_destroy_pipe(in);
 };
 
-if (call g_array_size(args) < 2) {
-    call g_write_pipe_n(out, "Error: missing arguments.");
-    return call help(in, out);
+if (g_array_size(args) < 2) {
+    g_write_pipe_n(out, "Error: missing arguments.");
+    return help(in, out);
 }
 
-if (call g_array_size(args) > 2) {
-    call g_write_pipe_n(out, "Error: too many arguments.");
-    return call help(in, out);
+if (g_array_size(args) > 2) {
+    g_write_pipe_n(out, "Error: too many arguments.");
+    return help(in, out);
 }
 
 var pipe = func ["PIPE"] ~(ch, out) {
-    call g_write_pipe(out, ch);
+    g_write_pipe(out, ch);
 };
 
-var type = call g_array_get(args, 0);
+var type = g_array_get(args, 0);
 if (type == "server" || type == "s") {
-    var port = call g_string_atoi(call g_array_get(args, 1));
+    var port = g_string_atoi(g_array_get(args, 1));
     if (port == g_minus_1) {
-        call g_write_pipe_n(out, "Error: invalid port '" + call g_array_get(args, 1) + "'");
-        return call help(in, out);
+        g_write_pipe_n(out, "Error: invalid port '" + g_array_get(args, 1) + "'");
+        return help(in, out);
     }
-    if (type == "server") { call g_write_pipe_n(out, "Using port: " + port); }
-    call g_printdn("Created server, port: " + port);
-    call g_net_msg_create_server(in, out, signal, port, type == "server");
+    if (type == "server") { g_write_pipe_n(out, "Using port: " + port); }
+    g_printdn("Created server, port: " + port);
+    g_net_msg_create_server(in, out, signal, port, type == "server");
 } else if (type == "connect") {
-    var addr = call g_array_get(args, 1);
-    call g_write_pipe_n(out, "Using address: " + addr);
-    call g_printdn("Created client, address: " + addr);
-    call g_net_msg_create_client(in, out, signal, addr, type == "connect");
+    var addr = g_array_get(args, 1);
+    g_write_pipe_n(out, "Using address: " + addr);
+    g_printdn("Created client, address: " + addr);
+    g_net_msg_create_client(in, out, signal, addr, type == "connect");
 } else {
-    call g_write_pipe_n(out, "Error: invalid command '" + type + "'");
-    return call help(in, out);
+    g_write_pipe_n(out, "Error: invalid command '" + type + "'");
+    return help(in, out);
 }
 
-call g_stop_share(signal);
+g_stop_share(signal);
 
-call g_destroy_pipe(out);
-call g_destroy_pipe(in);
+g_destroy_pipe(out);
+g_destroy_pipe(in);

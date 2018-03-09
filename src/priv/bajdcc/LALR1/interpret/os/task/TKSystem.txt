@@ -6,78 +6,78 @@ import "sys.string";
 import "sys.ui";
 import "sys.net";
 
-call g_set_process_desc("system service");
-call g_set_process_priority(72);
+g_set_process_desc("system service");
+g_set_process_priority(72);
 
-call g_printn("Running...");
+g_printn("Running...");
 
 var tid = 1;
-var handle = call g_create_pipe("TASKSEND#" + tid);
+var handle = g_create_pipe("TASKSEND#" + tid);
 
 var time = func ~(msg, caller) {
-    var id = call g_map_get(msg, "id");
-    if (call g_is_null(id)) {
-        call g_map_put(msg, "error", 1);
-        call g_map_put(msg, "val", "invalid task argument - id");
+    var id = g_map_get(msg, "id");
+    if (g_is_null(id)) {
+        g_map_put(msg, "error", 1);
+        g_map_put(msg, "val", "invalid task argument - id");
         return;
     }
     if (id == "now") {
         var val = "";
-        var arg = call g_map_get(msg, "arg");
-        var ts = call g_array_get(arg, 2);
-        if (!call g_is_null(ts) && ts == "timestamp") {
-           val := call g_task_get_timestamp();
+        var arg = g_map_get(msg, "arg");
+        var ts = g_array_get(arg, 2);
+        if (!g_is_null(ts) && ts == "timestamp") {
+           val := g_task_get_timestamp();
         } else {
-           val := call g_task_get_time("yyyy-MM-dd HH:mm:ss");
+           val := g_task_get_time("yyyy-MM-dd HH:mm:ss");
         }
-        call g_map_put(msg, "val", val);
+        g_map_put(msg, "val", val);
     } else if (id == "speed") {
-        var val = call g_task_sys_speed();
-        call g_map_put(msg, "val", val);
+        var val = g_task_sys_speed();
+        g_map_put(msg, "val", val);
     } else if (id == "pipe") {
-        var val = call g_task_get_pipe_stat();
-        val := call g_string_join_array(val, g_endl);
-        call g_map_put(msg, "val", val);
+        var val = g_task_get_pipe_stat();
+        val := g_string_join_array(val, g_endl);
+        g_map_put(msg, "val", val);
     } else if (id == "share") {
-        var val = call g_task_get_share_stat();
-        val := call g_string_join_array(val, g_endl);
-        call g_map_put(msg, "val", val);
+        var val = g_task_get_share_stat();
+        val := g_string_join_array(val, g_endl);
+        g_map_put(msg, "val", val);
     } else if (id == "guid") {
-        var val = call g_task_get_guid();
-        call g_map_put(msg, "val", val);
+        var val = g_task_get_guid();
+        g_map_put(msg, "val", val);
     } else if (id == "sleep") {
-        var arg = call g_map_get(msg, "arg");
-        var second = call g_array_get(arg, 2);
-        if (call g_is_null(second)) { second := g_minus_1; }
-        else { second := call g_string_atoi(second); }
+        var arg = g_map_get(msg, "arg");
+        var second = g_array_get(arg, 2);
+        if (g_is_null(second)) { second := g_minus_1; }
+        else { second := g_string_atoi(second); }
         if (second < 0) { second := 1; }
-        call g_task_sleep(second);
-        call g_map_put(msg, "val", "Slept " + call g_to_string(second) + "s.");
+        g_task_sleep(second);
+        g_map_put(msg, "val", "Slept " + g_to_string(second) + "s.");
     } else if (id == "halt") {
-        call g_ui_printn("** System is going to power off! **");
-        call g_net_msg_server_send_error("Server shutdown");
+        g_ui_printn("** System is going to power off! **");
+        g_net_msg_server_send_error("Server shutdown");
         var shutdown_proc = func ~() {
-            call g_sleep(100);
-            var handle = call g_create_pipe("int#3");
-            call g_start_share("CMD#EXIT", true);
-            call g_write_pipe(handle, 'E');
+            g_sleep(100);
+            var handle = g_create_pipe("int#3");
+            g_start_share("CMD#EXIT", true);
+            g_write_pipe(handle, 'E');
         };
-        call g_create_user_process(shutdown_proc);
-        call g_map_put(msg, "val", "** System is going to power off! **");
+        g_create_user_process(shutdown_proc);
+        g_map_put(msg, "val", "** System is going to power off! **");
     } else if (id == "load") {
-        var arg = call g_map_get(msg, "arg");
-        var fn = call g_array_get(arg, 2);
-        if (call g_is_null(fn)) {
-            call g_map_put(msg, "error", "1");
-            call g_map_put(msg, "val", "Invalid path.");
+        var arg = g_map_get(msg, "arg");
+        var fn = g_array_get(arg, 2);
+        if (g_is_null(fn)) {
+            g_map_put(msg, "error", "1");
+            g_map_put(msg, "val", "Invalid path.");
         } else {
-            var ret = call g_load_user_sync_x("$/usr/bin/" + fn);
+            var ret = g_load_user_sync_x("$/usr/bin/" + fn);
             if (ret) {
-                call g_map_put(msg, "val", "Process exit.");
+                g_map_put(msg, "val", "Process exit.");
             } else {
-                call g_map_put(msg, "error", "1");
-                call g_ui_printn("Invalid path.");
-                call g_map_put(msg, "val", "Invalid path.");
+                g_map_put(msg, "error", "1");
+                g_ui_printn("Invalid path.");
+                g_map_put(msg, "val", "Invalid path.");
             }
         }
     }
@@ -85,19 +85,19 @@ var time = func ~(msg, caller) {
 
 var handler = func ~(ch) {
     if (ch == 'E') {
-        call g_destroy_pipe(handle);
+        g_destroy_pipe(handle);
         return;
     }
-    var msg = call g_query_share("TASKDATA#" + tid);
-    var caller = call g_query_share("TASKCALLER#" + tid);
-    call time(msg, caller);
-    var handle = call g_create_pipe("TASKRECV#" + tid);
-    call g_write_pipe(handle, 'E');
+    var msg = g_query_share("TASKDATA#" + tid);
+    var caller = g_query_share("TASKCALLER#" + tid);
+    time(msg, caller);
+    var handle = g_create_pipe("TASKRECV#" + tid);
+    g_write_pipe(handle, 'E');
 };
 
 var data = {};
-call g_task_add_proc(1, data);
+g_task_add_proc(1, data);
 
-call g_read_pipe(handle, handler);
+g_read_pipe(handle, handler);
 
-call g_printn("Exit.");
+g_printn("Exit.");

@@ -4,31 +4,31 @@ import "sys.string";
 import "sys.proc";
 import "sys.task";
 
-call g_set_process_desc("proc routinue");
-var pid = call g_get_pid();
-var share = call g_wait_share("PID#" + pid);
-call g_stop_share("PID#" + pid);
-var args = call g_map_get(share, "args");
+g_set_process_desc("proc routinue");
+var pid = g_get_pid();
+var share = g_wait_share("PID#" + pid);
+g_stop_share("PID#" + pid);
+var args = g_map_get(share, "args");
 
-var in = call g_create_pipe("PIPEIN#" + pid);
-var out = call g_create_pipe("PIPEOUT#" + pid);
+var in = g_create_pipe("PIPEIN#" + pid);
+var out = g_create_pipe("PIPEOUT#" + pid);
 
-var arg1 = call g_array_get(args, 0);
-if (call g_is_null(arg1)) {
-    arg1 := call g_query_usr_proc();
+var arg1 = g_array_get(args, 0);
+if (g_is_null(arg1)) {
+    arg1 := g_query_usr_proc();
 } else if (arg1 == "sys") {
-    arg1 := call g_query_sys_proc();
+    arg1 := g_query_sys_proc();
 } else {
-    arg1 := call g_query_all_proc();
+    arg1 := g_query_all_proc();
 }
-call g_write_pipe_n(out, "    Speed: " + call g_task_get_fast("system", "speed"));
-foreach (var i : call g_range_array(arg1)) {
-    call g_printdn(call g_to_string(i));
-    foreach (var j : call g_range_string(call g_to_string(i))) {
-        call g_write_pipe(out, j);
+g_write_pipe_n(out, "    Speed: " + g_task_get_fast("system", "speed"));
+foreach (var i : g_range_array(arg1)) {
+    g_printdn(g_to_string(i));
+    foreach (var j : g_range_string(g_to_string(i))) {
+        g_write_pipe(out, j);
     }
-    call g_write_pipe(out, g_endl);
+    g_write_pipe(out, g_endl);
 }
 
-call g_destroy_pipe(out);
-call g_destroy_pipe(in);
+g_destroy_pipe(out);
+g_destroy_pipe(in);

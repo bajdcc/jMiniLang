@@ -6,38 +6,38 @@ import "sys.class";
 import "std.base";
 import "std.shell";
 
-call g_set_process_desc("bash routinue");
-var pid = call g_get_pid();
-var share = call g_wait_share("PID#" + pid);
-call g_stop_share("PID#" + pid);
-var args = call g_map_get(share, "args");
+g_set_process_desc("bash routinue");
+var pid = g_get_pid();
+var share = g_wait_share("PID#" + pid);
+g_stop_share("PID#" + pid);
+var args = g_map_get(share, "args");
 
-var in = call g_create_pipe("PIPEIN#" + pid);
-var out = call g_create_pipe("PIPEOUT#" + pid);
+var in = g_create_pipe("PIPEIN#" + pid);
+var out = g_create_pipe("PIPEOUT#" + pid);
 
 var signal = "PIDSIG#" + pid;
-call g_start_share(signal, true);
+g_start_share(signal, true);
 
-var ctx = call g_create_context();
-call g_import_std_base(ctx);
-call g_import_std_shell(ctx);
+var ctx = g_create_context();
+g_import_std_base(ctx);
+g_import_std_shell(ctx);
 
 var buf = [];
-var shell = call g_create_class(ctx, "system::shell");
+var shell = g_create_class(ctx, "system::shell");
 set shell::"out" = out;
 var pipe = func ["PIPE"] ~(ch, out) {
     if (ch == '\n') {
-        var cmd = call g_string_build(buf);
+        var cmd = g_string_build(buf);
         invoke shell::"exec"(cmd);
-        call g_array_clear(buf);
+        g_array_clear(buf);
     } else if (ch == '\r') {
     } else {
-        call g_array_add(buf, ch);
+        g_array_add(buf, ch);
     }
 };
 
-call g_read_pipe_args(in, pipe, out);
+g_read_pipe_args(in, pipe, out);
 
-call g_stop_share(signal);
-call g_destroy_pipe(out);
-call g_destroy_pipe(in);
+g_stop_share(signal);
+g_destroy_pipe(out);
+g_destroy_pipe(in);

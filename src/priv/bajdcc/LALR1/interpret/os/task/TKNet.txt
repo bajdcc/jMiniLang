@@ -6,98 +6,98 @@ import "sys.net";
 import "sys.string";
 import "sys.ui";
 
-call g_set_process_desc("net service");
-call g_set_process_priority(75);
+g_set_process_desc("net service");
+g_set_process_priority(75);
 
-call g_printn("Running...");
+g_printn("Running...");
 
 var tid = 4;
-var handle = call g_create_pipe("TASKSEND#" + tid);
+var handle = g_create_pipe("TASKSEND#" + tid);
 
 var time = func ~(msg, caller) {
-    var id = call g_map_get(msg, "id");
-    if (call g_is_null(id)) {
-        call g_map_put(msg, "error", 1);
-        call g_map_put(msg, "val", "invalid task argument - id");
+    var id = g_map_get(msg, "id");
+    if (g_is_null(id)) {
+        g_map_put(msg, "error", 1);
+        g_map_put(msg, "val", "invalid task argument - id");
         return;
     }
     if (id == "get") {
-        var arg = call g_map_get(msg, "arg");
+        var arg = g_map_get(msg, "arg");
         var str = "";
-        var len = call g_array_size(arg);
-        foreach (var i : call g_range(2, len - 1)) {
-            str += call g_array_get(arg, i);
+        var len = g_array_size(arg);
+        foreach (var i : g_range(2, len - 1)) {
+            str += g_array_get(arg, i);
         }
-        var res = call g_net_get(str);
-        call g_map_put(msg, "val", res);
+        var res = g_net_get(str);
+        g_map_put(msg, "val", res);
     } else if (id == "get_json") {
-        var arg = call g_map_get(msg, "arg");
+        var arg = g_map_get(msg, "arg");
         var str = "";
-        var len = call g_array_size(arg);
-        foreach (var i : call g_range(2, len - 1)) {
-            str += call g_array_get(arg, i);
+        var len = g_array_size(arg);
+        foreach (var i : g_range(2, len - 1)) {
+            str += g_array_get(arg, i);
         }
-        var res = call g_net_get_json(str);
-        call g_map_put(msg, "val", res);
+        var res = g_net_get_json(str);
+        g_map_put(msg, "val", res);
     } else if (id == "ssh") {
-        var arg = call g_map_get(msg, "arg");
+        var arg = g_map_get(msg, "arg");
         var str = "";
-        var len = call g_array_size(arg);
-        foreach (var i : call g_range(2, len - 1)) {
-            str += call g_array_get(arg, i);
+        var len = g_array_size(arg);
+        foreach (var i : g_range(2, len - 1)) {
+            str += g_array_get(arg, i);
         }
-        var res = call g_to_string(call g_net_ssh(str));
-        if (call g_string_start_with(res, "Error")) {
-            call g_map_put(msg, "error", 1);
+        var res = g_to_string(g_net_ssh(str));
+        if (g_string_start_with(res, "Error")) {
+            g_map_put(msg, "error", 1);
         }
-        call g_map_put(msg, "val", res);
+        g_map_put(msg, "val", res);
     } else if (id == "stop") {
-        if (!call g_is_null(call g_query_share("SSHD#EXIT"))) {
-            call g_net_msg_server_send_error("Server shutdown");
-            call g_ui_printn("Server shutdown!");
-            call g_task_sleep(3);
-            call g_create_share("SSHD#EXIT", true);
-            call g_map_put(msg, "val", "Success");
+        if (!g_is_null(g_query_share("SSHD#EXIT"))) {
+            g_net_msg_server_send_error("Server shutdown");
+            g_ui_printn("Server shutdown!");
+            g_task_sleep(3);
+            g_create_share("SSHD#EXIT", true);
+            g_map_put(msg, "val", "Success");
         } else {
-            call g_map_put(msg, "error", 1);
-            call g_map_put(msg, "val", "Failed");
+            g_map_put(msg, "error", 1);
+            g_map_put(msg, "val", "Failed");
         }
     } else if (id == "rss") {
-        var arg = call g_map_get(msg, "arg");
+        var arg = g_map_get(msg, "arg");
         var str = "";
-        var len = call g_array_size(arg);
-        foreach (var i : call g_range(2, len - 1)) {
-            str += call g_array_get(arg, i);
+        var len = g_array_size(arg);
+        foreach (var i : g_range(2, len - 1)) {
+            str += g_array_get(arg, i);
         }
-        var res = call g_net_get_rss(str);
-        call g_map_put(msg, "val", res);
+        var res = g_net_get_rss(str);
+        g_map_put(msg, "val", res);
     }
 };
 
 var handler = func ~(ch) {
     if (ch == 'E') {
         var ui_num = 8; // ! UI_NUM
-        var ui_name_table = call g_query_share("UI#NAMELIST");
+        var ui_name_table = g_query_share("UI#NAMELIST");
 
-        foreach (var i : call g_range(0, ui_num - 1)) {
-            var ui_name = call g_array_get(ui_name_table, i);
-            if (!call g_is_null(ui_name)) {
-                call g_create_share("UI#" + ui_name, false);
+        foreach (var i : g_range(0, ui_num - 1)) {
+            var ui_name = g_array_get(ui_name_table, i);
+            if (!g_is_null(ui_name)) {
+                g_create_share("UI#" + ui_name, false);
             }
         }
-        call g_destroy_pipe(handle);
+        g_destroy_pipe(handle);
         return;
     }
-    var msg = call g_query_share("TASKDATA#" + tid);
-    var caller = call g_query_share("TASKCALLER#" + tid);
-    call time(msg, caller);
-    var handle = call g_create_pipe("TASKRECV#" + tid);
-    call g_write_pipe(handle, 'E');
+    var msg = g_query_share("TASKDATA#" + tid);
+    var caller = g_query_share("TASKCALLER#" + tid);
+    time(msg, caller);
+    var handle = g_create_pipe("TASKRECV#" + tid);
+    g_write_pipe(handle, 'E');
 };
 
 var data = {};
-call g_task_add_proc(4, data);
+g_task_add_proc(4, data);
 
-call g_read_pipe(handle, handler);
+g_read_pipe(handle, handler);
 
-call g_printn("Exit.");
+g_printn("Exit.");
