@@ -1,0 +1,139 @@
+import "sys.base";
+import "sys.list";
+import "sys.proc";
+import "sys.string";
+import "sys.class";
+import "sys.task";
+import "sys.ui";
+import "std.base";
+
+g_set_process_desc("ai routinue");
+var pid = g_get_pid();
+var share = g_wait_share("PID#" + pid);
+g_stop_share("PID#" + pid);
+var args = g_map_get(share, "args");
+
+var in = g_create_pipe("PIPEIN#" + pid);
+var out = g_create_pipe("PIPEOUT#" + pid);
+
+var signal = "PIDSIG#" + pid;
+g_start_share(signal, true);
+
+// -----------------------------------------------------------------------------------------
+// ## Behavior Tree Class Design
+// @ Refer: https://github.com/hbbalfred/guardians/
+// ---- CODE BEGIN ----
+
+var ctx = g_create_context();
+g_import_std_base(ctx);
+
+var _ = g_null;
+
+// 状态定义
+var STATE_EXECUTING = 0;
+var STATE_FINISH = 1;
+
+/* -----------------------------------------------------------------
+# CLASS [app::ai::node.base]
+# 行为树结点基类
+----------------------------------------------------------------- */
+g_register_class(ctx, "app::ai::node.base", lambda(this) {
+    /* 数据 */
+    set this::"pre_cond" = _; // 前置条件类
+    set this::"children" = _; // 子结点
+    set this::"parent" = _; // 父结点
+    /* 事件 */
+    set this::"do_evaluate" = lambda(this, input) -> true; // 执行事件
+    set this::"do_tick" = lambda(this, input, output) -> STATE_FINISH; // 定时事件
+    set this::"do_leave" = lambda(this, input) -> _; // 离开事件
+    /* 方法 */
+    set this::"add_child" = lambda(this, node) { // 添加子结点
+        if (call g_is_null(this."children")) {
+            set this::"children" = call g_create(ctx, "list::array");
+        }
+        invoke this."children"::"add"(node);
+        set node::"parent" = this;
+    };
+    set this::"add_child_at" = lambda(this, node, i) { // 添加子结点
+        if (call g_is_null(this."children")) {
+            set this::"children" = call g_create(ctx, "list::array");
+        }
+        invoke this."children"::"insert"(i, node);
+        set node::"parent" = this;
+    };
+    set this::"set_pre_cond" = lambda(this, cond) { // 添加前置条件
+        set this::"pre_cond" = cond;
+    };
+    set this::"evaluate" = lambda(this, input) { // 执行
+        var ret = !call g_is_null(this."pre_cond") || invoke this."pre_cond"::"evaluate"(input);
+        return ret && invoke this::"do_evaluate"(input);
+    };
+    set this::"tick" = lambda(this, input, output) { // 定时
+        return invoke this::"do_tick"(input, output);
+    };
+    set this::"leave" = lambda(this, input) { // 离开
+        return invoke this::"do_leave"(input);
+    };
+    set this::"check_index" = lambda(this, i) { // 检查越界
+        return !call g_is_null(this."children") && i >= 0 && i < invoke this."children"::"size"();
+    };
+}, "object");
+
+/* -----------------------------------------------------------------
+# CLASS [app::ai::node.base]
+# 重复结点
+----------------------------------------------------------------- */
+g_register_class(ctx, "app::ai::node.loop", lambda(this) {
+    /* 数据 */
+    set this::"loop_count" = -1; // 指定循环次数上限
+    set this::"current_loop" = 0; // 当前循环次数
+    /* 事件 */
+    g_hook_add_before(this, "do_evaluate", lambda(class, name, this, next, input) { // 执行事件
+        if ((this."loop_count" != -1) && (this."current_loop" >= this."loop_count")) {
+            return false;
+        }
+        if (invoke this::"checkIndex"(0) && invoke (invoke this."children"::"get"(0))::"evaluate"(input)) {
+            return true;
+        }
+        return false;
+    });
+    g_hook_add_before(this, "do_tick", lambda(class, name, this, next, input, output) { // 定时事件
+        var is_finish = STATE_FINISH;
+        if (invoke this::"check_index"(0)) {
+            is_finish := invoke (invoke this."children"::"get"(0))::"tick"(input, output);
+            if (is_finish == STATE_FINISH) {
+                if (this."loop_count" == -1) {
+                    is_finish := STATE_EXECUTING;
+                } else {
+                    set this::"current_loop" = this."current_loop" + 1;
+                    if (this."current_loop" < this."loop_count") {
+                        is_finish := STATE_EXECUTING;
+                    }
+                }
+            }
+        }
+        if (is_finish == STATE_FINISH) {
+            set this::"current_loop" = 0;
+        }
+        return is_finish;
+    });
+    g_hook_add_before(this, "do_leave", lambda(class, name, this, next, input) { // 离开事件
+        if (invoke this::"check_index"(0)) {
+            invoke (invoke this."children"::"get"(0))::"do_leave"(input);
+        }
+        set this::"current_loop" = 0;
+    });
+    /* 方法 */
+    set this::"set_loop_count" = lambda(this, loop_count) { // 设置循环上限
+        set this::"loop_count" = loop_count;
+    };
+}, "object");
+
+// ---- CODE END ----
+// -----------------------------------------------------------------------------------------
+
+g_read_pipe_args(in, lambda(ch, out) -> g_wtite_pipe(out, ch), out);
+
+g_stop_share(signal);
+g_destroy_pipe(out);
+g_destroy_pipe(in);
