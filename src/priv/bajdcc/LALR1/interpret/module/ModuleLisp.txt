@@ -132,6 +132,7 @@ var standard_env = func [
     bind_1st("type_ord", "g_get_type_ordinal");
     bind_1st("empty", "g_array_empty");
     bind_1st("length", "g_array_size");
+    bind_1st("string", "g_to_string");
     bind_1st("not", "g_func_not");
     bind_1st_curry("car", "g_func_1", "g_array_get", 0);
     bind_1st_curry("cdr", "g_func_1", "g_func_drop", 1);

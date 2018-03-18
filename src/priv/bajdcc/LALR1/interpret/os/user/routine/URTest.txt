@@ -287,8 +287,6 @@ var stage_lisp = func ~() {
     };
     // eval code
     // ##########################
-    eval("(list 1 2 3 4 5)");
-        eval("(range 1 10)");
     comment("1. Lambda");
     eval("(define circle-area
     (lambda (r)
@@ -725,6 +723,21 @@ var stage_bash = func ~() {
     exec("range 1 10 | replace task util calc $ * $ | bash | > &");
     exec("range 1 10 | replace task util calc $ + 1 | bash | util product | > &");
     exec("range -5 10 | replace task util calc $ * $ * $ | bash | util sum | > &");
+
+    var env = g_lisp_env();
+    var eval = func~(exp) {
+        g_lisp_repl(env, exp);
+    };
+    var exec_call = lambda(exp) -> exec(g_string_join_array(exp, " "));
+    g_map_put(env, "exec", exec_call);
+    eval("(define exec_cubic
+        (lambda (n)
+            (exec \"echo\" (string n) \"|\"
+            \"replace\" \"task\" \"util\" \"calc\" \"$\" \"*\" \"$\" \"|\"
+            \"bash\" \"|\"
+            \">\" \"&\")))");
+    eval("(map exec_cubic (range -5 10))");
+
     exec("echo Made_by_bajdcc | > &");
 };
 

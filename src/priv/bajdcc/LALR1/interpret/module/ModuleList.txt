@@ -15,3 +15,48 @@ var g_array_find = func ~(a, b) {
     }
 };
 export "g_array_find";
+var g_array_concat = func ~(a, b) {
+    g_array_add(a, b);
+    return a;
+};
+export "g_array_concat";
+var g_array_1 = func ~(a1) {
+    var a = [];
+    g_array_add(a, a1);
+    return a;
+};
+export "g_array_1";
+var g_array_2 = func ~(a1, a2) {
+    var a = [];
+    g_array_add(a, a1);
+    g_array_add(a, a2);
+    return a;
+};
+export "g_array_2";
+var g_array_3 = func ~(a1, a2, a3) {
+    var a = [];
+    g_array_add(a, a1);
+    g_array_add(a, a2);
+    g_array_add(a, a3);
+    return a;
+};
+export "g_array_3";
+var g_array_4 = func ~(a1, a2, a3, a4) {
+    var a = [];
+    g_array_add(a, a1);
+    g_array_add(a, a2);
+    g_array_add(a, a3);
+    g_array_add(a, a4);
+    return a;
+};
+export "g_array_4";
+var g_array_5 = func ~(a1, a2, a3, a4, a5) {
+    var a = [];
+    g_array_add(a, a1);
+    g_array_add(a, a2);
+    g_array_add(a, a3);
+    g_array_add(a, a4);
+    g_array_add(a, a5);
+    return a;
+};
+export "g_array_5";
