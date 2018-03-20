@@ -39,7 +39,7 @@ var STATE_FINISH = 1;
 ----------------------------------------------------------------- */
 g_register_class(ctx, "app::ai::node.base", lambda(this) {
     /* 数据 */
-    set this::"pre_cond" = _; // 前置条件类
+    set this::"cond" = _; // 前置条件类
     set this::"children" = _; // 子结点
     set this::"parent" = _; // 父结点
     /* 事件 */
@@ -61,11 +61,11 @@ g_register_class(ctx, "app::ai::node.base", lambda(this) {
         invoke this."children"::"insert"(i, node);
         set node::"parent" = this;
     };
-    set this::"set_pre_cond" = lambda(this, cond) { // 添加前置条件
-        set this::"pre_cond" = cond;
+    set this::"set_cond" = lambda(this, cond) { // 添加前置条件
+        set this::"cond" = cond;
     };
     set this::"evaluate" = lambda(this, input) { // 执行
-        var ret = !call g_is_null(this."pre_cond") || invoke this."pre_cond"::"evaluate"(input);
+        var ret = !call g_is_null(this."cond") || invoke this."cond"::"evaluate"(input);
         return ret && invoke this::"do_evaluate"(input);
     };
     set this::"tick" = lambda(this, input, output) { // 定时
@@ -80,7 +80,7 @@ g_register_class(ctx, "app::ai::node.base", lambda(this) {
 }, "object");
 
 /* -----------------------------------------------------------------
-# CLASS [app::ai::node.base]
+# CLASS [app::ai::node.loop]
 # 重复结点
 ----------------------------------------------------------------- */
 g_register_class(ctx, "app::ai::node.loop", lambda(this) {
@@ -127,7 +127,103 @@ g_register_class(ctx, "app::ai::node.loop", lambda(this) {
     set this::"set_loop_count" = lambda(this, loop_count) { // 设置循环上限
         set this::"loop_count" = loop_count;
     };
+}, "app::ai::node.base");
+
+// #################################################################
+
+/* -----------------------------------------------------------------
+# CLASS [app::ai::cond.base]
+# 判定条件基类
+----------------------------------------------------------------- */
+g_register_class(ctx, "app::ai::cond.base", lambda(this) {
+    /* 事件 */
+    set this::"evaluate" = lambda(this, input) -> _; // 执行事件
+    /* 方法 */
+    set this::"init" = lambda(this, cond) -> _; // 初始化
 }, "object");
+
+/* -----------------------------------------------------------------
+# CLASS [app::ai::cond.not]
+# 判定条件（非）
+----------------------------------------------------------------- */
+g_register_class(ctx, "app::ai::cond.not", lambda(this) {
+    /* 数据 */
+    set this::"cond" = _; // 条件
+    /* 事件 */
+    g_hook_add_before(this, "evaluate", lambda(class, name, this, next, input) {
+        return !invoke this."cond"::"evaluate"(input);
+    });
+    /* 方法 */
+    g_hook_add_before(this, "init", lambda(class, name, this, next, cond) {
+        set this::"cond" = cond;
+    });
+}, "app::ai::cond.base");
+
+/* -----------------------------------------------------------------
+# CLASS [app::ai::cond.false]
+# 判定条件（假）
+----------------------------------------------------------------- */
+g_register_class(ctx, "app::ai::cond.false", lambda(this) {
+    /* 事件 */
+    g_hook_add_before(this, "evaluate", lambda(class, name, this, next, input) {
+        return false;
+    });
+}, "app::ai::cond.base");
+
+/* -----------------------------------------------------------------
+# CLASS [app::ai::cond.true]
+# 判定条件（真）
+----------------------------------------------------------------- */
+g_register_class(ctx, "app::ai::cond.true", lambda(this) {
+    /* 事件 */
+    g_hook_add_before(this, "evaluate", lambda(class, name, this, next, input) {
+        return true;
+    });
+}, "app::ai::cond.base");
+
+/* -----------------------------------------------------------------
+# CLASS [app::ai::cond.and]
+# 判定条件（与）
+----------------------------------------------------------------- */
+g_register_class(ctx, "app::ai::cond.and", lambda(this) {
+    /* 数据 */
+    set this::"cond" = g_new_array;
+    /* 事件 */
+    g_hook_add_before(this, "evaluate", lambda(class, name, this, next, input) {
+        foreach (var i : g_range_array(this."cond")) {
+            if (!invoke i::"evaluate"(input)) {
+                return false;
+            }
+        }
+        return true;
+    });
+    /* 方法 */
+    g_hook_add_before(this, "init", lambda(class, name, this, next, cond) {
+        set this::"cond" = cond;
+    });
+}, "app::ai::cond.base");
+
+/* -----------------------------------------------------------------
+# CLASS [app::ai::cond.or]
+# 判定条件（或）
+----------------------------------------------------------------- */
+g_register_class(ctx, "app::ai::cond.or", lambda(this) {
+    /* 数据 */
+    set this::"cond" = g_new_array;
+    /* 事件 */
+    g_hook_add_before(this, "evaluate", lambda(class, name, this, next, input) {
+        foreach (var i : g_range_array(this."cond")) {
+            if (invoke i::"evaluate"(input)) {
+                return true;
+            }
+        }
+        return false;
+    });
+    /* 方法 */
+    g_hook_add_before(this, "init", lambda(class, name, this, next, cond) {
+        set this::"cond" = cond;
+    });
+}, "app::ai::cond.base");
 
 // ---- CODE END ----
 // -----------------------------------------------------------------------------------------
