@@ -48,15 +48,15 @@ g_register_class(ctx, "app::ai::node.base", lambda(this) {
     set this::"do_leave" = lambda(this, input) -> _; // 离开事件
     /* 方法 */
     set this::"add_child" = lambda(this, node) { // 添加子结点
-        if (call g_is_null(this."children")) {
-            set this::"children" = call g_create(ctx, "list::array");
+        if (g_is_null(this."children")) {
+            set this::"children" = g_create(ctx, "list::array");
         }
         invoke this."children"::"add"(node);
         set node::"parent" = this;
     };
     set this::"add_child_at" = lambda(this, node, i) { // 添加子结点
-        if (call g_is_null(this."children")) {
-            set this::"children" = call g_create(ctx, "list::array");
+        if (g_is_null(this."children")) {
+            set this::"children" = g_create(ctx, "list::array");
         }
         invoke this."children"::"insert"(i, node);
         set node::"parent" = this;
@@ -65,7 +65,7 @@ g_register_class(ctx, "app::ai::node.base", lambda(this) {
         set this::"cond" = cond;
     };
     set this::"evaluate" = lambda(this, input) { // 执行
-        var ret = !call g_is_null(this."cond") || invoke this."cond"::"evaluate"(input);
+        var ret = !g_is_null(this."cond") || invoke this."cond"::"evaluate"(input);
         return ret && invoke this::"do_evaluate"(input);
     };
     set this::"tick" = lambda(this, input, output) { // 定时
@@ -75,7 +75,7 @@ g_register_class(ctx, "app::ai::node.base", lambda(this) {
         return invoke this::"do_leave"(input);
     };
     set this::"check_index" = lambda(this, i) { // 检查越界
-        return !call g_is_null(this."children") && i >= 0 && i < invoke this."children"::"size"();
+        return !g_is_null(this."children") && i >= 0 && i < invoke this."children"::"size"();
     };
 }, "object");
 
@@ -228,7 +228,7 @@ g_register_class(ctx, "app::ai::cond.or", lambda(this) {
 // ---- CODE END ----
 // -----------------------------------------------------------------------------------------
 
-g_read_pipe_args(in, lambda(ch, out) -> g_wtite_pipe(out, ch), out);
+g_read_pipe_args(in, lambda(ch, out) -> g_write_pipe(out, ch), out);
 
 g_stop_share(signal);
 g_destroy_pipe(out);

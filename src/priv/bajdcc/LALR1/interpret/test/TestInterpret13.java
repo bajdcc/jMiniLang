@@ -92,8 +92,6 @@ public class TestInterpret13 {
 							"call g_printn(invoke circle::\"get_index\"(1));\n" +
 							"call g_printn(invoke square::\"get_index\"(2));\n" +
 							"",
-
-					"import \"sys.base\";\nvar a=func~()->1;g_printn(a());"
 			};
 
 			Interpreter interpreter = new Interpreter();
