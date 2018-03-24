@@ -1051,7 +1051,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 		}
 		switchPage();
 		stack.reg.execId = stack.getTry();
-		stack.setTry(-1);
+		stack.resetTry();
 		triesCount--;
 	}
 

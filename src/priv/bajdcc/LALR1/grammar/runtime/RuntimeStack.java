@@ -17,6 +17,7 @@ public class RuntimeStack {
 	public int level = 0;
 
 	public RuntimeRegister reg = new RuntimeRegister();
+	private Stack<Integer> dataTryCounts = new Stack<>();
 
 	/**
 	 * 数据堆栈
@@ -154,11 +155,22 @@ public class RuntimeStack {
 	}
 
 	public void setTry(int jmp) {
+		if (jmp != -1)
+			dataTryCounts.push(stkData.size());
 		stkCall.get(0).setTryJmp(jmp);
 	}
 
 	public int getTry() {
 		return stkCall.get(0).getTryJmp();
+	}
+
+	public void resetTry() {
+		int last = dataTryCounts.pop();
+		RuntimeObject obj = stkData.pop();
+		while (stkData.size() > last)
+			stkData.pop();
+		stkData.push(obj);
+		dataTryCounts.push(stkData.size());
 	}
 
 	@Override

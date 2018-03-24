@@ -76,9 +76,7 @@ public class StmtTry implements IStmt {
 		}
 		catchBlock.genCode(codegen);
 		jmp.op1 = codegen.getCodeIndex();
-		if (token != null) {
-			codegen.genCode(RuntimeInst.ipop);
-		}
+		codegen.genCode(RuntimeInst.ipop);
 		codegen.genCode(RuntimeInst.iscpo);
 		codegen.genCode(RuntimeInst.itry, -1);
 	}

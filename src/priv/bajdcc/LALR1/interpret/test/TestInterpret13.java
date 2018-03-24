@@ -92,8 +92,6 @@ public class TestInterpret13 {
 							"call g_printn(invoke circle::\"get_index\"(1));\n" +
 							"call g_printn(invoke square::\"get_index\"(2));\n" +
 							"",
-
-					"var b=[lambda()->2, lambda(b)->3];"
 			};
 
 			Interpreter interpreter = new Interpreter();
