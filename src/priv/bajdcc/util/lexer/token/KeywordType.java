@@ -2,7 +2,7 @@ package priv.bajdcc.util.lexer.token;
 
 /**
  * 关键词
- * 
+ *
  * @author bajdcc
  */
 public enum KeywordType {
@@ -16,7 +16,8 @@ public enum KeywordType {
 			"union"), UNSIGNED("unsigned"), VOID("void"), VOLATILE("volatile"), WHILE(
 			"while"), VARIABLE("var"), FUNCTION("func"), LET("let"), CALL(
 			"call"), IMPORT("import"), EXPORT("export"), YIELD("yield"), FOREACH(
-			"foreach"), LAMBDA("lambda"), SET("set"), INVOKE("invoke");
+			"foreach"), LAMBDA("lambda"), SET("set"), INVOKE("invoke"), TRY(
+			"try"),	CATCH("catch"), THROW("throw");
 
 	private String name;
 

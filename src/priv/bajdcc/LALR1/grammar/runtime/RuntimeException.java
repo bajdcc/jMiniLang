@@ -39,7 +39,10 @@ public class RuntimeException extends Exception {
 		DUP_SHARE_NAME("共享名重复"),
 		INVALID_SHARE_NAME("共享名不存在"),
 		INVALID_REFERENCE("引用计数异常"),
-		ACCESS_FORBIDDEN("越权访问"),;
+		ACCESS_FORBIDDEN("越权访问"),
+		THROWS_EXCEPTION("发生异常"),
+		DUP_EXCEPTION("重复发生异常"),
+		;
 
 		private String message;
 

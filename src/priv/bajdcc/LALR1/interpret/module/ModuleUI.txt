@@ -80,7 +80,7 @@ var g_ui_inputd = func ~(callback, arr) {
             }
         }
     }
-    g_write_pipe(handle, g_array_get(arr, 0));
+    g_write_pipe(handle, arr[0]);
 };
 export "g_ui_inputd";
 var g_ui_print_internal = func ~(ch) {

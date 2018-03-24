@@ -74,6 +74,9 @@ public class ExpBinop implements IExp {
 		}
 		if (leftOperand instanceof ExpValue && rightOperand instanceof ExpValue) {
 			if (token.kToken == TokenType.OPERATOR) {
+				OperatorType op = (OperatorType) token.object;
+				if (op == OperatorType.COLON)
+					return this;
 				if (TokenTools.binop(recorder, this)) {
 					return leftOperand;
 				}
@@ -125,6 +128,10 @@ public class ExpBinop implements IExp {
 				codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(left.getToken().object));
 				codegen.genCode(RuntimeInst.istore);
 				return;
+			} else if (op == OperatorType.COLON) {
+				rightOperand.genCode(codegen);
+				leftOperand.genCode(codegen);
+				return;
 			}
 		}
 		RuntimeInst inst = TokenTools.op2ins(token);
@@ -149,13 +156,17 @@ public class ExpBinop implements IExp {
 
 	@Override
 	public String toString() {
-		return "( " + leftOperand.toString() + " " + token.toRealString() + " "
-				+ rightOperand.toString() + " )";
+		return print(new StringBuilder());
 	}
 
 	@Override
 	public String print(StringBuilder prefix) {
-		return toString();
+		if (token.kToken == TokenType.OPERATOR && token.object == OperatorType.COLON) {
+			return leftOperand.print(prefix) + " " + token.toRealString() + " "
+					+ rightOperand.print(prefix);
+		}
+		return "( " + leftOperand.print(prefix) + " " + token.toRealString() + " "
+				+ rightOperand.print(prefix) + " )";
 	}
 
 	@Override

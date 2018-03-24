@@ -108,6 +108,9 @@ public class ExpInvoke implements IExp {
 
 	@Override
 	public IExp simplify(ISemanticRecorder recorder) {
+		for (int i = 0; i < params.size(); i++) {
+			params.set(i, params.get(i).simplify(recorder));
+		}
 		return this;
 	}
 

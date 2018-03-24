@@ -7,8 +7,8 @@ g_set_process_desc("dup routinue");
 var pid = g_get_pid();
 var share = g_wait_share("PID#" + pid);
 g_stop_share("PID#" + pid);
-var args = g_map_get(share, "args");
-var count = g_array_get(args, 0);
+var args = share["args"];
+var count = args[0];
 if (g_is_null(count)) {
     count := "2";
 }

@@ -10,9 +10,9 @@ var g_create_property = func ~(class, name, property) {
 export "g_create_property";
 var g_get_property = func ~(class, name) {
     if (g_map_contains(class, name)) {
-        return g_map_get(class, name);
+        return class[name];
     }
-    var base = g_map_get(class, "__base__");
+    var base = class["__base__"];
     if (g_is_null(base)) {
         return;
     }
@@ -23,7 +23,7 @@ var g_has_property = func ~(class, name) {
     if (g_map_contains(class, name)) {
         return true;
     }
-    var base = g_map_get(class, "__base__");
+    var base = class["__base__"];
     if (g_is_null(base)) {
         return false;
     }
@@ -35,7 +35,7 @@ var g_set_property_rec = func ~(class, name, property) {
         g_map_put(class, name, property);
         return true;
     }
-    var base = g_map_get(class, "__base__");
+    var base = class["__base__"];
     if (g_is_null(base)) {
         return false;
     }
@@ -50,7 +50,7 @@ var g_set_property = func ~(class, name, property) {
         g_map_put(class, name, property);
         return true;
     }
-    var base = g_map_get(class, "__base__");
+    var base = class["__base__"];
     if (g_is_null(base)) {
         g_map_put(class, name, property);
         return false;
@@ -80,7 +80,7 @@ var g_invoke_method = func ~(class, name) {
                 g_array_add(__ret, true);
                 return;
             }
-            var next = g_array_get(__before, __i);
+            var next = __before[__i];
             __i++;
             var _next =  func ~() -> __next(__ret, __before, __cnt, __i, __next);
             return next(class."__type__", name, class, _next);
@@ -101,7 +101,7 @@ var g_invoke_method = func ~(class, name) {
                 g_array_add(__ret, true);
                 return;
             }
-            var next = g_array_get(__after, __i);
+            var next = __after[__i];
             __i++;
             var _next =  func ~() -> __next(__ret, __after, __cnt, __i, _r, __next);
             return next(class."__type__", name, class, _r, _next);
@@ -128,7 +128,7 @@ var method = class.name;
                 g_array_add(__ret, true);
                 return;
             }
-            var next = g_array_get(__before, __i);
+            var next = __before[__i];
             __i++;
             var _next =  func ~() -> __next(__ret, __before, __cnt, __i, __next, arg1);
             return next(class."__type__", name, class, _next, arg1);
@@ -149,7 +149,7 @@ var method = class.name;
                 g_array_add(__ret, true);
                 return;
             }
-            var next = g_array_get(__after, __i);
+            var next = __after[__i];
             __i++;
             var _next =  func ~() -> __next(__ret, __after, __cnt, __i, _r, __next, arg1);
             return next(class."__type__", name, class, _r, _next, arg1);
@@ -176,7 +176,7 @@ var method = class.name;
                 g_array_add(__ret, true);
                 return;
             }
-            var next = g_array_get(__before, __i);
+            var next = __before[__i];
             __i++;
             var _next =  func ~() -> __next(__ret, __before, __cnt, __i, __next, arg1, arg2);
             return next(class."__type__", name, class, _next, arg1, arg2);
@@ -197,7 +197,7 @@ var method = class.name;
                 g_array_add(__ret, true);
                 return;
             }
-            var next = g_array_get(__after, __i);
+            var next = __after[__i];
             __i++;
             var _next =  func ~() -> __next(__ret, __after, __cnt, __i, _r, __next, arg1, arg2);
             return next(class."__type__", name, class, _r, _next, arg1, arg2);
@@ -224,7 +224,7 @@ var method = class.name;
                 g_array_add(__ret, true);
                 return;
             }
-            var next = g_array_get(__before, __i);
+            var next = __before[__i];
             __i++;
             var _next =  func ~() -> __next(__ret, __before, __cnt, __i, __next, arg1, arg2, arg3);
             return next(class."__type__", name, class, _next, arg1, arg2, arg3);
@@ -245,7 +245,7 @@ var method = class.name;
                 g_array_add(__ret, true);
                 return;
             }
-            var next = g_array_get(__after, __i);
+            var next = __after[__i];
             __i++;
             var _next =  func ~() -> __next(__ret, __after, __cnt, __i, _r, __next, arg1, arg2, arg3);
             return next(class."__type__", name, class, _r, _next, arg1, arg2, arg3);
@@ -272,7 +272,7 @@ var method = class.name;
                 g_array_add(__ret, true);
                 return;
             }
-            var next = g_array_get(__before, __i);
+            var next = __before[__i];
             __i++;
             var _next =  func ~() -> __next(__ret, __before, __cnt, __i, __next, arg1, arg2, arg3, arg4);
             return next(class."__type__", name, class, _next, arg1, arg2, arg3, arg4);
@@ -293,7 +293,7 @@ var method = class.name;
                 g_array_add(__ret, true);
                 return;
             }
-            var next = g_array_get(__after, __i);
+            var next = __after[__i];
             __i++;
             var _next =  func ~() -> __next(__ret, __after, __cnt, __i, _r, __next, arg1, arg2, arg3, arg4);
             return next(class."__type__", name, class, _r, _next, arg1, arg2, arg3, arg4);
@@ -320,7 +320,7 @@ var method = class.name;
                 g_array_add(__ret, true);
                 return;
             }
-            var next = g_array_get(__before, __i);
+            var next = __before[__i];
             __i++;
             var _next =  func ~() -> __next(__ret, __before, __cnt, __i, __next, arg1, arg2, arg3, arg4, arg5);
             return next(class."__type__", name, class, _next, arg1, arg2, arg3, arg4, arg5);
@@ -341,7 +341,7 @@ var method = class.name;
                 g_array_add(__ret, true);
                 return;
             }
-            var next = g_array_get(__after, __i);
+            var next = __after[__i];
             __i++;
             var _next =  func ~() -> __next(__ret, __after, __cnt, __i, _r, __next, arg1, arg2, arg3, arg4, arg5);
             return next(class."__type__", name, class, _r, _next, arg1, arg2, arg3, arg4, arg5);
@@ -368,7 +368,7 @@ var method = class.name;
                 g_array_add(__ret, true);
                 return;
             }
-            var next = g_array_get(__before, __i);
+            var next = __before[__i];
             __i++;
             var _next =  func ~() -> __next(__ret, __before, __cnt, __i, __next, arg1, arg2, arg3, arg4, arg5, arg6);
             return next(class."__type__", name, class, _next, arg1, arg2, arg3, arg4, arg5, arg6);
@@ -389,7 +389,7 @@ var method = class.name;
                 g_array_add(__ret, true);
                 return;
             }
-            var next = g_array_get(__after, __i);
+            var next = __after[__i];
             __i++;
             var _next =  func ~() -> __next(__ret, __after, __cnt, __i, _r, __next, arg1, arg2, arg3, arg4, arg5, arg6);
             return next(class."__type__", name, class, _r, _next, arg1, arg2, arg3, arg4, arg5, arg6);
@@ -416,7 +416,7 @@ var method = class.name;
                 g_array_add(__ret, true);
                 return;
             }
-            var next = g_array_get(__before, __i);
+            var next = __before[__i];
             __i++;
             var _next =  func ~() -> __next(__ret, __before, __cnt, __i, __next, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
             return next(class."__type__", name, class, _next, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
@@ -437,7 +437,7 @@ var method = class.name;
                 g_array_add(__ret, true);
                 return;
             }
-            var next = g_array_get(__after, __i);
+            var next = __after[__i];
             __i++;
             var _next =  func ~() -> __next(__ret, __after, __cnt, __i, _r, __next, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
             return next(class."__type__", name, class, _r, _next, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
@@ -464,7 +464,7 @@ var method = class.name;
                 g_array_add(__ret, true);
                 return;
             }
-            var next = g_array_get(__before, __i);
+            var next = __before[__i];
             __i++;
             var _next =  func ~() -> __next(__ret, __before, __cnt, __i, __next, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
             return next(class."__type__", name, class, _next, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
@@ -485,7 +485,7 @@ var method = class.name;
                 g_array_add(__ret, true);
                 return;
             }
-            var next = g_array_get(__after, __i);
+            var next = __after[__i];
             __i++;
             var _next =  func ~() -> __next(__ret, __after, __cnt, __i, _r, __next, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
             return next(class."__type__", name, class, _r, _next, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
@@ -512,7 +512,7 @@ var method = class.name;
                 g_array_add(__ret, true);
                 return;
             }
-            var next = g_array_get(__before, __i);
+            var next = __before[__i];
             __i++;
             var _next =  func ~() -> __next(__ret, __before, __cnt, __i, __next, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
             return next(class."__type__", name, class, _next, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
@@ -533,7 +533,7 @@ var method = class.name;
                 g_array_add(__ret, true);
                 return;
             }
-            var next = g_array_get(__after, __i);
+            var next = __after[__i];
             __i++;
             var _next =  func ~() -> __next(__ret, __after, __cnt, __i, _r, __next, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
             return next(class."__type__", name, class, _r, _next, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
@@ -559,16 +559,16 @@ var g_register_class = func ~(ctx, name, init, base) {
 export "g_register_class";
 
 var g_create_class = func ~(ctx, name) {
-    var prototype = g_map_get(ctx, name);
+    var prototype = ctx[name];
     if (g_is_null(prototype)) {
         return;
     }
     var class = {};
     g_create_property(class, "__type__", name);
     if (g_map_contains(prototype, "base")) {
-        g_map_put(class, "__base__", g_create_class(ctx, g_map_get(prototype, "base")));
+        g_map_put(class, "__base__", g_create_class(ctx, prototype["base"]));
     }
-    var init = g_map_get(prototype, "init");
+    var init = prototype["init"];
     if (!g_is_null(init)) {
         init(class);
     }

@@ -2,6 +2,7 @@ import "sys.base";
 import "sys.list";
 import "sys.proc";
 import "sys.task";
+import "sys.func";
 import "sys.string";
 import "sys.class";
 import "sys.math";
@@ -14,13 +15,17 @@ g_set_process_desc("test routinue");
 var pid = g_get_pid();
 var share = g_wait_share("PID#" + pid);
 g_stop_share("PID#" + pid);
-var args = g_map_get(share, "args");
+var args = share["args"];
 
 var in = g_create_pipe("PIPEIN#" + pid);
 var out = g_create_pipe("PIPEOUT#" + pid);
 
 var put = func ["PIPE"] ~(ch) {
     g_write_pipe(out, ch);
+};
+var putn = func ["PIPE"] ~(ch) {
+    g_write_pipe(out, ch);
+    g_write_pipe(out, g_endl);
 };
 var puts = func ["PIPE"] ~(str) {
     foreach (var c : g_range_string(str)) {
@@ -107,11 +112,11 @@ var stage_philo = func ~() {
     }
     var handles = [];
     var philo = func ~(args) {
-        var eat = g_map_get(args, "eating");
-        var o = g_map_get(args, "out");
-        var id = g_map_get(args, "id");
-        var left_id = g_map_get(args, "left_id");
-        var right_id = g_map_get(args, "right_id");
+        var eat = args["eating"];
+        var o = args["out"];
+        var id = args["id"];
+        var left_id = args["left_id"];
+        var right_id = args["right_id"];
         var left = g_use_semaphore("fork_" + left_id);
         var right = g_use_semaphore("fork_" + right_id);
         eat(o, "Philosophy#" + id + " ready");
@@ -137,12 +142,13 @@ var stage_philo = func ~() {
         g_unlock_mutex(pm);
     };
     foreach (var j : g_range(1, 5)) {
-        var args = {};
-        g_map_put(args, "eating", eating);
-        g_map_put(args, "out", out);
-        g_map_put(args, "id", j);
-        g_map_put(args, "left_id", (j == 1) ? 5 : (j - 1));
-        g_map_put(args, "right_id", (j == 5) ? 1 : (j + 1));
+        var args = {
+            "eating": eating,
+            "out": out,
+            "id": j,
+            "left_id": (j == 1) ? 5 : (j - 1),
+            "right_id": (j == 5) ? 1 : (j + 1)
+        };
         var h = g_create_user_process_args(philo, args);
         g_array_add(handles, h);
         g_task_sleep(1);
@@ -167,12 +173,12 @@ var stage_philo2 = func ~() {
     }
     var handles = [];
     var philo2 = func ~(args) {
-        var eat = g_map_get(args, "eating");
-        var states = g_map_get(args, "states");
-        var o = g_map_get(args, "out");
-        var id = g_map_get(args, "id");
-        var left_id = g_map_get(args, "left_id");
-        var right_id = g_map_get(args, "right_id");
+        var eat = args["eating"];
+        var states = args["states"];
+        var o = args["out"];
+        var id = args["id"];
+        var left_id = args["left_id"];
+        var right_id = args["right_id"];
         var monitor = g_use_mutex("philo_monitor");
         eat(o, "Philosophy#" + id + " ready");
         var enter = func ~() { // 进入临界区
@@ -198,14 +204,14 @@ var stage_philo2 = func ~() {
         var test = func ~(_id) { // 测试哲学家是否具备进餐条件
             var _left_id = (_id == 1) ? 5 : (_id - 1);
             var _right_id = (_id == 5) ? 1 : (_id + 1);
-            if ((g_array_get(states, _left_id) != "eating") && // 如果左右都不在进餐
-                (g_array_get(states, _right_id) != "eating") &&
-                (g_array_get(states, _id) == "hungry")) { // 且自己为饥饿状态
+            if ((states[_left_id] != "eating") && // 如果左右都不在进餐
+                (states[_right_id] != "eating") &&
+                (states[_id] == "hungry")) { // 且自己为饥饿状态
                 signal(_id); // 发出就餐信号
             } else {
-                g_printdn("Test failed. #" + _left_id + ": " + g_array_get(states, _left_id) +
-                    ", #" + _right_id + ": " + g_array_get(states, _right_id) + ", #" +
-                    _id + ": " +　g_array_get(states, _id));
+                g_printdn("Test failed. #" + _left_id + ": " + states[_left_id] +
+                    ", #" + _right_id + ": " + states[_right_id] + ", #" +
+                    _id + ": " +　states[_id]);
             }
         };
         var pickup = func ~() { // 拿起叉子
@@ -213,7 +219,7 @@ var stage_philo2 = func ~() {
             g_array_set(states, id, "hungry"); // 设置状态是饥饿
             test(id);
             leave();
-            if (g_array_get(states, id) != "eating") { // 如果尝试失败
+            if (states[id] != "eating") { // 如果尝试失败
                 wait(id); // 等待
                 g_array_set(states, id, "eating"); // 设置为进餐状态
             }
@@ -278,7 +284,7 @@ var stage_lisp = func ~() {
         }
     };
     var comment = func~(str) -> word_typewrite("\n    " + str + "\n\n", 40);
-    var out_call = func~(strs) -> word_typewrite(g_array_get(strs, 0) + "\n", 35);
+    var out_call = func~(strs) -> word_typewrite(strs[0] + "\n", 35);
     g_map_put(env, "out", out_call);
     var builtin = func~(str) {
         puts("\n");
@@ -741,7 +747,21 @@ var stage_bash = func ~() {
     exec("echo Made_by_bajdcc | > &");
 };
 
-var name = g_array_get(args, 0);
+// ---------------------------------------------
+// TRY_CATCH
+
+var stage_try = func ~() {
+    // Origin: fact(n) -> n <= 1 ? 1 : fact(n - 1) * n
+    putn("Factorial(10) = " + g_tail_opt(
+        lambda(f) -> lambda(n, total) -> n <= 1 ? total : f([n - 1, total * n]),
+        [10, 1]));
+    // Origin: fib(n) -> n <= 2 ? 1 : fact(n - 1) + fact(n - 2)
+    putn("Fibonacci(10) = " + g_tail_opt(
+        lambda(f) -> lambda(n, a, total) -> n <= 1 ? total : f([n - 1, total, a + total]),
+        [10, 0, 1]));
+};
+
+var name = args[0];
 if (g_is_null(name)) {
     create_stage(stage_clear);
     create_stage(stage_1);
@@ -759,6 +779,8 @@ if (g_is_null(name)) {
     stage_class();
 } else if (name == "bash") {
     stage_bash();
+} else if (name == "try") {
+    stage_try();
 } else {
     g_read_pipe_args(in, lambda(ch, out) -> g_write_pipe(out, ch), out);
 }

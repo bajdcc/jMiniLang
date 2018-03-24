@@ -214,6 +214,15 @@ public class RuntimeTools {
 		case imap:
 			stk.opMap();
 			break;
+		case iidx:
+			stk.opIndex();
+			break;
+		case itry:
+			stk.opTry();
+			break;
+		case ithrow:
+			stk.opThrow();
+			break;
 		default:
 			return false;
 		}

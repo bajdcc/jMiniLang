@@ -8,8 +8,8 @@ g_set_process_desc("grep routinue");
 var pid = g_get_pid();
 var share = g_wait_share("PID#" + pid);
 g_stop_share("PID#" + pid);
-var args = g_map_get(share, "args");
-var pat = g_array_get(args, 0);
+var args = share["args"];
+var pat = args[0];
 if (g_is_null(pat)) {
     var _in = g_create_pipe("PIPEIN#" + pid);
     var _out = g_create_pipe("PIPEOUT#" + pid);
@@ -30,12 +30,12 @@ var next = func ["CALC NEXT"] ~(str) {
         g_array_add(n, g_minus_1);
     }
     while (u < patlen - 1) {
-        if (v == m1 || (g_string_get(str, u) == g_string_get(str, v))) {
+        if (v == m1 || (str[u] == str[v])) {
             u++;
             v++;
             g_array_set(n, u, v);
         } else {
-            v := g_array_get(n, v);
+            v := n[v];
         }
     }
     return n;
@@ -46,10 +46,10 @@ var find = func ["FIND WITH NEXT"] ~(str, n) {
     var j = 0;
     var slen = g_string_length(str);
     while (i < slen && j < patlen) {
-        if (j == m1 || (g_string_get(str, i) == g_string_get(pat, j))) {
+        if (j == m1 || (str[i] == pat[j])) {
             i++; j++;
         } else {
-            j := g_array_get(n, j);
+            j := n[j];
         }
     }
     if (j == patlen) {

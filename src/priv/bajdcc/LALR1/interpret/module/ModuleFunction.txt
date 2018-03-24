@@ -1,5 +1,6 @@
 import "sys.base";
 import "sys.list";
+import "sys.proc";
 var g_func_not = func ~(a) -> !a;
 var g_func_max = func ~(a, b) -> a > b ? a : b;
 var g_func_min = func ~(a, b) -> a < b ? a : b;
@@ -47,7 +48,7 @@ var g_func_xsl = func ["数组遍历闭包-foldl"] ~(l) {
     var idx = 0;
     return lambda() {
         if (idx == len) { return g__; }
-        var d = g_array_get(l, idx);
+        var d = l[idx];
         idx++;
         return lambda() -> d;
     };
@@ -57,7 +58,7 @@ var g_func_xsr = func ["数组遍历闭包-foldr"] ~(l) {
     var idx = g_array_size(l) - 1;
     return lambda() {
         if (idx < 0) { return g__; }
-        var d = g_array_get(l, idx);
+        var d = l[idx];
         idx--;
         return lambda() -> d;
     };
@@ -82,7 +83,7 @@ var g_func_fold = func
     var val = g__;
     var x = g__;
     if (g_is_null(init)) { // 没初值的话，取第一个元素为初值
-        if (len == 1) { return g_array_get(list, 0); }
+        if (len == 1) { return list[0]; }
         x := xs(list);// 创建遍历闭包
         val := x();// 取第一个元素
         val := val();
@@ -193,3 +194,46 @@ export "g_func_import_string_module";
 var g_func_apply_array = func ~(list) ->
     g_func_fold("g_array_append", list, g_new_array, "g_func_xsl", "g_func_1", "g_func_1", "g_func_always_true");
 export "g_func_apply_array";
+
+// ----------------------------------------------
+var g_call_apply = func ~(fun, args) {
+    var size = g_array_size(args);
+    if (size > 10) {
+        g_panic("g_call_apply: TOO MANY ARGUMENTS");
+    }
+    var apply_callbacks = g_query_share("MODULE_FUNC#APPLY_FUNCS");
+    if (g_is_null(apply_callbacks)) {
+        apply_callbacks := [
+            lambda(f, a) -> f(),
+            lambda(f, a) -> f(a[0]),
+            lambda(f, a) -> f(a[0], a[1]),
+            lambda(f, a) -> f(a[0], a[1], a[2]),
+            lambda(f, a) -> f(a[0], a[1], a[2], a[3]),
+            lambda(f, a) -> f(a[0], a[1], a[2], a[3], a[4]),
+            lambda(f, a) -> f(a[0], a[1], a[2], a[3], a[4], a[5]),
+            lambda(f, a) -> f(a[0], a[1], a[2], a[3], a[4], a[5], a[6]),
+            lambda(f, a) -> f(a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7]),
+            lambda(f, a) -> f(a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8]),
+            lambda(f, a) -> f(a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9])
+        ];
+        g_start_share("MODULE_FUNC#APPLY_FUNCS", apply_callbacks);
+    }
+    var fn = apply_callbacks[size];
+    return fn(fun, args);
+};
+export "g_call_apply";
+var g_tail_opt = func ["尾递归优化"] ~(fun, args) {
+    var x = lambda(a) { throw a; };
+    var fact = fun(x);
+    for (;;) {
+        try {
+            return g_call_apply(fact, args);
+        } catch (e) {
+            args := e;
+        }
+    }
+};
+export "g_tail_opt";
+
+var g_string_reverse = func ~(str) -> g_func_apply_arg("g_func_add", g_string_split(str, ""), "g_func_swap");
+export "g_string_reverse";

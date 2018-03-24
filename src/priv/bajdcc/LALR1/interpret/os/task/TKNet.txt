@@ -15,36 +15,36 @@ var tid = 4;
 var handle = g_create_pipe("TASKSEND#" + tid);
 
 var time = func ~(msg, caller) {
-    var id = g_map_get(msg, "id");
+    var id = msg["id"];
     if (g_is_null(id)) {
         g_map_put(msg, "error", 1);
         g_map_put(msg, "val", "invalid task argument - id");
         return;
     }
     if (id == "get") {
-        var arg = g_map_get(msg, "arg");
+        var arg = msg["arg"];
         var str = "";
         var len = g_array_size(arg);
         foreach (var i : g_range(2, len - 1)) {
-            str += g_array_get(arg, i);
+            str += arg[i];
         }
         var res = g_net_get(str);
         g_map_put(msg, "val", res);
     } else if (id == "get_json") {
-        var arg = g_map_get(msg, "arg");
+        var arg = msg["arg"];
         var str = "";
         var len = g_array_size(arg);
         foreach (var i : g_range(2, len - 1)) {
-            str += g_array_get(arg, i);
+            str += arg[i];
         }
         var res = g_net_get_json(str);
         g_map_put(msg, "val", res);
     } else if (id == "ssh") {
-        var arg = g_map_get(msg, "arg");
+        var arg = msg["arg"];
         var str = "";
         var len = g_array_size(arg);
         foreach (var i : g_range(2, len - 1)) {
-            str += g_array_get(arg, i);
+            str += arg[i];
         }
         var res = g_to_string(g_net_ssh(str));
         if (g_string_start_with(res, "Error")) {
@@ -63,11 +63,11 @@ var time = func ~(msg, caller) {
             g_map_put(msg, "val", "Failed");
         }
     } else if (id == "rss") {
-        var arg = g_map_get(msg, "arg");
+        var arg = msg["arg"];
         var str = "";
         var len = g_array_size(arg);
         foreach (var i : g_range(2, len - 1)) {
-            str += g_array_get(arg, i);
+            str += arg[i];
         }
         var res = g_net_get_rss(str);
         g_map_put(msg, "val", res);
@@ -80,7 +80,7 @@ var handler = func ~(ch) {
         var ui_name_table = g_query_share("UI#NAMELIST");
 
         foreach (var i : g_range(0, ui_num - 1)) {
-            var ui_name = g_array_get(ui_name_table, i);
+            var ui_name = ui_name_table[i];
             if (!g_is_null(ui_name)) {
                 g_create_share("UI#" + ui_name, false);
             }

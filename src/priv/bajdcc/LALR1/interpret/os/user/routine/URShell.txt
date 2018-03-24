@@ -45,9 +45,9 @@ g_start_share("PIPE#HANDLE", g_new_array);
 
 var parse_cmd_1 = func ["PARSE"] ~(arg) {
     var pid = g_get_pid();
-    var parse = g_map_get(arg, "parse");
-    var cmd = g_map_get(arg, "args");
-    var parent = g_map_get(arg, "parent");
+    var parse = arg["parse"];
+    var cmd = arg["args"];
+    var parent = arg["parent"];
     var exe = g_array_pop(cmd);
     exe := g_string_trim(exe);
     var _args = g_string_split(exe, " ");
@@ -58,7 +58,7 @@ var parse_cmd_1 = func ["PARSE"] ~(arg) {
             g_array_add(args, ss);
         }
     }
-    var exec = g_array_get(args, 0);
+    var exec = args[0];
     g_array_remove(args, 0);
     var share = {};
     g_map_put(share, "args", args);
@@ -76,11 +76,7 @@ var parse_cmd_1 = func ["PARSE"] ~(arg) {
     g_map_put(share, "child", child);
     var k = g_null;
     if (g_array_size(cmd) > 0) {
-        var _args_ = {};
-        g_map_put(_args_, "parse", parse);
-        g_map_put(_args_, "args", cmd);
-        g_map_put(_args_, "parent", child);
-        k := g_create_user_process_args(parse, _args_);
+        k := g_create_user_process_args(parse, {"parse": parse, "args": cmd, "parent": child});
     }
     var in = g_create_pipe("PIPEIN#" + parent);
     var out = g_create_pipe("PIPEOUT#" + child);
@@ -95,7 +91,7 @@ var parse_cmd_1 = func ["PARSE"] ~(arg) {
         g_join_process(k);
     }
     var ct = g_query_share("PIPE#CTRL");
-    if (!g_array_empty(ct) && g_array_get(ct, 0) == 'C') {
+    if (!g_array_empty(ct) && ct[0] == 'C') {
         g_printdn("#" + g_get_pid() + " Force kill!");
         g_destroy_pipe_once(in);
         g_printdn("#" + g_get_pid() + " Force kill! ok");
@@ -118,7 +114,7 @@ var parse_cmd = func ["PARSE"] ~(cmd, parse) {
             g_array_add(args, ss);
         }
     }
-    var exec = g_array_get(args, 0);
+    var exec = args[0];
     g_array_remove(args, 0);
     var share = {};
     g_map_put(share, "args", args);
@@ -135,11 +131,7 @@ var parse_cmd = func ["PARSE"] ~(cmd, parse) {
     g_create_share("PIPE#HANDLE", g_new_array);
     var k = g_null;
     if (g_array_size(cmd) > 0) {
-        var _args_ = {};
-        g_map_put(_args_, "parse", parse);
-        g_map_put(_args_, "args", cmd);
-        g_map_put(_args_, "parent", child);
-        k := g_create_user_process_args(parse, _args_);
+        k := g_create_user_process_args(parse, {"parse": parse, "args": cmd, "parent": child});
     }
     var f = func ~(ch) -> g_ui_print(ch);
     var out = g_wait_pipe("PIPEOUT#" + child);
@@ -205,15 +197,15 @@ var task_fast_invoker = func ~(cmd, arg) {
     cmd := g_string_right(cmd, 1);
     g_array_remove(arg, 0);
     if (g_array_size(arg) == 1) {
-        return g_task_get_fast(cmd, g_array_get(arg, 0));
+        return g_task_get_fast(cmd, arg[0]);
     } else if (g_array_size(arg) == 2) {
-        var ret = task_native(cmd, g_array_get(arg, 0), g_array_get(arg, 1));
+        var ret = task_native(cmd, arg[0], arg[1]);
         if (g_is_null(ret)) {
-            return g_task_get_fast_arg(cmd, g_array_get(arg, 0), g_array_get(arg, 1));
+            return g_task_get_fast_arg(cmd, arg[0], arg[1]);
         }
         return ret;
     } else {
-        var msg = g_array_get(arg, 0);
+        var msg = arg[0];
         g_array_remove(arg, 0);
         var ret = task_native(cmd, msg, arg);
         if (g_is_null(ret)) {
@@ -226,7 +218,7 @@ var task_fast_invoker = func ~(cmd, arg) {
 // TASK COMMAND
 var handle_task_command = func ~(arg) {
     var arr = g_string_split(arg, " ");
-    var cmd = g_array_get(arr, 0);
+    var cmd = arr[0];
     if (g_string_start_with(cmd, "@")) {
         return task_fast_invoker(cmd, arr);
     }
@@ -235,8 +227,8 @@ var handle_task_command = func ~(arg) {
 // GET STDIO cmd
 var get_input = func ["INPUT"] ~(arg) {
     g_set_process_desc("shell routinue");
-    var this = g_array_get(arg, 0);
-    var parse = g_array_get(arg, 1);
+    var this = arg[0];
+    var parse = arg[1];
     g_ui_print("$ \uffef");
     g_sleep(400);
     var cmd = g_ui_input();
@@ -271,7 +263,4 @@ var get_input = func ["INPUT"] ~(arg) {
         g_create_user_process_args(this, arg);
     }
 };
-var _args_ = [];
-g_array_add(_args_, get_input);
-g_array_add(_args_, parse_cmd_1);
-g_create_user_process_args(get_input, _args_);
+g_create_user_process_args(get_input, [get_input, parse_cmd_1]);

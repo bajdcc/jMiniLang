@@ -45,6 +45,11 @@ public class RuntimeFunc {
 	private String retPage = "";
 
 	/**
+	 * 保存的异常跳转地址
+	 */
+	private int tryJmp = -1;
+
+	/**
 	 * 参数
 	 */
 	private ArrayList<RuntimeObject> params = new ArrayList<>();
@@ -172,6 +177,14 @@ public class RuntimeFunc {
 
 	public void popYieldStack() {
 		yields.pop();
+	}
+
+	public int getTryJmp() {
+		return tryJmp;
+	}
+
+	public void setTryJmp(int tryJmp) {
+		this.tryJmp = tryJmp;
 	}
 
 	@Override

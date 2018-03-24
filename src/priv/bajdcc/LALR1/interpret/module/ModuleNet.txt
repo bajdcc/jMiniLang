@@ -40,9 +40,9 @@ var msg_receive = func ~(out, signal, port, log) {
             g_task_sleep_signal(1, signal);
             continue;
         }
-        var type = g_map_get(obj, "type");
-        var addr = g_map_get(obj, "addr");
-        var content = g_map_get(obj, "content");
+        var type = obj["type"];
+        var addr = obj["addr"];
+        var content = obj["content"];
         var msg = "[" + type + "] " + addr + ": " + content;
         if (log) { g_write_pipe_n(out, "[" + type + "] " + addr + ": " + content); }
         else if (type == "MSG ") { g_write_pipe_n(out, content); }
@@ -109,9 +109,9 @@ var msg_send = func ~(in, out, signal, addr) {
             g_task_sleep_signal(1, signal);
             continue;
         }
-        var type = g_map_get(obj, "type");
-        var addr = g_map_get(obj, "addr");
-        var content = g_map_get(obj, "content");
+        var type = obj["type"];
+        var addr = obj["addr"];
+        var content = obj["content"];
         var msg = "[" + type + "] " + addr + ": " + content;
         g_write_pipe_n(out, "[" + type + "] " + addr + ": " + content);
         g_printdn("Received msg: " + msg);
@@ -177,11 +177,11 @@ var task_fast_invoker = func ~(cmd, arg) {
     cmd := g_string_right(cmd, 1);
     g_array_remove(arg, 0);
     if (g_array_size(arg) == 1) {
-        return g_task_get_fast(cmd, g_array_get(arg, 0));
+        return g_task_get_fast(cmd, arg[0]);
     } else if (g_array_size(arg) == 2) {
-        return g_task_get_fast_arg(cmd, g_array_get(arg, 0), g_array_get(arg, 1));
+        return g_task_get_fast_arg(cmd, arg[0], arg[1]);
     } else {
-        var msg = g_array_get(arg, 0);
+        var msg = arg[0];
         g_array_remove(arg, 0);
         return g_task_get_fast_args(cmd, msg, arg);
     }
@@ -190,7 +190,7 @@ var task_fast_invoker = func ~(cmd, arg) {
 // TASK FAST INVOKER
 var handle_task_command = func ~(arg) {
     var arr = g_string_split(arg, " ");
-    var cmd = g_array_get(arr, 0);
+    var cmd = arr[0];
     if (g_string_start_with(cmd, "@")) {
         return task_fast_invoker(cmd, arr);
     }
@@ -226,10 +226,10 @@ var sshd_msg_receive = func ~(port) {
             g_task_sleep(1);
             continue;
         }
-        var type = g_map_get(obj, "type");
-        var origin = g_map_get(obj, "origin");
-        var addr = g_map_get(obj, "addr");
-        var content = g_map_get(obj, "content");
+        var type = obj["type"];
+        var origin = obj["origin"];
+        var addr = obj["addr"];
+        var content = obj["content"];
         var msg = "[" + type + "] " + addr + ": " + content;
         g_ui_printn("[" + type + "] " + addr + ": " + content);
         g_printdn("Received msg: " + msg);
@@ -346,10 +346,10 @@ var ssh_msg_recv = func ~(address) {
             i++;
             continue;
         }
-        var origin = g_map_get(obj, "origin");
-        var type = g_map_get(obj, "type");
-        var addr = g_map_get(obj, "addr");
-        var content = g_map_get(obj, "content");
+        var origin = obj["origin"];
+        var type = obj["type"];
+        var addr = obj["addr"];
+        var content = obj["content"];
         var msg = "[" + type + "] " + addr + ": " + content;
         if (type == "ECHO") {
             if (!g_is_null(origin) && g_net_msg_get_client_addr() == origin) {
@@ -389,7 +389,7 @@ var ssh_msg_send = func ~() {
             if (g_array_empty(address)) {
                 g_net_msg_client_send(cmd);
             } else {
-                g_net_msg_client_send_with_origin(cmd, g_array_get(address, 0));
+                g_net_msg_client_send_with_origin(cmd, address[0]);
             }
         }
     }

@@ -15,7 +15,7 @@ var tid = 1;
 var handle = g_create_pipe("TASKSEND#" + tid);
 
 var time = func ~(msg, caller) {
-    var id = g_map_get(msg, "id");
+    var id = msg["id"];
     if (g_is_null(id)) {
         g_map_put(msg, "error", 1);
         g_map_put(msg, "val", "invalid task argument - id");
@@ -23,8 +23,8 @@ var time = func ~(msg, caller) {
     }
     if (id == "now") {
         var val = "";
-        var arg = g_map_get(msg, "arg");
-        var ts = g_array_get(arg, 2);
+        var arg = msg["arg"];
+        var ts = arg[2];
         if (!g_is_null(ts) && ts == "timestamp") {
            val := g_task_get_timestamp();
         } else {
@@ -46,8 +46,8 @@ var time = func ~(msg, caller) {
         var val = g_task_get_guid();
         g_map_put(msg, "val", val);
     } else if (id == "sleep") {
-        var arg = g_map_get(msg, "arg");
-        var second = g_array_get(arg, 2);
+        var arg = msg["arg"];
+        var second = arg[2];
         if (g_is_null(second)) { second := g_minus_1; }
         else { second := g_string_atoi(second); }
         if (second < 0) { second := 1; }
@@ -65,8 +65,8 @@ var time = func ~(msg, caller) {
         g_create_user_process(shutdown_proc);
         g_map_put(msg, "val", "** System is going to power off! **");
     } else if (id == "load") {
-        var arg = g_map_get(msg, "arg");
-        var fn = g_array_get(arg, 2);
+        var arg = msg["arg"];
+        var fn = arg[2];
         if (g_is_null(fn)) {
             g_map_put(msg, "error", "1");
             g_map_put(msg, "val", "Invalid path.");

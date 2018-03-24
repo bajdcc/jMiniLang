@@ -64,16 +64,11 @@ var g_task_get = func ~(tid, msg) {
 export "g_task_get";
 
 var g_task_get_fast = func ~(tid, id) {
-    var arg = [];
-    g_array_add(arg, tid);
-    g_array_add(arg, id);
-
-    var msg = {};
-    g_map_put(msg, "id", id);
-    g_map_put(msg, "arg", arg);
+    var arg = [tid, id];
+    var msg = {"id": id, "arg": arg};
     g_task_get(tid, msg);
-    var error = g_map_get(msg, "error");
-    var val = g_map_get(msg, "val");
+    var error = msg["error"];
+    var val = msg["val"];
     if (error == 1) {
         return g_null;
     } else {
@@ -82,17 +77,11 @@ var g_task_get_fast = func ~(tid, id) {
 };
 export "g_task_get_fast";
 var g_task_get_fast_arg = func ~(tid, id, a) {
-    var arg = [];
-    g_array_add(arg, tid);
-    g_array_add(arg, id);
-    g_array_add(arg, a);
-
-    var msg = {};
-    g_map_put(msg, "id", id);
-    g_map_put(msg, "arg", arg);
+    var arg = [tid, id, a];
+    var msg = {"id": id, "arg": arg};
     g_task_get(tid, msg);
-    var error = g_map_get(msg, "error");
-    var val = g_map_get(msg, "val");
+    var error = msg["error"];
+    var val = msg["val"];
     if (error == 1) {
         return g_null;
     } else {
@@ -110,8 +99,8 @@ var g_task_get_fast_args = func ~(tid, id, a) {
     g_map_put(msg, "id", id);
     g_map_put(msg, "arg", arg);
     g_task_get(tid, msg);
-    var error = g_map_get(msg, "error");
-    var val = g_map_get(msg, "val");
+    var error = msg["error"];
+    var val = msg["val"];
     if (error == 1) {
         return g_null;
     } else {
@@ -128,13 +117,13 @@ var task_handler = func ~(ch) {
     }
     var task_table = g_query_share("TASK#TABLE");
     g_lock_share("TASK#LIST");                     // 锁定等待队列
-    var pid = g_array_get(waiting_list, 0);        // 取最早等待的进程
+    var pid = waiting_list[0];        // 取最早等待的进程
     g_array_remove(waiting_list, 0);               // 移除它
     g_unlock_share("TASK#LIST");                   // 解锁队列
     var m = g_query_share("MSG#" + pid);           // 读取客户端的数据
-    var _tid = g_map_get(m, "tid");
+    var _tid = m["tid"];
     var tid = g_task_get_id_by_name(_tid);
-    var msg = g_map_get(m, "msg");
+    var msg = m["msg"];
     if (g_is_null(tid)) {
         g_map_put(msg, "error", 1);
         g_map_put(msg, "val", "invalid task name");
@@ -163,7 +152,7 @@ export "g_task_handler";
 var g_task_get_id_by_name = func ~(name) {
     var task_name_table = g_query_share("TASK#NAMELIST");
     foreach (var i : g_range(0, 16 - 1)) {
-        var t = g_array_get(task_name_table, i);
+        var t = task_name_table[i];
         if (!g_is_null(t) && t == name) {
             return i;
         }

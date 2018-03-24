@@ -92,11 +92,13 @@ public class TestInterpret13 {
 							"call g_printn(invoke circle::\"get_index\"(1));\n" +
 							"call g_printn(invoke square::\"get_index\"(2));\n" +
 							"",
+
+					"var b=[lambda()->2, lambda(b)->3];"
 			};
 
 			Interpreter interpreter = new Interpreter();
 			Grammar grammar = new Grammar(codes[codes.length - 1]);
-			//System.out.println(grammar.toString());
+			System.out.println(grammar.toString());
 			RuntimeCodePage page = grammar.getCodePage();
 			//System.out.println(page.toString());
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();

@@ -98,7 +98,7 @@ public class SemanticHandler {
 				recorder.add(SemanticError.DUP_PARAM, token);
 			}
 		});
-		/* 声明参数 */
+		/* 清除参数 */
 		mapSemanticAction.put("func_clearargs", (indexed, manage, access, recorder) -> {
 			manage.getManageScopeService().clearFutureArgs();
 			Token token = access.relativeGet(0);
@@ -106,6 +106,10 @@ public class SemanticHandler {
 			if (type == KeywordType.YIELD) {
 				manage.getQueryBlockService().enterBlock(BlockType.kYield);
 			}
+		});
+		/* CATCH 清除参数 */
+		mapSemanticAction.put("clear_catch", (indexed, manage, access, recorder) -> {
+			manage.getManageScopeService().clearFutureArgs();
 		});
 		/* 循环体 */
 		mapSemanticAction.put("do_enter_cycle", (indexed, manage, access, recorder) -> manage.getQueryBlockService().enterBlock(BlockType.kCycle));
@@ -192,6 +196,11 @@ public class SemanticHandler {
 					invoke.setParams((ArrayList<IExp>) indexed.get(4).object);
 				}
 				return invoke;
+			} else if (indexed.exists(5)) {
+				ExpIndex exp = new ExpIndex();
+				exp.setToken(indexed.get(0).token);
+				exp.setExp((IExp) indexed.get(5).object);
+				return exp;
 			} else {
 				ExpValue value = new ExpValue();
 				Token token = indexed.get(0).token;
@@ -494,9 +503,52 @@ public class SemanticHandler {
 			return block;
 		});
 		/* 数组 */
-		mapSemanticAnalyzier.put("array", (indexed, query, recorder) -> new ExpArray());
+		mapSemanticAnalyzier.put("array", (indexed, query, recorder) -> {
+			ExpArray exp = new ExpArray();
+			if (indexed.exists(0)) {
+				exp.setParams((ArrayList<IExp>) indexed.get(0).object);
+			}
+			return exp;
+		});
 		/* 字典 */
-		mapSemanticAnalyzier.put("map", (indexed, query, recorder) -> new ExpMap());
+		mapSemanticAnalyzier.put("map_list", (indexed, query, recorder) -> {
+			ArrayList<IExp> exps;
+			if (indexed.exists(0)) {
+				exps = (ArrayList<IExp>) indexed.get(0).object;
+			} else {
+				exps = new ArrayList<>();
+			}
+			ExpBinop binop = new ExpBinop();
+			binop.setToken(indexed.get(3).token);
+			ExpValue value = new ExpValue();
+			value.setToken(indexed.get(1).token);
+			binop.setLeftOperand(value);
+			binop.setRightOperand((IExp) indexed.get(2).object);
+			exps.add(0, binop.simplify(recorder));
+			return exps;
+		});
+		mapSemanticAnalyzier.put("map", (indexed, query, recorder) -> {
+			ExpMap exp = new ExpMap();
+			if (indexed.exists(0)) {
+				exp.setParams((ArrayList<IExp>) indexed.get(0).object);
+			}
+			return exp;
+		});
+		/* 异常处理 */
+		mapSemanticAnalyzier.put("try", (indexed, query, recorder) -> {
+			StmtTry stmt = new StmtTry();
+			stmt.setTryBlock((Block) indexed.get(1).object);
+			stmt.setCatchBlock((Block) indexed.get(2).object);
+			if (indexed.exists(0)) {
+				stmt.setToken(indexed.get(0).token);
+			}
+			return stmt;
+		});
+		mapSemanticAnalyzier.put("throw", (indexed, query, recorder) -> {
+			StmtThrow stmt = new StmtThrow();
+			stmt.setExp((IExp) indexed.get(0).object);
+			return stmt;
+		});
 	}
 
 	/**

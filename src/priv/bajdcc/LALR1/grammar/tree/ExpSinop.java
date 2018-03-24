@@ -95,12 +95,12 @@ public class ExpSinop implements IExp {
 
 	@Override
 	public String toString() {
-		return "( " + token.toRealString() + " " + operand.toString() + " )";
+		return print(new StringBuilder());
 	}
 
 	@Override
 	public String print(StringBuilder prefix) {
-		return toString();
+		return "( " + token.toRealString() + " " + operand.print(prefix) + " )";
 	}
 
 	@Override

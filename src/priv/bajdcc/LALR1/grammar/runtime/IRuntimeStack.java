@@ -41,6 +41,9 @@ public interface IRuntimeStack {
 	void opYieldCreateContext() throws Exception;
 	void opYieldDestroyContext() throws RuntimeException;
 	void opScope(boolean enter) throws RuntimeException;
-	void opArr();
-	void opMap();
+	void opArr() throws RuntimeException;
+	void opMap() throws RuntimeException;
+	void opIndex() throws RuntimeException;;
+	void opTry() throws RuntimeException;
+	void opThrow() throws RuntimeException;
 }

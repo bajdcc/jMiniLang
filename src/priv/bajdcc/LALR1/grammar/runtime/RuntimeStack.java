@@ -153,6 +153,14 @@ public class RuntimeStack {
 		stkCall.get(0).setName(funcName);
 	}
 
+	public void setTry(int jmp) {
+		stkCall.get(0).setTryJmp(jmp);
+	}
+
+	public int getTry() {
+		return stkCall.get(0).getTryJmp();
+	}
+
 	@Override
 	public String toString() {
 		return "=========================" +

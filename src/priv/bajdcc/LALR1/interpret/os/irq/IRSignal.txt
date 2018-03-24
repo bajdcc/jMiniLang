@@ -19,8 +19,8 @@ var destroy_int = func ~() {
     g_printn("Stopping service...");
     g_stop_share("TASK#LIST");
     foreach (var i : g_range(0, 15)) { // ! ModuleTask.TASK_NUM - 1
-        if (!g_is_null(g_array_get(tt, i))) {
-            var tid = g_array_get(tn, i);
+        if (!g_is_null(tt[i])) {
+            var tid = tn[i];
             g_task_get_fast(tid, "#SHUTDOWN#");
             var handle = g_create_pipe("TASKSEND#" + i);
             g_write_pipe(handle, 'E');
@@ -48,15 +48,14 @@ var handler = func ~(ch) {
      }
 };
 
-var state = [];
-g_array_add(state, true);
+var state = [true];
 g_start_share("IRQ#ON." + no, state);
 var handle = g_create_pipe("int#" + no);
 for (;;) {
     g_read_pipe(handle, handler);
     g_sleep(10 + no);
     var _state_ = g_query_share("IRQ#ON." + no);
-    var on = g_array_get(_state_, 0);
+    var on = _state_[0];
     if (!on) { break; }
 }
 

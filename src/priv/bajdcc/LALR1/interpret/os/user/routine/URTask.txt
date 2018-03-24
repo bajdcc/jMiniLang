@@ -8,7 +8,7 @@ g_set_process_desc("task routinue");
 var pid = g_get_pid();
 var share = g_wait_share("PID#" + pid);
 g_stop_share("PID#" + pid);
-var args = g_map_get(share, "args");
+var args = share["args"];
 
 var in = g_create_pipe("PIPEIN#" + pid);
 var out = g_create_pipe("PIPEOUT#" + pid);
@@ -20,16 +20,14 @@ if (g_array_size(args) < 2) {
     return;
 }
 
-var tid = g_array_get(args, 0);
-var id = g_array_get(args, 1);
+var tid = args[0];
+var id = args[1];
 
-var msg = {};
-g_map_put(msg, "id", id);
-g_map_put(msg, "arg", args);
+var msg = {"id": id, "arg": args};
 g_task_get(tid, msg);
 
-var error = g_map_get(msg, "error");
-var val = g_map_get(msg, "val");
+var error = msg["error"];
+var val = msg["val"];
 val := g_to_string(val);
 if (error == 1) {
     g_write_pipe_n(out, "Error: " + val);

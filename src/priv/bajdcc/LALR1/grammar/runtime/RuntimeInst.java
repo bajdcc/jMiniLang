@@ -78,4 +78,8 @@ public enum RuntimeInst {
 
     iarr,             // 生成数组于[top]
     imap,             // 生成字典于[top]
+    iidx,             // 间接寻址
+
+    itry,             // 异常
+    ithrow,           // 异常
 }

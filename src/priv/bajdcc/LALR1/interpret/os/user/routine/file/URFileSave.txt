@@ -8,8 +8,8 @@ g_set_process_desc("save routinue");
 var pid = g_get_pid();
 var share = g_wait_share("PID#" + pid);
 g_stop_share("PID#" + pid);
-var args = g_map_get(share, "args");
-var o = g_map_get(share, "out");
+var args = share["args"];
+var o = share["out"];
 
 var in = g_create_pipe("PIPEIN#" + pid);
 var out = g_create_pipe("PIPEOUT#" + pid);
@@ -21,7 +21,7 @@ if (g_array_empty(args)) {
     g_write_pipe(out, "USAGE: > [filename] [encoding=u/g/a]" + g_endl);
     g_write_pipe(out, "       > & (redirect to stdout)" + g_endl);
 } else {
-    var filename = g_array_get(args, 0);
+    var filename = args[0];
     if (filename == "&") {
         if (g_is_null(o)) {
             g_read_pipe(in, lambda(ch) -> g_ui_print(ch));
@@ -38,7 +38,7 @@ if (g_array_empty(args)) {
     } else {
         var function = "g_write_file_utf8";
         if (g_array_size(args) > 1) {
-            var enc = g_array_get(args, 1);
+            var enc = args[1];
             if (enc == "u") {
                 //function := "g_write_file_utf8";
             } else if (enc == "g") {

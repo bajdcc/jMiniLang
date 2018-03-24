@@ -23,7 +23,7 @@ var handles = [];
 g_start_share("UI#PIDS", handles);
 
 foreach (var j : g_range(0, ui_num - 1)) {
-    var t = g_array_get(ui_name_table, j);
+    var t = ui_name_table[j];
     if (!g_is_null(t)) {
         g_start_share("UI#" + t, true);
         var pid = g_load_x("/ui/" + t);

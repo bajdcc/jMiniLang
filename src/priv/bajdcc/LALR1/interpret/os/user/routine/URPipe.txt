@@ -11,12 +11,12 @@ var out = g_create_pipe("PIPEOUT#" + pid);
 
 var share = g_wait_share("PID#" + pid);
 g_stop_share("PID#" + pid);
-var args = g_map_get(share, "args");
+var args = share["args"];
 
 if (g_array_empty(args)) {
     g_read_pipe_args(in, lambda(ch, out) -> g_write_pipe(out, ch), out);
 } else {
-    var time = g_array_get(args, 0);
+    var time = args[0];
     time := g_string_atoi(time);
     if (time < 1) { time := 1; }
     g_read_pipe_args(in, lambda(ch, out) { g_write_pipe(out, ch); g_sleep(time); }, out);

@@ -18,13 +18,13 @@ g_func_import_string_module();
 var env = g_lisp_env();
 
 var time = func ~(msg, caller) {
-    var id = g_map_get(msg, "id");
+    var id = msg["id"];
     if (g_is_null(id)) {
         g_map_put(msg, "error", 1);
         g_map_put(msg, "val", "invalid task argument - id");
         return;
     }
-    var arg = g_map_get(msg, "arg");
+    var arg = msg["arg"];
     var arr = g_func_drop(arg, 2);
     if (g_array_empty(arr)) { return; }
     if (id == "calc") {

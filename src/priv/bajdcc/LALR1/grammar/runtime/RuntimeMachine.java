@@ -20,6 +20,7 @@ import priv.bajdcc.util.lexer.token.TokenType;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -44,6 +45,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	private RuntimeProcess process;
 	private int pid;
 	private int parentId;
+	private int triesCount;
 	private boolean debug = false;
 
 	public RuntimeMachine() throws Exception {
@@ -53,9 +55,9 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 					ModuleBase.getInstance(),
 					ModuleMath.getInstance(),
 					ModuleList.getInstance(),
-					ModuleFunction.getInstance(),
 					ModuleString.getInstance(),
 					ModuleProc.getInstance(),
+					ModuleFunction.getInstance(),
 					ModuleUI.getInstance(),
 					ModuleTask.getInstance(),
 					ModuleRemote.getInstance(),
@@ -270,15 +272,23 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 
 	private int loadInt() throws RuntimeException {
 		RuntimeObject obj = load();
-		if (!(obj.getObj() instanceof Integer)) {
+		if (obj.getType() != RuntimeObjectType.kPtr) {
 			err(RuntimeError.WRONG_OPERATOR, RuntimeObjectType.kInt.getName() + " " + obj.toString());
 		}
 		return (int) obj.getObj();
 	}
 
+	private String loadString() throws RuntimeException {
+		RuntimeObject obj = load();
+		if (obj.getType() != RuntimeObjectType.kString) {
+			err(RuntimeError.WRONG_OPERATOR, RuntimeObjectType.kInt.getName() + " " + obj.toString());
+		}
+		return String.valueOf(obj.getObj());
+	}
+
 	private boolean loadBool() throws RuntimeException {
 		RuntimeObject obj = load();
-		if (!(obj.getObj() instanceof Boolean)) {
+		if (obj.getType() != RuntimeObjectType.kBool) {
 			err(RuntimeError.WRONG_OPERATOR, RuntimeObjectType.kBool.getName() + " " + obj.toString());
 		}
 		return (boolean) obj.getObj();
@@ -286,7 +296,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 
 	private boolean loadBoolRetain() throws RuntimeException {
 		RuntimeObject obj = top();
-		if (!(obj.getObj() instanceof Boolean)) {
+		if (obj.getType() != RuntimeObjectType.kBool) {
 			err(RuntimeError.WRONG_OPERATOR, RuntimeObjectType.kBool.getName() + " " + obj.toString());
 		}
 		return (boolean) obj.getObj();
@@ -971,13 +981,78 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	}
 
 	@Override
-	public void opArr() {
-		stack.pushData(new RuntimeObject(new RuntimeArray()));
+	public void opArr() throws RuntimeException {
+		int size = current();
+		next();
+		RuntimeArray arr = new RuntimeArray();
+		for (int i = 0; i < size; i++) {
+			arr.add(load());
+		}
+		stack.pushData(new RuntimeObject(arr));
 	}
 
 	@Override
-	public void opMap() {
-		stack.pushData(new RuntimeObject(new RuntimeMap()));
+	public void opMap() throws RuntimeException {
+		int size = current();
+		next();
+		RuntimeMap map = new RuntimeMap();
+		for (int i = 0; i < size; i++) {
+			map.put(loadString(), load());
+		}
+		stack.pushData(new RuntimeObject(map));
+	}
+
+	@Override
+	public void opIndex() throws RuntimeException {
+		RuntimeObject index = load();
+		RuntimeObject obj = load();
+		RuntimeObjectType typeIdx = index.getType();
+		RuntimeObjectType typeObj = obj.getType();
+		if (typeIdx == RuntimeObjectType.kInt) {
+			if (typeObj == RuntimeObjectType.kArray) {
+				stack.pushData(new RuntimeObject(((RuntimeArray) obj.getObj()).get(((BigInteger) index.getObj()).intValue())));
+				return;
+			} else if (typeObj == RuntimeObjectType.kString) {
+				stack.pushData(new RuntimeObject((String.valueOf(obj.getObj()).charAt(((BigInteger) index.getObj()).intValue()))));
+				return;
+			}
+		} else if (typeIdx == RuntimeObjectType.kString) {
+			if (typeObj == RuntimeObjectType.kMap) {
+				stack.pushData(new RuntimeObject(((RuntimeMap) obj.getObj()).get(String.valueOf(index.getObj()))));
+				return;
+			}
+		}
+		err(RuntimeError.WRONG_ARGTYPE, obj.toString() + ", " + index.toString());
+	}
+
+	@Override
+	public void opTry() throws RuntimeException {
+		triesCount++;
+		int jmp = current();
+		if (jmp != -1 && stack.getTry() != -1) {
+			err(RuntimeError.DUP_EXCEPTION);
+		}
+		next();
+		stack.setTry(jmp);
+	}
+
+	@Override
+	public void opThrow() throws RuntimeException {
+		RuntimeObject obj = top();
+		if (triesCount <= 0) {
+			if (obj.getType() == RuntimeObjectType.kString) {
+				err(RuntimeError.THROWS_EXCEPTION, String.valueOf(obj.getObj()));
+			} else {
+				err(RuntimeError.THROWS_EXCEPTION);
+			}
+		}
+		while (stack.getTry() == -1) { // redirect to try stack
+			stack.opReturn(stack.reg); // clear stack
+		}
+		switchPage();
+		stack.reg.execId = stack.getTry();
+		stack.setTry(-1);
+		triesCount--;
 	}
 
 	public boolean isDebug() {

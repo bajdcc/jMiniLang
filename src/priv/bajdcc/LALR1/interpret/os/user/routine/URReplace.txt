@@ -11,8 +11,8 @@ var out = g_create_pipe("PIPEOUT#" + pid);
 
 var share = g_wait_share("PID#" + pid);
 g_stop_share("PID#" + pid);
-var args = g_map_get(share, "args");
-var arg1 = g_array_get(args, 0);
+var args = share["args"];
+var arg1 = args[0];
 
 var buf = [];
 if (g_is_null(arg1)) {

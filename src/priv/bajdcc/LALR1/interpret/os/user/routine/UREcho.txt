@@ -8,7 +8,7 @@ g_set_process_desc("echo routinue");
 var pid = g_get_pid();
 var share = g_wait_share("PID#" + pid);
 g_stop_share("PID#" + pid);
-var args = g_map_get(share, "args");
+var args = share["args"];
 
 var in = g_create_pipe("PIPEIN#" + pid);
 var out = g_create_pipe("PIPEOUT#" + pid);

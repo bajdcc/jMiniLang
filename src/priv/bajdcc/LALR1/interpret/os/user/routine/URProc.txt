@@ -8,12 +8,12 @@ g_set_process_desc("proc routinue");
 var pid = g_get_pid();
 var share = g_wait_share("PID#" + pid);
 g_stop_share("PID#" + pid);
-var args = g_map_get(share, "args");
+var args = share["args"];
 
 var in = g_create_pipe("PIPEIN#" + pid);
 var out = g_create_pipe("PIPEOUT#" + pid);
 
-var arg1 = g_array_get(args, 0);
+var arg1 = args[0];
 if (g_is_null(arg1)) {
     arg1 := g_query_usr_proc();
 } else if (arg1 == "sys") {

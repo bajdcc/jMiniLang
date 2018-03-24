@@ -136,15 +136,15 @@ public class ExpTriop implements IExp {
 
 	@Override
 	public String toString() {
-		return "( " + firstOperand.toString() + " " + firstToken.toRealString()
-				+ " " + secondOperand.toString() + " "
-				+ secondToken.toRealString() + " " + thirdOperand.toString()
-				+ " )";
+		return print(new StringBuilder());
 	}
 
 	@Override
 	public String print(StringBuilder prefix) {
-		return toString();
+		return "( " + firstOperand.print(prefix) + " " + firstToken.toRealString()
+				+ " " + secondOperand.print(prefix) + " "
+				+ secondToken.toRealString() + " " + thirdOperand.print(prefix)
+				+ " )";
 	}
 
 	@Override

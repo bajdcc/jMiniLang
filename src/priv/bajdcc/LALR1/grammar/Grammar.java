@@ -150,7 +150,7 @@ public class Grammar extends Semantic {
 				"exp4", "exp5", "exp6", "exp7", "exp8", "exp9", "exp10", "type",
 				"block", "call_exp", "call", "ret", "doc_list", "port", "if",
 				"for", "while", "foreach", "cycle_ctrl", "block_stmt", "array", "map", "set", "invoke",
-				"exp01"};
+				"exp01", "try", "throw", "map_list"};
 		for (String string : nonTerminals) {
 			addNonTerminal(string);
 		}
@@ -181,13 +181,13 @@ public class Grammar extends Semantic {
 		infer(handler.getSemanticHandler("stmt_exp"),
 				"stmt_stmt -> [stmt_exp[0]] @SEMI{lost_semi}");
 		infer(handler.getSemanticHandler("copy"),
-				"stmt_ctrl -> ret[0] | port[0] | if[0] | for[0] | foreach[0] | while[0]");
+				"stmt_ctrl -> ret[0] | port[0] | if[0] | for[0] | foreach[0] | while[0] | try[0] | throw[0]");
 		/* 返回语句 */
 		infer(handler.getSemanticHandler("return"),
 				"ret -> (@YIELD[1] | @RETURN) [exp[0]] @SEMI{lost_semi}");
 		/* 变量定义（赋值）语句（由于支持Lambda，函数定义皆为Lambda形式） */
 		infer(handler.getSemanticHandler("var"),
-				"var -> (@VARIABLE[11] | @LET[12]) @ID[0]#declear_variable#{lost_token} @ASSIGN{lost_assign} (func[1]{lost_func} | exp[2]{lost_exp} | array[2]{lost_array} | map[2]{lost_map})");
+				"var -> (@VARIABLE[11] | @LET[12]) @ID[0]#declear_variable#{lost_token} @ASSIGN{lost_assign} (func[1]{lost_func} | exp[2]{lost_exp})");
 		/* 类属性赋值语句 */
 		infer(handler.getSemanticHandler("set"),
 				"set -> @SET exp[3]{lost_exp} @PROPERTY{lost_property} exp[4]{lost_exp} @ASSIGN{lost_assign} exp[2]{lost_exp}");
@@ -237,7 +237,7 @@ public class Grammar extends Semantic {
 				"lambda -> @LAMBDA[1]#lambda# @LPA{lost_lpa} [var_list[2]] @RPA{lost_rpa} (@PTR_OP{lost_func_body} exp[3]{lost_exp} | block[4]{lost_func_body})");
 		/* 基本数据类型 */
 		infer(handler.getSemanticHandler("type"),
-				"type -> @ID[0] [@LPA[3] [exp_list[4]] @RPA{lost_rpa}] | @INTEGER[0] | @DECIMAL[0] | @LITERAL[0] | @CHARACTER[0] | @BOOLEAN[0] | @LPA exp[1]{lost_exp} @RPA{lost_rpa} | call[1] | lambda[2] | set[1] | invoke[1]");
+				"type -> @ID[0] [(@LPA[3] [exp_list[4]] @RPA{lost_rpa}) | (@LSQ exp[5]{lost_exp} @RSQ{lost_rpa})] | @INTEGER[0] | @DECIMAL[0] | @LITERAL[0] | @CHARACTER[0] | @BOOLEAN[0] | @LPA exp[1]{lost_exp} @RPA{lost_rpa} | call[1] | lambda[2] | set[1] | invoke[1] | array[1] | map[1]");
 		/* 条件语句 */
 		infer(handler.getSemanticHandler("if"),
 				"if -> @IF @LPA{lost_lpa} exp[0]{lost_exp} @RPA{lost_rpa} block[1]{lost_block} [@ELSE (block[2]{lost_block} | if[3]{lost_block})]");
@@ -254,10 +254,17 @@ public class Grammar extends Semantic {
 				"cycle_ctrl -> @BREAK[0] | @CONTINUE[0]");
 		/* 数组初始化 */
 		infer(handler.getSemanticHandler("array"),
-				"array -> @LSQ @RSQ{lost_rsq}");
+				"array -> @LSQ [exp_list[0]] @RSQ{lost_rsq}");
 		/* 字典初始化 */
+		infer(handler.getSemanticHandler("map_list"),
+				"map_list -> @LITERAL[1] @COLON[3]{lost_colon} exp[2]{lost_exp} [@COMMA map_list[0]]");
 		infer(handler.getSemanticHandler("map"),
-				"map -> @LBR @RBR{lost_rbr}");
+				"map -> @LBR [map_list[0]] @RBR{lost_rbr}");
+		/* 异常处理 */
+		infer(handler.getSemanticHandler("try"),
+				"try -> @TRY block[1]{lost_block} @CATCH{lost_catch} [@LPA{lost_lpa} @ID[0]#declear_param#{lost_token} @RPA{lost_rpa}] block[2]#clear_catch#{lost_block}");
+		infer(handler.getSemanticHandler("throw"),
+				"throw -> @THROW exp[0]{lost_exp} @SEMI{lost_semi}");
 		initialize("program");
 	}
 
@@ -291,6 +298,8 @@ public class Grammar extends Semantic {
 		addErrorHandler("lost_map", new LostHandler("字典'{}'"));
 		addErrorHandler("lost_dot", new LostHandler("点号'.'"));
 		addErrorHandler("lost_property", new LostHandler("属性连接符'::'"));
+		addErrorHandler("lost_try", new LostHandler("属性连接符'::'"));
+		addErrorHandler("lost_catch", new LostHandler("'catch'"));
 	}
 
 	/**
@@ -301,7 +310,8 @@ public class Grammar extends Semantic {
 	private void declareActionHandler() throws SyntaxException {
 		String[] actionNames = new String[]{"do_enter_scope",
 				"do_leave_scope", "predeclear_funcname", "declear_variable",
-				"declear_param", "func_clearargs", "do_enter_cycle", "lambda"};
+				"declear_param", "func_clearargs", "do_enter_cycle", "lambda",
+				"clear_catch"};
 		for (String string : actionNames) {
 			addActionHandler(string, handler.getActionHandler(string));
 		}

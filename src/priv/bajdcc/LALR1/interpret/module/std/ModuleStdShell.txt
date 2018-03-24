@@ -11,10 +11,10 @@ import "sys.file";
 var import_shell_class = func ~(ctx) {
     var parse_cmd_1 = func ["PARSE"] ~(arg) {
         var pid = g_get_pid();
-        var cmd = g_map_get(arg, "args");
-        var parent = g_map_get(arg, "parent");
-        var parse = g_map_get(arg, "parse");
-        var o = g_map_get(arg, "out");
+        var cmd = arg["args"];
+        var parent = arg["parent"];
+        var parse = arg["parse"];
+        var o = arg["out"];
         var exe = g_array_pop(cmd);
         exe := g_string_trim(exe);
         var _args = g_string_split(exe, " ");
@@ -25,11 +25,9 @@ var import_shell_class = func ~(ctx) {
                 g_array_add(args, ss);
             }
         }
-        var exec = g_array_get(args, 0);
+        var exec = args[0];
         g_array_remove(args, 0);
-        var share = {};
-        g_map_put(share, "args", args);
-        g_map_put(share, "out", o);
+        var share = {"args": args, "out": o};
         g_set_process_desc("shell: " + exec);
         var path = "/usr/p/" + exec;
         var child = g_load_user_x(path);
@@ -44,11 +42,12 @@ var import_shell_class = func ~(ctx) {
         g_map_put(share, "child", child);
         var k = g_null;
         if (g_array_size(cmd) > 0) {
-            var _args_ = {};
-            g_map_put(_args_, "args", cmd);
-            g_map_put(_args_, "out", o);
-            g_map_put(_args_, "parse", parse);
-            g_map_put(_args_, "parent", child);
+            var _args_ = {
+                "args": cmd,
+                "out": o,
+                "parse": parse,
+                "parent": child
+            };
             k := g_create_user_process_args(parse, _args_);
         }
         var in = g_create_pipe("PIPEIN#" + parent);
@@ -73,11 +72,9 @@ var import_shell_class = func ~(ctx) {
                 g_array_add(args, ss);
             }
         }
-        var exec = g_array_get(args, 0);
+        var exec = args[0];
         g_array_remove(args, 0);
-        var share = {};
-        g_map_put(share, "args", args);
-        g_map_put(share, "out", o);
+        var share = {"args": args, "out": o};
         g_set_process_desc("shell: " + exec);
         var path = "/usr/p/" + exec;
         var child = g_load_user_x(path);
@@ -88,11 +85,12 @@ var import_shell_class = func ~(ctx) {
         g_start_share("PID#" + child, share);
         var k = g_null;
         if (g_array_size(cmd) > 0) {
-            var _args_ = {};
-            g_map_put(_args_, "args", cmd);
-            g_map_put(_args_, "parse", parse);
-            g_map_put(_args_, "out", o);
-            g_map_put(_args_, "parent", child);
+            var _args_ = {
+                "args": cmd,
+                "parse": parse,
+                "out": o,
+                "parent": child
+            };
             k := g_create_user_process_args(parse, _args_);
         }
         var out = g_wait_pipe("PIPEOUT#" + child);
@@ -117,15 +115,15 @@ var import_shell_class = func ~(ctx) {
         cmd := g_string_right(cmd, 1);
         g_array_remove(arg, 0);
         if (g_array_size(arg) == 1) {
-            return g_task_get_fast(cmd, g_array_get(arg, 0));
+            return g_task_get_fast(cmd, arg[0]);
         } else if (g_array_size(arg) == 2) {
-            var ret = task_native(cmd, g_array_get(arg, 0), g_array_get(arg, 1));
+            var ret = task_native(cmd, arg[0], arg[1]);
             if (g_is_null(ret)) {
-                return g_task_get_fast_arg(cmd, g_array_get(arg, 0), g_array_get(arg, 1));
+                return g_task_get_fast_arg(cmd, arg[0], arg[1]);
             }
             return ret;
         } else {
-            var msg = g_array_get(arg, 0);
+            var msg = arg[0];
             g_array_remove(arg, 0);
             var ret = task_native(cmd, msg, arg);
             if (g_is_null(ret)) {
@@ -138,7 +136,7 @@ var import_shell_class = func ~(ctx) {
     // TASK COMMAND
     var handle_task_command = func ~(arg) {
         var arr = g_string_split(arg, " ");
-        var cmd = g_array_get(arr, 0);
+        var cmd = arr[0];
         if (g_string_start_with(cmd, "@")) {
             return task_fast_invoker(cmd, arr);
         }
