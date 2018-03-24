@@ -32,6 +32,8 @@
 19. Save/Load file or VFS.
 20. **Class prototype**.
 21. **Bash Interface**.
+22. Array/Map initialize list.
+23. **Try/Catch/Throw**.
 
 #### What it generates
 
@@ -63,6 +65,7 @@ Now has commands:
 - **bash**
 - replace
 - util
+- **ai**
 
 Tasks:
 - System
@@ -129,6 +132,30 @@ range 1 10 | replace task util calc $ * $ | bash | > &
 range 1 10 | replace task util calc $ + 1 | bash | util product | > &
 range -5 10 | replace task util calc $ * $ * $ | bash | util sum | > &
 echo Made_by_bajdcc | > &
+```
+
+**Tail optimization**
+
+```javascript
+var g_tail_opt = func ["尾递归优化"] ~(fun, args) {
+    var x = lambda(a) { throw a; };
+    var fact = fun(x);
+    for (;;) {
+        try {
+            return g_call_apply(fact, args);
+        } catch (e) {
+            args := e;
+        }
+    }
+};
+
+// Usage
+g_printn("Factorial(10) = " + g_tail_opt(
+    lambda(f) -> lambda(n, total) -> n <= 1 ? total : f([n - 1, total * n]),
+    [10, 1]));
+g_printn("Fibonacci(10) = " + g_tail_opt(
+    lambda(f) -> lambda(n, a, total) -> n <= 1 ? total : f([n - 1, total, a + total]),
+    [10, 0, 1]));
 ```
 
 **0. Class**
