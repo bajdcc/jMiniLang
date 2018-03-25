@@ -358,6 +358,28 @@ public class ModuleList implements IInterpreterModule {
 				return new RuntimeObject(array);
 			}
 		});
+		info.addExternalFunc("g_array_fill", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "填充数组";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kArray, RuntimeObjectType.kObject};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				RuntimeArray array = (RuntimeArray) args.get(0).getObj();
+				RuntimeObject obj = args.get(0);
+				for (int i = 0; i <= array.length(); i++) {
+					array.set(i, obj);
+				}
+				return new RuntimeObject(array);
+			}
+		});
 	}
 
 	/**

@@ -83,6 +83,10 @@ public class RuntimeArray implements Cloneable {
 		return new RuntimeObject(BigInteger.valueOf(array.size()));
 	}
 
+	public int length() {
+		return array.size();
+	}
+
 	public RuntimeObject remove(int index) {
 		if (index >= 0 && index < array.size()) {
 			return array.remove(index);

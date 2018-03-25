@@ -107,7 +107,8 @@ public class StmtTry implements IStmt {
 
 	@Override
 	public void addClosure(IClosureScope scope) {
-		scope.addRef(token.object);
+		if (token != null)
+			scope.addRef(token.object);
 		tryBlock.addClosure(scope);
 		catchBlock.addClosure(scope);
 	}

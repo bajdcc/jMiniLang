@@ -21,7 +21,7 @@ var import_list_class = func ~(ctx) {
         set this::"remove" = lambda(this, i) -> g_array_remove(this."array", i);
         set this::"delete" = lambda(this, obj) -> g_array_delete(this."array", obj);
         set this::"empty" = lambda(this) -> g_array_empty(this."array");
-        set this::"range" = lambda(this, a, b) -> g_array_rangle(this."array", a, b);
+        set this::"fill" = lambda(this, obj) -> g_array_fill(this."array", obj);
     }, "object");
     g_register_class(ctx, "list::map", lambda(this) {
         set this::"map" = g_new_map;

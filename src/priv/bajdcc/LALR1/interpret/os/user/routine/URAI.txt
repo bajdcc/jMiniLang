@@ -129,6 +129,62 @@ g_register_class(ctx, "app::ai::node.loop", lambda(this) {
     };
 }, "app::ai::node.base");
 
+/* -----------------------------------------------------------------
+# CLASS [app::ai::node.parallel]
+# 平行结点
+----------------------------------------------------------------- */
+g_register_class(ctx, "app::ai::node.parallel", lambda(this) {
+    /* 数据 */
+    set this::"or" = 1; // 指定是“或”(1)还是“与”(0)
+    set this::"children_status" = g_create(ctx, "list::array"); // 子结点执行状态
+    /* 事件 */
+    g_hook_add_before(this, "do_evaluate", lambda(class, name, this, next, input) { // 执行事件
+        if ((this."loop_count" != -1) && (this."current_loop" >= this."loop_count")) {
+            return false;
+        }
+        if (invoke this::"checkIndex"(0) && invoke (invoke this."children"::"get"(0))::"evaluate"(input)) {
+            return true;
+        }
+        return false;
+    });
+    g_hook_add_before(this, "do_tick", lambda(class, name, this, next, input, output) { // 定时事件
+        var is_finish = STATE_FINISH;
+        if (invoke this::"check_index"(0)) {
+            is_finish := invoke (invoke this."children"::"get"(0))::"tick"(input, output);
+            if (is_finish == STATE_FINISH) {
+                if (this."loop_count" == -1) {
+                    is_finish := STATE_EXECUTING;
+                } else {
+                    set this::"current_loop" = this."current_loop" + 1;
+                    if (this."current_loop" < this."loop_count") {
+                        is_finish := STATE_EXECUTING;
+                    }
+                }
+            }
+        }
+        if (is_finish == STATE_FINISH) {
+            set this::"current_loop" = 0;
+        }
+        return is_finish;
+    });
+    g_hook_add_before(this, "do_leave", lambda(class, name, this, next, input) { // 离开事件
+        invoke this::"reset_status"();
+        foreach (var i : g_range_array(this."children"."array")) {
+            invoke i::"leave"(input);
+        }
+    });
+    /* 方法 */
+    g_hook_add_after(this, "add_child", lambda(class, name, this, r, next, node) { // 执行事件
+        invoke this."children_status"::"add"(STATE_EXECUTING);
+    });
+    g_hook_add_after(this, "add_child_at", lambda(class, name, this, r, next, node, i) { // 执行事件
+        invoke this."children_status"::"insert"(i, STATE_EXECUTING);
+    });
+    set this::"reset_status" = lambda(this) { // 重置状态
+        invoke this."children_status"::"fill"(STATE_EXECUTING);
+    };
+}, "app::ai::node.base");
+
 // #################################################################
 
 /* -----------------------------------------------------------------

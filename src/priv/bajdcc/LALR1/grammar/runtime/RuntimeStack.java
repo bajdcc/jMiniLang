@@ -18,6 +18,7 @@ public class RuntimeStack {
 
 	public RuntimeRegister reg = new RuntimeRegister();
 	private Stack<Integer> dataTryCounts = new Stack<>();
+	private boolean catchState = false;
 
 	/**
 	 * 数据堆栈
@@ -154,10 +155,19 @@ public class RuntimeStack {
 		stkCall.get(0).setName(funcName);
 	}
 
+	public boolean hasCatch() {
+		return catchState;
+	}
+
 	public void setTry(int jmp) {
 		if (jmp != -1)
 			dataTryCounts.push(stkData.size());
 		stkCall.get(0).setTryJmp(jmp);
+		catchState = false;
+	}
+
+	public boolean hasTry() {
+		return !dataTryCounts.empty();
 	}
 
 	public int getTry() {
@@ -170,7 +180,7 @@ public class RuntimeStack {
 		while (stkData.size() > last)
 			stkData.pop();
 		stkData.push(obj);
-		dataTryCounts.push(stkData.size());
+		catchState = true;
 	}
 
 	@Override

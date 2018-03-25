@@ -1038,7 +1038,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 
 	@Override
 	public void opThrow() throws RuntimeException {
-		RuntimeObject obj = top();
+		RuntimeObject obj = load();
 		if (triesCount <= 0) {
 			if (obj.getType() == RuntimeObjectType.kString) {
 				err(RuntimeError.THROWS_EXCEPTION, String.valueOf(obj.getObj()));
@@ -1046,11 +1046,21 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 				err(RuntimeError.THROWS_EXCEPTION);
 			}
 		}
+		if (!stack.hasTry()) {
+			while (!stack.hasTry()) {
+				opYieldSwitch(false);
+			}
+			opYieldDestroyContext();
+		}
+		if (stack.hasCatch()) {
+			pop();
+			opScope(false);
+		}
 		while (stack.getTry() == -1) { // redirect to try stack
 			stack.opReturn(stack.reg); // clear stack
 		}
-		switchPage();
 		stack.reg.execId = stack.getTry();
+		store(obj);
 		stack.resetTry();
 		triesCount--;
 	}

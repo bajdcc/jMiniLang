@@ -92,6 +92,15 @@ public class TestInterpret13 {
 							"call g_printn(invoke circle::\"get_index\"(1));\n" +
 							"call g_printn(invoke square::\"get_index\"(2));\n" +
 							"",
+
+					"import \"sys.base\";\n" +
+							"var c = yield ~(){throw 3;};\n" +
+							"var b = yield ~(){\n" +
+							"try{foreach(var k : c()){}yield 1;}\n" +
+							"catch{\n" +
+							"  yield 4;throw 2;}};\n" +
+							"/*g_set_debug(true);*/\n" +
+							"try{foreach(var k : b()){g_printn(k);}}catch{g_printn(5);}\n"
 			};
 
 			Interpreter interpreter = new Interpreter();
