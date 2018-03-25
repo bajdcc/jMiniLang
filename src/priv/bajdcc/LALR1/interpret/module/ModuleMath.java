@@ -54,6 +54,8 @@ public class ModuleMath implements IInterpreterModule {
 	private void buildUnaryFunc(IRuntimeDebugInfo info) {
 		info.addExternalFunc("g_sqrt", new ModuleMathUnaryFunc("开方",
 				ModuleMathUnaryFunc.ModuleMathUnaryFuncType.kSqrt));
+		info.addExternalFunc("g_sqrt_double", new ModuleMathUnaryFunc("开方",
+				ModuleMathUnaryFunc.ModuleMathUnaryFuncType.kSqrtDouble));
 		info.addExternalFunc("g_floor", new IRuntimeDebugExec() {
 			@Override
 			public String getDoc() {

@@ -16,7 +16,8 @@ import priv.bajdcc.LALR1.grammar.type.TokenTools;
 public class ModuleMathUnaryFunc implements IRuntimeDebugExec {
 
 	public enum ModuleMathUnaryFuncType {
-		kSqrt
+		kSqrt,
+		kSqrtDouble,
 	}
 
 	private String doc = null;
@@ -34,6 +35,9 @@ public class ModuleMathUnaryFunc implements IRuntimeDebugExec {
 		case kSqrt:
 			return new RuntimeObject(ModuleMath.sqrt((BigDecimal) args.get(0)
 					.getObj(), TokenTools.SCALE_NUM));
+		case kSqrtDouble:
+			return new RuntimeObject(BigDecimal.valueOf(Math.sqrt(((BigDecimal) args.get(0)
+					.getObj()).doubleValue())));
 		default:
 			break;
 		}
