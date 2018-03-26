@@ -596,6 +596,24 @@ var g_hook_add_before = func ~(class, name, f) {
     return true;
 };
 export "g_hook_add_before";
+var g_hook_insert_before = func ~(class, name, f) {
+    var old = class.name;
+    if (g_is_null(old)) {
+        return false;
+    }
+    var flag = g_get_flag(old);
+    if ((flag & 1) > 0) {
+        var _before = class.(name + "__before");
+        g_array_insert(_before, 0, f);
+    } else {
+        var _before = [];
+        g_array_add(_before, f);
+        set class::(name + "__before") = _before;
+        g_set_flag(old, flag | 1);
+    }
+    return true;
+};
+export "g_hook_insert_before";
 var g_hook_remove_before = func ~(class, name, f) {
     var old = class.name;
     if (g_is_null(old)) {
@@ -632,6 +650,24 @@ var g_hook_add_after = func ~(class, name, f) {
     return true;
 };
 export "g_hook_add_after";
+var g_hook_insert_after = func ~(class, name, f) {
+    var old = class.name;
+    if (g_is_null(old)) {
+        return false;
+    }
+    var flag = g_get_flag(old);
+    if ((flag & 2) > 0) {
+        var _after = class.(name + "__after");
+        g_array_insert(_after, 0, f);
+    } else {
+        var _after = [];
+        g_array_add(_after, f);
+        set class::(name + "__after") = _after;
+        g_set_flag(old, flag | 2);
+    }
+    return true;
+};
+export "g_hook_insert_after";
 var g_hook_remove_after = func ~(class, name, f) {
     var old = class.name;
     if (g_is_null(old)) {

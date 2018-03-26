@@ -3,7 +3,7 @@ import "sys.proc";
 import "sys.list";
 import "sys.string";
 
-g_set_process_desc("pipe routinue");
+g_set_process_desc("pipe routine");
 
 var pid = g_get_pid();
 var in = g_create_pipe("PIPEIN#" + pid);

@@ -34,6 +34,7 @@
 21. **Bash Interface**.
 22. Array/Map initialize list.
 23. **Try/Catch/Throw**.
+24. **Behavior Tree**.
 
 #### What it generates
 

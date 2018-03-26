@@ -373,7 +373,7 @@ public class ModuleList implements IInterpreterModule {
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) throws Exception {
 				RuntimeArray array = (RuntimeArray) args.get(0).getObj();
-				RuntimeObject obj = args.get(0);
+				RuntimeObject obj = args.get(1);
 				for (int i = 0; i <= array.length(); i++) {
 					array.set(i, obj);
 				}

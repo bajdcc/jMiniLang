@@ -424,11 +424,12 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 
 	@Override
 	public Object[] getProcInfo() {
+		String funcName = stack.getFuncSimpleName();
 		return new Object[]{
 				process.isBlock(pid) ? " " : "*",
 				pid,
 				name,
-				stack.getFuncSimpleName(),
+				funcName.substring(0, Math.min(funcName.length(), 20)),
 				description,
 		};
 	}

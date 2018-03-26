@@ -7,6 +7,7 @@ import priv.bajdcc.util.ResourceLoader;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Random;
 
 /**
  * 【模块】数学模块
@@ -23,6 +24,8 @@ public class ModuleMath implements IInterpreterModule {
 	}
 
 	final static BigInteger HUNDRED = BigInteger.valueOf(100);
+	final static BigDecimal PI2 = BigDecimal.valueOf(Math.PI * 2.0);
+	final static private Random rand = new Random();
 
 	@Override
 	public String getModuleName() {
@@ -45,7 +48,9 @@ public class ModuleMath implements IInterpreterModule {
 		RuntimeCodePage page = grammar.getCodePage();
 		IRuntimeDebugInfo info = page.getInfo();
 		info.addExternalValue("g_PI", () -> new RuntimeObject(BigDecimal.valueOf(Math.PI)));
+		info.addExternalValue("g_PI_2", () -> new RuntimeObject(BigDecimal.valueOf(Math.PI * 2.0)));
 		info.addExternalValue("g_E", () -> new RuntimeObject(BigDecimal.valueOf(Math.E)));
+		info.addExternalValue("g_random", () -> new RuntimeObject(BigDecimal.valueOf(rand.nextDouble())));
 		buildUnaryFunc(info);
 
 		return runtimeCodePage = page;
@@ -56,6 +61,10 @@ public class ModuleMath implements IInterpreterModule {
 				ModuleMathUnaryFunc.ModuleMathUnaryFuncType.kSqrt));
 		info.addExternalFunc("g_sqrt_double", new ModuleMathUnaryFunc("开方",
 				ModuleMathUnaryFunc.ModuleMathUnaryFuncType.kSqrtDouble));
+		info.addExternalFunc("g_cos", new ModuleMathUnaryFunc("余弦",
+				ModuleMathUnaryFunc.ModuleMathUnaryFuncType.kCos));
+		info.addExternalFunc("g_sin", new ModuleMathUnaryFunc("正弦",
+				ModuleMathUnaryFunc.ModuleMathUnaryFuncType.kSin));
 		info.addExternalFunc("g_floor", new IRuntimeDebugExec() {
 			@Override
 			public String getDoc() {
@@ -74,7 +83,45 @@ public class ModuleMath implements IInterpreterModule {
 				BigInteger n = (BigInteger) args.get(1).getObj();
 				return new RuntimeObject(decimal.setScale(n.intValue(), BigDecimal.ROUND_HALF_UP));
 			}
-		});	}
+		});
+		info.addExternalFunc("g_atan2", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "atan(y, x)";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[] { RuntimeObjectType.kReal, RuntimeObjectType.kReal };
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				BigDecimal y = (BigDecimal) args.get(0).getObj();
+				BigDecimal x = (BigDecimal) args.get(1).getObj();
+				return new RuntimeObject(BigDecimal.valueOf(Math.atan2(y.doubleValue(), x.doubleValue())));
+			}
+		});
+		info.addExternalFunc("g_random_int", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "随机数";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kInt};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				return new RuntimeObject(BigInteger.valueOf(rand.nextInt(((BigInteger) args
+						.get(0).getObj()).intValue())));
+			}
+		});
+	}
 
 	public static BigDecimal sqrt(BigDecimal number, int scale, int roundingMode) {
 		if (number.compareTo(BigDecimal.ZERO) < 0)

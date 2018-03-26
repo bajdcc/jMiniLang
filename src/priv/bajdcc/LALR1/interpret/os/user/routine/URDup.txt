@@ -3,7 +3,7 @@ import "sys.list";
 import "sys.proc";
 import "sys.string";
 
-g_set_process_desc("dup routinue");
+g_set_process_desc("dup routine");
 var pid = g_get_pid();
 var share = g_wait_share("PID#" + pid);
 g_stop_share("PID#" + pid);

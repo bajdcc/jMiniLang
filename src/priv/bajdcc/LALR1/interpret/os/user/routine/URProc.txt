@@ -4,7 +4,7 @@ import "sys.string";
 import "sys.proc";
 import "sys.task";
 
-g_set_process_desc("proc routinue");
+g_set_process_desc("proc routine");
 var pid = g_get_pid();
 var share = g_wait_share("PID#" + pid);
 g_stop_share("PID#" + pid);

@@ -18,6 +18,8 @@ public class ModuleMathUnaryFunc implements IRuntimeDebugExec {
 	public enum ModuleMathUnaryFuncType {
 		kSqrt,
 		kSqrtDouble,
+		kCos,
+		kSin,
 	}
 
 	private String doc = null;
@@ -37,6 +39,12 @@ public class ModuleMathUnaryFunc implements IRuntimeDebugExec {
 					.getObj(), TokenTools.SCALE_NUM));
 		case kSqrtDouble:
 			return new RuntimeObject(BigDecimal.valueOf(Math.sqrt(((BigDecimal) args.get(0)
+					.getObj()).doubleValue())));
+		case kCos:
+			return new RuntimeObject(BigDecimal.valueOf(Math.cos(((BigDecimal) args.get(0)
+					.getObj()).doubleValue())));
+		case kSin:
+			return new RuntimeObject(BigDecimal.valueOf(Math.sin(((BigDecimal) args.get(0)
 					.getObj()).doubleValue())));
 		default:
 			break;

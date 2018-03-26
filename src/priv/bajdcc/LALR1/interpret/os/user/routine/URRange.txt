@@ -3,7 +3,7 @@ import "sys.list";
 import "sys.string";
 import "sys.proc";
 
-g_set_process_desc("range routinue");
+g_set_process_desc("range routine");
 var pid = g_get_pid();
 var share = g_wait_share("PID#" + pid);
 g_stop_share("PID#" + pid);

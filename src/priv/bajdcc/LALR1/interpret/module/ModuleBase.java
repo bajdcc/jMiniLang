@@ -23,7 +23,6 @@ public class ModuleBase implements IInterpreterModule {
 	private static ModuleBase instance = new ModuleBase();
 	private static Logger logger = Logger.getLogger("console");
 	private RuntimeCodePage runtimeCodePage;
-	private Random rand = new Random();
 
 	public static ModuleBase getInstance() {
 		return instance;
@@ -510,24 +509,6 @@ public class ModuleBase implements IInterpreterModule {
 					System.err.println(e.getMessage());
 				}
 				return null;
-			}
-		});
-		info.addExternalFunc("g_random_int", new IRuntimeDebugExec() {
-			@Override
-			public String getDoc() {
-				return "随机数";
-			}
-
-			@Override
-			public RuntimeObjectType[] getArgsType() {
-				return new RuntimeObjectType[]{RuntimeObjectType.kInt};
-			}
-
-			@Override
-			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
-			                                      IRuntimeStatus status) throws Exception {
-				return new RuntimeObject(BigInteger.valueOf(rand.nextInt(((BigInteger) args
-						.get(0).getObj()).intValue())));
 			}
 		});
 		buildIORead(info);

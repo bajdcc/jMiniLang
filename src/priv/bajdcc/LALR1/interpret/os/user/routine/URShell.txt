@@ -226,7 +226,7 @@ var handle_task_command = func ~(arg) {
 
 // GET STDIO cmd
 var get_input = func ["INPUT"] ~(arg) {
-    g_set_process_desc("shell routinue");
+    g_set_process_desc("shell routine");
     var this = arg[0];
     var parse = arg[1];
     g_ui_print("$ \uffef");
