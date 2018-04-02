@@ -1,5 +1,6 @@
 import "sys.base";
 import "sys.list";
+import "sys.proc";
 
 var g_create_context = func ~() -> g_new_map;
 export "g_create_context";
@@ -686,3 +687,43 @@ var g_hook_remove_after = func ~(class, name, f) {
     return false;
 };
 export "g_hook_remove_after";
+
+var g_invoke_apply = func ~(class, fun, args) {
+    var size = g_array_size(args);
+    if (size > 9) {
+        g_panic("g_call_apply: TOO MANY ARGUMENTS");
+    }
+    var apply_callbacks = g_query_share("MODULE_CLASS#APPLY_FUNCS");
+    if (g_is_null(apply_callbacks)) {
+        apply_callbacks := [
+            lambda(c, f, a) -> invoke c::f::(),
+            lambda(c, f, a) -> invoke c::f::(a[0]),
+            lambda(c, f, a) -> invoke c::f::(a[0], a[1]),
+            lambda(c, f, a) -> invoke c::f::(a[0], a[1], a[2]),
+            lambda(c, f, a) -> invoke c::f::(a[0], a[1], a[2], a[3]),
+            lambda(c, f, a) -> invoke c::f::(a[0], a[1], a[2], a[3], a[4]),
+            lambda(c, f, a) -> invoke c::f::(a[0], a[1], a[2], a[3], a[4], a[5]),
+            lambda(c, f, a) -> invoke c::f::(a[0], a[1], a[2], a[3], a[4], a[5], a[6]),
+            lambda(c, f, a) -> invoke c::f::(a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7]),
+            lambda(c, f, a) -> invoke c::f::(a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8])
+        ];
+        g_start_share("MODULE_CLASS#APPLY_FUNCS", apply_callbacks);
+    }
+    var fn = apply_callbacks[size];
+    return fn(class, fun, args);
+};
+export "g_invoke_apply";
+var g_new_class = func ~(ctx, name, data, method) {
+    var class = g_create_class(ctx, name);
+    foreach (var d : g_range_array(data)) {
+        set class::d[0] = d[1];
+    }
+    var m_ = g_null;
+    foreach (var m : g_range_array(method)) {
+        m_ := m[0];
+        g_array_remove(m, 0);
+        g_invoke_apply(class, m_, m);
+    }
+    return class;
+};
+export "g_new_class";

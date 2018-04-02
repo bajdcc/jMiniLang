@@ -685,32 +685,24 @@ g_register_class(ctx, "app::ai::test", lambda(this) {
         invoke this."output"::"put"("v", [0.0, 0.0]);
         invoke this."output"::"put"("dir", 0);
 
-        set this::"root" = g_create_class(ctx, "app::ai::node.priority");
-        set this."root"::"name" = "root";
-
-        var move = invoke g_create_class(ctx, "app::ai::node.sequence")::
-            "set_cond"(g_create_class(ctx, "app::ai::cond::test.reached_target"));
-        invoke this."root"::"add_child"(move);
-        set move::"name" = "move";
-
-        invoke move::"add_child"(g_create_class(ctx, "app::ai::node.terminal::test.face_to"));
-        invoke move::"add_child"(g_create_class(ctx, "app::ai::node.terminal::test.idle"));
-        invoke move::"add_child"(g_create_class(ctx, "app::ai::node.terminal::test.move_to"));
-        invoke move::"add_child"(g_create_class(ctx, "app::ai::node.terminal::test.look_around"));
-
-        var patrol = g_create_class(ctx, "app::ai::node.parallel");
-        invoke this."root"::"add_child"(patrol);
-        set patrol::"name" = "patrol";
-
-        invoke patrol::"add_child"(g_create_class(ctx, "app::ai::node.terminal::test.hovering"));
-
-        var smoking = g_create_class(ctx, "app::ai::node.priority.always");
-        invoke patrol::"add_child"(smoking);
-        set smoking::"name" = "smoking";
-        invoke smoking::"add_child"(invoke g_create_class(ctx, "app::ai::node.terminal::test.smoking")::"set_cond"(
-            g_create_class(ctx, "app::ai::cond::test.smoke")));
-        invoke smoking::"add_child"(invoke g_create_class(ctx, "app::ai::node.terminal::test.coughing")::"set_cond"(
-            g_create_class(ctx, "app::ai::cond::test.cough")));
+        set this::"root" = g_new_class(ctx, "app::ai::node.priority",
+            [["name", "root"]],
+            [["add_child", g_new_class(ctx, "app::ai::node.sequence",
+                [["name", "move"]],
+                [["set_cond", g_create_class(ctx, "app::ai::cond::test.reached_target")],
+                ["add_child", g_create_class(ctx, "app::ai::node.terminal::test.face_to")],
+                ["add_child", g_create_class(ctx, "app::ai::node.terminal::test.idle")],
+                ["add_child", g_create_class(ctx, "app::ai::node.terminal::test.move_to")],
+                ["add_child", g_create_class(ctx, "app::ai::node.terminal::test.look_around")]])],
+            ["add_child", g_new_class(ctx, "app::ai::node.parallel",
+                [["name", "patrol"]],
+                [["add_child", g_create_class(ctx, "app::ai::node.terminal::test.hovering")],
+                ["add_child", g_new_class(ctx, "app::ai::node.priority.always",
+                    [["name", "smoking"]],
+                    [["add_child", g_new_class(ctx, "app::ai::node.terminal::test.smoking", [],
+                        [["set_cond", g_create_class(ctx, "app::ai::cond::test.smoke")]])],
+                    ["add_child", g_new_class(ctx, "app::ai::node.terminal::test.coughing", [],
+                        [["set_cond", g_create_class(ctx, "app::ai::cond::test.cough")]])]])]])]]);
     };
     set this::"tick" = lambda(this) { // 每帧事件
         invoke this."input"::"put"("p", g_new(invoke this."output"::"get"("p")));
