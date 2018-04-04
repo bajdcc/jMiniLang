@@ -34,6 +34,9 @@ public class UIGraphics {
 	private boolean caretPrev;
 	private boolean caretState;
 	private int caretTime;
+	private int stateColor;
+	private int countColor;
+	private int[] colors;
 
 	public UIGraphics(int w, int h, int cols, int rows, int width, int height, int zoom) {
 		this.w = w;
@@ -54,6 +57,9 @@ public class UIGraphics {
 		this.image = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
 		this.image.getGraphics().setColor(Color.white);
 		this.image.getGraphics().fillRect(0, 0, w, h);
+		this.stateColor = 0;
+		this.countColor = 0;
+		this.colors = new int[3];
 	}
 
 	public void paint(Graphics2D g) {
@@ -62,10 +68,17 @@ public class UIGraphics {
 			Character c = this.queue.poll();
 			if (c == null)
 				break;
+			if (stateColor != 0 && countColor < 3) {
+				markColor(c);
+				continue;
+			}
 			if (c == '\uffef') {
 				markInput();
 			} else if (c == '\f') {
 				clear(g);
+			} else if (c == '\uffd2' || c == '\uffd3') {
+				stateColor = c == '\uffd2' ? 1 : 2;
+				countColor = 0;
 			} else {
 				if (c == '\t')
 					c = ' ';
@@ -95,6 +108,17 @@ public class UIGraphics {
 			}
 		}
 		g.drawImage(image, 0, 0, null);
+	}
+
+	private void markColor(Character c) {
+		colors[countColor++] = c & 255;
+		if (countColor >= 3) {
+			if (stateColor == 1)
+				setFGColor(colors[0], colors[1], colors[2]);
+			else
+				setBGColor(colors[0], colors[1], colors[2]);
+			stateColor = 0;
+		}
 	}
 
 	private void showCaret(Graphics2D g) {
@@ -248,4 +272,13 @@ public class UIGraphics {
 	public int calcWidth(String str) {
 		return UIFontImage.calcWidth(str);
 	}
+
+	private void setFGColor(int r, int g, int b) {
+		fontImage.setFGColor(new Color(r, g, b));
+	}
+
+	private void setBGColor(int r, int g, int b) {
+		fontImage.setBGColor(new Color(r, g, b));
+	}
 }
+

@@ -87,3 +87,19 @@ var g_ui_print_internal = func ~(ch) {
     while (g_ui_print_internal_block(ch)) {}
 };
 export "g_ui_print_internal";
+var g_ui_fgcolor = func ~(r, g, b) {
+    g_ui_print("" + '\uffd2' + ('\ufd00' + r) + ('\ufd00' + g) + ('\ufd00' + b));
+};
+export "g_ui_fgcolor";
+var g_ui_bgcolor = func ~(r, g, b) {
+    g_ui_print("" + '\uffd3' + ('\ufd00' + r) + ('\ufd00' + g) + ('\ufd00' + b));
+};
+export "g_ui_bgcolor";
+var g_ui_fgclear = func ~() {
+    g_ui_fgcolor(0, 0, 0);
+};
+export "g_ui_fgclear";
+var g_ui_bgclear = func ~() {
+    g_ui_bgcolor(255, 255, 255);
+};
+export "g_ui_bgclear";

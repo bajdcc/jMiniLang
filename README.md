@@ -25,7 +25,7 @@
 12. **Multiple process**.
 13. Load file with Sync/Async.
 14. **Virtual machine**.
-15. **Support GUI**.
+15. **Support Colorful GUI**.
 16. **Functional programming**.
 17. **LISP**.
 18. **Socket stream**.

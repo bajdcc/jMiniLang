@@ -20,8 +20,7 @@ if (!g_is_null(g_query_share("cmd#histroy"))) {
 var welcome = func ["WELCOME"] ~() {
     var print_logo = func ~(str) -> g_ui_printn(str);
     if (!g_read_file_s_ascii("$LOGO", print_logo)) {
-        var logo_s = "
-  ________  ________        ___  ________  ________  ________
+        var logo_s = "  ________  ________        ___  ________  ________  ________
  |\\   __  \\|\\   __  \\      |\\  \\|\\   ___ \\|\\   ____\\|\\   ____\\
  \\ \\  \\|\\ /\\ \\  \\|\\  \\     \\ \\  \\ \\  \\_|\\ \\ \\  \\___|\\ \\  \\___|
   \\ \\   __  \\ \\   __  \\  __ \\ \\  \\ \\  \\ \\\\ \\ \\  \\    \\ \\  \\
@@ -33,9 +32,16 @@ var welcome = func ["WELCOME"] ~() {
         while (g_is_null(g_task_get_fast("system", "guid"))) {
             g_sleep(10);
         }
-        g_write_file_s_ascii("$LOGO", logo_s);
-        g_write_file_sa_ascii("$LOGO", "  ID: " + g_task_get_fast("system", "guid") + g_endl + g_endl);
-        g_read_file_s_ascii("$LOGO", print_logo);
+        g_write_file_s_utf8("$LOGO", logo_s);
+        g_write_file_sa_utf8("$LOGO", "  唯一标识： " + g_task_get_fast("system", "guid") + g_endl + g_endl);
+        g_ui_print("              ");
+        g_ui_fgcolor(106, 0, 122);
+        g_ui_bgcolor(230, 230, 230);
+        g_ui_printn("--== jMiniOS 脚本操作系统 Made by bajdcc ==--");
+        g_ui_bgclear();
+        g_ui_fgcolor(0, 0, 255);
+        g_read_file_s_utf8("$LOGO", print_logo);
+        g_ui_fgclear();
     }
     g_printn("Running...");
 };
@@ -67,7 +73,9 @@ var parse_cmd_1 = func ["PARSE"] ~(arg) {
     var child = g_load_user_x(path);
     g_start_share("PID#" + child, share);
     if (child+1 == 0) {
-        g_ui_printn("Cannot execute '"+path+"'.");
+        g_ui_fgcolor(255, 0, 0);
+        g_ui_printn("不能执行程序 “"+path+"”");
+        g_ui_fgclear();
         var p = g_wait_pipe("PIPEIN#" + parent);
         g_sleep(50);
         g_destroy_pipe(p);
@@ -122,7 +130,9 @@ var parse_cmd = func ["PARSE"] ~(cmd, parse) {
     var path = "/usr/p/" + exec;
     var child = g_load_user_x(path);
     if (child+1 == 0) {
-        g_ui_printn("Cannot execute '"+path+"'.");
+        g_ui_fgcolor(255, 0, 0);
+        g_ui_printn("不能执行程序 “"+path+"”");
+        g_ui_fgclear();
         return;
     }
     g_start_share("PID#" + child, share);
@@ -229,7 +239,10 @@ var get_input = func ["INPUT"] ~(arg) {
     g_set_process_desc("shell routine");
     var this = arg[0];
     var parse = arg[1];
-    g_ui_print("$ \uffef");
+    g_ui_fgcolor(47, 18, 2);
+    g_ui_print("$");
+    g_ui_fgclear();
+    g_ui_print(" \uffef");
     g_sleep(400);
     var str = g_ui_input();
     var cmd = "";
@@ -243,7 +256,9 @@ var get_input = func ["INPUT"] ~(arg) {
     str := g_string_trim(str);
     cmd += str;
     if (g_string_length(cmd) == 0) {
-        g_ui_printn("Error: no cmd");
+        g_ui_fgcolor(255, 0, 0);
+        g_ui_printn("错误：没有输入指令");
+        g_ui_fgclear();
         g_create_user_process_args(this, arg);
         return;
     }
@@ -257,7 +272,9 @@ var get_input = func ["INPUT"] ~(arg) {
     if (g_string_start_with(cmd, "@")) {
         var ret = handle_task_command(cmd);
         if (g_is_null(ret)) {
-            g_ui_printn("Error: invalid command");
+            g_ui_fgcolor(255, 0, 0);
+            g_ui_printn("命令有误");
+            g_ui_fgclear();
         } else {
             g_ui_printn(g_to_string(ret));
         }
