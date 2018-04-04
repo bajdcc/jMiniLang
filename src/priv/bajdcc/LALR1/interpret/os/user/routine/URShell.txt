@@ -231,8 +231,17 @@ var get_input = func ["INPUT"] ~(arg) {
     var parse = arg[1];
     g_ui_print("$ \uffef");
     g_sleep(400);
-    var cmd = g_ui_input();
-    cmd := g_string_trim(cmd);
+    var str = g_ui_input();
+    var cmd = "";
+    while (g_string_end_with(str, "\\")) {
+        str := g_string_trim(str);
+        str := g_string_substr(str, 0, g_string_length(str) - 1);
+        cmd += str;
+        g_ui_print("\uffef");
+        str := g_ui_input();
+    }
+    str := g_string_trim(str);
+    cmd += str;
     if (g_string_length(cmd) == 0) {
         g_ui_printn("Error: no cmd");
         g_create_user_process_args(this, arg);
