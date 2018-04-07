@@ -408,7 +408,7 @@ g_register_class(ctx, "app::ai::node.terminal", lambda(this) {
         invoke this::"log_exit"();
         return next();
     });*/
-    set this::"log" = lambda(this, str) -> log("[" + this."name" + "] " + str);
+    set this::"log" = lambda(this, str) -> log(g_ui_fg(15, 120, 15) + "[" + this."name" + "] " + g_ui_fgc() + str);
     set this::"log_enter" = lambda(this) -> invoke this::"log"("Enter");
     set this::"log_execute" = lambda(this) -> invoke this::"log"("Execute");
     set this::"log_exit" = lambda(this) -> invoke this::"log"("Exit");

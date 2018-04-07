@@ -208,6 +208,8 @@ public class UIMainFrame extends JFrame {
 	}
 
 	public void setFocus() {
+		panel.setVisible(false);
+		panel.setVisible(true);
 		panel.setFocusable(true);
 	}
 }

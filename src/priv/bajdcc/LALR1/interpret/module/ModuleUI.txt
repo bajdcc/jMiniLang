@@ -60,6 +60,7 @@ var g_ui_input = func ~() {
                     g_ui_input_queue(old);
                 }
             } else if (c == '\uffee') {
+                while (!g_ui_caret(false)) {};
                 g_ui_println();
                 return g_ui_input_im();
             } else {
@@ -103,3 +104,11 @@ var g_ui_bgclear = func ~() {
     g_ui_bgcolor(255, 255, 255);
 };
 export "g_ui_bgclear";
+var g_ui_fg = func ~(r, g, b) -> "" + '\uffd2' + ('\ufd00' + r) + ('\ufd00' + g) + ('\ufd00' + b);
+export "g_ui_fg";
+var g_ui_bg = func ~(r, g, b) -> "" + '\uffd3' + ('\ufd00' + r) + ('\ufd00' + g) + ('\ufd00' + b);
+export "g_ui_bg";
+var g_ui_fgc = func ~() -> g_ui_fg(0, 0, 0);
+export "g_ui_fgc";
+var g_ui_bgc = func ~() -> g_ui_bg(255, 255, 255);
+export "g_ui_bgc";
