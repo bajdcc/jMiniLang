@@ -181,7 +181,10 @@ public class Lexer extends RegexStringIterator implements
 		String str;
 		int start = arrLinesNo.get(position.iLine) + 1;
 		if (position.iLine == arrLinesNo.size() - 1) {
-			str = context.substring(start, Math.min(context.length() - 1, start + position.iColumn));
+			if (start < context.length() - 1)
+				str = context.substring(start, Math.min(context.length() - 1, start + position.iColumn));
+			else
+				str = "";
 		} else {
 			str = context.substring(start, arrLinesNo.get(position.iLine + 1));
 		}
