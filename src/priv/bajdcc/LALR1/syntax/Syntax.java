@@ -1,18 +1,8 @@
 package priv.bajdcc.LALR1.syntax;
 
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.HashMap;
-
 import priv.bajdcc.LALR1.semantic.token.ISemanticAction;
 import priv.bajdcc.LALR1.syntax.automata.npa.NPA;
-import priv.bajdcc.LALR1.syntax.exp.BranchExp;
-import priv.bajdcc.LALR1.syntax.exp.IExpCollction;
-import priv.bajdcc.LALR1.syntax.exp.OptionExp;
-import priv.bajdcc.LALR1.syntax.exp.PropertyExp;
-import priv.bajdcc.LALR1.syntax.exp.RuleExp;
-import priv.bajdcc.LALR1.syntax.exp.SequenceExp;
-import priv.bajdcc.LALR1.syntax.exp.TokenExp;
+import priv.bajdcc.LALR1.syntax.exp.*;
 import priv.bajdcc.LALR1.syntax.handler.IErrorHandler;
 import priv.bajdcc.LALR1.syntax.handler.SyntaxException;
 import priv.bajdcc.LALR1.syntax.handler.SyntaxException.SyntaxError;
@@ -27,6 +17,10 @@ import priv.bajdcc.LALR1.syntax.token.TokenType;
 import priv.bajdcc.util.BitVector2;
 import priv.bajdcc.util.Position;
 import priv.bajdcc.util.lexer.error.RegexException;
+
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.HashMap;
 
 /**
  * 【语法分析】文法构造器
@@ -45,45 +39,45 @@ public class Syntax {
 	/**
 	 * 终结符表
 	 */
-	protected ArrayList<TokenExp> arrTerminals = new ArrayList<>();
+	static protected ArrayList<TokenExp> arrTerminals = new ArrayList<>();
 
 	/**
 	 * 终结符映射
 	 */
-	protected HashMap<String, TokenExp> mapTerminals = new HashMap<>();
+	static protected HashMap<String, TokenExp> mapTerminals = new HashMap<>();
 
 	/**
 	 * 非终结符表
 	 */
-	protected ArrayList<RuleExp> arrNonTerminals = new ArrayList<>();
+	static protected ArrayList<RuleExp> arrNonTerminals = new ArrayList<>();
 
 	/**
 	 * 非终结符映射
 	 */
-	protected HashMap<String, RuleExp> mapNonTerminals = new HashMap<>();
+	static protected HashMap<String, RuleExp> mapNonTerminals = new HashMap<>();
 
 	/**
 	 * 错误处理表
 	 */
-	protected ArrayList<IErrorHandler> arrHandlers = new ArrayList<>();
+	static protected ArrayList<IErrorHandler> arrHandlers = new ArrayList<>();
 	/**
 	 * 错误处理映射
 	 */
-	protected HashMap<String, IErrorHandler> mapHandlers = new HashMap<>();
+	static protected HashMap<String, IErrorHandler> mapHandlers = new HashMap<>();
 
 	/**
 	 * 语义动作表
 	 */
-	protected ArrayList<ISemanticAction> arrActions = new ArrayList<>();
+	static protected ArrayList<ISemanticAction> arrActions = new ArrayList<>();
 	/**
 	 * 语义动作映射
 	 */
-	protected HashMap<String, ISemanticAction> mapActions = new HashMap<>();
+	static protected HashMap<String, ISemanticAction> mapActions = new HashMap<>();
 
 	/**
 	 * 文法起始符号
 	 */
-	private String strBeginRuleName = "";
+	static private String strBeginRuleName = "";
 
 	/**
 	 * 面向文法的词法分析器
@@ -103,7 +97,7 @@ public class Syntax {
 	/**
 	 * 非确定性下推自动机
 	 */
-	protected NPA npa = null;
+	static protected NPA npa = null;
 
 	public Syntax() throws RegexException {
 		this(true);
@@ -524,7 +518,7 @@ public class Syntax {
 		strBeginRuleName = startSymbol;
 		checkStartSymbol();
 		semanticAnalysis();
-		generateNGA();
+		generateNPA();
 	}
 
 	/**
@@ -690,7 +684,7 @@ public class Syntax {
 	/**
 	 * 生成非确定性下推自动机
 	 */
-	private void generateNGA() {
+	private void generateNPA() {
 		npa = new NPA(arrNonTerminals, arrTerminals,
 				mapNonTerminals.get(strBeginRuleName).rule, arrActions);
 	}

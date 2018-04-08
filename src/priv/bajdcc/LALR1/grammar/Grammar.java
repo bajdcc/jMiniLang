@@ -60,11 +60,15 @@ public class Grammar extends Semantic {
 	 * @throws SyntaxException
 	 */
 	private void initialize() throws SyntaxException {
-		declareTerminal();
-		declareNonTerminal();
-		declareErrorHandler();
-		declareActionHandler();
-		infer();
+		if (npa == null) {
+			// 为避免多次构造NPA，这里采用单例模式
+			declareTerminal();
+			declareNonTerminal();
+			declareErrorHandler();
+			declareActionHandler();
+			infer();
+		}
+		parse();
 		check();
 		gencode();
 	}

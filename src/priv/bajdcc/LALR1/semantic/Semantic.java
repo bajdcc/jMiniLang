@@ -130,14 +130,10 @@ public class Semantic extends Syntax implements IErrorHandler {
 	}
 
 	/**
-	 * 初始化
-	 * 
-	 * @param startSymbol
-	 *            开始符号
-	 * @throws SyntaxException 词法错误
+	 * 开始解析
+	 * @throws SyntaxException 语法错误
 	 */
-	public void initialize(String startSymbol) throws SyntaxException {
-		super.initialize(startSymbol);
+	public void parse() throws SyntaxException {
 		analysis();
 		run();
 	}
