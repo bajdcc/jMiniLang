@@ -7,6 +7,7 @@ import "sys.string";
 import "sys.class";
 import "sys.math";
 import "sys.ui";
+import "sys.file";
 import "module.lisp";
 import "std.base";
 import "std.shell";
@@ -761,6 +762,68 @@ var stage_try = func ~() {
         [10, 0, 1]));
 };
 
+// ---------------------------------------------
+// BAD APPLE TEXT ANIMATION
+
+var stage_badapple = func ~() {
+    var read = true;
+    var num = 0;
+    var hex = {};
+    var pixels = 80 * 25;
+    var px = 0;
+    var disp = "";
+    var h = 0;
+    var sys_out = g_create_pipe("int#2"); // use system output
+    g_write_pipe(out, "\f");
+    for (var i = 0; i < 10; i++) {
+        g_map_put(hex, "" + i, i);
+    }
+    for (let i = 0; i < 6; i++) {
+        g_map_put(hex, "" + ('A' + i), 10 + i);
+    }
+    var callback = func ~(ch, out) {
+        if (!g_query_share(signal)) {
+            return false;
+        }
+        if (ch == ' ' || ch == '\r' || ch == '\n') {
+            return;
+        }
+        h := hex["" + ch];
+        if (read) {
+            num := h;
+            read := false;
+        } else {
+            read := true;
+            num := (num << 4) + h;
+            if ((num & 128) != 0) {
+                num := num - 128;
+                disp := " ";
+            } else {
+                disp := "\x07";
+            }
+            if (px + num > pixels) {
+                g_write_pipe(sys_out, g_string_rep(disp, pixels - px));
+                g_write_pipe(sys_out, "\uffe2");
+                while (g_wait_pipe_empty(sys_out)) {}
+                px := px + num - pixels;
+                g_write_pipe(sys_out, g_string_rep(disp, px));
+            } else {
+                px := px + num;
+                g_write_pipe(sys_out, g_string_rep(disp, num));
+            }
+        }
+    };
+    g_write_pipe(out, "\f");
+    g_write_pipe(out, "\uffe1");
+    if (!g_read_file_utf8_args("src/priv/bajdcc/fs/badapple.txt", callback, out)) {
+        g_write_pipe(out, "\uffe1");
+        g_write_pipe(out, "Error: Read file failed!" + g_endl);
+        return;
+    }
+    g_write_pipe(out, "\uffe1");
+    g_write_pipe(out, "\f");
+};
+
 var name = args[0];
 if (g_is_null(name)) {
     create_stage(stage_clear);
@@ -781,6 +844,8 @@ if (g_is_null(name)) {
     stage_bash();
 } else if (name == "try") {
     stage_try();
+} else if (name == "badapple") {
+    stage_badapple();
 } else {
     g_read_pipe_args(in, lambda(ch, out) -> g_write_pipe(out, ch), out);
 }

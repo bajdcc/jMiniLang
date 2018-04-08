@@ -105,6 +105,8 @@ Tests:
 - `test fork`: Test fork
 - `test class`: Test AOP and Prototype for class
 - `test bash`: Test bash interface
+- `test try`: Test try/catch
+- `test badapple`: Test ascii output, code in [BadApple](https://github.com/bajdcc/tinix/blob/master/user/app/badapple.c)
 
 Implemented MSG, usage:
 - Create server: `msg server PORT | filter pipe`

@@ -21,7 +21,7 @@ public class ModuleUI implements IInterpreterModule {
 	private static final int INPUT_TIME = 10;
 	private static ModuleUI instance = new ModuleUI();
 	private UIGraphics graphics;
-	private Queue<Character> queue = new LinkedBlockingDeque<>(1024);
+	private Queue<Character> queue = new LinkedBlockingDeque<>(10000);
 	private Queue<Character> queueDisplay = new ArrayDeque<>();
 	private StringBuilder sb = new StringBuilder();
 	private RuntimeCodePage runtimeCodePage;

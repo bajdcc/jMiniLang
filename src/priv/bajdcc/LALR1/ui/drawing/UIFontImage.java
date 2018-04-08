@@ -93,7 +93,9 @@ public class UIFontImage {
 		g.setColor(Color.white);
 		g.fillRect(0, 0, w, height);
 		g.setColor(Color.black);
-		if (!Character.isISOControl((char) i)) {
+		if (i == 7) {
+			g.fillRect(0, 0, w, height);
+		} else if (!Character.isISOControl((char) i)) {
 			if (i < 256) {
 				g.setFont(asciiFont);
 				String str = Character.toString((char) i);

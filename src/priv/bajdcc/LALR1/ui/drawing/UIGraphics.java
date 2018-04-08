@@ -37,6 +37,7 @@ public class UIGraphics {
 	private int stateColor;
 	private int countColor;
 	private int[] colors;
+	private boolean autoFresh;
 
 	public UIGraphics(int w, int h, int cols, int rows, int width, int height, int zoom) {
 		this.w = w;
@@ -60,6 +61,7 @@ public class UIGraphics {
 		this.stateColor = 0;
 		this.countColor = 0;
 		this.colors = new int[3];
+		this.autoFresh = true;
 	}
 
 	public void paint(Graphics2D g) {
@@ -76,6 +78,11 @@ public class UIGraphics {
 				markInput();
 			} else if (c == '\f') {
 				clear(g);
+			} else if (c == '\uffe1' || c == '\uffe2') {
+				if (c == '\uffe1')
+					autoFresh = !autoFresh;
+				else
+					refresh(g);
 			} else if (c == '\uffd2' || c == '\uffd3') {
 				stateColor = c == '\uffd2' ? 1 : 2;
 				countColor = 0;
@@ -110,6 +117,39 @@ public class UIGraphics {
 		g.drawImage(image, 0, 0, null);
 	}
 
+	private void drawText(int row, int col, String text) {
+		setFGColor(230,230,230);
+		setBGColor(25,25,25);
+		for (int i = 0; i < text.length(); i++) {
+			image.getGraphics().drawImage(fontImage.getImage(text.charAt(i)),
+					(col + i) * width, row * height, null);
+		}
+		setFGColor(0,0,0);
+		setBGColor(255,255,255);
+	}
+
+	private void refresh(Graphics2D g) {
+		image.getGraphics().setColor(Color.white);
+		image.getGraphics().fillRect(0, 0, w, h);
+		g.drawImage(image, 0, 0, null);
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
+				char c = this.data[i * cols + j];
+				if (c != FILL_FONT_SPAN) {
+					image.getGraphics().drawImage(fontImage.getImage(c),
+							j * width, i * height, null);
+				}
+			}
+		}
+		final String logo = "--== jMiniOS made by bajdcc ==--";
+		drawText(0, (cols - logo.length()) / 2, logo);
+		this.ptr_x = 0;
+		this.ptr_y = 0;
+		for (int i = 0; i < size; i++) {
+			this.data[i] = '\0';
+		}
+	}
+
 	private void markColor(Character c) {
 		colors[countColor++] = c & 255;
 		if (countColor >= 3) {
@@ -122,9 +162,9 @@ public class UIGraphics {
 	}
 
 	private void showCaret(Graphics2D g) {
-		if (ptr_x == getCols()) {
+		if (ptr_x == cols) {
 			ptr_x = 0;
-			if (ptr_y == getRows()) {
+			if (ptr_y == rows) {
 				clear(g);
 			} else {
 				ptr_y++;
@@ -146,14 +186,14 @@ public class UIGraphics {
 
 	private void drawIntern(Graphics2D g, char c) {
 		if (c == '\n') {
-			if (ptr_y == getRows() - 1) {
+			if (ptr_y == rows - 1) {
 				newline(g);
 			} else {
 				ptr_x = 0;
 				ptr_y++;
 			}
 		} else if (c == '\b') {
-			if (ptr_mx + ptr_my * getCols() < ptr_x + ptr_y * getCols()) {
+			if (ptr_mx + ptr_my * cols < ptr_x + ptr_y * cols) {
 				if (ptr_y == 0) {
 					if (ptr_x != 0) {
 						drawChar('\0');
@@ -165,7 +205,7 @@ public class UIGraphics {
 						ptr_x--;
 					} else {
 						drawChar('\0');
-						ptr_x = getCols() - 1;
+						ptr_x = cols - 1;
 						ptr_y--;
 					}
 				}
@@ -177,11 +217,11 @@ public class UIGraphics {
 			ptr_x = 0;
 		} else if (c == '\r') {
 			ptr_x = 0;
-		} else if (ptr_x == getCols() - 1) {
-			if (ptr_y == getRows() - 1) {
-				newline(g);
+		} else if (ptr_x == cols - 1) {
+			if (ptr_y == rows - 1) {
 				drawChar(c);
-				ptr_x++;
+				if (autoFresh)
+					newline(g);
 			} else {
 				drawChar(c);
 				ptr_x = 0;
@@ -194,8 +234,8 @@ public class UIGraphics {
 	}
 
 	private void drawChar(char c) {
-		this.data[ptr_y * getCols() + ptr_x] = c;
-		if (c != FILL_FONT_SPAN) {
+		this.data[ptr_y * cols + ptr_x] = c;
+		if (autoFresh && c != FILL_FONT_SPAN) {
 			image.getGraphics().drawImage(fontImage.getImage(c),
 					ptr_x * width, ptr_y * height, null);
 		}
@@ -212,14 +252,14 @@ public class UIGraphics {
 		g.drawImage(image, 0, 0, null);
 	}
 
-	public void newline(Graphics2D g) {
+	private void newline(Graphics2D g) {
 		this.ptr_x = 0;
-		int end = size - getCols();
-		System.arraycopy(data, getCols(), data, 0, size - getCols());
+		int end = size - cols;
+		System.arraycopy(data, cols, data, 0, size - cols);
         Arrays.fill(data, end, size - 1, '\0');
-		image.getGraphics().copyArea(0, height, w, (getRows() - 1) * height, 0, -height);
+		image.getGraphics().copyArea(0, height, w, (rows - 1) * height, 0, -height);
         image.getGraphics().setColor(Color.white);
-		image.getGraphics().fillRect(0, (getRows() - 1) * height, w, height);
+		image.getGraphics().fillRect(0, (rows - 1) * height, w, height);
         g.drawImage(image, 0, 0, null);
 	}
 
@@ -247,12 +287,12 @@ public class UIGraphics {
 
 	public void fallback() {
 		int x = ptr_x, y = ptr_y;
-		while (ptr_mx + ptr_my * getCols() < x + y * getCols()) {
+		while (ptr_mx + ptr_my * cols < x + y * cols) {
 			if (x == 0) {
-				x = getCols() - 1;
+				x = cols - 1;
 				y--;
 			}
-			this.data[y * getCols() + x] = '\0';
+			this.data[y * cols + x] = '\0';
 			image.getGraphics().drawImage(fontImage.getImage('\0'),
 					x * width, y * height, null);
 			x--;
