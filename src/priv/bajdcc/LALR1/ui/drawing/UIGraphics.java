@@ -280,5 +280,13 @@ public class UIGraphics {
 	private void setBGColor(int r, int g, int b) {
 		fontImage.setBGColor(new Color(r, g, b));
 	}
+
+	public int getWidth() {
+		return w;
+	}
+
+	public int getHeight() {
+		return h;
+	}
 }
 
