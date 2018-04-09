@@ -774,6 +774,11 @@ var stage_badapple = func ~() {
     var disp = "";
     var h = 0;
     var sys_out = g_create_pipe("int#2"); // use system output
+    var frame = 0;
+    var frame_count = 0;
+    var fps = 0.0;
+    var timestamp = g_task_get_timestamp();
+    var now = timestamp;
     g_write_pipe(out, "\f");
     for (var i = 0; i < 10; i++) {
         g_map_put(hex, "" + i, i);
@@ -802,7 +807,16 @@ var stage_badapple = func ~() {
                 disp := "\x07";
             }
             if (px + num > pixels) {
+                frame := frame + 1;
+                frame_count := frame_count + 1;
+                now := g_task_get_timestamp();
+                if (now - timestamp > 1000) {
+                    fps := 1000.0 * frame_count / (now - timestamp);
+                    frame_count := 0;
+                    timestamp := now;
+                }
                 g_write_pipe(sys_out, g_string_rep(disp, pixels - px));
+                g_write_pipe(sys_out, "\r帧：" + frame + " FPS：" + g_floor(fps, 2));
                 g_write_pipe(sys_out, "\uffe2");
                 while (g_wait_pipe_empty(sys_out)) {}
                 px := px + num - pixels;
