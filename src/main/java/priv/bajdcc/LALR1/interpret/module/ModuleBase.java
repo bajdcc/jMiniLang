@@ -162,6 +162,25 @@ public class ModuleBase implements IInterpreterModule {
 				return null;
 			}
 		});
+		info.addExternalFunc("g_set_rapid", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "设置高速模式";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kBool};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				boolean mode = (boolean) args.get(0).getObj();
+				status.getService().getProcessService().setHighSpeed(mode);
+				return null;
+			}
+		});
 		info.addExternalFunc("g_not_null", new IRuntimeDebugExec() {
 			@Override
 			public String getDoc() {

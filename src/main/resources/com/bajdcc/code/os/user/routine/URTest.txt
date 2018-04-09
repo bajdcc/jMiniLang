@@ -815,25 +815,35 @@ var stage_badapple = func ~() {
                     frame_count := 0;
                     timestamp := now;
                 }
-                g_write_pipe(sys_out, g_string_rep(disp, pixels - px));
+                for (var j = 0; j < pixels - px; j++) {
+                    g_ui_print_internal(disp);
+                }
                 g_write_pipe(sys_out, "\r帧：" + frame + " FPS：" + g_floor(fps, 2));
                 g_write_pipe(sys_out, "\uffe2");
                 while (g_wait_pipe_empty(sys_out)) {}
                 px := px + num - pixels;
-                g_write_pipe(sys_out, g_string_rep(disp, px));
+                for (let j = 0; j < px; j++) {
+                    g_ui_print_internal(disp);
+                }
             } else {
                 px := px + num;
-                g_write_pipe(sys_out, g_string_rep(disp, num));
+                for (var j = 0; j < num; j++) {
+                    g_ui_print_internal(disp);
+                }
             }
         }
     };
     g_write_pipe(out, "\f");
     g_write_pipe(out, "\uffe1");
+    g_set_rapid(true);
+    g_task_sleep_ms_signal(100, signal);
     if (!g_read_file_utf8_args("!/com/bajdcc/code/fs/badapple.txt", callback, out)) {
+        g_set_rapid(false);
         g_write_pipe(out, "\uffe1");
         g_write_pipe(out, "Error: Read file failed!" + g_endl);
         return;
     }
+    g_set_rapid(false);
     g_write_pipe(out, "\uffe1");
     g_write_pipe(out, "\f");
 };

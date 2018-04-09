@@ -86,4 +86,10 @@ public interface IRuntimeProcessService {
 	 * @param debug 是否调试
 	 */
 	void setDebug(int pid, boolean debug);
+
+	/**
+	 * 设置高速运行模式
+	 * @param mode 是否不休眠
+	 */
+	void setHighSpeed(boolean mode);
 }

@@ -56,6 +56,7 @@ public class RuntimeProcess implements IRuntimeProcessService {
 	private RuntimeService service;
 	private boolean isWaitingForUI = false;
 	private boolean needToExit = false;
+	private boolean highSpeed = false;
 	private Map<String, String> pageFileMap;
 
 	private SystemStat stat = new SystemStat();
@@ -151,7 +152,8 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		if (needToExit)
 			return false;
 		if (isWaitingForUI) {
-			Thread.sleep(CLOCK_WAIT_UI);
+			if (!highSpeed)
+				Thread.sleep(CLOCK_WAIT_UI);
 			isWaitingForUI = false;
 			return true;
 		}
@@ -355,6 +357,11 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		if (setProcessId.contains(pid)) {
 			arrProcess[pid].machine.setDebug(debug);
 		}
+	}
+
+	@Override
+	public void setHighSpeed(boolean mode) {
+		highSpeed = mode;
 	}
 
 	private class SystemStat {
