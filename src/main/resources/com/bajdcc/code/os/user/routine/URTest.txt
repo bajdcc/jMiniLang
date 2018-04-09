@@ -1,0 +1,855 @@
+import "sys.base";
+import "sys.list";
+import "sys.proc";
+import "sys.task";
+import "sys.func";
+import "sys.string";
+import "sys.class";
+import "sys.math";
+import "sys.ui";
+import "sys.file";
+import "module.lisp";
+import "std.base";
+import "std.shell";
+
+g_set_process_desc("test routine");
+var pid = g_get_pid();
+var share = g_wait_share("PID#" + pid);
+g_stop_share("PID#" + pid);
+var args = share["args"];
+
+var in = g_create_pipe("PIPEIN#" + pid);
+var out = g_create_pipe("PIPEOUT#" + pid);
+
+var put = func ["PIPE"] ~(ch) {
+    g_write_pipe(out, ch);
+};
+var putn = func ["PIPE"] ~(ch) {
+    g_write_pipe(out, ch);
+    g_write_pipe(out, g_endl);
+};
+var puts = func ["PIPE"] ~(str) {
+    foreach (var c : g_range_string(str)) {
+        g_write_pipe(out, c);
+    }
+};
+var signal = "PIDSIG#" + pid;
+g_start_share(signal, true);
+
+/* 创建场景 */
+var create_stage = func ~(f) -> f();
+
+/* 重复操作 */
+var real_repeat = func ~(_operation, _arg, _start, _end) {
+    var repeat = func ~(operation, arg, start, end) {
+        var index = start;
+        var repeat0 = func ~() {
+            if (index >= end) { return; }
+            operation(arg, index);
+            return repeat(operation, arg, ++index, end);
+        };
+        return repeat0;
+    };
+    var repear_f = func ~() -> repeat(_operation, _arg, _start, _end);
+    call(func ~(f) {
+        while (!(g_is_null(f)) && (g_get_type_ordinal(f) == 8)) {
+            f := f();
+        }
+    })(repear_f);
+};
+    
+/* 打字效果 */
+var word_typewrite0 = func ~(str, span) {
+    var print = func ~(a, n) {
+        put(g_string_get(a, n));
+        g_task_sleep_ms_signal(span, signal);
+    };
+    real_repeat(print, str, 0, g_string_length(str));
+};
+
+/* 打字效果 */
+var word_typewrite = func ~(str, span) {
+    foreach (var c : g_range_string(str)) {
+        put(c);
+        g_task_sleep_ms_signal(span, signal);
+    }
+    put(g_endl);
+};
+
+/* 清屏 */
+var stage_clear = func ~() {
+    word_typewrite("Are you ready?", 200);
+    word_typewrite("  3!  2!  1!\n", 300);
+    word_typewrite("  Let's go!!!   \n", 300);
+    put('\f');
+};
+
+/* 场景一 */
+var stage_1 = func ~() {
+    puts(g_string_rep(" ", 31));
+    word_typewrite("- Stage 1 -\n", 400);
+    word_typewrite("* Hello world! 你好！\n", 80);
+    word_typewrite("* This is a test program. 这是一个测试程序。\n", 80);
+    word_typewrite("* Made by bajdcc. 由bajdcc编写。\n", 80);
+    word_typewrite("* 项目网址在 https://github.com/bajdcc/jMiniLang 上。\n", 100);
+    word_typewrite("* 这是我做的一个脚本操作系统。\n", 100);
+    word_typewrite("* 支持闭包、进程、管道、互斥等特性。\n", 100);
+    word_typewrite("* 不过由于设计不足以及Java的使用，脚本运行还是太慢。\n", 100);
+    word_typewrite("* 最让我兴奋的是语法分析的实现、虚拟机的构建、同步/异步语义的实现。\n", 100);
+    word_typewrite("* 进程、管道、互斥是这个操作系统的基础。\n", 100);
+    word_typewrite("\n\n\n\n", 400);
+    puts(g_string_rep(" ", 31));
+    word_typewrite("- @bajdcc -\n", 400);
+};
+
+// ------------------------------------
+
+/* 哲学家就餐问题 */
+var stage_philo = func ~() {
+    word_typewrite("演示哲学家就餐问题！    \n", 100);
+    g_create_mutex("philo_print");
+    foreach (var i : g_range(1, 5)) {
+        g_create_semaphore("fork_" + i, 1); // 每个叉最多能使用一次
+    }
+    var handles = [];
+    var philo = func ~(args) {
+        var eat = args["eating"];
+        var o = args["out"];
+        var id = args["id"];
+        var left_id = args["left_id"];
+        var right_id = args["right_id"];
+        var left = g_use_semaphore("fork_" + left_id);
+        var right = g_use_semaphore("fork_" + right_id);
+        eat(o, "Philosophy#" + id + " ready");
+        foreach (var j : g_range(1, 10)) {
+            g_lock_semaphore(left); // P左
+            eat(o, "Philosophy#" + id + " is using fork#" + left_id);
+            g_lock_semaphore(right); // P右
+            eat(o, "Philosophy#" + id + " is using fork#" + right_id);
+            eat(o, "Philosophy#" + id + " is eating. Process: " + j + "0%");
+            g_unlock_semaphore(left); // V左
+            g_unlock_semaphore(right); // V右
+        }
+        eat(o, "Philosophy#" + id + " OK");
+    };
+    var eating = func ~(out, str) {
+        var pm = g_use_mutex("philo_print");
+        g_lock_mutex(pm);
+        foreach (var c : g_range_string(str)) {
+            g_write_pipe(out, c);
+        }
+        g_write_pipe(out, '\n');
+        g_task_sleep_ms_signal(100, signal);
+        g_unlock_mutex(pm);
+    };
+    foreach (var j : g_range(1, 5)) {
+        var args = {
+            "eating": eating,
+            "out": out,
+            "id": j,
+            "left_id": (j == 1) ? 5 : (j - 1),
+            "right_id": (j == 5) ? 1 : (j + 1)
+        };
+        var h = g_create_user_process_args(philo, args);
+        g_array_add(handles, h);
+        g_task_sleep(1);
+    }
+    g_join_process_array(handles);
+    foreach (var k : g_range(1, 5)) {
+        g_destroy_semaphore(g_use_semaphore("fork_" + k));
+    }
+    g_destroy_mutex(g_use_mutex("philo_print"));
+};
+
+/* 哲学家就餐问题 - 管程解决 */
+var stage_philo2 = func ~() {
+    word_typewrite("【管程】演示哲学家就餐问题！    \n", 100);
+    g_create_mutex("philo_print");
+    g_create_mutex("philo_monitor");
+    var states = [];
+    g_array_add(states, g_null);
+    foreach (var i : g_range(1, 5)) {
+        g_create_semaphore("philo_" + i, 1); // 记录每个哲学家的状态（管程）
+        g_array_add(states, "thinking"); // 开始时哲学家都在思考
+    }
+    var handles = [];
+    var philo2 = func ~(args) {
+        var eat = args["eating"];
+        var states = args["states"];
+        var o = args["out"];
+        var id = args["id"];
+        var left_id = args["left_id"];
+        var right_id = args["right_id"];
+        var monitor = g_use_mutex("philo_monitor");
+        eat(o, "Philosophy#" + id + " ready");
+        var enter = func ~() { // 进入临界区
+            var monitor = g_use_mutex("philo_monitor");
+            g_lock_mutex(monitor); // mutex自带等待队列
+            g_printdn("Philosophy#" + id + " entered critical section");
+        };
+        var leave = func ~() { // 离开临界区
+            g_printdn("Philosophy#" + id + " leaved critical section");
+            var monitor = g_use_mutex("philo_monitor");
+            g_unlock_mutex(monitor);
+        };
+        var wait = func ~(_id) { // 等待信号
+            var sem = g_use_semaphore("philo_" + _id);
+            g_printdn("Philosophy#" + _id + " waiting");
+            g_lock_mutex(sem); // semaphore自带等待队列
+        };
+        var signal = func ~(_id) { // 发出信号
+            var sem = g_use_semaphore("philo_" + _id);
+            g_unlock_mutex(sem);
+            g_printdn("Philosophy#" + _id + " received signal");
+        };
+        var test = func ~(_id) { // 测试哲学家是否具备进餐条件
+            var _left_id = (_id == 1) ? 5 : (_id - 1);
+            var _right_id = (_id == 5) ? 1 : (_id + 1);
+            if ((states[_left_id] != "eating") && // 如果左右都不在进餐
+                (states[_right_id] != "eating") &&
+                (states[_id] == "hungry")) { // 且自己为饥饿状态
+                signal(_id); // 发出就餐信号
+            } else {
+                g_printdn("Test failed. #" + _left_id + ": " + states[_left_id] +
+                    ", #" + _right_id + ": " + states[_right_id] + ", #" +
+                    _id + ": " +　states[_id]);
+            }
+        };
+        var pickup = func ~() { // 拿起叉子
+            enter();
+            g_array_set(states, id, "hungry"); // 设置状态是饥饿
+            test(id);
+            leave();
+            if (states[id] != "eating") { // 如果尝试失败
+                wait(id); // 等待
+                g_array_set(states, id, "eating"); // 设置为进餐状态
+            }
+        };
+        var putdown = func ~() { // 放下叉子
+            enter();
+            g_array_set(states, id, "thinking"); // 设置状态是思考
+            test(left_id); // 测试左边的哲学家可否就餐
+            test(right_id); // 测试右边的哲学家可否就餐
+            leave();
+        };
+        foreach (var j : g_range(1, 10)) {
+            eat(o, "Philosophy#" + id + " is thinking");
+            pickup();
+            eat(o, "Philosophy#" + id + " is eating. Process: " + j + "0%");
+            putdown();
+        }
+        eat(o, "Philosophy#" + id + " OK");
+    };
+    var eating = func ~(out, str) {
+        var pm = g_use_mutex("philo_print");
+        g_lock_mutex(pm);
+        foreach (var c : g_range_string(str)) {
+            g_write_pipe(out, c);
+        }
+        g_write_pipe(out, '\n');
+        g_task_sleep_ms_signal(100, signal);
+        g_unlock_mutex(pm);
+    };
+    foreach (var j : g_range(1, 5)) {
+        var args = {};
+        g_map_put(args, "eating", eating);
+        g_map_put(args, "states", states);
+        g_map_put(args, "out", out);
+        g_map_put(args, "id", j);
+        g_map_put(args, "left_id", (j == 1) ? 5 : (j - 1));
+        g_map_put(args, "right_id", (j == 5) ? 1 : (j + 1));
+        var h = g_create_user_process_args(philo2, args);
+        g_array_add(handles, h);
+    }
+    g_join_process_array(handles);
+    foreach (var k : g_range(1, 5)) {
+        g_destroy_semaphore(g_use_semaphore("fork_" + k));
+    }
+    g_destroy_mutex(g_use_mutex("philo_print"));
+};
+
+// -------------------------------------
+// lisp
+/* LISP 测试示例 */
+var stage_lisp = func ~() {
+    word_typewrite("\n    TEST LISP!!!       @jMiniLisp \n", 100);
+    var env = g_lisp_env();
+    var eval = func~(exp) {
+        puts("\n");
+        //puts("jMiniLisp> ");
+        word_typewrite(exp + "\n", 30);
+        var val = g_lisp_repl(env, exp);
+        if (val != "null") {
+            puts("= ");
+            word_typewrite(val + "\n", 30);
+        }
+    };
+    var comment = func~(str) -> word_typewrite("\n    " + str + "\n\n", 40);
+    var out_call = func~(strs) -> word_typewrite(strs[0] + "\n", 35);
+    g_map_put(env, "out", out_call);
+    var builtin = func~(str) {
+        puts("\n");
+        //puts("jMiniLisp> ");
+        word_typewrite(str + "\n", 25);
+    };
+    // eval code
+    // ##########################
+    comment("1. Lambda");
+    eval("(define circle-area
+    (lambda (r)
+        (* PI
+            (* r r))))");
+    eval("(circle-area 10)");
+    eval("(define fact
+    (lambda (n)
+        (if (<= n 1)
+            1
+            (* n (fact (- n 1))))))");
+    eval("(fact 10)");
+    // ##########################
+    comment("2. List");
+    eval("(list 1 2 3 4 5)");
+    eval("(range 1 10)");
+    eval("(define L (list 1 2 3 4 5))");
+    eval("(car L)");
+    eval("(cdr L)");
+    // ##########################
+    comment("3. Count");
+    builtin("(define count
+    (lambda (item L)
+        (if L
+            (+ 0
+                (== item (car L))
+                (count item (cdr L)))
+            0)))");
+    eval("(count 0 (list 0 1 2 3 0 0))");
+    eval("(count 'the
+    '(the more the merrier the bigger the better))");
+    // ##########################
+    comment("4. Type");
+    eval("(null? (list))");
+    eval("(number? 5.0)");
+    eval("(number? (list))");
+    eval("(type 'hello)");
+    eval("(list? (list))");
+    eval("(car '(a b c))");
+    eval("(type (car '(a b c)))");
+    eval("(cdr (cons 'a '(b c)))");
+    // ##########################
+    comment("5. Function");
+    eval("(define repeat
+    (lambda (f)
+        (lambda (x)
+            (f (f x)))))");
+    eval("(define twice
+    (lambda (x)
+        (* 2 x)))");
+    eval("((repeat twice) 10)");
+    eval("(define sum
+    (lambda (n)
+        (if (< n 2)
+            1
+            (+ n (sum (- n 1))))))");
+    eval("(sum 10)");
+    eval("(min 50 60)");
+    eval("(range 0 10)");
+    eval("(define fib
+    (lambda (n)
+        (if (<= n 2)
+            1
+            (+ (fib (- n 1)) (fib (- n 2))))))");
+    eval("(fib 10)");
+    eval("(map fib (list 3 2 3 4 5))");
+    eval("(map fib (range 1 10))");
+    eval("(map
+    (lambda (n)
+        ((repeat twice) n))
+    (range 1 10))");
+    builtin("(define apply
+    (lambda (item L)
+        (eval (cons item L))))");
+    eval("(apply +
+    (list \"hello\" #s \"world\" #s \"bajdcc!\"))");
+    eval("(apply + (range 1 10))");
+    eval("(append '(a b) '(c d))");
+    eval("(apply 'append '('(a b) '(c d)))");
+    eval("(apply max (range 1 10))");
+    builtin("(define Y
+    (lambda (F)
+        ((lambda (self)
+            (F (lambda (x)((self self) x))))
+        (lambda (self)
+            (F (lambda (x)((self self) x))))))))))");
+    eval("(define fib_Y
+    (lambda (f)
+        (lambda (n)
+            (if (<= n 2)
+                1
+                (+ (f (- n 1)) (f (- n 2)))))))");
+    eval("(apply + (map (Y fib_Y) (range 1 10)))");
+    // ##########################
+    comment("6. Condition");
+    eval("(cond
+    ((== 1 2) 3 7)
+    ((== 4 4) 6))");
+    eval("(cond
+    ((== 1 2) 3)
+    ((== 4 4) 6))");
+    eval("(define N 8)");
+    eval("(case N
+    (1 2)
+    (8 9))");
+    eval("(case N
+    (3 2)
+    (2 9)
+    ('(4 8) 5))");
+    eval("(when (> N 5) 6)");
+    eval("(when (> N 50) 6)");
+    eval("(while (> N 1)
+    (set! N (-- N)))");
+    eval("(val N)");
+    eval("(while (<= N 10)
+    (begin
+        (out (+ \"Hello_world!_\" (str N)))
+        (set! N (++ N))))");
+    // ##########################
+    comment("The end.                @bajdcc");
+};
+
+// ---------------------------------------------------------
+// 打印古诗
+
+var cols = g_ui_cols();
+var rows = g_ui_rows();
+
+/* 打字效果（空格不算） */
+var word_typewrite_fast = func ~(span, str) {
+    var l = g_ui_text_length(str);
+    var space = (cols - l) / 2;
+    puts(g_string_rep(" ", space));
+    foreach (var c : g_range_string(str)) {
+        put(c);
+        g_task_sleep_ms_signal(span, signal);
+    }
+    put(g_endl);
+};
+
+/* 换页特效 */
+var stage_trans = func ~() {
+    word_typewrite_fast(900, "...");
+    put('\f');
+};
+
+/* 打印古诗 */
+var stage_font = func ~() {
+    put('\f');
+    var text = "
+
+- 登幽州台歌 -
+
+陈子昂
+
+
+
+  前不见古人，
+
+  后不见来者。
+
+  念天地之悠悠，
+
+  独怆然而涕下！
+
+.
+
+- 春望 -
+
+杜甫
+
+
+
+  国破山河在，城春草木深。
+
+  感时花溅泪，恨别鸟惊心。
+
+  烽火连三月，家书抵万金。
+
+  白头搔更短，浑欲不胜簪。
+
+.
+
+- 如梦令·昨夜雨疏风骤 -
+
+李清照
+
+
+
+  昨夜雨疏风骤，
+
+  浓睡不消残酒。
+
+  试问卷帘人，
+
+  却道海棠依旧，
+
+  知否，知否？
+
+  应是绿肥红瘦。
+
+.
+
+- 龟虽寿 -
+
+曹操
+
+
+
+  神龟虽寿，犹有竟时。
+
+  螣蛇乘雾，终为土灰。
+
+  老骥伏枥，志在千里。
+
+  烈士暮年，壮心不已。
+
+  盈缩之期，不但在天。
+
+  养怡之福，可得永年。
+
+  幸甚至哉！歌以咏志。
+
+";
+    var t = g_string_split(text, '\n');
+    foreach (var s : g_range_array(t)) {
+        if (g_string_start_with(s, ".")) {
+            stage_trans();
+        } else {
+            word_typewrite_fast(80, s);
+        }
+    }
+};
+
+// ---------------------------------------------
+// FORK
+
+var stage_fork = func ~() {
+    var fork_proc = func ~() {
+        g_set_process_desc("fork job");
+        var fork_entry = func ~(arg) {
+            g_set_process_desc("fork #" + arg);
+            g_sleep(50);
+            var o = g_create_pipe("FORK#COUNT");
+            g_write_pipe(o, '*');
+        };
+        for (var i = 0; i < 20000; i++) {
+            g_create_user_process_args(fork_entry, i);
+        }
+    };
+    g_create_user_process(fork_proc);
+    var __in = g_create_pipe("FORK#COUNT");
+    var count = 0;
+    g_read_pipe_args(__in, lambda(ch, out) {
+        puts("" + count + "\r");
+        count++;
+        if (count >= 20000) {
+            puts("Tested 20000 process.\n");
+            g_destroy_pipe(g_create_pipe("FORK#COUNT"));
+        }
+    }, out);
+};
+
+// ---------------------------------------------
+// CLASS
+
+var stage_class = func ~() {
+    var print = func ~(str) -> word_typewrite(str, 10);
+    var ctx = g_create_context();
+    print(g_string_rep("-", 16));
+    print("1. Object");
+    print(g_string_rep("-", 16));
+    g_register_class(ctx, "shape", lambda(this) {
+        set this::"type" = "shape";
+        set this::"get_area" = lambda(this) -> 0;
+        set this::"get_index" = lambda(this, i) -> i;
+    }, g_null);
+    g_register_class(ctx, "square", lambda(this) {
+        set this::"type" = "square";
+        set this::"a" = 0;
+        set this::"b" = 0;
+        set this::"get_area" = lambda(this) -> this."a" * this."b";
+        set this::"to_string" = lambda(this) -> this."type" + " a=" + this."a" + " b=" + this."b" + " area=" + invoke this::"get_area"();
+    }, "shape");
+    g_register_class(ctx, "circle", lambda(this) {
+        set this::"type" = "circle";
+        set this::"r" = 0;
+        set this::"get_area" = lambda(this) -> 3.14 * this."r" * this."r";
+        set this::"to_string" = lambda(this) -> this."type" + " r=" + this."r" + " area=" + invoke this::"get_area"();
+    }, "shape");
+
+    var square = g_create_class(ctx, "square");
+    set square::"a" = 5;
+    set square::"b" = 6;
+    var circle = g_create_class(ctx, "circle");
+    set circle::"r" = 10;
+    set circle::"s" = square;
+
+    print(invoke square::"to_string"());
+    print(invoke circle::"to_string"());
+
+    set square::"a" = 100;
+    set circle."s"::"b" = 120;
+
+    print("" + square."type"
+        + " a=" + square."a"
+        + " b=" + square."b"
+        + " area=" + invoke square::"get_area"()
+        + " index=" + invoke square::"get_index"(1));
+    print("" + circle."type"
+        + " r=" + circle."r"
+        + " sa=" + circle."s"."a"
+        + " sb=" + circle."s"."b"
+        + " area=" + invoke circle::"get_area"()
+        + " sarea=" + invoke circle."s"::"get_area"()
+        + " index=" + invoke circle::"get_index"(2));
+
+    print("");
+    print(g_string_rep("-", 16));
+    print("2. Hook");
+    print(g_string_rep("-", 16));
+
+    // 返回null，因为before回调中没有调用next()，直接拦截
+    // 因此before_1后直接退出，before_2和after_1没有执行
+    var before_1 = lambda(class, name, this, next) -> print("HOOKED BEFORE 1: " + class + "::" + name);
+    g_hook_add_before(square, "get_area", before_1);
+    var before_2 = lambda(class, name, this, next) -> print("HOOKED BEFORE 2: " + class + "::" + name);
+    g_hook_add_before(square, "get_area", before_2);
+    var after_1 = lambda(class, name, this, ret, next) -> print("HOOKED AFTER 1: " + class + "::" + name);
+    g_hook_add_after(square, "get_area", after_1);
+
+    print("A " + square."type" + " area=" + invoke square::"get_area"()); // failed
+
+    g_hook_remove_before(square, "get_area", before_1);
+    g_hook_remove_before(square, "get_area", before_2);
+    g_hook_remove_after(square, "get_area", after_1);
+
+    // 返回12000，因为before和after都调用next()，未拦截
+    before_1 := lambda(class, name, this, next) {
+        print("HOOKED BEFORE 1: " + class + "::" + name);
+        return next();
+    };
+    g_hook_add_before(square, "get_area", before_1);
+    before_2 := lambda(class, name, this, next) {
+        print("HOOKED BEFORE 2: " + class + "::" + name);
+        return next();
+    };
+    g_hook_add_before(square, "get_area", before_2);
+    after_1 := lambda(class, name, this, r, next) {
+        print("HOOKED AFTER  3: " + class + "::" + name + "=" + r);
+        return next();
+    };
+    g_hook_add_after(square, "get_area", after_1);
+
+    print("B " + square."type" + " area=" + invoke square::"get_area"());
+
+    g_hook_remove_before(square, "get_area", before_1);
+    g_hook_remove_before(square, "get_area", before_2);
+    g_hook_remove_after(square, "get_area", after_1);
+
+    // 返回12346，直接拦截了，因为before_2中没有调用next()
+    // 因此返回12345+1，但当before_2返回next()+12345时
+    // get_area还是返回12000，拦截没有效果，因为都调用了next()
+    before_1 := lambda(class, name, this, next) {
+        print("HOOKED BEFORE 4: " + class + "::" + name);
+        return next() + 1;
+    };
+    g_hook_add_before(square, "get_area", before_1);
+    before_2 := lambda(class, name, this, next) {
+        print("HOOKED BEFORE 5: " + class + "::" + name);
+        return 12345;
+    };
+    g_hook_add_before(square, "get_area", before_2);
+    after_1 := lambda(class, name, this, r, next) {
+        print("HOOKED AFTER  6: " + class + "::" + name + "=" + r);
+        return next() + 10;
+    };
+    g_hook_add_after(square, "get_area", after_1);
+
+    print("C " + square."type" + " area=" + invoke square::"get_area"());
+
+    g_hook_remove_before(square, "get_area", before_1);
+    g_hook_remove_before(square, "get_area", before_2);
+
+    // 返回12010，因为有两个after，after_7没有调用next()，直接拦截
+    var after_2 = lambda(class, name, this, r, next) {
+        print("HOOKED AFTER  7: " + class + "::" + name + "=" + r);
+        return r;
+    };
+    g_hook_add_after(square, "get_area", after_2);
+
+    print("D " + square."type" + " area=" + invoke square::"get_area"());
+
+    g_hook_remove_after(square, "get_area", after_1);
+    g_hook_remove_after(square, "get_area", after_2);
+
+    print("E " + square."type" + " area=" + invoke square::"get_area"());
+
+    before_1 := lambda(class, name, this, next, arg1) {
+        print("HOOKED BEFORE 5: " + class + "::" + name);
+        return 10000;
+    };
+    g_hook_add_before(square, "get_index", before_1);
+
+    print("F " + square."type" + " index=" + invoke square::"get_index"(1));
+
+    g_hook_remove_before(square, "get_index", before_1);
+};
+
+// ---------------------------------------------
+// BASH
+
+var stage_bash = func ~() {
+    var ctx = g_create_context();
+    g_import_std_base(ctx);
+    g_import_std_shell(ctx);
+    var shell = g_create_class(ctx, "system::shell");
+    set shell::"out" = out;
+
+    var exec = func ~(cmd) {
+        g_write_pipe_n(out, g_endl + "# " + cmd + g_endl);
+        invoke shell::"exec"(cmd);
+        g_task_sleep_ms_signal(600, signal);
+    };
+    exec("@ui on monitor");
+    exec("range 1 10");
+    exec("range 1 10 | dup 2 | grep 2");
+    exec("range 1 10 | > &");
+    exec("range 1 10 | > $/tmp/a");
+    exec("< $/tmp/a | dup 2 | grep 2 | > &");
+    exec("< $/tmp/a | dup 2 | grep 2 | count | > &");
+    exec("< $/tmp/a | sleep 1 | pipe 10 | > &");
+    exec("range 1 10 | replace 1 $ 2 $ 3 | > &");
+    exec("range 1 10 | replace task util calc $ * $ | bash | > &");
+    exec("range 1 10 | replace task util calc $ + 1 | bash | util product | > &");
+    exec("range -5 10 | replace task util calc $ * $ * $ | bash | util sum | > &");
+
+    var env = g_lisp_env();
+    var eval = func~(exp) {
+        g_lisp_repl(env, exp);
+    };
+    var exec_call = lambda(exp) -> exec(g_string_join_array(exp, " "));
+    g_map_put(env, "exec", exec_call);
+    eval("(define exec_cubic
+        (lambda (n)
+            (exec \"echo\" (string n) \"|\"
+            \"replace\" \"task\" \"util\" \"calc\" \"$\" \"*\" \"$\" \"|\"
+            \"bash\" \"|\"
+            \">\" \"&\")))");
+    eval("(map exec_cubic (range -5 10))");
+
+    exec("echo Made_by_bajdcc | > &");
+};
+
+// ---------------------------------------------
+// TRY_CATCH
+
+var stage_try = func ~() {
+    // Origin: fact(n) -> n <= 1 ? 1 : fact(n - 1) * n
+    putn("Factorial(10) = " + g_tail_opt(
+        lambda(f) -> lambda(n, total) -> n <= 1 ? total : f([n - 1, total * n]),
+        [10, 1]));
+    // Origin: fib(n) -> n <= 2 ? 1 : fact(n - 1) + fact(n - 2)
+    putn("Fibonacci(10) = " + g_tail_opt(
+        lambda(f) -> lambda(n, a, total) -> n <= 1 ? total : f([n - 1, total, a + total]),
+        [10, 0, 1]));
+};
+
+// ---------------------------------------------
+// BAD APPLE TEXT ANIMATION
+
+var stage_badapple = func ~() {
+    var read = true;
+    var num = 0;
+    var hex = {};
+    var pixels = 80 * 25;
+    var px = 0;
+    var disp = "";
+    var h = 0;
+    var sys_out = g_create_pipe("int#2"); // use system output
+    g_write_pipe(out, "\f");
+    for (var i = 0; i < 10; i++) {
+        g_map_put(hex, "" + i, i);
+    }
+    for (let i = 0; i < 6; i++) {
+        g_map_put(hex, "" + ('A' + i), 10 + i);
+    }
+    var callback = func ~(ch, out) {
+        if (!g_query_share(signal)) {
+            return false;
+        }
+        if (ch == ' ' || ch == '\r' || ch == '\n') {
+            return;
+        }
+        h := hex["" + ch];
+        if (read) {
+            num := h;
+            read := false;
+        } else {
+            read := true;
+            num := (num << 4) + h;
+            if ((num & 128) != 0) {
+                num := num - 128;
+                disp := " ";
+            } else {
+                disp := "\x07";
+            }
+            if (px + num > pixels) {
+                g_write_pipe(sys_out, g_string_rep(disp, pixels - px));
+                g_write_pipe(sys_out, "\uffe2");
+                while (g_wait_pipe_empty(sys_out)) {}
+                px := px + num - pixels;
+                g_write_pipe(sys_out, g_string_rep(disp, px));
+            } else {
+                px := px + num;
+                g_write_pipe(sys_out, g_string_rep(disp, num));
+            }
+        }
+    };
+    g_write_pipe(out, "\f");
+    g_write_pipe(out, "\uffe1");
+    if (!g_read_file_utf8_args("!/com/bajdcc/code/fs/badapple.txt", callback, out)) {
+        g_write_pipe(out, "\uffe1");
+        g_write_pipe(out, "Error: Read file failed!" + g_endl);
+        return;
+    }
+    g_write_pipe(out, "\uffe1");
+    g_write_pipe(out, "\f");
+};
+
+var name = args[0];
+if (g_is_null(name)) {
+    create_stage(stage_clear);
+    create_stage(stage_1);
+} else if (name == "philo") {
+    create_stage(stage_philo);
+} else if (name == "philo2") {
+    create_stage(stage_philo2);
+} else if (name == "lisp") {
+    create_stage(stage_lisp);
+} else if (name == "font") {
+    stage_font();
+} else if (name == "fork") {
+    stage_fork();
+} else if (name == "class") {
+    stage_class();
+} else if (name == "bash") {
+    stage_bash();
+} else if (name == "try") {
+    stage_try();
+} else if (name == "badapple") {
+    stage_badapple();
+} else {
+    g_read_pipe_args(in, lambda(ch, out) -> g_write_pipe(out, ch), out);
+}
+
+g_stop_share(signal);
+g_destroy_pipe(out);
+g_destroy_pipe(in);
