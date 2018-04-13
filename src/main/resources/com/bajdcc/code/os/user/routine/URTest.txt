@@ -844,7 +844,7 @@ var stage_badapple = func ~() {
         return;
     }
     g_set_rapid(false);
-    g_write_pipe(out, "\uffe1");
+    g_write_pipe(sys_out, "\uffe1");
     g_write_pipe(out, "\f");
 };
 
