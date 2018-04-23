@@ -197,7 +197,7 @@ public class Grammar extends Semantic {
 				"set -> @SET exp[3]{lost_exp} @PROPERTY{lost_property} exp[4]{lost_exp} @ASSIGN{lost_assign} exp[2]{lost_exp}");
 		/* 类方法调用语句 */
 		infer(handler.getSemanticHandler("invoke"),
-				"invoke -> @INVOKE[0] exp[1]{lost_exp} @PROPERTY{lost_property} exp[2]{lost_exp} [@PROPERTY] @LPA{lost_lpa} [exp_list[3]] @RPA{lost_rpa}");
+				"invoke -> @INVOKE[0] exp[1]{lost_exp} @PROPERTY{lost_property} exp[2]{lost_exp} @PROPERTY{lost_property} @LPA{lost_lpa} [exp_list[3]] @RPA{lost_rpa}");
 		/* 导入与导出语句 */
 		infer(handler.getSemanticHandler("port"),
 				"port -> (@IMPORT[1] | @EXPORT[2]) @LITERAL[0]{lost_string} @SEMI{lost_semi}");

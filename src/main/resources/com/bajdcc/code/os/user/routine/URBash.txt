@@ -28,7 +28,7 @@ set shell::"out" = out;
 var pipe = func ["PIPE"] ~(ch, out) {
     if (ch == '\n') {
         var cmd = g_string_build(buf);
-        invoke shell::"exec"(cmd);
+        shell."exec"(cmd);
         g_array_clear(buf);
     } else if (ch == '\r') {
     } else {
