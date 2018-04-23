@@ -44,47 +44,47 @@ var STATE_ERROR = -1;
 ----------------------------------------------------------------- */
 g_register_class(ctx, "app::ai::node.base", lambda(this) {
     /* 数据 */
-    set this::"name" = ""; // 名字
-    set this::"cond" = _; // 前置条件类
-    set this::"children" = _; // 子结点
-    set this::"parent" = _; // 父结点
+    this."name" := ""; // 名字
+    this."cond" := _; // 前置条件类
+    this."children" := _; // 子结点
+    this."parent" := _; // 父结点
     /* 事件 */
-    set this::"do_evaluate" = lambda(this, input) -> true; // 测试事件
-    set this::"do_tick" = lambda(this, input, output) -> STATE_FINISH; // 定时事件
-    set this::"do_leave" = lambda(this, input) -> _; // 离开事件
+    this."do_evaluate" := lambda(this, input) -> true; // 测试事件
+    this."do_tick" := lambda(this, input, output) -> STATE_FINISH; // 定时事件
+    this."do_leave" := lambda(this, input) -> _; // 离开事件
     /* 方法 */
-    set this::"add_child" = lambda(this, node) { // 添加子结点
+    this."add_child" := lambda(this, node) { // 添加子结点
         if (g_is_null(this."children")) {
-            set this::"children" = g_create_class(ctx, "list::array");
+            this."children" := g_create_class(ctx, "list::array");
         }
         this."children"."add"(node);
-        set node::"parent" = this;
+        node."parent" := this;
         return this;
     };
-    set this::"add_child_at" = lambda(this, node, i) { // 添加子结点
+    this."add_child_at" := lambda(this, node, i) { // 添加子结点
         if (g_is_null(this."children")) {
-            set this::"children" = g_create_class(ctx, "list::array");
+            this."children" := g_create_class(ctx, "list::array");
         }
         this."children"."insert"(i, node);
-        set node::"parent" = this;
+        node."parent" := this;
         return this;
     };
-    set this::"set_cond" = lambda(this, cond) { // 添加前置条件
-        set this::"cond" = cond;
-        set cond::"parent" = this;
+    this."set_cond" := lambda(this, cond) { // 添加前置条件
+        this."cond" := cond;
+        cond."parent" := this;
         return this;
     };
-    set this::"evaluate" = lambda(this, input) { // 测试
+    this."evaluate" := lambda(this, input) { // 测试
         var ret = g_is_null(this."cond") || this."cond"."evaluate"(input);
         return ret && this."do_evaluate"(input);
     };
-    set this::"tick" = lambda(this, input, output) { // 定时
+    this."tick" := lambda(this, input, output) { // 定时
         return this."do_tick"(input, output);
     };
-    set this::"leave" = lambda(this, input) { // 离开
+    this."leave" := lambda(this, input) { // 离开
         return this."do_leave"(input);
     };
-    set this::"check_index" = lambda(this, i) { // 检查越界
+    this."check_index" := lambda(this, i) { // 检查越界
         return !g_is_null(this."children") && i >= 0 && i < this."children"."size"();
     };
 }, "object");
@@ -100,8 +100,8 @@ g_register_class(ctx, "app::ai::node.base", lambda(this) {
 ----------------------------------------------------------------- */
 g_register_class(ctx, "app::ai::node.loop", lambda(this) {
     /* 数据 */
-    set this::"loop_count" = -1; // 指定循环次数上限
-    set this::"current_loop" = 0; // 当前循环次数
+    this."loop_count" := -1; // 指定循环次数上限
+    this."current_loop" := 0; // 当前循环次数
     /* 事件 */
     g_hook_add_before(this, "do_evaluate", lambda(class, name, this, next, input) { // 测试事件
         if ((this."loop_count" != -1) && (this."current_loop" >= this."loop_count")) {
@@ -120,7 +120,7 @@ g_register_class(ctx, "app::ai::node.loop", lambda(this) {
                 if (this."loop_count" == -1) {
                     is_finish := STATE_EXECUTING;
                 } else {
-                    set this::"current_loop" = this."current_loop" + 1;
+                    this."current_loop" := this."current_loop" + 1;
                     if (this."current_loop" < this."loop_count") {
                         is_finish := STATE_EXECUTING;
                     }
@@ -128,7 +128,7 @@ g_register_class(ctx, "app::ai::node.loop", lambda(this) {
             }
         }
         if (is_finish == STATE_FINISH) {
-            set this::"current_loop" = 0;
+            this."current_loop" := 0;
         }
         return is_finish;
     });
@@ -136,11 +136,11 @@ g_register_class(ctx, "app::ai::node.loop", lambda(this) {
         if (this."check_index"(0)) {
             this."children"."get"(0)."do_leave"(input);
         }
-        set this::"current_loop" = 0;
+        this."current_loop" := 0;
     });
     /* 方法 */
-    set this::"set_loop_count" = lambda(this, loop_count) { // 设置循环上限
-        set this::"loop_count" = loop_count;
+    this."set_loop_count" := lambda(this, loop_count) { // 设置循环上限
+        this."loop_count" := loop_count;
     };
 }, "app::ai::node.base");
 
@@ -155,8 +155,8 @@ g_register_class(ctx, "app::ai::node.loop", lambda(this) {
 ----------------------------------------------------------------- */
 g_register_class(ctx, "app::ai::node.parallel", lambda(this) {
     /* 数据 */
-    set this::"or" = true; // 指定是“或”(1)还是“与”(0)
-    set this::"children_status" = g_create_class(ctx, "list::array"); // 子结点测试状态
+    this."or" := true; // 指定是“或”(1)还是“与”(0)
+    this."children_status" := g_create_class(ctx, "list::array"); // 子结点测试状态
     /* 事件 */
     g_hook_add_before(this, "do_evaluate", lambda(class, name, this, next, input) { // 测试事件
         var len = this."children"."size"();
@@ -217,7 +217,7 @@ g_register_class(ctx, "app::ai::node.parallel", lambda(this) {
         this."children_status"."insert"(i, STATE_EXECUTING);
         return next();
     });
-    set this::"reset_status" = lambda(this) { // 重置状态
+    this."reset_status" := lambda(this) { // 重置状态
         this."children_status"."fill"(STATE_EXECUTING);
     };
 }, "app::ai::node.base");
@@ -235,7 +235,7 @@ g_register_class(ctx, "app::ai::node.parallel", lambda(this) {
 ----------------------------------------------------------------- */
 g_register_class(ctx, "app::ai::node.sequence", lambda(this) {
     /* 数据 */
-    set this::"current" = -1; // 当前活动的结点索引
+    this."current" := -1; // 当前活动的结点索引
     /* 事件 */
     g_hook_add_before(this, "do_evaluate", lambda(class, name, this, next, input) { // 测试事件
         var index = this."current";
@@ -250,21 +250,21 @@ g_register_class(ctx, "app::ai::node.sequence", lambda(this) {
     g_hook_add_before(this, "do_tick", lambda(class, name, this, next, input, output) { // 定时事件
         var is_finish = STATE_FINISH;
         if (this."current" == -1) {
-            set this::"current" = 0;
+            this."current" := 0;
         }
         if (this."check_index"(this."current")) {
             is_finish := this."children"."get"(this."current")."tick"(input, output);
             if (is_finish == STATE_FINISH) {
-                set this::"current" = this."current" + 1;
+                this."current" := this."current" + 1;
                 if (this."current" == this."children"."size"()) {
-                    set this::"current" = -1;
+                    this."current" := -1;
                 } else {
                     is_finish := STATE_EXECUTING;
                 }
             }
         }
         if (is_finish < 0) {
-            set this::"current" = -1;
+            this."current" := -1;
         }
         return is_finish;
     });
@@ -272,7 +272,7 @@ g_register_class(ctx, "app::ai::node.sequence", lambda(this) {
         if (this."check_index"(this."current")) {
             this."children"."get"(this."current")."do_leave"(input);
         }
-        set this::"current" = -1;
+        this."current" := -1;
     });
 }, "app::ai::node.base");
 
@@ -287,15 +287,15 @@ g_register_class(ctx, "app::ai::node.sequence", lambda(this) {
 ----------------------------------------------------------------- */
 g_register_class(ctx, "app::ai::node.priority", lambda(this) {
     /* 数据 */
-    set this::"current" = -1; // 当前活动的结点索引
-    set this::"last" = -1; // 上次活动的结点索引
+    this."current" := -1; // 当前活动的结点索引
+    this."last" := -1; // 上次活动的结点索引
     /* 事件 */
     g_hook_add_before(this, "do_evaluate", lambda(class, name, this, next, input) { // 测试事件
-        set this::"current" = -1;
+        this."current" := -1;
         var len = this."children"."size"();
         for (var i = 0; i < len; i++) {
             if (this."children"."get"(i)."evaluate"(input)) {
-                set this::"current" = i;
+                this."current" := i;
                 return true;
             }
         }
@@ -308,13 +308,13 @@ g_register_class(ctx, "app::ai::node.priority", lambda(this) {
                 if (this."check_index"(this."last")) {
                     this."children"."get"(this."last")."leave"(input);
                 }
-                set this::"last" = this."current";
+                this."last" := this."current";
             }
         }
         if (this."check_index"(this."last")) {
             is_finish := this."children"."get"(this."last")."tick"(input, output);
             if (is_finish == STATE_FINISH) {
-                set this::"last" = -1;
+                this."last" := -1;
             }
         }
         return is_finish;
@@ -323,7 +323,7 @@ g_register_class(ctx, "app::ai::node.priority", lambda(this) {
         if (this."check_index"(this."last")) {
             this."children"."get"(this."last")."do_leave"(input);
         }
-        set this::"last" = -1;
+        this."last" := -1;
     });
 }, "app::ai::node.base");
 
@@ -357,25 +357,25 @@ var STATUS_FINISH = 2;
 ----------------------------------------------------------------- */
 g_register_class(ctx, "app::ai::node.terminal", lambda(this) {
     /* 数据 */
-    set this::"status" = STATUS_READY; // 状态
-    set this::"need_exit" = -1; // 当前状态需要退出
+    this."status" := STATUS_READY; // 状态
+    this."need_exit" := -1; // 当前状态需要退出
     /* 事件 */
-    set this::"do_enter" = lambda(this, input) -> true; // 进入事件
-    set this::"do_execute" = lambda(this, input, output) -> STATE_FINISH; // 执行事件
-    set this::"do_exit" = lambda(this, input, id) -> _; // 离开事件
+    this."do_enter" := lambda(this, input) -> true; // 进入事件
+    this."do_execute" := lambda(this, input, output) -> STATE_FINISH; // 执行事件
+    this."do_exit" := lambda(this, input, id) -> _; // 离开事件
     g_hook_add_before(this, "do_tick", lambda(class, name, this, next, input, output) { // 定时事件
         var is_finish = STATE_FINISH;
         if (this."status" == STATUS_READY) {
             //this."log_enter"();
             this."do_enter"(input);
-            set this::"status" = STATUS_RUNNING;
-            set this::"need_exit" = true;
+            this."status" := STATUS_RUNNING;
+            this."need_exit" := true;
         }
         if (this."status" == STATUS_RUNNING) {
             //this."log_execute"();
             is_finish := this."do_execute"(input, output);
             if (is_finish == STATE_FINISH || is_finish < 0) {
-                set this::"status" = STATUS_FINISH;
+                this."status" := STATUS_FINISH;
             }
         }
         if (this."status" == STATUS_FINISH) {
@@ -383,8 +383,8 @@ g_register_class(ctx, "app::ai::node.terminal", lambda(this) {
                 //this."log_exit"();
                 this."do_exit"(input, is_finish);
             }
-            set this::"status" = STATUS_READY;
-            set this::"need_exit" = false;
+            this."status" := STATUS_READY;
+            this."need_exit" := false;
         }
         return is_finish;
     });
@@ -392,8 +392,8 @@ g_register_class(ctx, "app::ai::node.terminal", lambda(this) {
         if (this."need_exit") {
             this."do_exit"(input, STATE_ERROR);
         }
-        set this::"status" = STATUS_READY;
-        set this::"need_exit" = false;
+        this."status" := STATUS_READY;
+        this."need_exit" := false;
     });
     /* 调试 */
     /*g_hook_add_before(this, "do_enter", lambda(class, name, this, next, input) {
@@ -408,10 +408,10 @@ g_register_class(ctx, "app::ai::node.terminal", lambda(this) {
         this."log_exit"();
         return next();
     });*/
-    set this::"log" = lambda(this, str) -> log(g_ui_fg(15, 120, 15) + "[" + this."name" + "] " + g_ui_fgc() + str);
-    set this::"log_enter" = lambda(this) -> this."log"("Enter");
-    set this::"log_execute" = lambda(this) -> this."log"("Execute");
-    set this::"log_exit" = lambda(this) -> this."log"("Exit");
+    this."log" := lambda(this, str) -> log(g_ui_fg(15, 120, 15) + "[" + this."name" + "] " + g_ui_fgc() + str);
+    this."log_enter" := lambda(this) -> this."log"("Enter");
+    this."log_execute" := lambda(this) -> this."log"("Execute");
+    this."log_exit" := lambda(this) -> this."log"("Exit");
 }, "app::ai::node.base");
 
 
@@ -423,11 +423,11 @@ g_register_class(ctx, "app::ai::node.terminal", lambda(this) {
 ----------------------------------------------------------------- */
 g_register_class(ctx, "app::ai::cond.base", lambda(this) {
     /* 数据 */
-    set this::"parent" = _; // 结点
+    this."parent" := _; // 结点
     /* 事件 */
-    set this::"evaluate" = lambda(this, input) -> _; // 测试事件
+    this."evaluate" := lambda(this, input) -> _; // 测试事件
     /* 方法 */
-    set this::"init" = lambda(this, cond) -> _; // 初始化
+    this."init" := lambda(this, cond) -> _; // 初始化
 }, "object");
 
 /* -----------------------------------------------------------------
@@ -436,14 +436,14 @@ g_register_class(ctx, "app::ai::cond.base", lambda(this) {
 ----------------------------------------------------------------- */
 g_register_class(ctx, "app::ai::cond.not", lambda(this) {
     /* 数据 */
-    set this::"cond" = _; // 条件
+    this."cond" := _; // 条件
     /* 事件 */
     g_hook_add_before(this, "evaluate", lambda(class, name, this, next, input) {
         return !this."cond"."evaluate"(input);
     });
     /* 方法 */
     g_hook_add_before(this, "init", lambda(class, name, this, next, cond) {
-        set this::"cond" = cond;
+        this."cond" := cond;
     });
 }, "app::ai::cond.base");
 
@@ -475,7 +475,7 @@ g_register_class(ctx, "app::ai::cond.true", lambda(this) {
 ----------------------------------------------------------------- */
 g_register_class(ctx, "app::ai::cond.and", lambda(this) {
     /* 数据 */
-    set this::"cond" = g_new_array;
+    this."cond" := g_new_array;
     /* 事件 */
     g_hook_add_before(this, "evaluate", lambda(class, name, this, next, input) {
         foreach (var i : g_range_array(this."cond")) {
@@ -487,7 +487,7 @@ g_register_class(ctx, "app::ai::cond.and", lambda(this) {
     });
     /* 方法 */
     g_hook_add_before(this, "init", lambda(class, name, this, next, cond) {
-        set this::"cond" = cond;
+        this."cond" := cond;
     });
 }, "app::ai::cond.base");
 
@@ -497,7 +497,7 @@ g_register_class(ctx, "app::ai::cond.and", lambda(this) {
 ----------------------------------------------------------------- */
 g_register_class(ctx, "app::ai::cond.or", lambda(this) {
     /* 数据 */
-    set this::"cond" = g_new_array;
+    this."cond" := g_new_array;
     /* 事件 */
     g_hook_add_before(this, "evaluate", lambda(class, name, this, next, input) {
         foreach (var i : g_range_array(this."cond")) {
@@ -509,14 +509,14 @@ g_register_class(ctx, "app::ai::cond.or", lambda(this) {
     });
     /* 方法 */
     g_hook_add_before(this, "init", lambda(class, name, this, next, cond) {
-        set this::"cond" = cond;
+        this."cond" := cond;
     });
 }, "app::ai::cond.base");
 
 // #################################################################
 
 g_register_class(ctx, "app::ai::node.terminal::test.face_to", lambda(this) {
-    set this::"name" = "FaceTo";
+    this."name" := "FaceTo";
     g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
         var target = input."get"("target");
         var p = input."get"("p");
@@ -528,8 +528,8 @@ g_register_class(ctx, "app::ai::node.terminal::test.face_to", lambda(this) {
 }, "app::ai::node.terminal");
 
 g_register_class(ctx, "app::ai::node.terminal::test.move_to", lambda(this) {
-    set this::"name" = "MoveTo";
-    set this::"v" = 10.0;
+    this."name" := "MoveTo";
+    this."v" := 10.0;
     g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
         var target = input."get"("target");
         var p = input."get"("p");
@@ -551,18 +551,18 @@ g_register_class(ctx, "app::ai::node.terminal::test.move_to", lambda(this) {
 }, "app::ai::node.terminal");
 
 g_register_class(ctx, "app::ai::node.terminal::test.look_around", lambda(this) {
-    set this::"name" = "LookAround";
-    set this::"ticks" = 0;
-    set this::"times" = 0;
+    this."name" := "LookAround";
+    this."ticks" := 0;
+    this."times" := 0;
     g_hook_add_before(this, "do_enter", lambda(class, name, this, next, input) {
         this."log"("四处查看");
-        set this::"ticks" = -1;
-        set this::"times" = 3 + g_random_int(3);
+        this."ticks" := -1;
+        this."times" := 3 + g_random_int(3);
     });
     g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
-        set this::"ticks" = this."ticks" + 1;
+        this."ticks" := this."ticks" + 1;
         if (this."ticks" % 12 == 0) {
-            set this::"times" = this."times" - 1;
+            this."times" := this."times" - 1;
             output."put"("dir", g_PI_2 * g_random);
         }
         if (this."times" > 0) {
@@ -578,14 +578,14 @@ g_register_class(ctx, "app::ai::node.terminal::test.look_around", lambda(this) {
 }, "app::ai::node.terminal");
 
 g_register_class(ctx, "app::ai::node.terminal::test.idle", lambda(this) {
-    set this::"name" = "Idle";
-    set this::"ticks" = 0;
+    this."name" := "Idle";
+    this."ticks" := 0;
     g_hook_add_before(this, "do_enter", lambda(class, name, this, next, input) {
         this."log"("空闲状态");
-        set this::"ticks" = 30;
+        this."ticks" := 30;
     });
     g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
-        set this::"ticks" = this."ticks" - 1;
+        this."ticks" := this."ticks" - 1;
         if (this."ticks" > 0) {
             return STATE_EXECUTING;
         }
@@ -594,17 +594,17 @@ g_register_class(ctx, "app::ai::node.terminal::test.idle", lambda(this) {
 }, "app::ai::node.terminal");
 
 g_register_class(ctx, "app::ai::node.terminal::test.hovering", lambda(this) {
-    set this::"name" = "Hovering";
-    set this::"ticks" = 0;
-    set this::"v" = 3.0;
+    this."name" := "Hovering";
+    this."ticks" := 0;
+    this."v" := 3.0;
     g_hook_add_before(this, "do_enter", lambda(class, name, this, next, input) {
-        set this::"ticks" = 0;
+        this."ticks" := 0;
     });
     g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
         this."log"("徘徊");
         var p = input."get"("p");
         var v = input."get"("v");
-        set this::"ticks" = this."ticks" + 1;
+        this."ticks" := this."ticks" + 1;
         if (this."ticks" % 20 == 0) {
             v := [0.0 - v[0], 0.0 - v[1]];
         }
@@ -617,7 +617,7 @@ g_register_class(ctx, "app::ai::node.terminal::test.hovering", lambda(this) {
 }, "app::ai::node.terminal");
 
 g_register_class(ctx, "app::ai::node.terminal::test.smoking", lambda(this) {
-    set this::"name" = "Smoking";
+    this."name" := "Smoking";
     g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
         this."log"("抽烟");
         return STATE_FINISH;
@@ -625,14 +625,14 @@ g_register_class(ctx, "app::ai::node.terminal::test.smoking", lambda(this) {
 }, "app::ai::node.terminal");
 
 g_register_class(ctx, "app::ai::node.terminal::test.coughing", lambda(this) {
-    set this::"name" = "Coughing";
-    set this::"times" = 0;
+    this."name" := "Coughing";
+    this."times" := 0;
     g_hook_add_before(this, "do_enter", lambda(class, name, this, next, input) {
-        set this::"times" = 5;
+        this."times" := 5;
     });
     g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
         this."log"("咳嗽");
-        set this::"times" = this."times" - 1;
+        this."times" := this."times" - 1;
         if (this."times" > 0) {
             return STATE_EXECUTING;
         }
@@ -668,13 +668,13 @@ g_register_class(ctx, "app::ai::cond::test.cough", lambda(this) {
 ----------------------------------------------------------------- */
 g_register_class(ctx, "app::ai::test", lambda(this) {
     /* 数据 */
-    set this::"root" = _;
-    set this::"input" = _;
-    set this::"output" = _;
+    this."root" := _;
+    this."input" := _;
+    this."output" := _;
     /* 方法 */
-    set this::"init" = lambda(this, out) { // 初始化
-        set this::"input" = g_create_class(ctx, "list::map");
-        set this::"output" = g_create_class(ctx, "list::map");
+    this."init" := lambda(this, out) { // 初始化
+        this."input" := g_create_class(ctx, "list::map");
+        this."output" := g_create_class(ctx, "list::map");
 
         this."input"."put"("out", out);
         this."input"."put"("target", [100.0, 100.0]);
@@ -685,7 +685,7 @@ g_register_class(ctx, "app::ai::test", lambda(this) {
         this."output"."put"("v", [0.0, 0.0]);
         this."output"."put"("dir", 0);
 
-        set this::"root" = g_new_class(ctx, "app::ai::node.priority",
+        this."root" := g_new_class(ctx, "app::ai::node.priority",
             [["name", "root"]],
             [["add_child", g_new_class(ctx, "app::ai::node.sequence",
                 [["name", "move"]],
@@ -704,7 +704,7 @@ g_register_class(ctx, "app::ai::test", lambda(this) {
                     ["add_child", g_new_class(ctx, "app::ai::node.terminal::test.coughing", [],
                         [["set_cond", g_create_class(ctx, "app::ai::cond::test.cough")]])]])]])]]);
     };
-    set this::"tick" = lambda(this) { // 每帧事件
+    this."tick" := lambda(this) { // 每帧事件
         this."input"."put"("p", g_new(this."output"."get"("p")));
         this."input"."put"("v", g_new(this."output"."get"("v")));
         this."input"."put"("status", g_new(this."output"."get"("status")));

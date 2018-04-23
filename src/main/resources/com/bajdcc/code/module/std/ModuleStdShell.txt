@@ -143,9 +143,9 @@ var import_shell_class = func ~(ctx) {
     };
 
     g_register_class(ctx, "system::shell", lambda(this) {
-        set this::"out" = g_null;
-        set this::"parse" = parse_cmd_1;
-        set this::"exec" = lambda(this, cmd) {
+        this."out" := g_null;
+        this."parse" := parse_cmd_1;
+        this."exec" := lambda(this, cmd) {
             g_printn("*** Shell: " + cmd);
             cmd := g_string_trim(cmd);
             if (g_string_start_with(cmd, "@")) {

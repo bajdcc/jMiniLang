@@ -118,9 +118,7 @@ public class ExpInvokeProperty implements IExp {
 	@Override
 	public String print(StringBuilder prefix) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(KeywordType.INVOKE.getName()).append(" ");
-		sb.append(obj.print(prefix)).append(" ").append(OperatorType.PROPERTY.getName());
-		sb.append(" ").append(property.print(prefix));
+		sb.append(obj.print(prefix)).append(".").append(property.print(prefix));
 		if (!params.isEmpty()) {
 			sb.append(OperatorType.LPARAN.getName()).append(" ");
 			if (params.size() == 1) {

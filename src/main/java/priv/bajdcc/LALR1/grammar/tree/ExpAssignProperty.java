@@ -95,8 +95,7 @@ public class ExpAssignProperty implements IExp {
 
 	@Override
 	public String print(StringBuilder prefix) {
-		return (KeywordType.SET.getName()) +
-				" " + obj.print(prefix) + " " + OperatorType.PROPERTY.getName() + " " + property.print(prefix) +
+		return obj.print(prefix) + "." + property.print(prefix) +
 				" " + OperatorType.ASSIGN.getName() + " " +
 				exp.print(prefix);
 	}

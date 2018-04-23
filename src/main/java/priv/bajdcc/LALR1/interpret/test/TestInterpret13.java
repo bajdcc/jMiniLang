@@ -111,7 +111,9 @@ public class TestInterpret13 {
 							"var b = g_create_class(ctx, \"list::array\");\n" +
 							"a.\"add\"(b);\n" +
 							"b.\"add\"(0);\n" +
-							"g_printn(a.\"get\"(0).\"size\"());"
+							"g_printn(a.\"get\"(0).\"size\"());\n" +
+							"a.\"get\"(0).\"c\" := 2;\n" +
+							"g_printn(a.\"get\"(0).\"c\");\n"
 			};
 
 			Interpreter interpreter = new Interpreter();

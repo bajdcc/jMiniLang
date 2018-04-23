@@ -135,10 +135,21 @@ public class SemanticHandler {
 		mapSemanticAnalyzier.put("exp", (indexed, query, recorder) -> {
 			if (indexed.exists(2)) {// 双目运算
 				Token token = indexed.get(2).token;
-				if (token.kToken == TokenType.OPERATOR && token.object == OperatorType.DOT && indexed.get(0).object instanceof ExpInvokeProperty) {
-					ExpInvokeProperty invoke = (ExpInvokeProperty) indexed.get(0).object;
-					invoke.setObj((IExp) indexed.get(1).object);
-					return invoke;
+				if (token.kToken == TokenType.OPERATOR) {
+					if (token.object == OperatorType.DOT && indexed.get(0).object instanceof ExpInvokeProperty) {
+						ExpInvokeProperty invoke = (ExpInvokeProperty) indexed.get(0).object;
+						invoke.setObj((IExp) indexed.get(1).object);
+						return invoke;
+					} else if (indexed.get(1).object instanceof ExpBinop) {
+						ExpBinop bin = (ExpBinop) indexed.get(1).object;
+						if (TokenTools.isAssignment((OperatorType) token.object)) {
+							ExpAssignProperty assign = new ExpAssignProperty();
+							assign.setObj(bin.getLeftOperand());
+							assign.setProperty(bin.getRightOperand());
+							assign.setExp((IExp) indexed.get(0).object);
+							return assign;
+						}
+					}
 				}
 				ExpBinop binop = new ExpBinop();
 				binop.setToken(indexed.get(2).token);

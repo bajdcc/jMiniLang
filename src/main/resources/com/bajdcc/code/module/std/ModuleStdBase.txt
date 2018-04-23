@@ -6,88 +6,88 @@ import "sys.class";
 
 var import_list_class = func ~(ctx) {
     g_register_class(ctx, "list::array", lambda(this) {
-        set this::"array" = g_new_array;
-        set this::"add" = lambda(this, obj) -> g_array_add(this."array", obj);
-        set this::"contains" = lambda(this, obj) -> g_array_contains(this."array", obj);
-        set this::"append" = lambda(this, obj) -> g_array_append(this."array", obj);
-        set this::"insert" = lambda(this, i, obj) -> g_array_insert(this."array", i, obj);
-        set this::"set" = lambda(this, i, obj) -> g_array_set(this."array", i, obj);
-        set this::"pop" = lambda(this) -> g_array_pop(this."array");
-        set this::"clear" = lambda(this) -> g_array_clear(this."array");
-        set this::"reverse" = lambda(this) -> g_array_reverse(this."array");
-        set this::"get" = lambda(this, obj) -> g_array_get(this."array", obj);
-        set this::"get_ex" = lambda(this, obj) -> g_array_get_ex(this."array", obj);
-        set this::"size" = lambda(this) -> g_array_size(this."array");
-        set this::"remove" = lambda(this, i) -> g_array_remove(this."array", i);
-        set this::"delete" = lambda(this, obj) -> g_array_delete(this."array", obj);
-        set this::"empty" = lambda(this) -> g_array_empty(this."array");
-        set this::"fill" = lambda(this, obj) -> g_array_fill(this."array", obj);
+        this."array" := g_new_array;
+        this."add" := lambda(this, obj) -> g_array_add(this."array", obj);
+        this."contains" := lambda(this, obj) -> g_array_contains(this."array", obj);
+        this."append" := lambda(this, obj) -> g_array_append(this."array", obj);
+        this."insert" := lambda(this, i, obj) -> g_array_insert(this."array", i, obj);
+        this."set" := lambda(this, i, obj) -> g_array_set(this."array", i, obj);
+        this."pop" := lambda(this) -> g_array_pop(this."array");
+        this."clear" := lambda(this) -> g_array_clear(this."array");
+        this."reverse" := lambda(this) -> g_array_reverse(this."array");
+        this."get" := lambda(this, obj) -> g_array_get(this."array", obj);
+        this."get_ex" := lambda(this, obj) -> g_array_get_ex(this."array", obj);
+        this."size" := lambda(this) -> g_array_size(this."array");
+        this."remove" := lambda(this, i) -> g_array_remove(this."array", i);
+        this."delete" := lambda(this, obj) -> g_array_delete(this."array", obj);
+        this."empty" := lambda(this) -> g_array_empty(this."array");
+        this."fill" := lambda(this, obj) -> g_array_fill(this."array", obj);
     }, "object");
     g_register_class(ctx, "list::map", lambda(this) {
-        set this::"map" = g_new_map;
-        set this::"put" = lambda(this, k, v) -> g_map_put(this."map", k, v);
-        set this::"contains" = lambda(this, obj) -> g_map_contains(this."map", obj);
-        set this::"get" = lambda(this, obj) -> g_map_get(this."map", obj);
-        set this::"size" = lambda(this) -> g_map_size(this."map");
-        set this::"remove" = lambda(this, obj) -> g_map_remove(this."map", obj);
-        set this::"clear" = lambda(this) -> g_map_clear(this."map");
-        set this::"empty" = lambda(this) -> g_map_empty(this."map");
+        this."map" := g_new_map;
+        this."put" := lambda(this, k, v) -> g_map_put(this."map", k, v);
+        this."contains" := lambda(this, obj) -> g_map_contains(this."map", obj);
+        this."get" := lambda(this, obj) -> g_map_get(this."map", obj);
+        this."size" := lambda(this) -> g_map_size(this."map");
+        this."remove" := lambda(this, obj) -> g_map_remove(this."map", obj);
+        this."clear" := lambda(this) -> g_map_clear(this."map");
+        this."empty" := lambda(this) -> g_map_empty(this."map");
     }, "object");
 };
 
 var import_string_class = func ~(ctx) {
     g_register_class(ctx, "string", lambda(this) {
-        set this::"str" = "";
-        set this::"replace" = lambda(this, from, to) -> g_string_replace(this."str", from, to);
-        set this::"split" = lambda(this, delim) -> g_string_split(this."str", delim);
-        set this::"splitn" = lambda(this, delim, n) -> g_string_splitn(this."str", delim, n);
-        set this::"trim" = lambda(this) -> g_string_trim(this."str");
-        set this::"length" = lambda(this) -> g_string_length(this."str");
-        set this::"size" = lambda(this) -> g_string_length(this."str");
-        set this::"get" = lambda(this, i) -> g_string_get(this."str", i);
-        set this::"empty" = lambda(this) -> g_string_empty(this."str");
-        set this::"regex" = lambda(this, regex) -> g_string_regex(this."str", regex);
-        set this::"atoi" = lambda(this) -> g_string_atoi(this."str");
-        set this::"atoi_s" = lambda(this) -> g_string_atoi_s(this."str");
-        set this::"to_upper" = lambda(this) -> g_string_toupper(this."str");
-        set this::"to_lower" = lambda(this) -> g_string_tolower(this."str");
-        set this::"to_number" = lambda(this) -> g_string_to_number(this."str");
-        set this::"start_with" = lambda(this, obj) -> g_string_start_with(this."str", obj);
-        set this::"substr" = lambda(this, start, end) -> g_string_substr(this."str", start, end);
-        set this::"left" = lambda(this, n) -> g_string_left(this."str", n);
-        set this::"right" = lambda(this, n) -> g_string_right(this."str", n);
+        this."str" := "";
+        this."replace" := lambda(this, from, to) -> g_string_replace(this."str", from, to);
+        this."split" := lambda(this, delim) -> g_string_split(this."str", delim);
+        this."splitn" := lambda(this, delim, n) -> g_string_splitn(this."str", delim, n);
+        this."trim" := lambda(this) -> g_string_trim(this."str");
+        this."length" := lambda(this) -> g_string_length(this."str");
+        this."size" := lambda(this) -> g_string_length(this."str");
+        this."get" := lambda(this, i) -> g_string_get(this."str", i);
+        this."empty" := lambda(this) -> g_string_empty(this."str");
+        this."regex" := lambda(this, regex) -> g_string_regex(this."str", regex);
+        this."atoi" := lambda(this) -> g_string_atoi(this."str");
+        this."atoi_s" := lambda(this) -> g_string_atoi_s(this."str");
+        this."to_upper" := lambda(this) -> g_string_toupper(this."str");
+        this."to_lower" := lambda(this) -> g_string_tolower(this."str");
+        this."to_number" := lambda(this) -> g_string_to_number(this."str");
+        this."start_with" := lambda(this, obj) -> g_string_start_with(this."str", obj);
+        this."substr" := lambda(this, start, end) -> g_string_substr(this."str", start, end);
+        this."left" := lambda(this, n) -> g_string_left(this."str", n);
+        this."right" := lambda(this, n) -> g_string_right(this."str", n);
     }, "object");
 };
 
 var import_stream_class = func ~(ctx) {
     g_register_class(ctx, "stream::input", lambda(this) {
-        set this::"handle" = g_null;
-        set this::"read" = lambda(this) -> g_read_pipe_once(this."handle");
-        set this::"destroy" = lambda(this) -> g_destroy_pipe(this."handle");
+        this."handle" := g_null;
+        this."read" := lambda(this) -> g_read_pipe_once(this."handle");
+        this."destroy" := lambda(this) -> g_destroy_pipe(this."handle");
     }, "object");
     g_register_class(ctx, "stream::output", lambda(this) {
-        set this::"handle" = g_null;
-        set this::"write" = lambda(this, ch) -> g_write_pipe(this."handle", ch);
-        set this::"writeln" = lambda(this, ch) -> g_write_pipe_n(this."handle", ch);
-        set this::"destroy" = lambda(this) -> g_destroy_pipe(this."handle");
+        this."handle" := g_null;
+        this."write" := lambda(this, ch) -> g_write_pipe(this."handle", ch);
+        this."writeln" := lambda(this, ch) -> g_write_pipe_n(this."handle", ch);
+        this."destroy" := lambda(this) -> g_destroy_pipe(this."handle");
     }, "object");
 };
 
 var import_process_class = func ~(ctx) {
     g_register_class(ctx, "system::process", lambda(this) {
-        set this::"handle" = g_nullptr;
-        set this::"entry" = g_null;
-        set this::"start" = lambda(this, entry) {
+        this."handle" := g_nullptr;
+        this."entry" := g_null;
+        this."start" := lambda(this, entry) {
             if (g_is_valid_handle(this."handle")) { return; }
-            set this::"entry" = entry;
-            set this::"handle" = g_create_user_process(entry);
+            this."entry" := entry;
+            this."handle" := g_create_user_process(entry);
         };
-        set this::"start_args" = lambda(this, entry, args) {
+        this."start_args" := lambda(this, entry, args) {
             if (g_is_valid_handle(this."handle")) { return; }
-            set this::"entry" = entry;
-            set this::"handle" = g_create_user_process_args(entry, args);
+            this."entry" := entry;
+            this."handle" := g_create_user_process_args(entry, args);
         };
-        set this::"stop" = lambda(this) {
+        this."stop" := lambda(this) {
             if (!g_is_valid_handle(this."handle")) { return; }
             g_join_process(this."handle");
         };
@@ -97,8 +97,8 @@ var import_process_class = func ~(ctx) {
 var g_import_std_base = func ~(ctx) {
     // Base class: object
     g_register_class(ctx, "object", lambda(this) {
-        set this::"type" = "object";
-        set this::"to_string" = lambda(this) -> this."__type__";
+        this."type" := "object";
+        this."to_string" := lambda(this) -> this."__type__";
     }, g_null);
     // List
     import_list_class(ctx);

@@ -567,36 +567,36 @@ var stage_class = func ~() {
     print("1. Object");
     print(g_string_rep("-", 16));
     g_register_class(ctx, "shape", lambda(this) {
-        set this::"type" = "shape";
-        set this::"get_area" = lambda(this) -> 0;
-        set this::"get_index" = lambda(this, i) -> i;
+        this."type" := "shape";
+        this."get_area" := lambda(this) -> 0;
+        this."get_index" := lambda(this, i) -> i;
     }, g_null);
     g_register_class(ctx, "square", lambda(this) {
-        set this::"type" = "square";
-        set this::"a" = 0;
-        set this::"b" = 0;
-        set this::"get_area" = lambda(this) -> this."a" * this."b";
-        set this::"to_string" = lambda(this) -> this."type" + " a=" + this."a" + " b=" + this."b" + " area=" + this."get_area"();
+        this."type" := "square";
+        this."a" := 0;
+        this."b" := 0;
+        this."get_area" := lambda(this) -> this."a" * this."b";
+        this."to_string" := lambda(this) -> this."type" + " a=" + this."a" + " b=" + this."b" + " area=" + this."get_area"();
     }, "shape");
     g_register_class(ctx, "circle", lambda(this) {
-        set this::"type" = "circle";
-        set this::"r" = 0;
-        set this::"get_area" = lambda(this) -> 3.14 * this."r" * this."r";
-        set this::"to_string" = lambda(this) -> this."type" + " r=" + this."r" + " area=" + this."get_area"();
+        this."type" := "circle";
+        this."r" := 0;
+        this."get_area" := lambda(this) -> 3.14 * this."r" * this."r";
+        this."to_string" := lambda(this) -> this."type" + " r=" + this."r" + " area=" + this."get_area"();
     }, "shape");
 
     var square = g_create_class(ctx, "square");
-    set square::"a" = 5;
-    set square::"b" = 6;
+    square."a" := 5;
+    square."b" := 6;
     var circle = g_create_class(ctx, "circle");
-    set circle::"r" = 10;
-    set circle::"s" = square;
+    circle."r" := 10;
+    circle."s" := square;
 
     print(square."to_string"());
     print(circle."to_string"());
 
-    set square::"a" = 100;
-    set circle."s"::"b" = 120;
+    square."a" := 100;
+    circle."s"."b" := 120;
 
     print("" + square."type"
         + " a=" + square."a"
@@ -711,7 +711,7 @@ var stage_bash = func ~() {
     g_import_std_base(ctx);
     g_import_std_shell(ctx);
     var shell = g_create_class(ctx, "system::shell");
-    set shell::"out" = out;
+    shell."out" := out;
 
     var exec = func ~(cmd) {
         g_write_pipe_n(out, g_endl + "# " + cmd + g_endl);
