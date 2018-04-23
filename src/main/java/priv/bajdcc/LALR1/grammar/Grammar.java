@@ -241,7 +241,7 @@ public class Grammar extends Semantic {
 				"lambda -> @LAMBDA[1]#lambda# @LPA{lost_lpa} [var_list[2]] @RPA{lost_rpa} (@PTR_OP{lost_func_body} exp[3]{lost_exp} | block[4]{lost_func_body})");
 		/* 基本数据类型 */
 		infer(handler.getSemanticHandler("type"),
-				"type -> @ID[0] [(@LPA[3] [exp_list[4]] @RPA{lost_rpa}) | (@LSQ exp[5]{lost_exp} @RSQ{lost_rpa})] | @INTEGER[0] | @DECIMAL[0] | @LITERAL[0] | @CHARACTER[0] | @BOOLEAN[0] | @LPA exp[1]{lost_exp} @RPA{lost_rpa} | call[1] | lambda[2] | set[1] | invoke[1] | array[1] | map[1]");
+				"type -> @ID[0] [(@LPA[3] [exp_list[4]] @RPA{lost_rpa}) | (@LSQ exp[5]{lost_exp} @RSQ{lost_rpa})] | @INTEGER[0] | @DECIMAL[0] | @LITERAL[0] [@LPA[3] [exp_list[4]] @RPA{lost_rpa}] | @CHARACTER[0] | @BOOLEAN[0] | @LPA exp[1]{lost_exp} @RPA{lost_rpa} | call[1] | lambda[2] | set[1] | invoke[1] | array[1] | map[1]");
 		/* 条件语句 */
 		infer(handler.getSemanticHandler("if"),
 				"if -> @IF @LPA{lost_lpa} exp[0]{lost_exp} @RPA{lost_rpa} block[1]{lost_block} [@ELSE (block[2]{lost_block} | if[3]{lost_block})]");

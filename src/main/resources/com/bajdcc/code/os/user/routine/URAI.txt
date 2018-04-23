@@ -57,7 +57,7 @@ g_register_class(ctx, "app::ai::node.base", lambda(this) {
         if (g_is_null(this."children")) {
             set this::"children" = g_create_class(ctx, "list::array");
         }
-        invoke this."children"::"add"(node);
+        this."children"."add"(node);
         set node::"parent" = this;
         return this;
     };
@@ -65,7 +65,7 @@ g_register_class(ctx, "app::ai::node.base", lambda(this) {
         if (g_is_null(this."children")) {
             set this::"children" = g_create_class(ctx, "list::array");
         }
-        invoke this."children"::"insert"(i, node);
+        this."children"."insert"(i, node);
         set node::"parent" = this;
         return this;
     };
@@ -75,17 +75,17 @@ g_register_class(ctx, "app::ai::node.base", lambda(this) {
         return this;
     };
     set this::"evaluate" = lambda(this, input) { // 测试
-        var ret = g_is_null(this."cond") || invoke this."cond"::"evaluate"(input);
-        return ret && invoke this::"do_evaluate"(input);
+        var ret = g_is_null(this."cond") || this."cond"."evaluate"(input);
+        return ret && this."do_evaluate"(input);
     };
     set this::"tick" = lambda(this, input, output) { // 定时
-        return invoke this::"do_tick"(input, output);
+        return this."do_tick"(input, output);
     };
     set this::"leave" = lambda(this, input) { // 离开
-        return invoke this::"do_leave"(input);
+        return this."do_leave"(input);
     };
     set this::"check_index" = lambda(this, i) { // 检查越界
-        return !g_is_null(this."children") && i >= 0 && i < invoke this."children"::"size"();
+        return !g_is_null(this."children") && i >= 0 && i < this."children"."size"();
     };
 }, "object");
 
@@ -107,15 +107,15 @@ g_register_class(ctx, "app::ai::node.loop", lambda(this) {
         if ((this."loop_count" != -1) && (this."current_loop" >= this."loop_count")) {
             return false;
         }
-        if (invoke this::"check_index"(0) && invoke (invoke this."children"::"get"(0))::"evaluate"(input)) {
+        if (this."check_index"(0) && this."children"."get"(0)."evaluate"(input)) {
             return true;
         }
         return false;
     });
     g_hook_add_before(this, "do_tick", lambda(class, name, this, next, input, output) { // 定时事件
         var is_finish = STATE_FINISH;
-        if (invoke this::"check_index"(0)) {
-            is_finish := invoke (invoke this."children"::"get"(0))::"tick"(input, output);
+        if (this."check_index"(0)) {
+            is_finish := this."children"."get"(0)."tick"(input, output);
             if (is_finish == STATE_FINISH) {
                 if (this."loop_count" == -1) {
                     is_finish := STATE_EXECUTING;
@@ -133,8 +133,8 @@ g_register_class(ctx, "app::ai::node.loop", lambda(this) {
         return is_finish;
     });
     g_hook_add_before(this, "do_leave", lambda(class, name, this, next, input) { // 离开事件
-        if (invoke this::"check_index"(0)) {
-            invoke (invoke this."children"::"get"(0))::"do_leave"(input);
+        if (this."check_index"(0)) {
+            this."children"."get"(0)."do_leave"(input);
         }
         set this::"current_loop" = 0;
     });
@@ -159,66 +159,66 @@ g_register_class(ctx, "app::ai::node.parallel", lambda(this) {
     set this::"children_status" = g_create_class(ctx, "list::array"); // 子结点测试状态
     /* 事件 */
     g_hook_add_before(this, "do_evaluate", lambda(class, name, this, next, input) { // 测试事件
-        var len = invoke this."children"::"size"();
+        var len = this."children"."size"();
         for (var i = 0; i < len; i++) {
-            if (invoke this."children_status"::"get"(i) == STATE_EXECUTING &&
-                !invoke (invoke this."children"::"get"(i))::"evaluate"(input)) {
+            if (this."children_status"."get"(i) == STATE_EXECUTING &&
+                !this."children"."get"(i)."evaluate"(input)) {
                 return false;
             }
         }
         return true;
     });
     g_hook_add_before(this, "do_tick", lambda(class, name, this, next, input, output) { // 定时事件
-        var len = invoke this."children"::"size"();
+        var len = this."children"."size"();
         var status = -1;
         if (this."or") {
             for (var i = 0; i < len; i++) {
-                status := invoke this."children_status"::"get"(i);
+                status := this."children_status"."get"(i);
                 if (status == STATE_EXECUTING) {
-                    status := invoke (invoke this."children"::"get"(i))::"tick"(input, output);
-                    invoke this."children_status"::"set"(i, status);
+                    status := this."children"."get"(i)."tick"(input, output);
+                    this."children_status"."set"(i, status);
                 }
                 if (status != STATE_EXECUTING) {
-                    invoke this::"reset_status"();
+                    this."reset_status"();
                     return STATE_FINISH;
                 }
             }
         } else {
             var count = 0;
             for (var i = 0; i < len; i++) {
-                status := invoke this."children_status"::"get"(i);
+                status := this."children_status"."get"(i);
                 if (status == STATE_EXECUTING) {
-                    status := invoke (invoke this."children"::"get"(i))::"tick"(input, output);
-                    invoke this."children_status"::"set"(i, status);
+                    status := this."children"."get"(i)."tick"(input, output);
+                    this."children_status"."set"(i, status);
                 }
                 if (status != STATE_EXECUTING) {
                     count++;
                 }
             }
             if (count == len) {
-                invoke this::"reset_status"();
+                this."reset_status"();
                 return STATE_FINISH;
             }
         }
         return STATE_EXECUTING;
     });
     g_hook_add_before(this, "do_leave", lambda(class, name, this, next, input) { // 离开事件
-        invoke this::"reset_status"();
+        this."reset_status"();
         foreach (var i : g_range_array(this."children"."array")) {
-            invoke i::"leave"(input);
+            i."leave"(input);
         }
     });
     /* 方法 */
     g_hook_insert_before(this, "add_child", lambda(class, name, this, next, node) {
-        invoke this."children_status"::"add"(STATE_EXECUTING);
+        this."children_status"."add"(STATE_EXECUTING);
         return next();
     });
     g_hook_insert_before(this, "add_child_at", lambda(class, name, this, next, node, i) {
-        invoke this."children_status"::"insert"(i, STATE_EXECUTING);
+        this."children_status"."insert"(i, STATE_EXECUTING);
         return next();
     });
     set this::"reset_status" = lambda(this) { // 重置状态
-        invoke this."children_status"::"fill"(STATE_EXECUTING);
+        this."children_status"."fill"(STATE_EXECUTING);
     };
 }, "app::ai::node.base");
 
@@ -242,7 +242,7 @@ g_register_class(ctx, "app::ai::node.sequence", lambda(this) {
         if (index == -1) {
             index := 0;
         }
-        if (invoke this::"check_index"(index) && invoke (invoke this."children"::"get"(index))::"evaluate"(input)) {
+        if (this."check_index"(index) && this."children"."get"(index)."evaluate"(input)) {
             return true;
         }
         return false;
@@ -252,11 +252,11 @@ g_register_class(ctx, "app::ai::node.sequence", lambda(this) {
         if (this."current" == -1) {
             set this::"current" = 0;
         }
-        if (invoke this::"check_index"(this."current")) {
-            is_finish := invoke (invoke this."children"::"get"(this."current"))::"tick"(input, output);
+        if (this."check_index"(this."current")) {
+            is_finish := this."children"."get"(this."current")."tick"(input, output);
             if (is_finish == STATE_FINISH) {
                 set this::"current" = this."current" + 1;
-                if (this."current" == invoke this."children"::"size"()) {
+                if (this."current" == this."children"."size"()) {
                     set this::"current" = -1;
                 } else {
                     is_finish := STATE_EXECUTING;
@@ -269,8 +269,8 @@ g_register_class(ctx, "app::ai::node.sequence", lambda(this) {
         return is_finish;
     });
     g_hook_add_before(this, "do_leave", lambda(class, name, this, next, input) { // 离开事件
-        if (invoke this::"check_index"(this."current")) {
-            invoke (invoke this."children"::"get"(this."current"))::"do_leave"(input);
+        if (this."check_index"(this."current")) {
+            this."children"."get"(this."current")."do_leave"(input);
         }
         set this::"current" = -1;
     });
@@ -292,9 +292,9 @@ g_register_class(ctx, "app::ai::node.priority", lambda(this) {
     /* 事件 */
     g_hook_add_before(this, "do_evaluate", lambda(class, name, this, next, input) { // 测试事件
         set this::"current" = -1;
-        var len = invoke this."children"::"size"();
+        var len = this."children"."size"();
         for (var i = 0; i < len; i++) {
-            if (invoke (invoke this."children"::"get"(i))::"evaluate"(input)) {
+            if (this."children"."get"(i)."evaluate"(input)) {
                 set this::"current" = i;
                 return true;
             }
@@ -303,16 +303,16 @@ g_register_class(ctx, "app::ai::node.priority", lambda(this) {
     });
     g_hook_add_before(this, "do_tick", lambda(class, name, this, next, input, output) { // 定时事件
         var is_finish = STATE_FINISH;
-        if (invoke this::"check_index"(this."current")) {
+        if (this."check_index"(this."current")) {
             if (this."current" != this."last") {
-                if (invoke this::"check_index"(this."last")) {
-                    invoke (invoke this."children"::"get"(this."last"))::"leave"(input);
+                if (this."check_index"(this."last")) {
+                    this."children"."get"(this."last")."leave"(input);
                 }
                 set this::"last" = this."current";
             }
         }
-        if (invoke this::"check_index"(this."last")) {
-            is_finish := invoke (invoke this."children"::"get"(this."last"))::"tick"(input, output);
+        if (this."check_index"(this."last")) {
+            is_finish := this."children"."get"(this."last")."tick"(input, output);
             if (is_finish == STATE_FINISH) {
                 set this::"last" = -1;
             }
@@ -320,8 +320,8 @@ g_register_class(ctx, "app::ai::node.priority", lambda(this) {
         return is_finish;
     });
     g_hook_add_before(this, "do_leave", lambda(class, name, this, next, input) { // 离开事件
-        if (invoke this::"check_index"(this."last")) {
-            invoke (invoke this."children"::"get"(this."last"))::"do_leave"(input);
+        if (this."check_index"(this."last")) {
+            this."children"."get"(this."last")."do_leave"(input);
         }
         set this::"last" = -1;
     });
@@ -339,8 +339,8 @@ g_register_class(ctx, "app::ai::node.priority", lambda(this) {
 g_register_class(ctx, "app::ai::node.priority.always", lambda(this) {
     /* 事件 */
     g_hook_insert_before(this, "do_evaluate", lambda(class, name, this, next, input) { // 测试事件
-        if (invoke this::"check_index"(this."current") &&
-            invoke (invoke this."children"::"get"(this."current"))::"evaluate"(input)) {
+        if (this."check_index"(this."current") &&
+            this."children"."get"(this."current")."evaluate"(input)) {
             return true;
         }
         return next();
@@ -366,22 +366,22 @@ g_register_class(ctx, "app::ai::node.terminal", lambda(this) {
     g_hook_add_before(this, "do_tick", lambda(class, name, this, next, input, output) { // 定时事件
         var is_finish = STATE_FINISH;
         if (this."status" == STATUS_READY) {
-            //invoke this::"log_enter"();
-            invoke this::"do_enter"(input);
+            //this."log_enter"();
+            this."do_enter"(input);
             set this::"status" = STATUS_RUNNING;
             set this::"need_exit" = true;
         }
         if (this."status" == STATUS_RUNNING) {
-            //invoke this::"log_execute"();
-            is_finish := invoke this::"do_execute"(input, output);
+            //this."log_execute"();
+            is_finish := this."do_execute"(input, output);
             if (is_finish == STATE_FINISH || is_finish < 0) {
                 set this::"status" = STATUS_FINISH;
             }
         }
         if (this."status" == STATUS_FINISH) {
             if (this."need_exit") {
-                //invoke this::"log_exit"();
-                invoke this::"do_exit"(input, is_finish);
+                //this."log_exit"();
+                this."do_exit"(input, is_finish);
             }
             set this::"status" = STATUS_READY;
             set this::"need_exit" = false;
@@ -390,28 +390,28 @@ g_register_class(ctx, "app::ai::node.terminal", lambda(this) {
     });
     g_hook_add_before(this, "do_leave", lambda(class, name, this, next, input) { // 离开事件
         if (this."need_exit") {
-            invoke this::"do_exit"(input, STATE_ERROR);
+            this."do_exit"(input, STATE_ERROR);
         }
         set this::"status" = STATUS_READY;
         set this::"need_exit" = false;
     });
     /* 调试 */
     /*g_hook_add_before(this, "do_enter", lambda(class, name, this, next, input) {
-        invoke this::"log_enter"();
+        this."log_enter"();
         return next();
     });
     g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
-        invoke this::"log_execute"();
+        this."log_execute"();
         return next();
     });
     g_hook_add_before(this, "do_exit", lambda(class, name, this, next, input, id) {
-        invoke this::"log_exit"();
+        this."log_exit"();
         return next();
     });*/
     set this::"log" = lambda(this, str) -> log(g_ui_fg(15, 120, 15) + "[" + this."name" + "] " + g_ui_fgc() + str);
-    set this::"log_enter" = lambda(this) -> invoke this::"log"("Enter");
-    set this::"log_execute" = lambda(this) -> invoke this::"log"("Execute");
-    set this::"log_exit" = lambda(this) -> invoke this::"log"("Exit");
+    set this::"log_enter" = lambda(this) -> this."log"("Enter");
+    set this::"log_execute" = lambda(this) -> this."log"("Execute");
+    set this::"log_exit" = lambda(this) -> this."log"("Exit");
 }, "app::ai::node.base");
 
 
@@ -439,7 +439,7 @@ g_register_class(ctx, "app::ai::cond.not", lambda(this) {
     set this::"cond" = _; // 条件
     /* 事件 */
     g_hook_add_before(this, "evaluate", lambda(class, name, this, next, input) {
-        return !invoke this."cond"::"evaluate"(input);
+        return !this."cond"."evaluate"(input);
     });
     /* 方法 */
     g_hook_add_before(this, "init", lambda(class, name, this, next, cond) {
@@ -479,7 +479,7 @@ g_register_class(ctx, "app::ai::cond.and", lambda(this) {
     /* 事件 */
     g_hook_add_before(this, "evaluate", lambda(class, name, this, next, input) {
         foreach (var i : g_range_array(this."cond")) {
-            if (!invoke i::"evaluate"(input)) {
+            if (!i."evaluate"(input)) {
                 return false;
             }
         }
@@ -501,7 +501,7 @@ g_register_class(ctx, "app::ai::cond.or", lambda(this) {
     /* 事件 */
     g_hook_add_before(this, "evaluate", lambda(class, name, this, next, input) {
         foreach (var i : g_range_array(this."cond")) {
-            if (invoke i::"evaluate"(input)) {
+            if (i."evaluate"(input)) {
                 return true;
             }
         }
@@ -518,11 +518,11 @@ g_register_class(ctx, "app::ai::cond.or", lambda(this) {
 g_register_class(ctx, "app::ai::node.terminal::test.face_to", lambda(this) {
     set this::"name" = "FaceTo";
     g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
-        var target = invoke input::"get"("target");
-        var p = invoke input::"get"("p");
+        var target = input."get"("target");
+        var p = input."get"("p");
         var d = [target[0] - p[0], target[1] - p[1]];
-        invoke this::"log"("目的地为 (" + g_floor(target[0], 2) + ", " + g_floor(target[1], 2) + ")");
-        invoke output::"put"("dir", g_atan2(d[1], d[0]));
+        this."log"("目的地为 (" + g_floor(target[0], 2) + ", " + g_floor(target[1], 2) + ")");
+        output."put"("dir", g_atan2(d[1], d[0]));
         return STATE_FINISH;
     });
 }, "app::ai::node.terminal");
@@ -531,21 +531,21 @@ g_register_class(ctx, "app::ai::node.terminal::test.move_to", lambda(this) {
     set this::"name" = "MoveTo";
     set this::"v" = 10.0;
     g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
-        var target = invoke input::"get"("target");
-        var p = invoke input::"get"("p");
-        var v = invoke input::"get"("v");
+        var target = input."get"("target");
+        var p = input."get"("p");
+        var v = input."get"("v");
         var d = [target[0] - p[0], target[1] - p[1]];
         var dl = g_sqrt_double(d[0] * d[0] + d[1] * d[1]);
         var vl = g_sqrt_double(v[0] * v[0] + v[1] * v[1]);
         if (dl < vl) {
-            invoke output::"put"("p", g_new(target));
+            output."put"("p", g_new(target));
             return STATE_FINISH;
         }
         d := [this."v" * d[0] / dl, this."v" * d[1] / dl];
-        invoke output::"put"("v", d);
-        invoke output::"put"("p", [p[0] + d[0], p[1] + d[1]]);
-        invoke output::"put"("dir", g_atan2(d[1], d[0]));
-        invoke this::"log"("当前位置 (" + g_floor(p[0], 2) + ", " + g_floor(p[1], 2) + ")");
+        output."put"("v", d);
+        output."put"("p", [p[0] + d[0], p[1] + d[1]]);
+        output."put"("dir", g_atan2(d[1], d[0]));
+        this."log"("当前位置 (" + g_floor(p[0], 2) + ", " + g_floor(p[1], 2) + ")");
         return STATE_EXECUTING;
     });
 }, "app::ai::node.terminal");
@@ -555,7 +555,7 @@ g_register_class(ctx, "app::ai::node.terminal::test.look_around", lambda(this) {
     set this::"ticks" = 0;
     set this::"times" = 0;
     g_hook_add_before(this, "do_enter", lambda(class, name, this, next, input) {
-        invoke this::"log"("四处查看");
+        this."log"("四处查看");
         set this::"ticks" = -1;
         set this::"times" = 3 + g_random_int(3);
     });
@@ -563,16 +563,16 @@ g_register_class(ctx, "app::ai::node.terminal::test.look_around", lambda(this) {
         set this::"ticks" = this."ticks" + 1;
         if (this."ticks" % 12 == 0) {
             set this::"times" = this."times" - 1;
-            invoke output::"put"("dir", g_PI_2 * g_random);
+            output."put"("dir", g_PI_2 * g_random);
         }
         if (this."times" > 0) {
             return STATE_EXECUTING;
         }
-        var dir = invoke output::"get"("dir");
-        var v = invoke input::"get"("v");
+        var dir = output."get"("dir");
+        var v = input."get"("v");
         var vl = g_sqrt_double(v[0] * v[0] + v[1] * v[1]);
-        invoke output::"put"("v", [g_cos(dir) * vl, g_sin(dir) * vl]);
-        invoke input::"put"("reached_target", true);
+        output."put"("v", [g_cos(dir) * vl, g_sin(dir) * vl]);
+        input."put"("reached_target", true);
         return STATE_FINISH;
     });
 }, "app::ai::node.terminal");
@@ -581,7 +581,7 @@ g_register_class(ctx, "app::ai::node.terminal::test.idle", lambda(this) {
     set this::"name" = "Idle";
     set this::"ticks" = 0;
     g_hook_add_before(this, "do_enter", lambda(class, name, this, next, input) {
-        invoke this::"log"("空闲状态");
+        this."log"("空闲状态");
         set this::"ticks" = 30;
     });
     g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
@@ -601,17 +601,17 @@ g_register_class(ctx, "app::ai::node.terminal::test.hovering", lambda(this) {
         set this::"ticks" = 0;
     });
     g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
-        invoke this::"log"("徘徊");
-        var p = invoke input::"get"("p");
-        var v = invoke input::"get"("v");
+        this."log"("徘徊");
+        var p = input."get"("p");
+        var v = input."get"("v");
         set this::"ticks" = this."ticks" + 1;
         if (this."ticks" % 20 == 0) {
             v := [0.0 - v[0], 0.0 - v[1]];
         }
         var vl = g_sqrt_double(v[0] * v[0] + v[1] * v[1]);
-        invoke output::"put"("v", [this."v" * v[0] / vl, this."v" * v[1] / vl]);
-        invoke output::"put"("p", [p[0] + v[0], p[1] + v[1]]);
-        invoke output::"put"("dir", g_atan2(v[1], v[0]));
+        output."put"("v", [this."v" * v[0] / vl, this."v" * v[1] / vl]);
+        output."put"("p", [p[0] + v[0], p[1] + v[1]]);
+        output."put"("dir", g_atan2(v[1], v[0]));
         return STATE_EXECUTING;
     });
 }, "app::ai::node.terminal");
@@ -619,7 +619,7 @@ g_register_class(ctx, "app::ai::node.terminal::test.hovering", lambda(this) {
 g_register_class(ctx, "app::ai::node.terminal::test.smoking", lambda(this) {
     set this::"name" = "Smoking";
     g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
-        invoke this::"log"("抽烟");
+        this."log"("抽烟");
         return STATE_FINISH;
     });
 }, "app::ai::node.terminal");
@@ -631,28 +631,28 @@ g_register_class(ctx, "app::ai::node.terminal::test.coughing", lambda(this) {
         set this::"times" = 5;
     });
     g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
-        invoke this::"log"("咳嗽");
+        this."log"("咳嗽");
         set this::"times" = this."times" - 1;
         if (this."times" > 0) {
             return STATE_EXECUTING;
         }
         var r = g_random;
-        invoke this::"log"("换一处地方");
-        invoke input::"put"("reached_target", false);
-        invoke input::"put"("target", [g_cos(r) * 100.0, g_sin(r) * 100.0]);
+        this."log"("换一处地方");
+        input."put"("reached_target", false);
+        input."put"("target", [g_cos(r) * 100.0, g_sin(r) * 100.0]);
         return STATE_FINISH;
     });
 }, "app::ai::node.terminal");
 
 g_register_class(ctx, "app::ai::cond::test.reached_target", lambda(this) {
     g_hook_add_before(this, "evaluate", lambda(class, name, this, next, input) {
-        return !invoke input::"get"("reached_target");
+        return !input."get"("reached_target");
     });
 }, "app::ai::cond.base");
 
 g_register_class(ctx, "app::ai::cond::test.smoke", lambda(this) {
     g_hook_add_before(this, "evaluate", lambda(class, name, this, next, input) {
-        return invoke input::"get"("reached_target") && g_random_int(5) == 0;
+        return input."get"("reached_target") && g_random_int(5) == 0;
     });
 }, "app::ai::cond.base");
 
@@ -676,14 +676,14 @@ g_register_class(ctx, "app::ai::test", lambda(this) {
         set this::"input" = g_create_class(ctx, "list::map");
         set this::"output" = g_create_class(ctx, "list::map");
 
-        invoke this."input"::"put"("out", out);
-        invoke this."input"::"put"("target", [100.0, 100.0]);
-        invoke this."input"::"put"("p", [0.0, 0.0]);
-        invoke this."input"::"put"("v", [0.0, 0.0]);
-        invoke this."input"::"put"("reached_target", false);
-        invoke this."output"::"put"("p", [0.0, 0.0]);
-        invoke this."output"::"put"("v", [0.0, 0.0]);
-        invoke this."output"::"put"("dir", 0);
+        this."input"."put"("out", out);
+        this."input"."put"("target", [100.0, 100.0]);
+        this."input"."put"("p", [0.0, 0.0]);
+        this."input"."put"("v", [0.0, 0.0]);
+        this."input"."put"("reached_target", false);
+        this."output"."put"("p", [0.0, 0.0]);
+        this."output"."put"("v", [0.0, 0.0]);
+        this."output"."put"("dir", 0);
 
         set this::"root" = g_new_class(ctx, "app::ai::node.priority",
             [["name", "root"]],
@@ -705,12 +705,12 @@ g_register_class(ctx, "app::ai::test", lambda(this) {
                         [["set_cond", g_create_class(ctx, "app::ai::cond::test.cough")]])]])]])]]);
     };
     set this::"tick" = lambda(this) { // 每帧事件
-        invoke this."input"::"put"("p", g_new(invoke this."output"::"get"("p")));
-        invoke this."input"::"put"("v", g_new(invoke this."output"::"get"("v")));
-        invoke this."input"::"put"("status", g_new(invoke this."output"::"get"("status")));
+        this."input"."put"("p", g_new(this."output"."get"("p")));
+        this."input"."put"("v", g_new(this."output"."get"("v")));
+        this."input"."put"("status", g_new(this."output"."get"("status")));
 
-        if (invoke this."root"::"evaluate"(this."input")) {
-            invoke this."root"::"tick"(this."input", this."output");
+        if (this."root"."evaluate"(this."input")) {
+            this."root"."tick"(this."input", this."output");
         }
     };
 }, "object");
@@ -719,10 +719,10 @@ g_register_class(ctx, "app::ai::test", lambda(this) {
 // -----------------------------------------------------------------------------------------
 
 var test = g_create_class(ctx, "app::ai::test");
-invoke test::"init"(log);
+test."init"(log);
 
 while (g_query_share(signal)) {
-    invoke test::"tick"();
+    test."tick"();
     g_task_sleep_ms_signal(60, signal);
 }
 

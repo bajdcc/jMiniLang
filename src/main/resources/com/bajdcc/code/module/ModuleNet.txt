@@ -272,7 +272,7 @@ var sshd_msg_receive = func ~(port) {
             };
             var out_pid = g_create_user_process_args(out_proc, buf);
             set shell::"out" = out;
-            invoke shell::"exec"(content);
+            shell."exec"(content);
             var str = g_string_build(buf);
             g_destroy_pipe(out);
             g_net_msg_server_send_with_origin(str, origin);

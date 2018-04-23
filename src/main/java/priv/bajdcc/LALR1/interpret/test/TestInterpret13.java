@@ -100,7 +100,18 @@ public class TestInterpret13 {
 							"catch{\n" +
 							"  yield 4;throw 2;}};\n" +
 							"/*g_set_debug(true);*/\n" +
-							"try{foreach(var k : b()){g_printn(k);}}catch{g_printn(5);}\n"
+							"try{foreach(var k : b()){g_printn(k);}}catch{g_printn(5);}\n",
+
+					"import \"sys.base\";\n" +
+					"import \"sys.class\";\n" +
+					"import \"std.base\";\n" +
+							"var ctx = g_create_context();\n" +
+							"g_import_std_base(ctx);\n" +
+							"var a = g_create_class(ctx, \"list::array\");\n" +
+							"var b = g_create_class(ctx, \"list::array\");\n" +
+							"a.\"add\"(b);\n" +
+							"b.\"add\"(0);\n" +
+							"g_printn(a.\"get\"(0).\"size\"());"
 			};
 
 			Interpreter interpreter = new Interpreter();
@@ -119,8 +130,9 @@ public class TestInterpret13 {
 			e.printStackTrace();
 		} catch (SyntaxException e) {
 			System.err.println();
-			System.err.println(e.getPosition() + "," + e.getMessage() + " "
-					+ e.getInfo());
+			System.err.println(String.format("模块名：%s. 位置：%s. 错误：%s-%s(%s:%d)",
+					e.getPageName(), e.getPosition(), e.getMessage(),
+					e.getInfo(), e.getFileName(), e.getPosition().iLine + 1));
 			e.printStackTrace();
 		} catch (RuntimeException e) {
 			System.err.println();

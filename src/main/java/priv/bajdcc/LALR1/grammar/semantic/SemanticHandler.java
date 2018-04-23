@@ -7,6 +7,7 @@ import priv.bajdcc.LALR1.grammar.type.TokenTools;
 import priv.bajdcc.LALR1.semantic.token.ISemanticAction;
 import priv.bajdcc.LALR1.semantic.token.ISemanticAnalyzer;
 import priv.bajdcc.util.lexer.token.KeywordType;
+import priv.bajdcc.util.lexer.token.OperatorType;
 import priv.bajdcc.util.lexer.token.Token;
 import priv.bajdcc.util.lexer.token.TokenType;
 
@@ -133,6 +134,12 @@ public class SemanticHandler {
 		/* 表达式 */
 		mapSemanticAnalyzier.put("exp", (indexed, query, recorder) -> {
 			if (indexed.exists(2)) {// 双目运算
+				Token token = indexed.get(2).token;
+				if (token.kToken == TokenType.OPERATOR && token.object == OperatorType.DOT && indexed.get(0).object instanceof ExpInvokeProperty) {
+					ExpInvokeProperty invoke = (ExpInvokeProperty) indexed.get(0).object;
+					invoke.setObj((IExp) indexed.get(1).object);
+					return invoke;
+				}
 				ExpBinop binop = new ExpBinop();
 				binop.setToken(indexed.get(2).token);
 				binop.setLeftOperand((IExp) indexed.get(1).object);
@@ -174,28 +181,40 @@ public class SemanticHandler {
 			} else if (indexed.exists(2)) {
 				return indexed.get(2).object;
 			} else if (indexed.exists(3)) {
-				ExpInvoke invoke = new ExpInvoke();
 				Token token = indexed.get(0).token;
-				invoke.setName(token);
-				Function func = query.getQueryScopeService().getFuncByName(
-						token.toRealString());
-				if (func == null) {
-					if (TokenTools.isExternalName(token)) {
-						invoke.setExtern(token);
-					} else if (query.getQueryScopeService()
-							.findDeclaredSymbol(token.toRealString())) {
-						invoke.setExtern(token);
-						invoke.setInvoke(true);
+				if (token.kToken == TokenType.ID) {
+					ExpInvoke invoke = new ExpInvoke();
+					invoke.setName(token);
+					Function func = query.getQueryScopeService().getFuncByName(
+							token.toRealString());
+					if (func == null) {
+						if (TokenTools.isExternalName(token)) {
+							invoke.setExtern(token);
+						} else if (query.getQueryScopeService()
+								.findDeclaredSymbol(token.toRealString())) {
+							invoke.setExtern(token);
+							invoke.setInvoke(true);
+						} else {
+							recorder.add(SemanticError.MISSING_FUNCNAME, token);
+						}
 					} else {
-						recorder.add(SemanticError.MISSING_FUNCNAME, token);
+						invoke.setFunc(func);
 					}
+					if (indexed.exists(4)) {
+						invoke.setParams((ArrayList<IExp>) indexed.get(4).object);
+					}
+					return invoke;
 				} else {
-					invoke.setFunc(func);
+					ExpInvokeProperty invoke = new ExpInvokeProperty();
+					invoke.setToken(token);
+					ExpValue value = new ExpValue();
+					value.setToken(token);
+					invoke.setProperty(value);
+					if (indexed.exists(4)) {
+						invoke.setParams((ArrayList<IExp>) indexed.get(4).object);
+					}
+					return invoke;
 				}
-				if (indexed.exists(4)) {
-					invoke.setParams((ArrayList<IExp>) indexed.get(4).object);
-				}
-				return invoke;
 			} else if (indexed.exists(5)) {
 				ExpIndex exp = new ExpIndex();
 				exp.setToken(indexed.get(0).token);
