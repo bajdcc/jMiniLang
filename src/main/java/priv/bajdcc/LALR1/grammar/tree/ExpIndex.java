@@ -16,22 +16,14 @@ import priv.bajdcc.util.lexer.token.TokenType;
 public class ExpIndex implements IExp {
 
 	/**
-	 * 单词
-	 */
-	private Token token = null;
-
-	/**
-	 * 单词
+	 * 对象
 	 */
 	private IExp exp = null;
 
-	public Token getToken() {
-		return token;
-	}
-
-	public Token setToken(Token token) {
-		return this.token = token;
-	}
+	/**
+	 * 索引
+	 */
+	private IExp index = null;
 
 	public IExp getExp() {
 		return exp;
@@ -39,6 +31,14 @@ public class ExpIndex implements IExp {
 
 	public void setExp(IExp exp) {
 		this.exp = exp;
+	}
+
+	public IExp getIndex() {
+		return index;
+	}
+
+	public void setIndex(IExp index) {
+		this.index = index;
 	}
 
 	@Override
@@ -53,19 +53,20 @@ public class ExpIndex implements IExp {
 
 	@Override
 	public IExp simplify(ISemanticRecorder recorder) {
+		exp = exp.simplify(recorder);
 		return this;
 	}
 
 	@Override
 	public void analysis(ISemanticRecorder recorder) {
-
+		exp.analysis(recorder);
+		index.analysis(recorder);
 	}
 
 	@Override
 	public void genCode(ICodegen codegen) {
-		codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(token.object));
-		codegen.genCode(RuntimeInst.iloadv);
 		exp.genCode(codegen);
+		index.genCode(codegen);
 		codegen.genCode(RuntimeInst.iidx);
 	}
 
@@ -77,18 +78,17 @@ public class ExpIndex implements IExp {
 	@Override
 	public String print(StringBuilder prefix) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(token.toRealString());
-		sb.append(OperatorType.LSQUARE.getName());
 		sb.append(exp.print(prefix));
+		sb.append(OperatorType.LSQUARE.getName());
+		sb.append(index.print(prefix));
 		sb.append(OperatorType.RSQUARE.getName());
 		return sb.toString();
 	}
 
 	@Override
 	public void addClosure(IClosureScope scope) {
-		if (token.kToken == TokenType.ID) {
-			scope.addRef(token.object);
-		}
+		exp.addClosure(scope);
+		index.addClosure(scope);
 	}
 
 	@Override

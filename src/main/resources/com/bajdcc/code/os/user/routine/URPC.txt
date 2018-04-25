@@ -413,6 +413,8 @@ g_register_class(ctx, "app::ai::node.terminal", lambda(this) {
         this."log_exit"();
         return next();
     });*/
+    this."logd" := lambda(this, name, str) -> logn(g_ui_fg(120, 15, 15) + "[" + name + "]" + g_ui_fgc() +
+        g_ui_fg(15, 120, 15) + "[" + this."name" + "] " + g_ui_fgc() + str);
     this."log" := lambda(this, str) -> logn(g_ui_fg(15, 120, 15) + "[" + this."name" + "] " + g_ui_fgc() + str);
     this."log_enter" := lambda(this) -> this."log"("Enter");
     this."log_execute" := lambda(this) -> this."log"("Execute");
@@ -520,6 +522,38 @@ g_register_class(ctx, "app::ai::cond.or", lambda(this) {
 
 // #################################################################
 
+var valid_zone = func ~(a, b) {
+    var min_w = a["w"] > b["w"] ? b["w"] : a["w"];
+    var min_h = a["h"] > b["h"] ? b["h"] : a["h"];
+    var xx = a["x"] > b["x"] ? (a["x"] - b["x"]) : (b["x"] - a["x"]);
+    var yy = a["y"] > b["y"] ? (a["y"] - b["y"]) : (b["y"] - a["y"]);
+    return xx < min_w && yy < min_h;
+};
+
+var distance = func ~(a, b) {
+    var xx = a["x"] > b["x"] ? (a["x"] - b["x"]) : (b["x"] - a["x"]);
+    var yy = a["y"] > b["y"] ? (a["y"] - b["y"]) : (b["y"] - a["y"]);
+    return xx + yy;
+};
+
+/* -----------------------------------------------------------------
+# CLASS [app::pc::level#1.cond]
+# 底层网络感知 - 条件
+----------------------------------------------------------------- */
+g_register_class(ctx, "app::pc::level#1.cond", lambda(this) {
+    g_hook_add_before(this, "evaluate", lambda(class, name, this, next, input) {
+        if (input["status"]["#1"]["delay"] > 10) {
+            if (input["status"]["#1"]["delay"] > 60) {
+                g_map_put(input["status"]["#1"], "delay", 0);
+            } else {
+                g_map_put(input["status"]["#1"], "delay", input["status"]["#1"]["delay"] + 1);
+            }
+            return false;
+        }
+        return true;
+    });
+}, "app::ai::cond.base");
+
 /* -----------------------------------------------------------------
 # CLASS [app::pc::level#1.broadcast]
 # 底层网络感知 - 广播
@@ -528,14 +562,26 @@ g_register_class(ctx, "app::pc::level#1.broadcast", lambda(this) {
     this."name" := "level#1.broadcast";
     this."times" := 0;
     g_hook_add_before(this, "do_enter", lambda(class, name, this, next, input) {
-        this."times" := 5;
+        this."times" := 2;
     });
     g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
-        this."log"("broadcast");
         this."times" := this."times" - 1;
         if (this."times" > 0) {
             return STATE_EXECUTING;
         }
+        this."logd"(input["name"], "广播路由表");
+        foreach (var pc : g_range_array(output."pc"."values"())) {
+            if (input["name"] != pc["name"] && valid_zone(input["status"], pc["status"])) {
+                (pc["status"]["#1"]["queue"])."insert"(0, {
+                    "origin": input["name"],
+                    "pass": input["name"],
+                    "time": g_task_get_timestamp() - distance(input["status"], pc["status"]),
+                    "ttl": 10,
+                    "route": input["status"]["#1"]["route"]
+                });
+            }
+        }
+        g_map_put(input["status"]["#1"], "delay", input["status"]["#1"]["delay"] + 1);
         return STATE_FINISH;
     });
 }, "app::ai::node.terminal");
@@ -548,13 +594,39 @@ g_register_class(ctx, "app::pc::level#1.receive", lambda(this) {
     this."name" := "level#1.receive";
     this."times" := 0;
     g_hook_add_before(this, "do_enter", lambda(class, name, this, next, input) {
-        this."times" := 5;
+        this."times" := 2;
     });
     g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
-        this."log"("receive");
         this."times" := this."times" - 1;
         if (this."times" > 0) {
             return STATE_EXECUTING;
+        }
+        this."logd"(input["name"], "解析路由表");
+        if ((input["status"]["#1"]["queue"])."empty"()) {
+            return STATE_FINISH;
+        }
+        var msg = (input["status"]["#1"]["queue"])."pop"();
+        g_map_put(msg, "ttl", msg["ttl"] - 1);
+        var delta = g_task_get_timestamp() - msg["time"];
+        if ((input["status"]["#1"]["route"])."contains"(msg["origin"])) {
+            if (delta < (input["status"]["#1"]["route"])."get"(msg["origin"])["span"]) {
+                this."logd"(input["name"], "更新路由表，来自：" + msg["origin"] + "，时间：" + delta + "，中转：" + msg["pass"] + "，TTL：" + msg["ttl"]);
+                (input["status"]["#1"]["route"])."put"(msg["origin"], {
+                    "ttl": msg["ttl"],
+                    "span": delta,
+                    "pass": msg["pass"]
+                });
+            } else {
+                return STATE_FINISH;
+            }
+        } else {
+            this."logd"(input["name"], "新增路由表，来自：" + msg["origin"] + "，时间：" + delta + "，中转：" + msg["pass"] + "，TTL：" + msg["ttl"]);
+            (input["status"]["#1"]["route"])."put"(msg["origin"], {
+                "ttl": msg["ttl"],
+                "span": delta,
+                "pass": msg["pass"]
+            });
+            g_map_put(input["status"]["#1"], "delay", 0);
         }
         return STATE_FINISH;
     });
@@ -571,7 +643,7 @@ g_register_class(ctx, "app::pc::level#2-1.recv", lambda(this) {
         this."times" := 5;
     });
     g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
-        this."log"("receive");
+        this."logd"(input["name"], "接收数据包");
         this."times" := this."times" - 1;
         if (this."times" > 0) {
             return STATE_EXECUTING;
@@ -591,7 +663,7 @@ g_register_class(ctx, "app::pc::level#2-1.ack", lambda(this) {
         this."times" := 5;
     });
     g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
-        this."log"("receive");
+        this."logd"(input["name"], "发送回应");
         this."times" := this."times" - 1;
         if (this."times" > 0) {
             return STATE_EXECUTING;
@@ -611,7 +683,7 @@ g_register_class(ctx, "app::pc::level#2-2.send", lambda(this) {
         this."times" := 5;
     });
     g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
-        this."log"("receive");
+        this."logd"(input["name"], "发送数据包");
         this."times" := this."times" - 1;
         if (this."times" > 0) {
             return STATE_EXECUTING;
@@ -631,7 +703,7 @@ g_register_class(ctx, "app::pc::level#2-2.wait", lambda(this) {
         this."times" := 5;
     });
     g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
-        this."log"("receive");
+        this."logd"(input["name"], "等待回应");
         this."times" := this."times" - 1;
         if (this."times" > 0) {
             return STATE_EXECUTING;
@@ -651,7 +723,7 @@ g_register_class(ctx, "app::pc::level#3.idle", lambda(this) {
         this."times" := 5;
     });
     g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
-        this."log"("receive");
+        this."log"(input["name"], "idle");
         this."times" := this."times" - 1;
         return STATE_EXECUTING;
     });
@@ -672,9 +744,8 @@ g_register_class(ctx, "app::pc::test", lambda(this) {
     };
     this."tick" := lambda(this) { // 每帧事件
         foreach (var pc : g_range_array(this."pc"."values"())) {
-            if (pc["node"]."evaluate"(pc)) {
-                log(g_ui_fg(120, 15, 15) + "[" + pc."name" + "]" + g_ui_fgc());
-                pc["node"]."tick"(pc, this);
+            if ((pc["node"])."evaluate"(pc)) {
+                (pc["node"])."tick"(pc, this);
             }
         }
     };
@@ -682,13 +753,21 @@ g_register_class(ctx, "app::pc::test", lambda(this) {
         this."pc"."put"(cfg["name"], {
             "name": cfg["name"],
             "status": {
-                "position": [cfg["x"], cfg["y"]],
-                "size": [cfg["w"], cfg["h"]]
+                "x": cfg["x"],
+                "y": cfg["y"],
+                "w": cfg["w"],
+                "h": cfg["h"],
+                "#1": {
+                    "delay": 0,
+                    "queue": g_create_class(ctx, "list::array"),
+                    "route": g_create_class(ctx, "list::map")
+                }
             },
             "node": g_create_class(ctx, "app::ai::node.priority")
                 ."set"("name", "协议栈")
                 ."add_child"(g_create_class(ctx, "app::ai::node.sequence")
                     ."set"("name", "底层网络感知")
+                    ."set_cond"(g_create_class(ctx, "app::pc::level#1.cond"))
                     ."add_child"(g_create_class(ctx, "app::pc::level#1.broadcast"))
                     ."add_child"(g_create_class(ctx, "app::pc::level#1.receive")))
                 ."add_child"(g_create_class(ctx, "app::ai::node.parallel")
@@ -716,6 +795,8 @@ test."init"(log);
 // 初始化
 test."create_pc"({"name": "A", "x": 0, "y": 0, "w": 100, "h": 100});
 test."create_pc"({"name": "B", "x": 50, "y": 50, "w": 100, "h": 100});
+test."create_pc"({"name": "C", "x": 100, "y": 0, "w": 100, "h": 100});
+test."create_pc"({"name": "D", "x": 140, "y": 90, "w": 100, "h": 100});
 
 while (g_query_share(signal)) {
     test."tick"();

@@ -169,6 +169,11 @@ public class SemanticHandler {
 				triop.setSecondOperand((IExp) indexed.get(6).object);
 				triop.setThirdOperand((IExp) indexed.get(7).object);
 				return triop.simplify(recorder);
+			} else if (indexed.exists(5)) {
+				ExpIndex exp = new ExpIndex();
+				exp.setExp((IExp) indexed.get(1).object);
+				exp.setIndex((IExp) indexed.get(5).object);
+				return exp;
 			} else {
 				Object obj = indexed.get(0).object;
 				if (obj instanceof ExpValue) {
@@ -226,11 +231,6 @@ public class SemanticHandler {
 					}
 					return invoke;
 				}
-			} else if (indexed.exists(5)) {
-				ExpIndex exp = new ExpIndex();
-				exp.setToken(indexed.get(0).token);
-				exp.setExp((IExp) indexed.get(5).object);
-				return exp;
 			} else {
 				ExpValue value = new ExpValue();
 				Token token = indexed.get(0).token;
