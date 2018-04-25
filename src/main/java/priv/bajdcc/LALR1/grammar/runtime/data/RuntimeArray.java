@@ -5,9 +5,7 @@ import priv.bajdcc.LALR1.grammar.runtime.RuntimeException;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeObject;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -25,6 +23,10 @@ public class RuntimeArray implements Cloneable {
 
 	public RuntimeArray(RuntimeArray obj) {
 		copyFrom(obj);
+	}
+
+	public RuntimeArray(List<RuntimeObject> array) {
+		this.array = array;
 	}
 
 	public void add(RuntimeObject obj) {

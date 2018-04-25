@@ -1,0 +1,727 @@
+import "sys.base";
+import "sys.list";
+import "sys.proc";
+import "sys.string";
+import "sys.class";
+import "sys.math";
+import "sys.task";
+import "sys.ui";
+import "std.base";
+
+g_set_process_desc("pc routine");
+var pid = g_get_pid();
+var share = g_wait_share("PID#" + pid);
+g_stop_share("PID#" + pid);
+var args = share["args"];
+
+var in = g_create_pipe("PIPEIN#" + pid);
+var out = g_create_pipe("PIPEOUT#" + pid);
+
+var signal = "PIDSIG#" + pid;
+g_start_share(signal, true);
+
+var logn = func ~(str) -> g_write_pipe_n(out, str);
+var log = func ~(str) -> g_write_pipe(out, str);
+
+// -----------------------------------------------------------------------------------------
+// ## Behavior Tree Class Design
+// @ Refer: https://github.com/hbbalfred/guardians/
+// @ Refer: http://www.aisharing.com/
+// ---- CODE BEGIN ----
+
+var ctx = g_create_context();
+g_import_std_base(ctx);
+
+var _ = g_null;
+
+// 状态定义
+var STATE_EXECUTING = 0;
+var STATE_FINISH = 1;
+var STATE_ERROR = -1;
+
+/* -----------------------------------------------------------------
+# CLASS [app::ai::node.base]
+# 行为树结点基类
+----------------------------------------------------------------- */
+g_register_class(ctx, "app::ai::node.base", lambda(this) {
+    /* 数据 */
+    this."name" := ""; // 名字
+    this."cond" := _; // 前置条件类
+    this."children" := _; // 子结点
+    this."parent" := _; // 父结点
+    /* 事件 */
+    this."do_evaluate" := lambda(this, input) -> true; // 测试事件
+    this."do_tick" := lambda(this, input, output) -> STATE_FINISH; // 定时事件
+    this."do_leave" := lambda(this, input) -> _; // 离开事件
+    /* 方法 */
+    this."set" := lambda(this, key, value) {
+        this.key := value;
+        return this;
+    };
+    this."add_child" := lambda(this, node) { // 添加子结点
+        if (g_is_null(this."children")) {
+            this."children" := g_create_class(ctx, "list::array");
+        }
+        this."children"."add"(node);
+        node."parent" := this;
+        return this;
+    };
+    this."add_child_at" := lambda(this, node, i) { // 添加子结点
+        if (g_is_null(this."children")) {
+            this."children" := g_create_class(ctx, "list::array");
+        }
+        this."children"."insert"(i, node);
+        node."parent" := this;
+        return this;
+    };
+    this."set_cond" := lambda(this, cond) { // 添加前置条件
+        this."cond" := cond;
+        cond."parent" := this;
+        return this;
+    };
+    this."evaluate" := lambda(this, input) { // 测试
+        var ret = g_is_null(this."cond") || this."cond"."evaluate"(input);
+        return ret && this."do_evaluate"(input);
+    };
+    this."tick" := lambda(this, input, output) { // 定时
+        return this."do_tick"(input, output);
+    };
+    this."leave" := lambda(this, input) { // 离开
+        return this."do_leave"(input);
+    };
+    this."check_index" := lambda(this, i) { // 检查越界
+        return !g_is_null(this."children") && i >= 0 && i < this."children"."size"();
+    };
+}, "object");
+
+/* -----------------------------------------------------------------
+# CLASS [app::ai::node.loop]
+# 循环结点
+  * 测试 do_evaluate
+  - 预设的循环次数到了就返回False，否则，只调用第一个子节点的Evaluate方法，用它所返回的值作为自身的值返回
+  - 只调用第一个节点的Tick方法，若返回运行结束，则看是否需要重复运行，
+  * 更新 do_tick
+  - 若循环次数没到，则自身返回运行中，若循环次数已到，则返回运行结束
+----------------------------------------------------------------- */
+g_register_class(ctx, "app::ai::node.loop", lambda(this) {
+    /* 数据 */
+    this."loop_count" := -1; // 指定循环次数上限
+    this."current_loop" := 0; // 当前循环次数
+    /* 事件 */
+    g_hook_add_before(this, "do_evaluate", lambda(class, name, this, next, input) { // 测试事件
+        if ((this."loop_count" != -1) && (this."current_loop" >= this."loop_count")) {
+            return false;
+        }
+        if (this."check_index"(0) && this."children"."get"(0)."evaluate"(input)) {
+            return true;
+        }
+        return false;
+    });
+    g_hook_add_before(this, "do_tick", lambda(class, name, this, next, input, output) { // 定时事件
+        var is_finish = STATE_FINISH;
+        if (this."check_index"(0)) {
+            is_finish := this."children"."get"(0)."tick"(input, output);
+            if (is_finish == STATE_FINISH) {
+                if (this."loop_count" == -1) {
+                    is_finish := STATE_EXECUTING;
+                } else {
+                    this."current_loop" := this."current_loop" + 1;
+                    if (this."current_loop" < this."loop_count") {
+                        is_finish := STATE_EXECUTING;
+                    }
+                }
+            }
+        }
+        if (is_finish == STATE_FINISH) {
+            this."current_loop" := 0;
+        }
+        return is_finish;
+    });
+    g_hook_add_before(this, "do_leave", lambda(class, name, this, next, input) { // 离开事件
+        if (this."check_index"(0)) {
+            this."children"."get"(0)."do_leave"(input);
+        }
+        this."current_loop" := 0;
+    });
+    /* 方法 */
+    this."set_loop_count" := lambda(this, loop_count) { // 设置循环上限
+        this."loop_count" := loop_count;
+    };
+}, "app::ai::node.base");
+
+/* -----------------------------------------------------------------
+# CLASS [app::ai::node.parallel]
+# 并行结点
+  * 测试 do_evaluate
+  - 依次调用所有的子节点的Evaluate方法，若所有的子节点都返回True，则自身也返回True，否则，返回False
+  * 更新 do_tick
+  - 调用所有子节点的Tick方法，若并行节点是“或者”的关系，则只要有一个子节点返回运行结束，那自身就返回运行结束。
+  - 若并行节点是“并且”的关系，则只有所有的子节点返回结束，自身才返回运行结束
+----------------------------------------------------------------- */
+g_register_class(ctx, "app::ai::node.parallel", lambda(this) {
+    /* 数据 */
+    this."or" := true; // 指定是“或”(1)还是“与”(0)
+    this."children_status" := g_create_class(ctx, "list::array"); // 子结点测试状态
+    /* 事件 */
+    g_hook_add_before(this, "do_evaluate", lambda(class, name, this, next, input) { // 测试事件
+        var len = this."children"."size"();
+        for (var i = 0; i < len; i++) {
+            if (this."children_status"."get"(i) == STATE_EXECUTING &&
+                !this."children"."get"(i)."evaluate"(input)) {
+                return false;
+            }
+        }
+        return true;
+    });
+    g_hook_add_before(this, "do_tick", lambda(class, name, this, next, input, output) { // 定时事件
+        var len = this."children"."size"();
+        var status = -1;
+        if (this."or") {
+            for (var i = 0; i < len; i++) {
+                status := this."children_status"."get"(i);
+                if (status == STATE_EXECUTING) {
+                    status := this."children"."get"(i)."tick"(input, output);
+                    this."children_status"."set"(i, status);
+                }
+                if (status != STATE_EXECUTING) {
+                    this."reset_status"();
+                    return STATE_FINISH;
+                }
+            }
+        } else {
+            var count = 0;
+            for (var i = 0; i < len; i++) {
+                status := this."children_status"."get"(i);
+                if (status == STATE_EXECUTING) {
+                    status := this."children"."get"(i)."tick"(input, output);
+                    this."children_status"."set"(i, status);
+                }
+                if (status != STATE_EXECUTING) {
+                    count++;
+                }
+            }
+            if (count == len) {
+                this."reset_status"();
+                return STATE_FINISH;
+            }
+        }
+        return STATE_EXECUTING;
+    });
+    g_hook_add_before(this, "do_leave", lambda(class, name, this, next, input) { // 离开事件
+        this."reset_status"();
+        foreach (var i : g_range_array(this."children"."array")) {
+            i."leave"(input);
+        }
+    });
+    /* 方法 */
+    g_hook_insert_before(this, "add_child", lambda(class, name, this, next, node) {
+        this."children_status"."add"(STATE_EXECUTING);
+        return next();
+    });
+    g_hook_insert_before(this, "add_child_at", lambda(class, name, this, next, node, i) {
+        this."children_status"."insert"(i, STATE_EXECUTING);
+        return next();
+    });
+    this."reset_status" := lambda(this) { // 重置状态
+        this."children_status"."fill"(STATE_EXECUTING);
+    };
+}, "app::ai::node.base");
+
+/* -----------------------------------------------------------------
+# CLASS [app::ai::node.sequence]
+# 序列结点
+  * 测试 do_evaluate
+  - 若是从头开始的，则调用第一个子节点的Evaluate方法，将其返回值作为自身的返回值返回。
+  - 否则，调用当前运行节点的Evaluate方法，将其返回值作为自身的返回值返回。
+  * 更新 do_tick
+  - 调用可以运行的子节点的Tick方法，若返回运行结束，则将下一个子节点作为当前运行节点，
+  - 若当前已是最后一个子节点，表示该序列已经运行结束，则自身返回运行结束。
+  - 若子节点返回运行中，则用它所返回的运行状态作为自身的运行状态返回。
+----------------------------------------------------------------- */
+g_register_class(ctx, "app::ai::node.sequence", lambda(this) {
+    /* 数据 */
+    this."current" := -1; // 当前活动的结点索引
+    /* 事件 */
+    g_hook_add_before(this, "do_evaluate", lambda(class, name, this, next, input) { // 测试事件
+        var index = this."current";
+        if (index == -1) {
+            index := 0;
+        }
+        if (this."check_index"(index) && this."children"."get"(index)."evaluate"(input)) {
+            return true;
+        }
+        return false;
+    });
+    g_hook_add_before(this, "do_tick", lambda(class, name, this, next, input, output) { // 定时事件
+        var is_finish = STATE_FINISH;
+        if (this."current" == -1) {
+            this."current" := 0;
+        }
+        if (this."check_index"(this."current")) {
+            is_finish := this."children"."get"(this."current")."tick"(input, output);
+            if (is_finish == STATE_FINISH) {
+                this."current" := this."current" + 1;
+                if (this."current" == this."children"."size"()) {
+                    this."current" := -1;
+                } else {
+                    is_finish := STATE_EXECUTING;
+                }
+            }
+        }
+        if (is_finish < 0) {
+            this."current" := -1;
+        }
+        return is_finish;
+    });
+    g_hook_add_before(this, "do_leave", lambda(class, name, this, next, input) { // 离开事件
+        if (this."check_index"(this."current")) {
+            this."children"."get"(this."current")."do_leave"(input);
+        }
+        this."current" := -1;
+    });
+}, "app::ai::node.base");
+
+/* -----------------------------------------------------------------
+# CLASS [app::ai::node.priority]
+# 带优先级的选择结点
+  * 测试 do_evaluate
+  - 从第一个子节点开始依次遍历所有的子节点，调用其Evaluate方法，
+  - 当发现存在可以运行的子节点时，记录子节点索引，停止遍历，返回True。
+  * 更新 do_tick
+  - 调用可以运行的子节点的Tick方法，用它所返回的运行状态作为自身的运行状态返回
+----------------------------------------------------------------- */
+g_register_class(ctx, "app::ai::node.priority", lambda(this) {
+    /* 数据 */
+    this."current" := -1; // 当前活动的结点索引
+    this."last" := -1; // 上次活动的结点索引
+    /* 事件 */
+    g_hook_add_before(this, "do_evaluate", lambda(class, name, this, next, input) { // 测试事件
+        this."current" := -1;
+        var len = this."children"."size"();
+        for (var i = 0; i < len; i++) {
+            if (this."children"."get"(i)."evaluate"(input)) {
+                this."current" := i;
+                return true;
+            }
+        }
+        return false;
+    });
+    g_hook_add_before(this, "do_tick", lambda(class, name, this, next, input, output) { // 定时事件
+        var is_finish = STATE_FINISH;
+        if (this."check_index"(this."current")) {
+            if (this."current" != this."last") {
+                if (this."check_index"(this."last")) {
+                    this."children"."get"(this."last")."leave"(input);
+                }
+                this."last" := this."current";
+            }
+        }
+        if (this."check_index"(this."last")) {
+            is_finish := this."children"."get"(this."last")."tick"(input, output);
+            if (is_finish == STATE_FINISH) {
+                this."last" := -1;
+            }
+        }
+        return is_finish;
+    });
+    g_hook_add_before(this, "do_leave", lambda(class, name, this, next, input) { // 离开事件
+        if (this."check_index"(this."last")) {
+            this."children"."get"(this."last")."do_leave"(input);
+        }
+        this."last" := -1;
+    });
+}, "app::ai::node.base");
+
+/* -----------------------------------------------------------------
+# CLASS [app::ai::node.priority.always]
+# 不带优先级的选择结点
+  * 测试 do_evaluate
+  - 先调用上一个运行的子节点（若存在）的Evaluate方法，
+  - 如果可以运行，则继续运行保存该节点的索引，返回True，
+  * 更新 do_tick
+  - 如果不能运行，则重新选择（同带优先级的选择节点的选择方式）
+----------------------------------------------------------------- */
+g_register_class(ctx, "app::ai::node.priority.always", lambda(this) {
+    /* 事件 */
+    g_hook_insert_before(this, "do_evaluate", lambda(class, name, this, next, input) { // 测试事件
+        if (this."check_index"(this."current") &&
+            this."children"."get"(this."current")."evaluate"(input)) {
+            return true;
+        }
+        return next();
+    });
+}, "app::ai::node.priority");
+
+var STATUS_READY = 0;
+var STATUS_RUNNING = 1;
+var STATUS_FINISH = 2;
+
+/* -----------------------------------------------------------------
+# CLASS [app::ai::node.terminal]
+# 叶子结点
+----------------------------------------------------------------- */
+g_register_class(ctx, "app::ai::node.terminal", lambda(this) {
+    /* 数据 */
+    this."status" := STATUS_READY; // 状态
+    this."need_exit" := -1; // 当前状态需要退出
+    /* 事件 */
+    this."do_enter" := lambda(this, input) -> true; // 进入事件
+    this."do_execute" := lambda(this, input, output) -> STATE_FINISH; // 执行事件
+    this."do_exit" := lambda(this, input, id) -> _; // 离开事件
+    g_hook_add_before(this, "do_tick", lambda(class, name, this, next, input, output) { // 定时事件
+        var is_finish = STATE_FINISH;
+        if (this."status" == STATUS_READY) {
+            //this."log_enter"();
+            this."do_enter"(input);
+            this."status" := STATUS_RUNNING;
+            this."need_exit" := true;
+        }
+        if (this."status" == STATUS_RUNNING) {
+            //this."log_execute"();
+            is_finish := this."do_execute"(input, output);
+            if (is_finish == STATE_FINISH || is_finish < 0) {
+                this."status" := STATUS_FINISH;
+            }
+        }
+        if (this."status" == STATUS_FINISH) {
+            if (this."need_exit") {
+                //this."log_exit"();
+                this."do_exit"(input, is_finish);
+            }
+            this."status" := STATUS_READY;
+            this."need_exit" := false;
+        }
+        return is_finish;
+    });
+    g_hook_add_before(this, "do_leave", lambda(class, name, this, next, input) { // 离开事件
+        if (this."need_exit") {
+            this."do_exit"(input, STATE_ERROR);
+        }
+        this."status" := STATUS_READY;
+        this."need_exit" := false;
+    });
+    /* 调试 */
+    /*g_hook_add_before(this, "do_enter", lambda(class, name, this, next, input) {
+        this."log_enter"();
+        return next();
+    });
+    g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
+        this."log_execute"();
+        return next();
+    });
+    g_hook_add_before(this, "do_exit", lambda(class, name, this, next, input, id) {
+        this."log_exit"();
+        return next();
+    });*/
+    this."log" := lambda(this, str) -> logn(g_ui_fg(15, 120, 15) + "[" + this."name" + "] " + g_ui_fgc() + str);
+    this."log_enter" := lambda(this) -> this."log"("Enter");
+    this."log_execute" := lambda(this) -> this."log"("Execute");
+    this."log_exit" := lambda(this) -> this."log"("Exit");
+}, "app::ai::node.base");
+
+
+// #################################################################
+
+/* -----------------------------------------------------------------
+# CLASS [app::ai::cond.base]
+# 判定条件基类
+----------------------------------------------------------------- */
+g_register_class(ctx, "app::ai::cond.base", lambda(this) {
+    /* 数据 */
+    this."parent" := _; // 结点
+    /* 事件 */
+    this."evaluate" := lambda(this, input) -> _; // 测试事件
+    /* 方法 */
+    this."init" := lambda(this, cond) -> _; // 初始化
+}, "object");
+
+/* -----------------------------------------------------------------
+# CLASS [app::ai::cond.not]
+# 判定条件（非）
+----------------------------------------------------------------- */
+g_register_class(ctx, "app::ai::cond.not", lambda(this) {
+    /* 数据 */
+    this."cond" := _; // 条件
+    /* 事件 */
+    g_hook_add_before(this, "evaluate", lambda(class, name, this, next, input) {
+        return !this."cond"."evaluate"(input);
+    });
+    /* 方法 */
+    g_hook_add_before(this, "init", lambda(class, name, this, next, cond) {
+        this."cond" := cond;
+    });
+}, "app::ai::cond.base");
+
+/* -----------------------------------------------------------------
+# CLASS [app::ai::cond.false]
+# 判定条件（假）
+----------------------------------------------------------------- */
+g_register_class(ctx, "app::ai::cond.false", lambda(this) {
+    /* 事件 */
+    g_hook_add_before(this, "evaluate", lambda(class, name, this, next, input) {
+        return false;
+    });
+}, "app::ai::cond.base");
+
+/* -----------------------------------------------------------------
+# CLASS [app::ai::cond.true]
+# 判定条件（真）
+----------------------------------------------------------------- */
+g_register_class(ctx, "app::ai::cond.true", lambda(this) {
+    /* 事件 */
+    g_hook_add_before(this, "evaluate", lambda(class, name, this, next, input) {
+        return true;
+    });
+}, "app::ai::cond.base");
+
+/* -----------------------------------------------------------------
+# CLASS [app::ai::cond.and]
+# 判定条件（与）
+----------------------------------------------------------------- */
+g_register_class(ctx, "app::ai::cond.and", lambda(this) {
+    /* 数据 */
+    this."cond" := g_new_array;
+    /* 事件 */
+    g_hook_add_before(this, "evaluate", lambda(class, name, this, next, input) {
+        foreach (var i : g_range_array(this."cond")) {
+            if (!i."evaluate"(input)) {
+                return false;
+            }
+        }
+        return true;
+    });
+    /* 方法 */
+    g_hook_add_before(this, "init", lambda(class, name, this, next, cond) {
+        this."cond" := cond;
+    });
+}, "app::ai::cond.base");
+
+/* -----------------------------------------------------------------
+# CLASS [app::ai::cond.or]
+# 判定条件（或）
+----------------------------------------------------------------- */
+g_register_class(ctx, "app::ai::cond.or", lambda(this) {
+    /* 数据 */
+    this."cond" := g_new_array;
+    /* 事件 */
+    g_hook_add_before(this, "evaluate", lambda(class, name, this, next, input) {
+        foreach (var i : g_range_array(this."cond")) {
+            if (i."evaluate"(input)) {
+                return true;
+            }
+        }
+        return false;
+    });
+    /* 方法 */
+    g_hook_add_before(this, "init", lambda(class, name, this, next, cond) {
+        this."cond" := cond;
+    });
+}, "app::ai::cond.base");
+
+// #################################################################
+
+/* -----------------------------------------------------------------
+# CLASS [app::pc::level#1.broadcast]
+# 底层网络感知 - 广播
+----------------------------------------------------------------- */
+g_register_class(ctx, "app::pc::level#1.broadcast", lambda(this) {
+    this."name" := "level#1.broadcast";
+    this."times" := 0;
+    g_hook_add_before(this, "do_enter", lambda(class, name, this, next, input) {
+        this."times" := 5;
+    });
+    g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
+        this."log"("broadcast");
+        this."times" := this."times" - 1;
+        if (this."times" > 0) {
+            return STATE_EXECUTING;
+        }
+        return STATE_FINISH;
+    });
+}, "app::ai::node.terminal");
+
+/* -----------------------------------------------------------------
+# CLASS [app::pc::level#1.receive]
+# 底层网络感知 - 接收
+----------------------------------------------------------------- */
+g_register_class(ctx, "app::pc::level#1.receive", lambda(this) {
+    this."name" := "level#1.receive";
+    this."times" := 0;
+    g_hook_add_before(this, "do_enter", lambda(class, name, this, next, input) {
+        this."times" := 5;
+    });
+    g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
+        this."log"("receive");
+        this."times" := this."times" - 1;
+        if (this."times" > 0) {
+            return STATE_EXECUTING;
+        }
+        return STATE_FINISH;
+    });
+}, "app::ai::node.terminal");
+
+/* -----------------------------------------------------------------
+# CLASS [app::pc::level#2-1.recv]
+# 底层消息互发 - 接收消息服务 - 接收
+----------------------------------------------------------------- */
+g_register_class(ctx, "app::pc::level#2-1.recv", lambda(this) {
+    this."name" := "level#2-1.recv";
+    this."times" := 0;
+    g_hook_add_before(this, "do_enter", lambda(class, name, this, next, input) {
+        this."times" := 5;
+    });
+    g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
+        this."log"("receive");
+        this."times" := this."times" - 1;
+        if (this."times" > 0) {
+            return STATE_EXECUTING;
+        }
+        return STATE_FINISH;
+    });
+}, "app::ai::node.terminal");
+
+/* -----------------------------------------------------------------
+# CLASS [app::pc::level#2-1.ack]
+# 底层消息互发 - 接收消息服务 - 应答
+----------------------------------------------------------------- */
+g_register_class(ctx, "app::pc::level#2-1.ack", lambda(this) {
+    this."name" := "level#2-1.ack";
+    this."times" := 0;
+    g_hook_add_before(this, "do_enter", lambda(class, name, this, next, input) {
+        this."times" := 5;
+    });
+    g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
+        this."log"("receive");
+        this."times" := this."times" - 1;
+        if (this."times" > 0) {
+            return STATE_EXECUTING;
+        }
+        return STATE_FINISH;
+    });
+}, "app::ai::node.terminal");
+
+/* -----------------------------------------------------------------
+# CLASS [app::pc::level#2-2.send]
+# 底层消息互发 - 发送消息服务 - 发送
+----------------------------------------------------------------- */
+g_register_class(ctx, "app::pc::level#2-2.send", lambda(this) {
+    this."name" := "level#2-2.send";
+    this."times" := 0;
+    g_hook_add_before(this, "do_enter", lambda(class, name, this, next, input) {
+        this."times" := 5;
+    });
+    g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
+        this."log"("receive");
+        this."times" := this."times" - 1;
+        if (this."times" > 0) {
+            return STATE_EXECUTING;
+        }
+        return STATE_FINISH;
+    });
+}, "app::ai::node.terminal");
+
+/* -----------------------------------------------------------------
+# CLASS [app::pc::level#2-2.wait]
+# 底层消息互发 - 发送消息服务 - 等待
+----------------------------------------------------------------- */
+g_register_class(ctx, "app::pc::level#2-2.wait", lambda(this) {
+    this."name" := "level#2-2.wait";
+    this."times" := 0;
+    g_hook_add_before(this, "do_enter", lambda(class, name, this, next, input) {
+        this."times" := 5;
+    });
+    g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
+        this."log"("receive");
+        this."times" := this."times" - 1;
+        if (this."times" > 0) {
+            return STATE_EXECUTING;
+        }
+        return STATE_FINISH;
+    });
+}, "app::ai::node.terminal");
+
+/* -----------------------------------------------------------------
+# CLASS [app::pc::level#3.idle]
+# 顶层消息服务 - 空闲
+----------------------------------------------------------------- */
+g_register_class(ctx, "app::pc::level#3.idle", lambda(this) {
+    this."name" := "level#3.idle";
+    this."times" := 0;
+    g_hook_add_before(this, "do_enter", lambda(class, name, this, next, input) {
+        this."times" := 5;
+    });
+    g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
+        this."log"("receive");
+        this."times" := this."times" - 1;
+        return STATE_EXECUTING;
+    });
+}, "app::ai::node.terminal");
+
+// #################################################################
+
+/* -----------------------------------------------------------------
+# CLASS [app::pc::test]
+# 计算机网络模拟
+----------------------------------------------------------------- */
+g_register_class(ctx, "app::pc::test", lambda(this) {
+    /* 数据 */
+    this."pc" := _;
+    /* 方法 */
+    this."init" := lambda(this, out) { // 初始化
+        this."pc" := g_create_class(ctx, "list::map");
+    };
+    this."tick" := lambda(this) { // 每帧事件
+        foreach (var pc : g_range_array(this."pc"."values"())) {
+            if (pc["node"]."evaluate"(pc)) {
+                log(g_ui_fg(120, 15, 15) + "[" + pc."name" + "]" + g_ui_fgc());
+                pc["node"]."tick"(pc, this);
+            }
+        }
+    };
+    this."create_pc" := lambda(this, cfg) {
+        this."pc"."put"(cfg["name"], {
+            "name": cfg["name"],
+            "status": {
+                "position": [cfg["x"], cfg["y"]],
+                "size": [cfg["w"], cfg["h"]]
+            },
+            "node": g_create_class(ctx, "app::ai::node.priority")
+                ."set"("name", "协议栈")
+                ."add_child"(g_create_class(ctx, "app::ai::node.sequence")
+                    ."set"("name", "底层网络感知")
+                    ."add_child"(g_create_class(ctx, "app::pc::level#1.broadcast"))
+                    ."add_child"(g_create_class(ctx, "app::pc::level#1.receive")))
+                ."add_child"(g_create_class(ctx, "app::ai::node.parallel")
+                    ."set"("name", "底层消息互发")
+                    ."add_child"(g_create_class(ctx, "app::ai::node.sequence")
+                        ."set"("name", "接收消息服务")
+                        ."add_child"(g_create_class(ctx, "app::pc::level#2-1.recv"))
+                        ."add_child"(g_create_class(ctx, "app::pc::level#2-1.ack")))
+                    ."add_child"(g_create_class(ctx, "app::ai::node.sequence")
+                        ."set"("name", "发送消息服务")
+                        ."add_child"(g_create_class(ctx, "app::pc::level#2-2.send"))
+                        ."add_child"(g_create_class(ctx, "app::pc::level#2-2.wait"))))
+                ."add_child"(g_create_class(ctx, "app::ai::node.parallel")
+                    ."set"("name", "顶层消息服务")
+                    ."add_child"(g_create_class(ctx, "app::pc::level#3.idle")))});
+    };
+}, "object");
+
+// ---- CODE END ----
+// -----------------------------------------------------------------------------------------
+
+var test = g_create_class(ctx, "app::pc::test");
+test."init"(log);
+
+// 初始化
+test."create_pc"({"name": "A", "x": 0, "y": 0, "w": 100, "h": 100});
+test."create_pc"({"name": "B", "x": 50, "y": 50, "w": 100, "h": 100});
+
+while (g_query_share(signal)) {
+    test."tick"();
+    g_task_sleep_ms_signal(60, signal);
+}
+
+g_stop_share(signal);
+g_destroy_pipe(out);
+g_destroy_pipe(in);

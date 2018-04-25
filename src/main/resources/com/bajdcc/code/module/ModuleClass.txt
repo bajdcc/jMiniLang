@@ -10,6 +10,9 @@ var g_create_property = func ~(class, name, property) {
 };
 export "g_create_property";
 var g_get_property = func ~(class, name) {
+    if (g_is_null(class)) {
+        throw "g_get_property: name = " + name;
+    }
     if (g_map_contains(class, name)) {
         return class[name];
     }
@@ -562,7 +565,7 @@ export "g_register_class";
 var g_create_class = func ~(ctx, name) {
     var prototype = ctx[name];
     if (g_is_null(prototype)) {
-        return;
+        throw "Undefined class: " + name;
     }
     var class = {};
     g_create_property(class, "__type__", name);

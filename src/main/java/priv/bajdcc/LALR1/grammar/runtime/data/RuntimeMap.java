@@ -3,8 +3,8 @@ package priv.bajdcc.LALR1.grammar.runtime.data;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeObject;
 
 import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 【运行时】运行时数组
@@ -55,6 +55,14 @@ public class RuntimeMap implements Cloneable {
 
 	public boolean isEmpty() {
 		return map.isEmpty();
+	}
+
+	public RuntimeArray getKeys() {
+		return new RuntimeArray(map.keySet().stream().map(RuntimeObject::new).collect(Collectors.toList()));
+	}
+
+	public RuntimeArray getValues() {
+		return new RuntimeArray(new ArrayList<>(map.values()));
 	}
 
 	/**

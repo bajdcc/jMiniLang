@@ -25,6 +25,8 @@ var import_list_class = func ~(ctx) {
     }, "object");
     g_register_class(ctx, "list::map", lambda(this) {
         this."map" := g_new_map;
+        this."keys" := lambda(this) -> g_map_keys(this."map");
+        this."values" := lambda(this) -> g_map_values(this."map");
         this."put" := lambda(this, k, v) -> g_map_put(this."map", k, v);
         this."contains" := lambda(this, obj) -> g_map_contains(this."map", obj);
         this."get" := lambda(this, obj) -> g_map_get(this."map", obj);

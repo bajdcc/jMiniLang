@@ -521,5 +521,41 @@ public class ModuleList implements IInterpreterModule {
 				return new RuntimeObject(map.isEmpty());
 			}
 		});
+		info.addExternalFunc("g_map_keys", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "字典键";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kMap};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				RuntimeMap map = (RuntimeMap) args.get(0).getObj();
+				return new RuntimeObject(map.getKeys());
+			}
+		});
+		info.addExternalFunc("g_map_values", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "字典值";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kMap};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				RuntimeMap map = (RuntimeMap) args.get(0).getObj();
+				return new RuntimeObject(map.getValues());
+			}
+		});
 	}
 }

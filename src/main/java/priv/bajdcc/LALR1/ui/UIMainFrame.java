@@ -160,6 +160,7 @@ public class UIMainFrame extends JFrame {
 				new URReplace(),
 				new URUtil(),
 				new URAI(),
+				new URPC(),
 				// USER FILE
 				new URFileLoad(),
 				new URFileSave(),
