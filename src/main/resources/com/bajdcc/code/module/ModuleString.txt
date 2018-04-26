@@ -1,8 +1,9 @@
 import "sys.base";
 var g_range_string = yield ~(a) {
+    a := "" + a;
     var size = g_string_length(a);
     for (var i = 0; i < size; i++) {
-        yield g_string_get(a, i);
+        yield a[i];
     }
 };
 export "g_range_string";

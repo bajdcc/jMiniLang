@@ -25,14 +25,14 @@ var lower = g_string_atoi(args[0]);
 var upper = g_string_atoi(args[1]);
 if (lower > upper) {
     for (var i = lower; i >= upper && g_query_share(signal); i--) {
-        foreach (var j : g_range_string(g_to_string(i))) {
+        foreach (var j : g_range_string(i)) {
             g_write_pipe(out, j);
         }
         g_write_pipe(out, g_endl);
     }
 } else {
     for (var i = lower; i <= upper && g_query_share(signal); i++) {
-        foreach (var j : g_range_string(g_to_string(i))) {
+        foreach (var j : g_range_string(i)) {
             g_write_pipe(out, j);
         }
         g_write_pipe(out, g_endl);

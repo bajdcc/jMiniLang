@@ -132,6 +132,8 @@ public class ExpInvokeProperty implements IExp {
 				}
 			}
 			sb.append(" ").append(OperatorType.RPARAN.getName());
+		} else {
+			sb.append(OperatorType.LPARAN.getName()).append(OperatorType.RPARAN.getName());
 		}
 		return sb.toString();
 	}

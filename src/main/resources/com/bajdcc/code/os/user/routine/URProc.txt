@@ -24,7 +24,7 @@ if (g_is_null(arg1)) {
 g_write_pipe_n(out, "    Speed: " + g_task_get_fast("system", "speed"));
 foreach (var i : g_range_array(arg1)) {
     g_printdn(g_to_string(i));
-    foreach (var j : g_range_string(g_to_string(i))) {
+    foreach (var j : g_range_string(i)) {
         g_write_pipe(out, j);
     }
     g_write_pipe(out, g_endl);

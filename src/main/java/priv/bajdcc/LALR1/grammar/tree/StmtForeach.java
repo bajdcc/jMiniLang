@@ -70,8 +70,9 @@ public class StmtForeach implements IStmt {
 		codegen.genCode(RuntimeInst.ipop);
 		CodegenBlock cb = new CodegenBlock();
 		RuntimeInstUnary start = codegen.genCode(RuntimeInst.ijmp, -1);
-		cb.breakId = codegen.getCodeIndex();
+		int exit = codegen.getCodeIndex();
 		codegen.genCode(RuntimeInst.ipop);
+		cb.breakId = codegen.getCodeIndex();
 		codegen.genCode(RuntimeInst.iyldx);
 		RuntimeInstUnary breakJmp = codegen.genCode(RuntimeInst.ijmp, -1);
 		cb.continueId = codegen.getCodeIndex();
@@ -79,7 +80,7 @@ public class StmtForeach implements IStmt {
 		start.op1 = cb.continueId;
 		int content = codegen.getCodeIndex();
 		enumerator.genCode(codegen);
-		codegen.genCode(RuntimeInst.ijnan, cb.breakId);
+		codegen.genCode(RuntimeInst.ijnan, exit);
 		codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(var.object));
 		codegen.genCode(RuntimeInst.istore);
 		codegen.genCode(RuntimeInst.ipop);

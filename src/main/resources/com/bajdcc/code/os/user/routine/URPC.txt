@@ -363,7 +363,7 @@ var STATUS_FINISH = 2;
 g_register_class(ctx, "app::ai::node.terminal", lambda(this) {
     /* 数据 */
     this."status" := STATUS_READY; // 状态
-    this."need_exit" := -1; // 当前状态需要退出
+    this."need_exit" := false; // 当前状态需要退出
     /* 事件 */
     this."do_enter" := lambda(this, input) -> true; // 进入事件
     this."do_execute" := lambda(this, input, output) -> STATE_FINISH; // 执行事件
@@ -543,7 +543,7 @@ var distance = func ~(a, b) {
 g_register_class(ctx, "app::pc::level#1.cond", lambda(this) {
     g_hook_add_before(this, "evaluate", lambda(class, name, this, next, input) {
         if (input["status"]["#1"]["delay"] > 10) {
-            if (input["status"]["#1"]["delay"] > 60) {
+            if (input["status"]["#1"]["delay"] > 600) {
                 g_map_put(input["status"]["#1"], "delay", 0);
             } else {
                 g_map_put(input["status"]["#1"], "delay", input["status"]["#1"]["delay"] + 1);
@@ -569,7 +569,7 @@ g_register_class(ctx, "app::pc::level#1.broadcast", lambda(this) {
         if (this."times" > 0) {
             return STATE_EXECUTING;
         }
-        //this."logd"(input["name"], "广播路由表");
+        this."logd"(input["name"], "广播路由表");
         foreach (var pc : g_range_array(output."pc"."values"())) {
             if (input["name"] != pc["name"] && valid_zone(input["status"], pc["status"])) {
                 (pc["status"]["#1"]["queue"])."insert"(0, {
@@ -616,8 +616,6 @@ g_register_class(ctx, "app::pc::level#1.receive", lambda(this) {
                     "span": delta,
                     "pass": msg["origin"]
                 });
-            } else {
-                return STATE_FINISH;
             }
         } else {
             this."logd"(input["name"], "新增路由表，来自：" + msg["origin"] + "，时间：" + delta + "，TTL：" + ttl);
@@ -632,6 +630,7 @@ g_register_class(ctx, "app::pc::level#1.receive", lambda(this) {
         foreach (var route : g_range_array((msg["route"])."values"())) {
             if (route["origin"] == input["name"]) { continue; }
             var _ttl = route["ttl"] - 1;
+            if (_ttl == 0) { continue; }
             var _span = delta + route["span"];
             if ((input["status"]["#1"]["route"])."contains"(route["origin"])) {
                 if (delta + route["span"] < (input["status"]["#1"]["route"])."get"(route["origin"])["span"]) {
@@ -659,6 +658,16 @@ g_register_class(ctx, "app::pc::level#1.receive", lambda(this) {
 }, "app::ai::node.terminal");
 
 /* -----------------------------------------------------------------
+# CLASS [app::pc::level#2-1.cond]
+# 底层消息互发 - 接收消息服务 - 条件
+----------------------------------------------------------------- */
+g_register_class(ctx, "app::pc::level#2-1.cond", lambda(this) {
+    g_hook_add_before(this, "evaluate", lambda(class, name, this, next, input) {
+        return !(input["status"]["#2"]["recv"])."empty"() || !(input["status"]["#2"]["queue"])."empty"();
+    });
+}, "app::ai::cond.base");
+
+/* -----------------------------------------------------------------
 # CLASS [app::pc::level#2-1.recv]
 # 底层消息互发 - 接收消息服务 - 接收
 ----------------------------------------------------------------- */
@@ -669,10 +678,30 @@ g_register_class(ctx, "app::pc::level#2-1.recv", lambda(this) {
         this."times" := 5;
     });
     g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
-        //this."logd"(input["name"], "接收数据包");
         this."times" := this."times" - 1;
         if (this."times" > 0) {
             return STATE_EXECUTING;
+        }
+        var msg = (input["status"]["#2"]["queue"])."pop"();
+        if (g_is_null(msg)) { this."times" := 10; return STATE_EXECUTING; }
+        if (msg["target"] == input["name"]) {
+            var index = -1;
+            var success = false;
+            foreach (var recv : g_range_array((input["status"]["#2"]["recv"])."array")) {
+                index++;
+                if (recv["origin"] == msg["origin"]) {
+                    this."logd"(input["name"], "收到数据包，" + msg["origin"] + " >> " + msg["target"] + "，内容：" + msg["message"]);
+                    success := true;
+                    break;
+                }
+            }
+            if (success) {
+                (input["status"]["#2"]["recv"])."remove"(index);
+            } else {
+                (input["status"]["#2"]["queue"])."insert"(0, msg);
+            }
+        } else {
+            (input["status"]["#2"]["send"])."insert"(0, msg);
         }
         return STATE_FINISH;
     });
@@ -689,14 +718,24 @@ g_register_class(ctx, "app::pc::level#2-1.ack", lambda(this) {
         this."times" := 5;
     });
     g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
-        //this."logd"(input["name"], "发送回应");
         this."times" := this."times" - 1;
         if (this."times" > 0) {
             return STATE_EXECUTING;
         }
+        //this."logd"(input["name"], "发送回应");
         return STATE_FINISH;
     });
 }, "app::ai::node.terminal");
+
+/* -----------------------------------------------------------------
+# CLASS [app::pc::level#2-2.cond]
+# 底层消息互发 - 发送消息服务 - 条件
+----------------------------------------------------------------- */
+g_register_class(ctx, "app::pc::level#2-2.cond", lambda(this) {
+    g_hook_add_before(this, "evaluate", lambda(class, name, this, next, input) {
+        return !(input["status"]["#2"]["send"])."empty"();
+    });
+}, "app::ai::cond.base");
 
 /* -----------------------------------------------------------------
 # CLASS [app::pc::level#2-2.send]
@@ -709,10 +748,18 @@ g_register_class(ctx, "app::pc::level#2-2.send", lambda(this) {
         this."times" := 5;
     });
     g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
-        //this."logd"(input["name"], "发送数据包");
         this."times" := this."times" - 1;
         if (this."times" > 0) {
             return STATE_EXECUTING;
+        }
+        var msg = (input["status"]["#2"]["send"])."pop"();
+        if (g_is_null(msg)) { this."times" := 10; return STATE_EXECUTING; }
+        if ((input["status"]["#1"]["route"])."contains"(msg["target"])) {
+            var route = (input["status"]["#1"]["route"])."get"(msg["target"]);
+            if (route["pass"] != input["name"]) {
+                this."logd"(input["name"], "传送数据包，" + msg["origin"] + " >> " + msg["target"] + "，中转：" + route["pass"]);
+                ((output."pc"."get"(route["pass"]))["status"]["#2"]["queue"])."insert"(0, msg);
+            }
         }
         return STATE_FINISH;
     });
@@ -729,14 +776,24 @@ g_register_class(ctx, "app::pc::level#2-2.wait", lambda(this) {
         this."times" := 5;
     });
     g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
-        //this."logd"(input["name"], "等待回应");
         this."times" := this."times" - 1;
         if (this."times" > 0) {
             return STATE_EXECUTING;
         }
+        //this."logd"(input["name"], "等待回应");
         return STATE_FINISH;
     });
 }, "app::ai::node.terminal");
+
+/* -----------------------------------------------------------------
+# CLASS [app::pc::level#3.cond]
+# 顶层消息服务 - 条件
+----------------------------------------------------------------- */
+g_register_class(ctx, "app::pc::level#3.cond", lambda(this) {
+    g_hook_add_before(this, "evaluate", lambda(class, name, this, next, input) {
+        return !input["status"]["#3"]["broadcast"];
+    });
+}, "app::ai::cond.base");
 
 /* -----------------------------------------------------------------
 # CLASS [app::pc::level#3.idle]
@@ -746,12 +803,28 @@ g_register_class(ctx, "app::pc::level#3.idle", lambda(this) {
     this."name" := "level#3.idle";
     this."times" := 0;
     g_hook_add_before(this, "do_enter", lambda(class, name, this, next, input) {
-        this."times" := 5;
+        this."times" := 10;
     });
     g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
-        this."log"(input["name"], "idle");
         this."times" := this."times" - 1;
-        return STATE_EXECUTING;
+        if (this."times" > 0) {
+            return STATE_EXECUTING;
+        }
+        this."logd"(input["name"], "空闲");
+        if (input["status"]["#3"]["broadcast"]) { return STATE_FINISH; }
+        g_map_put(input["status"]["#3"], "broadcast", true);
+        foreach (var route : g_range_array((input["status"]["#1"]["route"])."values"())) {
+            if (route["origin"] == input["name"]) { continue; }
+            (input["status"]["#2"]["send"])."insert"(0, {
+                "origin": input["name"],
+                "target": route["origin"],
+                "message": "Hello, " + route["origin"] +"! From " + input["name"]
+            });
+            (input["status"]["#2"]["recv"])."insert"(0, {
+                "origin": route["origin"]
+            });
+        }
+        return STATE_FINISH;
     });
 }, "app::ai::node.terminal");
 
@@ -787,6 +860,15 @@ g_register_class(ctx, "app::pc::test", lambda(this) {
                     "delay": 0,
                     "queue": g_create_class(ctx, "list::array"),
                     "route": g_create_class(ctx, "list::map")
+                },
+                "#2": {
+                    "recv": g_create_class(ctx, "list::array"),
+                    "send": g_create_class(ctx, "list::array"),
+                    "queue": g_create_class(ctx, "list::array")
+                },
+                "#3": {
+                    "broadcast": false,
+                    "idle": 0
                 }
             },
             "node": g_create_class(ctx, "app::ai::node.priority")
@@ -800,14 +882,17 @@ g_register_class(ctx, "app::pc::test", lambda(this) {
                     ."set"("name", "底层消息互发")
                     ."add_child"(g_create_class(ctx, "app::ai::node.sequence")
                         ."set"("name", "接收消息服务")
+                        ."set_cond"(g_create_class(ctx, "app::pc::level#2-1.cond"))
                         ."add_child"(g_create_class(ctx, "app::pc::level#2-1.recv"))
                         ."add_child"(g_create_class(ctx, "app::pc::level#2-1.ack")))
                     ."add_child"(g_create_class(ctx, "app::ai::node.sequence")
                         ."set"("name", "发送消息服务")
+                        ."set_cond"(g_create_class(ctx, "app::pc::level#2-2.cond"))
                         ."add_child"(g_create_class(ctx, "app::pc::level#2-2.send"))
                         ."add_child"(g_create_class(ctx, "app::pc::level#2-2.wait"))))
-                ."add_child"(g_create_class(ctx, "app::ai::node.parallel")
+                ."add_child"(g_create_class(ctx, "app::ai::node.sequence")
                     ."set"("name", "顶层消息服务")
+                    ."set_cond"(g_create_class(ctx, "app::pc::level#3.cond"))
                     ."add_child"(g_create_class(ctx, "app::pc::level#3.idle")))});
     };
 }, "object");
