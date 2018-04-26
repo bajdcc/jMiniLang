@@ -569,12 +569,11 @@ g_register_class(ctx, "app::pc::level#1.broadcast", lambda(this) {
         if (this."times" > 0) {
             return STATE_EXECUTING;
         }
-        this."logd"(input["name"], "广播路由表");
+        //this."logd"(input["name"], "广播路由表");
         foreach (var pc : g_range_array(output."pc"."values"())) {
             if (input["name"] != pc["name"] && valid_zone(input["status"], pc["status"])) {
                 (pc["status"]["#1"]["queue"])."insert"(0, {
                     "origin": input["name"],
-                    "pass": input["name"],
                     "time": g_task_get_timestamp() - distance(input["status"], pc["status"]),
                     "ttl": 10,
                     "route": input["status"]["#1"]["route"]
@@ -601,32 +600,59 @@ g_register_class(ctx, "app::pc::level#1.receive", lambda(this) {
         if (this."times" > 0) {
             return STATE_EXECUTING;
         }
-        this."logd"(input["name"], "解析路由表");
+        //this."logd"(input["name"], "解析路由表");
         if ((input["status"]["#1"]["queue"])."empty"()) {
             return STATE_FINISH;
         }
         var msg = (input["status"]["#1"]["queue"])."pop"();
-        g_map_put(msg, "ttl", msg["ttl"] - 1);
+        var ttl = msg["ttl"] - 1;
         var delta = g_task_get_timestamp() - msg["time"];
         if ((input["status"]["#1"]["route"])."contains"(msg["origin"])) {
             if (delta < (input["status"]["#1"]["route"])."get"(msg["origin"])["span"]) {
-                this."logd"(input["name"], "更新路由表，来自：" + msg["origin"] + "，时间：" + delta + "，中转：" + msg["pass"] + "，TTL：" + msg["ttl"]);
+                this."logd"(input["name"], "更新路由表，来自：" + msg["origin"] + "，时间：" + delta + "，TTL：" + ttl);
                 (input["status"]["#1"]["route"])."put"(msg["origin"], {
-                    "ttl": msg["ttl"],
+                    "origin": msg["origin"],
+                    "ttl": ttl,
                     "span": delta,
-                    "pass": msg["pass"]
+                    "pass": msg["origin"]
                 });
             } else {
                 return STATE_FINISH;
             }
         } else {
-            this."logd"(input["name"], "新增路由表，来自：" + msg["origin"] + "，时间：" + delta + "，中转：" + msg["pass"] + "，TTL：" + msg["ttl"]);
+            this."logd"(input["name"], "新增路由表，来自：" + msg["origin"] + "，时间：" + delta + "，TTL：" + ttl);
             (input["status"]["#1"]["route"])."put"(msg["origin"], {
-                "ttl": msg["ttl"],
+                "origin": msg["origin"],
+                "ttl": ttl,
                 "span": delta,
-                "pass": msg["pass"]
+                "pass": msg["origin"]
             });
             g_map_put(input["status"]["#1"], "delay", 0);
+        }
+        foreach (var route : g_range_array((msg["route"])."values"())) {
+            if (route["origin"] == input["name"]) { continue; }
+            var _ttl = route["ttl"] - 1;
+            var _span = delta + route["span"];
+            if ((input["status"]["#1"]["route"])."contains"(route["origin"])) {
+                if (delta + route["span"] < (input["status"]["#1"]["route"])."get"(route["origin"])["span"]) {
+                    this."logd"(input["name"], "更新路由表，来自：" + route["origin"] + "，时间：" + _span + "，中转：" + msg["origin"] + "，TTL：" + _ttl);
+                    (input["status"]["#1"]["route"])."put"(msg["origin"], {
+                        "origin": route["origin"],
+                        "ttl": _ttl,
+                        "span": _span,
+                        "pass": msg["origin"]
+                    });
+                }
+            } else {
+                this."logd"(input["name"], "新增路由表，来自：" + route["origin"] + "，时间：" + _span + "，中转：" + msg["origin"] + "，TTL：" + _ttl);
+                (input["status"]["#1"]["route"])."put"(route["origin"], {
+                    "origin": route["origin"],
+                    "ttl": _ttl,
+                    "span": _span,
+                    "pass": msg["origin"]
+                });
+                g_map_put(input["status"]["#1"], "delay", 0);
+            }
         }
         return STATE_FINISH;
     });
@@ -643,7 +669,7 @@ g_register_class(ctx, "app::pc::level#2-1.recv", lambda(this) {
         this."times" := 5;
     });
     g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
-        this."logd"(input["name"], "接收数据包");
+        //this."logd"(input["name"], "接收数据包");
         this."times" := this."times" - 1;
         if (this."times" > 0) {
             return STATE_EXECUTING;
@@ -663,7 +689,7 @@ g_register_class(ctx, "app::pc::level#2-1.ack", lambda(this) {
         this."times" := 5;
     });
     g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
-        this."logd"(input["name"], "发送回应");
+        //this."logd"(input["name"], "发送回应");
         this."times" := this."times" - 1;
         if (this."times" > 0) {
             return STATE_EXECUTING;
@@ -683,7 +709,7 @@ g_register_class(ctx, "app::pc::level#2-2.send", lambda(this) {
         this."times" := 5;
     });
     g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
-        this."logd"(input["name"], "发送数据包");
+        //this."logd"(input["name"], "发送数据包");
         this."times" := this."times" - 1;
         if (this."times" > 0) {
             return STATE_EXECUTING;
@@ -703,7 +729,7 @@ g_register_class(ctx, "app::pc::level#2-2.wait", lambda(this) {
         this."times" := 5;
     });
     g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
-        this."logd"(input["name"], "等待回应");
+        //this."logd"(input["name"], "等待回应");
         this."times" := this."times" - 1;
         if (this."times" > 0) {
             return STATE_EXECUTING;
@@ -794,9 +820,9 @@ test."init"(log);
 
 // 初始化
 test."create_pc"({"name": "A", "x": 0, "y": 0, "w": 100, "h": 100});
-test."create_pc"({"name": "B", "x": 50, "y": 50, "w": 100, "h": 100});
-test."create_pc"({"name": "C", "x": 100, "y": 0, "w": 100, "h": 100});
-test."create_pc"({"name": "D", "x": 140, "y": 90, "w": 100, "h": 100});
+test."create_pc"({"name": "B", "x": 90, "y": 90, "w": 100, "h": 100});
+test."create_pc"({"name": "C", "x": 180, "y": 180, "w": 100, "h": 100});
+test."create_pc"({"name": "D", "x": 270, "y": 270, "w": 100, "h": 100});
 
 while (g_query_share(signal)) {
     test."tick"();
