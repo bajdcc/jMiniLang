@@ -34,7 +34,7 @@
 21. **Bash Interface**.
 22. Array/Map initialize list.
 23. **Try/Catch/Throw**.
-24. **Behavior Tree**.
+24. **Behavior Tree**, including PC network simulator.
 
 #### What it generates
 
@@ -67,6 +67,7 @@ Now has commands:
 - replace
 - util
 - **ai**
+- **pc**
 
 Tasks:
 - System

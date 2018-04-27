@@ -402,23 +402,23 @@ g_register_class(ctx, "app::ai::node.terminal", lambda(this) {
     });
     /* 调试 */
     /*g_hook_add_before(this, "do_enter", lambda(class, name, this, next, input) {
-        this."log_enter"();
+        this."log_enter"(input);
         return next();
     });
     g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
-        this."log_execute"();
+        this."log_execute"(input);
         return next();
     });
     g_hook_add_before(this, "do_exit", lambda(class, name, this, next, input, id) {
-        this."log_exit"();
+        this."log_exit"(input);
         return next();
     });*/
     this."logd" := lambda(this, name, str) -> logn(g_ui_fg(120, 15, 15) + "[" + name + "]" + g_ui_fgc() +
         g_ui_fg(15, 120, 15) + "[" + this."name" + "] " + g_ui_fgc() + str);
     this."log" := lambda(this, str) -> logn(g_ui_fg(15, 120, 15) + "[" + this."name" + "] " + g_ui_fgc() + str);
-    this."log_enter" := lambda(this) -> this."log"("Enter");
-    this."log_execute" := lambda(this) -> this."log"("Execute");
-    this."log_exit" := lambda(this) -> this."log"("Exit");
+    this."log_enter" := lambda(this, input) -> this."logd"(input["name"], "Enter");
+    this."log_execute" := lambda(this, input) -> this."logd"(input["name"], "Execute");
+    this."log_exit" := lambda(this, input) -> this."logd"(input["name"], "Exit");
 }, "app::ai::node.base");
 
 
@@ -569,7 +569,7 @@ g_register_class(ctx, "app::pc::level#1.broadcast", lambda(this) {
         if (this."times" > 0) {
             return STATE_EXECUTING;
         }
-        this."logd"(input["name"], "广播路由表");
+        //this."logd"(input["name"], "广播路由表");
         foreach (var pc : g_range_array(output."pc"."values"())) {
             if (input["name"] != pc["name"] && valid_zone(input["status"], pc["status"])) {
                 (pc["status"]["#1"]["queue"])."insert"(0, {
@@ -607,10 +607,13 @@ g_register_class(ctx, "app::pc::level#1.receive", lambda(this) {
         var msg = (input["status"]["#1"]["queue"])."pop"();
         var ttl = msg["ttl"] - 1;
         var delta = g_task_get_timestamp() - msg["time"];
-        if ((input["status"]["#1"]["route"])."contains"(msg["origin"])) {
-            if (delta < (input["status"]["#1"]["route"])."get"(msg["origin"])["span"]) {
-                this."logd"(input["name"], "更新路由表，来自：" + msg["origin"] + "，时间：" + delta + "，TTL：" + ttl);
-                (input["status"]["#1"]["route"])."put"(msg["origin"], {
+        var r = input["status"]["#1"]["route"];
+        if (r."contains"(msg["origin"])) {
+            if (delta < r."get"(msg["origin"])["span"]) {
+                if (r."get"(msg["origin"])["pass"] != msg["origin"]) {
+                    this."logd"(input["name"], "更新路由表，来自：" + msg["origin"] + "，时间：" + delta + "，TTL：" + ttl);
+                }
+                r."put"(msg["origin"], {
                     "origin": msg["origin"],
                     "ttl": ttl,
                     "span": delta,
@@ -619,7 +622,7 @@ g_register_class(ctx, "app::pc::level#1.receive", lambda(this) {
             }
         } else {
             this."logd"(input["name"], "新增路由表，来自：" + msg["origin"] + "，时间：" + delta + "，TTL：" + ttl);
-            (input["status"]["#1"]["route"])."put"(msg["origin"], {
+            r."put"(msg["origin"], {
                 "origin": msg["origin"],
                 "ttl": ttl,
                 "span": delta,
@@ -632,10 +635,12 @@ g_register_class(ctx, "app::pc::level#1.receive", lambda(this) {
             var _ttl = route["ttl"] - 1;
             if (_ttl == 0) { continue; }
             var _span = delta + route["span"];
-            if ((input["status"]["#1"]["route"])."contains"(route["origin"])) {
-                if (delta + route["span"] < (input["status"]["#1"]["route"])."get"(route["origin"])["span"]) {
-                    this."logd"(input["name"], "更新路由表，来自：" + route["origin"] + "，时间：" + _span + "，中转：" + msg["origin"] + "，TTL：" + _ttl);
-                    (input["status"]["#1"]["route"])."put"(msg["origin"], {
+            if (r."contains"(route["origin"])) {
+                if (delta + route["span"] < r."get"(route["origin"])["span"]) {
+                    if (r."get"(msg["origin"])["pass"] != msg["origin"]) {
+                        this."logd"(input["name"], "更新路由表，来自：" + route["origin"] + "，时间：" + _span + "，中转：" + msg["origin"] + "，TTL：" + _ttl);
+                    }
+                    r."put"(route["origin"], {
                         "origin": route["origin"],
                         "ttl": _ttl,
                         "span": _span,
@@ -644,7 +649,7 @@ g_register_class(ctx, "app::pc::level#1.receive", lambda(this) {
                 }
             } else {
                 this."logd"(input["name"], "新增路由表，来自：" + route["origin"] + "，时间：" + _span + "，中转：" + msg["origin"] + "，TTL：" + _ttl);
-                (input["status"]["#1"]["route"])."put"(route["origin"], {
+                r."put"(route["origin"], {
                     "origin": route["origin"],
                     "ttl": _ttl,
                     "span": _span,
@@ -663,7 +668,7 @@ g_register_class(ctx, "app::pc::level#1.receive", lambda(this) {
 ----------------------------------------------------------------- */
 g_register_class(ctx, "app::pc::level#2-1.cond", lambda(this) {
     g_hook_add_before(this, "evaluate", lambda(class, name, this, next, input) {
-        return !(input["status"]["#2"]["recv"])."empty"() || !(input["status"]["#2"]["queue"])."empty"();
+        return !(input["status"]["#2"]["recv"])."empty"() || !(input["status"]["#2"]["queue"])."empty"() || input["status"]["#3"]["broadcast"];
     });
 }, "app::ai::cond.base");
 
@@ -689,8 +694,13 @@ g_register_class(ctx, "app::pc::level#2-1.recv", lambda(this) {
             var success = false;
             foreach (var recv : g_range_array((input["status"]["#2"]["recv"])."array")) {
                 index++;
-                if (recv["origin"] == msg["origin"]) {
+                if (recv == msg["origin"]) {
                     this."logd"(input["name"], "收到数据包，" + msg["origin"] + " >> " + msg["target"] + "，内容：" + msg["message"]);
+                    g_map_put(input["status"]["#3"], "echo", input["status"]["#3"]["echo"] + 1);
+                    /*this."logd"(input["name"], "队列：" + (input["status"]["#2"]["queue"])."size"() +
+                        "，发送：" + (input["status"]["#2"]["send"])."size"() +
+                        "，接收：" + ((input["status"]["#2"]["recv"])."size"() - 1) +
+                        "，回应：" + input["status"]["#3"]["echo"]);*/
                     success := true;
                     break;
                 }
@@ -733,7 +743,7 @@ g_register_class(ctx, "app::pc::level#2-1.ack", lambda(this) {
 ----------------------------------------------------------------- */
 g_register_class(ctx, "app::pc::level#2-2.cond", lambda(this) {
     g_hook_add_before(this, "evaluate", lambda(class, name, this, next, input) {
-        return !(input["status"]["#2"]["send"])."empty"();
+        return !(input["status"]["#2"]["send"])."empty"() || input["status"]["#3"]["broadcast"];
     });
 }, "app::ai::cond.base");
 
@@ -758,6 +768,9 @@ g_register_class(ctx, "app::pc::level#2-2.send", lambda(this) {
             var route = (input["status"]["#1"]["route"])."get"(msg["target"]);
             if (route["pass"] != input["name"]) {
                 this."logd"(input["name"], "传送数据包，" + msg["origin"] + " >> " + msg["target"] + "，中转：" + route["pass"]);
+                /*this."logd"(input["name"], "队列：" + (input["status"]["#2"]["queue"])."size"() +
+                    "，发送：" + (input["status"]["#2"]["send"])."size"() +
+                    "，接收：" + (input["status"]["#2"]["recv"])."size"());*/
                 ((output."pc"."get"(route["pass"]))["status"]["#2"]["queue"])."insert"(0, msg);
             }
         }
@@ -815,14 +828,13 @@ g_register_class(ctx, "app::pc::level#3.idle", lambda(this) {
         g_map_put(input["status"]["#3"], "broadcast", true);
         foreach (var route : g_range_array((input["status"]["#1"]["route"])."values"())) {
             if (route["origin"] == input["name"]) { continue; }
+            this."logd"(input["name"], "发送消息，" + input["name"] + " >> " + route["origin"] + "，中转：" + route["pass"]);
             (input["status"]["#2"]["send"])."insert"(0, {
                 "origin": input["name"],
                 "target": route["origin"],
-                "message": "Hello, " + route["origin"] +"! From " + input["name"]
+                "message": "Hello, " + route["origin"] +"! From " + input["name"] + "."
             });
-            (input["status"]["#2"]["recv"])."insert"(0, {
-                "origin": route["origin"]
-            });
+            (input["status"]["#2"]["recv"])."add"(route["origin"]);
         }
         return STATE_FINISH;
     });
@@ -868,7 +880,8 @@ g_register_class(ctx, "app::pc::test", lambda(this) {
                 },
                 "#3": {
                     "broadcast": false,
-                    "idle": 0
+                    "idle": 0,
+                    "echo": 0
                 }
             },
             "node": g_create_class(ctx, "app::ai::node.priority")
@@ -880,6 +893,7 @@ g_register_class(ctx, "app::pc::test", lambda(this) {
                     ."add_child"(g_create_class(ctx, "app::pc::level#1.receive")))
                 ."add_child"(g_create_class(ctx, "app::ai::node.parallel")
                     ."set"("name", "底层消息互发")
+                    ."set"("or", false)
                     ."add_child"(g_create_class(ctx, "app::ai::node.sequence")
                         ."set"("name", "接收消息服务")
                         ."set_cond"(g_create_class(ctx, "app::pc::level#2-1.cond"))
