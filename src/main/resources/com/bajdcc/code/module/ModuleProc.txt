@@ -143,7 +143,7 @@ var g_create_semaphore = func ~(name, n) {
 export "g_create_semaphore";
 var g_create_one_semaphore = func ~(name) {
     if (g_query_pipe(name)) {
-        return;
+        return g_create_pipe(name);
     }
     var pipe = g_create_pipe(name);
     g_write_pipe(pipe, '*');

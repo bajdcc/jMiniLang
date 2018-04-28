@@ -3,6 +3,7 @@ import "sys.list";
 import "sys.string";
 import "sys.proc";
 import "sys.task";
+import "sys.ui";
 
 g_set_process_desc("task routine");
 var pid = g_get_pid();
@@ -14,7 +15,7 @@ var in = g_create_pipe("PIPEIN#" + pid);
 var out = g_create_pipe("PIPEOUT#" + pid);
 
 if (g_array_size(args) < 2) {
-    g_write_pipe(out, "Error: missing arguments." + g_endl);
+    g_write_pipe(out, g_ui_fg(255, 0, 0) + "Error: missing arguments." + g_endl + g_ui_fgc());
     g_destroy_pipe(out);
     g_destroy_pipe(in);
     return;
@@ -30,7 +31,7 @@ var error = msg["error"];
 var val = msg["val"];
 val := g_to_string(val);
 if (error == 1) {
-    g_write_pipe_n(out, "Error: " + val);
+    g_write_pipe_n(out, g_ui_fg(255, 0, 0) + "Error: " + val + g_ui_fgc());
 } else {
     g_write_pipe_n(out, val);
 }

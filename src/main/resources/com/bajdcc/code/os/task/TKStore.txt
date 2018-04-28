@@ -1,0 +1,75 @@
+import "sys.base";
+import "sys.list";
+import "sys.proc";
+import "sys.task";
+import "sys.func";
+import "sys.string";
+
+g_set_process_desc("store service");
+g_set_process_priority(73);
+
+g_printn("Running...");
+
+var tid = 5;
+var handle = g_create_pipe("TASKSEND#" + tid);
+var global_storage = {};
+
+var time = func ~(msg, caller) {
+    var id = msg["id"];
+    if (g_is_null(id)) {
+        g_map_put(msg, "error", 1);
+        g_map_put(msg, "val", "invalid task argument - id");
+        return;
+    }
+    var arg = msg["arg"];
+    var arr = g_func_drop(arg, 2);
+    if (g_array_empty(arr)) {
+        g_map_put(msg, "error", 1);
+        g_map_put(msg, "val", "invalid argument");
+        return;
+    }
+    var key = arr[0];
+    if (id == "query") {
+        var val = g_map_contains(global_storage, key);
+        g_map_put(msg, "val", val);
+    } else if (id == "get") {
+        var val = g_map_contains(global_storage, key);
+        if (!val) {
+            g_map_put(msg, "error", 1);
+            g_map_put(msg, "val", "invalid task argument - id");
+            return;
+        }
+        g_map_put(msg, "val", global_storage[key]);
+    } else if (id == "put") {
+        var value = arr[1];
+        if (g_is_null(value)) {
+            g_map_put(msg, "error", 1);
+            g_map_put(msg, "val", "null value");
+            return;
+        }
+        g_map_put(msg, "val", g_map_contains(global_storage, key));
+        g_map_put(global_storage, key, value);
+    } else {
+        g_map_put(msg, "error", 1);
+        g_map_put(msg, "val", "invalid argument");
+    }
+};
+
+var handler = func ~(ch) {
+    if (ch == 'E') {
+        g_destroy_pipe(handle);
+        return;
+    }
+    var msg = g_query_share("TASKDATA#" + tid);
+    var caller = g_query_share("TASKCALLER#" + tid);
+    time(msg, caller);
+    var handle = g_create_pipe("TASKRECV#" + tid);
+    g_write_pipe(handle, 'E');
+};
+
+var data = {};
+g_task_add_proc(5, data);
+
+g_read_pipe(handle, handler);
+
+g_printn("Exit.");

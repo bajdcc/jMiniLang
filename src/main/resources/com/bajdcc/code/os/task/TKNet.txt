@@ -71,6 +71,9 @@ var time = func ~(msg, caller) {
         }
         var res = g_net_get_rss(str);
         g_map_put(msg, "val", res);
+    } else {
+        g_map_put(msg, "error", 1);
+        g_map_put(msg, "val", "invalid argument");
     }
 };
 

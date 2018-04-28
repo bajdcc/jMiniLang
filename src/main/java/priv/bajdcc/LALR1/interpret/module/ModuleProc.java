@@ -501,9 +501,9 @@ public class ModuleProc implements IInterpreterModule {
 				String name = args.get(0).getObj().toString();
 				int result = status.getService().getShareService().startSharing(name, args.get(1));
 				if (result == -1)
-					status.err(RuntimeException.RuntimeError.MAX_HANDLE);
+					status.err(RuntimeException.RuntimeError.MAX_HANDLE, name);
 				if (result == 0)
-					status.err(RuntimeException.RuntimeError.DUP_SHARE_NAME);
+					status.err(RuntimeException.RuntimeError.DUP_SHARE_NAME, name);
 				return new RuntimeObject(BigInteger.valueOf(result));
 			}
 		});
@@ -524,7 +524,7 @@ public class ModuleProc implements IInterpreterModule {
 				String name = args.get(0).getObj().toString();
 				int result = status.getService().getShareService().createSharing(name, args.get(1));
 				if (result == -1)
-					status.err(RuntimeException.RuntimeError.MAX_HANDLE);
+					status.err(RuntimeException.RuntimeError.MAX_HANDLE, name);
 				return new RuntimeObject(BigInteger.valueOf(result));
 			}
 		});
@@ -581,9 +581,9 @@ public class ModuleProc implements IInterpreterModule {
 				String name = args.get(0).getObj().toString();
 				int result = status.getService().getShareService().stopSharing(name);
 				if (result == -1)
-					status.err(RuntimeException.RuntimeError.INVALID_SHARE_NAME);
+					status.err(RuntimeException.RuntimeError.INVALID_SHARE_NAME, name);
 				if (result == 2)
-					status.err(RuntimeException.RuntimeError.INVALID_REFERENCE);
+					status.err(RuntimeException.RuntimeError.INVALID_REFERENCE, name);
 				return new RuntimeObject(result == 1);
 			}
 		});

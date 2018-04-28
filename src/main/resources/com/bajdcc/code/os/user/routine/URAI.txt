@@ -685,6 +685,7 @@ g_register_class(ctx, "app::ai::test", lambda(this) {
         this."output"."put"("v", [0.0, 0.0]);
         this."output"."put"("dir", 0);
 
+
         this."root" := g_new_class(ctx, "app::ai::node.priority",
             [["name", "root"]],
             [["add_child", g_new_class(ctx, "app::ai::node.sequence",
