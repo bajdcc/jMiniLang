@@ -74,6 +74,7 @@ Tasks:
 - Utility
 - Remote
 - UI
+- Store
 
 UI:
 - Clock
@@ -112,6 +113,11 @@ Tests:
 Implemented MSG, usage:
 - Create server: `msg server PORT | filter pipe`
 - Create client: `other pipe | msg connect IP:PORT`
+
+PC command:
+- `pc add A 10 10 100 100`
+- `pc remove A`
+- `pc msg A B`
 
 #### Manual
 
@@ -168,132 +174,142 @@ g_printn("Fibonacci(10) = " + g_tail_opt(
 import "sys.class";
 // create context
 var ctx = call g_create_context();
-// register base class
-call g_register_class(ctx, "shape", lambda(this) { // constructor
-    set this::"type" = "shape";
-    set this::"get_area" = lambda(this) -> 0;
-    set this::"get_index" = lambda(this, i) -> i;
+
+g_register_class(ctx, "shape", lambda(this) {
+    this."type" := "shape";
+    this."get_area" := lambda(this) -> 0;
+    this."get_index" := lambda(this, i) -> i;
 }, g_null);
-// register subclass
-call g_register_class(ctx, "square", lambda(this) {
-    set this::"type" = "square";
-    set this::"a" = 0;
-    set this::"b" = 0;
-    set this::"get_area" = lambda(this) -> this."a" * this."b";
-    set this::"to_string" = lambda(this) -> this."type" + " a=" + this."a" + " b=" + this."b" + " area=" + invoke this::"get_area"();
+g_register_class(ctx, "square", lambda(this) {
+    this."type" := "square";
+    this."a" := 0;
+    this."b" := 0;
+    this."get_area" := lambda(this) -> this."a" * this."b";
+    this."to_string" := lambda(this) -> this."type" + " a=" + this."a" + " b=" + this."b" + " area=" + this."get_area"();
 }, "shape");
-// register subclass
-call g_register_class(ctx, "circle", lambda(this){
-    set this::"type" = "circle";
-    set this::"r" = 0;
-    set this::"get_area" = lambda(this) -> 3.14 * this."r" * this."r";
-    set this::"to_string" = lambda(this) -> this."type" + " r=" + this."r" + " area=" + invoke this::"get_area"();
+g_register_class(ctx, "circle", lambda(this) {
+    this."type" := "circle";
+    this."r" := 0;
+    this."get_area" := lambda(this) -> 3.14 * this."r" * this."r";
+    this."to_string" := lambda(this) -> this."type" + " r=" + this."r" + " area=" + this."get_area"();
 }, "shape");
 
-// instantiate object
-var square = call g_create_class(ctx, "square");
-set square::"a" = 5;
-set square::"b" = 6;
-var circle = call g_create_class(ctx, "circle");
-set circle::"r" = 10;
-set circle::"s" = square;
-call print(invoke square::"to_string"());
-call print(invoke circle::"to_string"());
+var square = g_create_class(ctx, "square");
+square."a" := 5;
+square."b" := 6;
+var circle = g_create_class(ctx, "circle");
+circle."r" := 10;
+circle."s" := square;
 
-// set object property
-set square::"a" = 100;
-set circle."s"::"b" = 120;
+print(square."to_string"());
+print(circle."to_string"());
 
-call print("" + square."type" // get object property
+square."a" := 100;
+circle."s"."b" := 120;
+
+print("" + square."type"
     + " a=" + square."a"
     + " b=" + square."b"
-    + " area=" + invoke square::"get_area"( // invoke
-    + " index=" + invoke square::"get_index"(1));
-call print("" + circle."type"
+    + " area=" + square."get_area"()
+    + " index=" + square."get_index"(1));
+print("" + circle."type"
     + " r=" + circle."r"
     + " sa=" + circle."s"."a"
     + " sb=" + circle."s"."b"
-    + " area=" + invoke circle::"get_area"()
-    + " sarea=" + invoke circle."s"::"get_area"()
-    + " index=" + invoke circle::"get_index"(2)); // dynamic args
-	
-// ----------------------- HOOKED METHOD!
+    + " area=" + circle."get_area"()
+    + " sarea=" + circle."s"."get_area"()
+    + " index=" + circle."get_index"(2));
+
+print("");
+print(g_string_rep("-", 16));
+print("2. Hook");
+print(g_string_rep("-", 16));
 
 // 返回null，因为before回调中没有调用next()，直接拦截
 // 因此before_1后直接退出，before_2和after_1没有执行
-var before_1 = lambda(class, name, this, next) -> call print("HOOKED BEFORE 1: " + class + "::" + name);
-call g_hook_add_before(square, "get_area", before_1);
-var before_2 = lambda(class, name, this, next) -> call print("HOOKED BEFORE 2: " + class + "::" + name);
-call g_hook_add_before(square, "get_area", before_2);
-var after_1 = lambda(class, name, this, ret, next) -> call print("HOOKED AFTER 1: " + class + "::" + name);
-call g_hook_add_after(square, "get_area", after_1);
+var before_1 = lambda(class, name, this, next) -> print("HOOKED BEFORE 1: " + class + "::" + name);
+g_hook_add_before(square, "get_area", before_1);
+var before_2 = lambda(class, name, this, next) -> print("HOOKED BEFORE 2: " + class + "::" + name);
+g_hook_add_before(square, "get_area", before_2);
+var after_1 = lambda(class, name, this, ret, next) -> print("HOOKED AFTER 1: " + class + "::" + name);
+g_hook_add_after(square, "get_area", after_1);
 
-call print("A " + square."type" + " area=" + invoke square::"get_area"()); // failed
+print("A " + square."type" + " area=" + square."get_area"()); // failed
 
-call g_hook_remove_before(square, "get_area", before_1);
-call g_hook_remove_before(square, "get_area", before_2);
-call g_hook_remove_after(square, "get_area", after_1);
+g_hook_remove_before(square, "get_area", before_1);
+g_hook_remove_before(square, "get_area", before_2);
+g_hook_remove_after(square, "get_area", after_1);
 
 // 返回12000，因为before和after都调用next()，未拦截
-let before_1 = lambda(class, name, this, next) {
-    call print("HOOKED BEFORE 1: " + class + "::" + name);
-    return call next();
+before_1 := lambda(class, name, this, next) {
+    print("HOOKED BEFORE 1: " + class + "::" + name);
+    return next();
 };
-call g_hook_add_before(square, "get_area", before_1);
-let before_2 = lambda(class, name, this, next) {
-    call print("HOOKED BEFORE 2: " + class + "::" + name);
-    return call next();
+g_hook_add_before(square, "get_area", before_1);
+before_2 := lambda(class, name, this, next) {
+    print("HOOKED BEFORE 2: " + class + "::" + name);
+    return next();
 };
-call g_hook_add_before(square, "get_area", before_2);
-let after_1 = lambda(class, name, this, r, next) {
-    call print("HOOKED AFTER  3: " + class + "::" + name + "=" + r);
-    return call next();
+g_hook_add_before(square, "get_area", before_2);
+after_1 := lambda(class, name, this, r, next) {
+    print("HOOKED AFTER  3: " + class + "::" + name + "=" + r);
+    return next();
 };
-call g_hook_add_after(square, "get_area", after_1);
+g_hook_add_after(square, "get_area", after_1);
 
-call print("B " + square."type" + " area=" + invoke square::"get_area"());
+print("B " + square."type" + " area=" + square."get_area"());
 
-call g_hook_remove_before(square, "get_area", before_1);
-call g_hook_remove_before(square, "get_area", before_2);
-call g_hook_remove_after(square, "get_area", after_1);
+g_hook_remove_before(square, "get_area", before_1);
+g_hook_remove_before(square, "get_area", before_2);
+g_hook_remove_after(square, "get_area", after_1);
 
 // 返回12346，直接拦截了，因为before_2中没有调用next()
 // 因此返回12345+1，但当before_2返回next()+12345时
 // get_area还是返回12000，拦截没有效果，因为都调用了next()
-let before_1 = lambda(class, name, this, next) {
-    call print("HOOKED BEFORE 4: " + class + "::" + name);
-    return call next() + 1;
+before_1 := lambda(class, name, this, next) {
+    print("HOOKED BEFORE 4: " + class + "::" + name);
+    return next() + 1;
 };
-call g_hook_add_before(square, "get_area", before_1);
-let before_2 = lambda(class, name, this, next) {
-    call print("HOOKED BEFORE 5: " + class + "::" + name);
+g_hook_add_before(square, "get_area", before_1);
+before_2 := lambda(class, name, this, next) {
+    print("HOOKED BEFORE 5: " + class + "::" + name);
     return 12345;
 };
-call g_hook_add_before(square, "get_area", before_2);
-let after_1 = lambda(class, name, this, r, next) {
-    call print("HOOKED AFTER  6: " + class + "::" + name + "=" + r);
-    return call next() + 10;
+g_hook_add_before(square, "get_area", before_2);
+after_1 := lambda(class, name, this, r, next) {
+    print("HOOKED AFTER  6: " + class + "::" + name + "=" + r);
+    return next() + 10;
 };
-call g_hook_add_after(square, "get_area", after_1);
+g_hook_add_after(square, "get_area", after_1);
 
-call print("C " + square."type" + " area=" + invoke square::"get_area"());
+print("C " + square."type" + " area=" + square."get_area"());
 
-call g_hook_remove_before(square, "get_area", before_1);
-call g_hook_remove_before(square, "get_area", before_2);
+g_hook_remove_before(square, "get_area", before_1);
+g_hook_remove_before(square, "get_area", before_2);
 
 // 返回12010，因为有两个after，after_7没有调用next()，直接拦截
 var after_2 = lambda(class, name, this, r, next) {
-    call print("HOOKED AFTER  7: " + class + "::" + name + "=" + r);
+    print("HOOKED AFTER  7: " + class + "::" + name + "=" + r);
     return r;
 };
-call g_hook_add_after(square, "get_area", after_2);
+g_hook_add_after(square, "get_area", after_2);
 
-call print("D " + square."type" + " area=" + invoke square::"get_area"());
+print("D " + square."type" + " area=" + square."get_area"());
 
-call g_hook_remove_after(square, "get_area", after_1);
-call g_hook_remove_after(square, "get_area", after_2);
+g_hook_remove_after(square, "get_area", after_1);
+g_hook_remove_after(square, "get_area", after_2);
 
-call print("E " + square."type" + " area=" + invoke square::"get_area"());
+print("E " + square."type" + " area=" + square."get_area"());
+
+before_1 := lambda(class, name, this, next, arg1) {
+    print("HOOKED BEFORE 5: " + class + "::" + name);
+    return 10000;
+};
+g_hook_add_before(square, "get_index", before_1);
+
+print("F " + square."type" + " index=" + square."get_index"(1));
+
+g_hook_remove_before(square, "get_index", before_1);
 ```
 
 **1. Lambda: Y Combinator of Hanoi**
