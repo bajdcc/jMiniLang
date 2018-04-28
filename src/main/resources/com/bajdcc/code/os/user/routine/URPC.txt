@@ -175,12 +175,11 @@ g_register_class(g_ctx(), "app::ai::node.parallel", lambda(this) {
     g_hook_add_before(this, "do_evaluate", lambda(class, name, this, next, input) { // 测试事件
         var len = this."children"."size"();
         for (var i = 0; i < len; i++) {
-            if (this."children_status"."get"(i) == /* STATE_EXECUTING= */ 0 &&
-                !this."children"."get"(i)."evaluate"(input)) {
-                return false;
+            if (this."children"."get"(i)."evaluate"(input)) {
+                return true;
             }
         }
-        return true;
+        return false;
     });
     g_hook_add_before(this, "do_tick", lambda(class, name, this, next, input, output) { // 定时事件
         var len = this."children"."size"();
@@ -555,7 +554,7 @@ var distance = func ~(a, b) {
 ----------------------------------------------------------------- */
 g_register_class(g_ctx(), "app::pc::level#1.cond", lambda(this) {
     g_hook_add_before(this, "evaluate", lambda(class, name, this, next, input) {
-        if (input["status"]["#1"]["idle"] > 10) {
+        if (input["status"]["#1"]["idle"] > 2) {
             return false;
         }
         return true;
@@ -681,14 +680,14 @@ g_register_class(g_ctx(), "app::pc::level#2-1.cond", lambda(this) {
         if ((input["status"]["#2"]["queue"])."size"() > 5) {
             return true;
         }
-        if (idle < 100) {
+        if (idle < 8) {
             res := (input["status"]["#2"]["recv"])."empty"() && (input["status"]["#2"]["queue"])."empty"();
             if (res) {
-                idle += 10;
+                idle += 3;
                 g_map_put(input["status"]["#2"], "recv_idle", idle);
             }
         }
-        if (idle > 100) {
+        if (idle > 8) {
             return false;
         } else {
             g_map_put(input["status"]["#2"], "recv_idle", idle + 1);
@@ -705,7 +704,7 @@ g_register_class(g_ctx(), "app::pc::level#2-1.recv", lambda(this) {
     this."name" := "level#2-1.recv";
     this."times" := 0;
     g_hook_add_before(this, "do_enter", lambda(class, name, this, next, input) {
-        this."times" := 5;
+        this."times" := 2;
     });
     g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
         this."times" := this."times" - 1;
@@ -750,7 +749,7 @@ g_register_class(g_ctx(), "app::pc::level#2-1.ack", lambda(this) {
     this."name" := "level#2-1.ack";
     this."times" := 0;
     g_hook_add_before(this, "do_enter", lambda(class, name, this, next, input) {
-        this."times" := 5;
+        this."times" := 2;
     });
     g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
         this."times" := this."times" - 1;
@@ -773,14 +772,14 @@ g_register_class(g_ctx(), "app::pc::level#2-2.cond", lambda(this) {
         if ((input["status"]["#2"]["send"])."size"() > 5) {
             return true;
         }
-        if (idle < 100) {
+        if (idle < 8) {
             res := (input["status"]["#2"]["send"])."empty"();
             if (res) {
-                idle += 10;
+                idle += 3;
                 g_map_put(input["status"]["#2"], "send_idle", idle);
             }
         }
-        if (idle > 100) {
+        if (idle > 8) {
             return false;
         } else {
             g_map_put(input["status"]["#2"], "send_idle", idle + 1);
@@ -797,7 +796,7 @@ g_register_class(g_ctx(), "app::pc::level#2-2.send", lambda(this) {
     this."name" := "level#2-2.send";
     this."times" := 0;
     g_hook_add_before(this, "do_enter", lambda(class, name, this, next, input) {
-        this."times" := 5;
+        this."times" := 2;
     });
     g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
         this."times" := this."times" - 1;
@@ -828,7 +827,7 @@ g_register_class(g_ctx(), "app::pc::level#2-2.wait", lambda(this) {
     this."name" := "level#2-2.wait";
     this."times" := 0;
     g_hook_add_before(this, "do_enter", lambda(class, name, this, next, input) {
-        this."times" := 5;
+        this."times" := 2;
     });
     g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
         this."times" := this."times" - 1;
@@ -847,9 +846,9 @@ g_register_class(g_ctx(), "app::pc::level#2-2.wait", lambda(this) {
 g_register_class(g_ctx(), "app::pc::level#3.cond", lambda(this) {
     g_hook_add_before(this, "evaluate", lambda(class, name, this, next, input) {
         var idle = input["status"]["#3"]["idle"];
-        if (idle > 5) {
+        if (idle > 2) {
             var msg_idle = input["status"]["#3"]["msg_idle"];
-            if (g_task_get_timestamp() - msg_idle > 30000) {
+            if (g_task_get_timestamp() - msg_idle > 600000) {
                 g_map_put(input["status"]["#3"], "msg_idle", g_task_get_timestamp());
                 g_map_put(input["status"]["#3"], "broadcast", false);
             }
@@ -873,7 +872,7 @@ g_register_class(g_ctx(), "app::pc::level#3.idle", lambda(this) {
     this."name" := "level#3.idle";
     this."times" := 0;
     g_hook_add_before(this, "do_enter", lambda(class, name, this, next, input) {
-        this."times" := 5;
+        this."times" := 2;
     });
     g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
         this."times" := this."times" - 1;
@@ -881,7 +880,6 @@ g_register_class(g_ctx(), "app::pc::level#3.idle", lambda(this) {
             return /* STATE_EXECUTING= */ 0;
         }
         if (input["status"]["#3"]["broadcast"]) { return /* STATE_FINISH= */ 1; }
-        g_map_put(input["status"]["#3"], "broadcast", true);
         g_map_put(input["status"]["#3"], "broadcast", true);
         this."logd"(input["name"], "空闲");
         foreach (var route : g_range_array((input["status"]["#1"]["route"])."values"())) {
@@ -938,8 +936,8 @@ g_register_class(g_ctx(), "app::pc::test", lambda(this) {
                     "send_idle": 0
                 },
                 "#3": {
-                    "broadcast": false,
-                    "msg_idle": 0,
+                    "broadcast": true,
+                    "msg_idle": g_task_get_timestamp(),
                     "idle": 0,
                     "echo": 0
                 }
@@ -968,6 +966,18 @@ g_register_class(g_ctx(), "app::pc::test", lambda(this) {
                     ."set"("name", "顶层消息服务")
                     ."set_cond"(g_create_class(g_ctx(), "app::pc::level#3.cond"))
                     ."add_child"(g_create_class(g_ctx(), "app::pc::level#3.idle")))});
+    };
+    this."send_msg" := lambda(this, src, dst) {
+        if (this."pc"."contains"(src) && this."pc"."contains"(dst)) {
+            ((this."pc"."get"(src))["status"]["#2"]["send"])."insert"(0, {
+                "origin": src,
+                "target": dst,
+                "message": "Hello, " + dst +"! From " + src + "."
+            });
+            ((this."pc"."get"(dst))["status"]["#2"]["recv"])."add"(src);
+            return true;
+        }
+        return false;
     };
 }, "object");
 
@@ -1013,6 +1023,20 @@ if (!g_array_empty(args)) {
             var h = g_string_atoi(args[5]);
             test."create_pc"({"name": name, "x": x, "y": y, "w": w, "h": h});
             g_logn("创建成功，名称：" + name + "，坐标：（" + x + "，" + y + "），范围：（" + w + "，" + h + "）");
+        }
+    } else if (op == "msg") {
+        if (g_array_size(args) < 3) {
+            err_msg := "参数太少";
+            success := false;
+        } else {
+            var src = args[1];
+            var dst = args[2];
+            if (test."send_msg"(src, dst)) {
+                g_logn("发送消息成功，从：" + src + "，到：" + dst);
+            } else {
+                err_msg := "对象不存在";
+                success := false;
+            }
         }
     }
     if (!success) {
