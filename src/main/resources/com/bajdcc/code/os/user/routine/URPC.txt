@@ -5,6 +5,7 @@ import "sys.string";
 import "sys.class";
 import "sys.math";
 import "sys.task";
+import "sys.func";
 import "sys.ui";
 import "std.base";
 
@@ -554,7 +555,8 @@ var distance = func ~(a, b) {
 ----------------------------------------------------------------- */
 g_register_class(g_ctx(), "app::pc::level#1.cond", lambda(this) {
     g_hook_add_before(this, "evaluate", lambda(class, name, this, next, input) {
-        if (input["status"]["#1"]["idle"] > 2) {
+        var min = g_func_min((input["status"]["#1"]["queue"])."size"(), 10);
+        if (input["status"]["#1"]["idle"] > min) {
             return false;
         }
         return true;
@@ -567,15 +569,7 @@ g_register_class(g_ctx(), "app::pc::level#1.cond", lambda(this) {
 ----------------------------------------------------------------- */
 g_register_class(g_ctx(), "app::pc::level#1.broadcast", lambda(this) {
     this."name" := "level#1.broadcast";
-    this."times" := 0;
-    g_hook_add_before(this, "do_enter", lambda(class, name, this, next, input) {
-        this."times" := 2;
-    });
     g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
-        this."times" := this."times" - 1;
-        if (this."times" > 0) {
-            return /* STATE_EXECUTING= */ 0;
-        }
         //this."logd"(input["name"], "广播路由表");
         foreach (var pc : g_range_array(output."pc"."values"())) {
             if (input["name"] != pc["name"] && valid_zone(input["status"], pc["status"])) {
@@ -598,15 +592,7 @@ g_register_class(g_ctx(), "app::pc::level#1.broadcast", lambda(this) {
 ----------------------------------------------------------------- */
 g_register_class(g_ctx(), "app::pc::level#1.receive", lambda(this) {
     this."name" := "level#1.receive";
-    this."times" := 0;
-    g_hook_add_before(this, "do_enter", lambda(class, name, this, next, input) {
-        this."times" := 2;
-    });
     g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
-        this."times" := this."times" - 1;
-        if (this."times" > 0) {
-            return /* STATE_EXECUTING= */ 0;
-        }
         if ((input["status"]["#1"]["queue"])."empty"()) {
             return /* STATE_FINISH= */ 1;
         }
@@ -676,18 +662,19 @@ g_register_class(g_ctx(), "app::pc::level#1.receive", lambda(this) {
 g_register_class(g_ctx(), "app::pc::level#2-1.cond", lambda(this) {
     g_hook_add_before(this, "evaluate", lambda(class, name, this, next, input) {
         var idle = input["status"]["#2"]["recv_idle"];
+        var min = g_func_min((input["status"]["#2"]["queue"])."size"(), 10);
         var res = false;
-        if ((input["status"]["#2"]["queue"])."size"() > 5) {
+        if ((input["status"]["#2"]["queue"])."size"() > min) {
             return true;
         }
-        if (idle < 8) {
+        if (idle < min) {
             res := (input["status"]["#2"]["recv"])."empty"() && (input["status"]["#2"]["queue"])."empty"();
             if (res) {
-                idle += 3;
+                idle += 4;
                 g_map_put(input["status"]["#2"], "recv_idle", idle);
             }
         }
-        if (idle > 8) {
+        if (idle > min) {
             return false;
         } else {
             g_map_put(input["status"]["#2"], "recv_idle", idle + 1);
@@ -702,15 +689,7 @@ g_register_class(g_ctx(), "app::pc::level#2-1.cond", lambda(this) {
 ----------------------------------------------------------------- */
 g_register_class(g_ctx(), "app::pc::level#2-1.recv", lambda(this) {
     this."name" := "level#2-1.recv";
-    this."times" := 0;
-    g_hook_add_before(this, "do_enter", lambda(class, name, this, next, input) {
-        this."times" := 2;
-    });
     g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
-        this."times" := this."times" - 1;
-        if (this."times" > 0) {
-            return /* STATE_EXECUTING= */ 0;
-        }
         var msg = (input["status"]["#2"]["queue"])."pop"();
         if (g_is_null(msg)) { this."times" := 10; return /* STATE_EXECUTING= */ 0; }
         if (msg["target"] == input["name"]) {
@@ -747,15 +726,7 @@ g_register_class(g_ctx(), "app::pc::level#2-1.recv", lambda(this) {
 ----------------------------------------------------------------- */
 g_register_class(g_ctx(), "app::pc::level#2-1.ack", lambda(this) {
     this."name" := "level#2-1.ack";
-    this."times" := 0;
-    g_hook_add_before(this, "do_enter", lambda(class, name, this, next, input) {
-        this."times" := 2;
-    });
     g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
-        this."times" := this."times" - 1;
-        if (this."times" > 0) {
-            return /* STATE_EXECUTING= */ 0;
-        }
         //this."logd"(input["name"], "发送回应");
         return /* STATE_FINISH= */ 1;
     });
@@ -768,18 +739,19 @@ g_register_class(g_ctx(), "app::pc::level#2-1.ack", lambda(this) {
 g_register_class(g_ctx(), "app::pc::level#2-2.cond", lambda(this) {
     g_hook_add_before(this, "evaluate", lambda(class, name, this, next, input) {
         var idle = input["status"]["#2"]["send_idle"];
+        var min = g_func_min((input["status"]["#2"]["send"])."size"(), 10);
         var res = false;
-        if ((input["status"]["#2"]["send"])."size"() > 5) {
+        if ((input["status"]["#2"]["send"])."size"() > min) {
             return true;
         }
-        if (idle < 8) {
+        if (idle < min) {
             res := (input["status"]["#2"]["send"])."empty"();
             if (res) {
-                idle += 3;
+                idle += 4;
                 g_map_put(input["status"]["#2"], "send_idle", idle);
             }
         }
-        if (idle > 8) {
+        if (idle > min) {
             return false;
         } else {
             g_map_put(input["status"]["#2"], "send_idle", idle + 1);
@@ -794,15 +766,7 @@ g_register_class(g_ctx(), "app::pc::level#2-2.cond", lambda(this) {
 ----------------------------------------------------------------- */
 g_register_class(g_ctx(), "app::pc::level#2-2.send", lambda(this) {
     this."name" := "level#2-2.send";
-    this."times" := 0;
-    g_hook_add_before(this, "do_enter", lambda(class, name, this, next, input) {
-        this."times" := 2;
-    });
     g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
-        this."times" := this."times" - 1;
-        if (this."times" > 0) {
-            return /* STATE_EXECUTING= */ 0;
-        }
         var msg = (input["status"]["#2"]["send"])."pop"();
         if (g_is_null(msg)) { this."times" := 10; return /* STATE_EXECUTING= */ 0; }
         if ((input["status"]["#1"]["route"])."contains"(msg["target"])) {
@@ -825,15 +789,7 @@ g_register_class(g_ctx(), "app::pc::level#2-2.send", lambda(this) {
 ----------------------------------------------------------------- */
 g_register_class(g_ctx(), "app::pc::level#2-2.wait", lambda(this) {
     this."name" := "level#2-2.wait";
-    this."times" := 0;
-    g_hook_add_before(this, "do_enter", lambda(class, name, this, next, input) {
-        this."times" := 2;
-    });
     g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
-        this."times" := this."times" - 1;
-        if (this."times" > 0) {
-            return /* STATE_EXECUTING= */ 0;
-        }
         //this."logd"(input["name"], "等待回应");
         return /* STATE_FINISH= */ 1;
     });
@@ -870,15 +826,7 @@ g_register_class(g_ctx(), "app::pc::level#3.cond", lambda(this) {
 ----------------------------------------------------------------- */
 g_register_class(g_ctx(), "app::pc::level#3.idle", lambda(this) {
     this."name" := "level#3.idle";
-    this."times" := 0;
-    g_hook_add_before(this, "do_enter", lambda(class, name, this, next, input) {
-        this."times" := 2;
-    });
     g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
-        this."times" := this."times" - 1;
-        if (this."times" > 0) {
-            return /* STATE_EXECUTING= */ 0;
-        }
         if (input["status"]["#3"]["broadcast"]) { return /* STATE_FINISH= */ 1; }
         g_map_put(input["status"]["#3"], "broadcast", true);
         this."logd"(input["name"], "空闲");
