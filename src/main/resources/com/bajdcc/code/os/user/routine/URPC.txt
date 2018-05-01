@@ -581,7 +581,7 @@ g_register_class(g_ctx(), "app::pc::level#1.broadcast", lambda(this) {
                 });
             }
         }
-        g_map_put(input["status"]["#1"], "idle", input["status"]["#1"]["idle"] + 1);
+        input["status"]["#1"]["idle"] := input["status"]["#1"]["idle"] + 1;
         return /* STATE_FINISH= */ 1;
     });
 }, "app::ai::node.terminal");
@@ -621,7 +621,7 @@ g_register_class(g_ctx(), "app::pc::level#1.receive", lambda(this) {
                 "span": delta,
                 "pass": msg["origin"]
             });
-            g_map_put(input["status"]["#1"], "idle", 0);
+            input["status"]["#1"]["idle"] := 0;
         }
         foreach (var route : g_range_array((msg["route"])."values"())) {
             if (route["origin"] == input["name"]) { continue; }
@@ -648,7 +648,7 @@ g_register_class(g_ctx(), "app::pc::level#1.receive", lambda(this) {
                     "span": _span,
                     "pass": msg["origin"]
                 });
-                g_map_put(input["status"]["#1"], "idle", 0);
+                input["status"]["#1"]["idle"] := 0;
             }
         }
         return /* STATE_FINISH= */ 1;
@@ -671,13 +671,13 @@ g_register_class(g_ctx(), "app::pc::level#2-1.cond", lambda(this) {
             res := (input["status"]["#2"]["recv"])."empty"() && (input["status"]["#2"]["queue"])."empty"();
             if (res) {
                 idle += 4;
-                g_map_put(input["status"]["#2"], "recv_idle", idle);
+                input["status"]["#2"]["recv_idle"] := idle;
             }
         }
         if (idle > min) {
             return false;
         } else {
-            g_map_put(input["status"]["#2"], "recv_idle", idle + 1);
+            input["status"]["#2"]["recv_idle"] := idle + 1;
         }
         return !res;
     });
@@ -699,7 +699,7 @@ g_register_class(g_ctx(), "app::pc::level#2-1.recv", lambda(this) {
                 index++;
                 if (recv == msg["origin"]) {
                     this."logd"(input["name"], "收到数据包，" + msg["origin"] + " >> " + msg["target"] + "，内容：" + msg["message"]);
-                    g_map_put(input["status"]["#3"], "echo", input["status"]["#3"]["echo"] + 1);
+                    input["status"]["#3"]["echo"] := input["status"]["#3"]["echo"] + 1;
                     /*this."logd"(input["name"], "队列：" + (input["status"]["#2"]["queue"])."size"() +
                         "，发送：" + (input["status"]["#2"]["send"])."size"() +
                         "，接收：" + ((input["status"]["#2"]["recv"])."size"() - 1) +
@@ -748,13 +748,13 @@ g_register_class(g_ctx(), "app::pc::level#2-2.cond", lambda(this) {
             res := (input["status"]["#2"]["send"])."empty"();
             if (res) {
                 idle += 4;
-                g_map_put(input["status"]["#2"], "send_idle", idle);
+                input["status"]["#2"]["send_idle"] := idle;
             }
         }
         if (idle > min) {
             return false;
         } else {
-            g_map_put(input["status"]["#2"], "send_idle", idle + 1);
+            input["status"]["#2"]["send_idle"] := idle + 1;
         }
         return !res;
     });
@@ -805,16 +805,16 @@ g_register_class(g_ctx(), "app::pc::level#3.cond", lambda(this) {
         if (idle > 2) {
             var msg_idle = input["status"]["#3"]["msg_idle"];
             if (g_task_get_timestamp() - msg_idle > 600000) {
-                g_map_put(input["status"]["#3"], "msg_idle", g_task_get_timestamp());
-                g_map_put(input["status"]["#3"], "broadcast", false);
+                input["status"]["#3"]["msg_idle"] := g_task_get_timestamp();
+                input["status"]["#3"]["broadcast"] := false;
             }
-            g_map_put(input["status"]["#1"], "idle", 0);
-            g_map_put(input["status"]["#2"], "send_idle", 0);
-            g_map_put(input["status"]["#2"], "recv_idle", 0);
-            g_map_put(input["status"]["#3"], "idle", 0);
+            input["status"]["#1"]["idle"] := 0;
+            input["status"]["#2"]["send_idle"] := 0;
+            input["status"]["#2"]["recv_idle"] := 0;
+            input["status"]["#3"]["idle"] := 0;
             return false;
         } else {
-            g_map_put(input["status"]["#3"], "idle", idle + 1);
+            input["status"]["#3"]["idle"] := idle + 1;
             return true;
         }
     });
@@ -828,7 +828,7 @@ g_register_class(g_ctx(), "app::pc::level#3.idle", lambda(this) {
     this."name" := "level#3.idle";
     g_hook_add_before(this, "do_execute", lambda(class, name, this, next, input, output) {
         if (input["status"]["#3"]["broadcast"]) { return /* STATE_FINISH= */ 1; }
-        g_map_put(input["status"]["#3"], "broadcast", true);
+        input["status"]["#3"]["broadcast"] := true;
         this."logd"(input["name"], "空闲");
         foreach (var route : g_range_array((input["status"]["#1"]["route"])."values"())) {
             if (route["origin"] == input["name"]) { continue; }

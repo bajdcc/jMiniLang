@@ -5,15 +5,13 @@ import priv.bajdcc.LALR1.grammar.runtime.RuntimeInst;
 import priv.bajdcc.LALR1.grammar.semantic.ISemanticRecorder;
 import priv.bajdcc.LALR1.grammar.tree.closure.IClosureScope;
 import priv.bajdcc.util.lexer.token.OperatorType;
-import priv.bajdcc.util.lexer.token.Token;
-import priv.bajdcc.util.lexer.token.TokenType;
 
 /**
- * 【语义分析】间接寻址
+ * 【语义分析】间接寻址赋值
  *
  * @author bajdcc
  */
-public class ExpIndex implements IExp {
+public class ExpIndexAssign implements IExp {
 
 	/**
 	 * 对象
@@ -24,6 +22,11 @@ public class ExpIndex implements IExp {
 	 * 索引
 	 */
 	private IExp index = null;
+
+	/**
+	 * 对象
+	 */
+	private IExp obj = null;
 
 	public IExp getExp() {
 		return exp;
@@ -41,6 +44,14 @@ public class ExpIndex implements IExp {
 		this.index = index;
 	}
 
+	public IExp getObj() {
+		return obj;
+	}
+
+	public void setObj(IExp obj) {
+		this.obj = obj;
+	}
+
 	@Override
 	public boolean isConstant() {
 		return false;
@@ -55,6 +66,7 @@ public class ExpIndex implements IExp {
 	public IExp simplify(ISemanticRecorder recorder) {
 		exp = exp.simplify(recorder);
 		index = index.simplify(recorder);
+		obj = obj.simplify(recorder);
 		return this;
 	}
 
@@ -62,13 +74,15 @@ public class ExpIndex implements IExp {
 	public void analysis(ISemanticRecorder recorder) {
 		exp.analysis(recorder);
 		index.analysis(recorder);
+		obj.analysis(recorder);
 	}
 
 	@Override
 	public void genCode(ICodegen codegen) {
+		obj.genCode(codegen);
 		exp.genCode(codegen);
 		index.genCode(codegen);
-		codegen.genCode(RuntimeInst.iidx);
+		codegen.genCode(RuntimeInst.iidxa);
 	}
 
 	@Override
@@ -83,6 +97,10 @@ public class ExpIndex implements IExp {
 		sb.append(OperatorType.LSQUARE.getName());
 		sb.append(index.print(prefix));
 		sb.append(OperatorType.RSQUARE.getName());
+		sb.append(" ");
+		sb.append(OperatorType.ASSIGN.getName());
+		sb.append(" ");
+		sb.append(obj.print(prefix));
 		return sb.toString();
 	}
 
@@ -90,6 +108,7 @@ public class ExpIndex implements IExp {
 	public void addClosure(IClosureScope scope) {
 		exp.addClosure(scope);
 		index.addClosure(scope);
+		obj.addClosure(scope);
 	}
 
 	@Override

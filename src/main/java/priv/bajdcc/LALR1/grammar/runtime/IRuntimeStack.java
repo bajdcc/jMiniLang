@@ -81,6 +81,8 @@ public interface IRuntimeStack {
 
 	void opIndex() throws RuntimeException;
 
+	void opIndexAssign() throws RuntimeException;
+
 	void opTry() throws RuntimeException;
 
 	void opThrow() throws RuntimeException;

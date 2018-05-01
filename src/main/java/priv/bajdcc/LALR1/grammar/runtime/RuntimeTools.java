@@ -216,6 +216,9 @@ public class RuntimeTools {
 			case iidx:
 				stk.opIndex();
 				break;
+			case iidxa:
+				stk.opIndexAssign();
+				break;
 			case itry:
 				stk.opTry();
 				break;

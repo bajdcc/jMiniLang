@@ -50,6 +50,9 @@ var g_set_property_rec = func ~(class, name, property) {
 };
 export "g_set_property_rec";
 var g_set_property = func ~(class, name, property) {
+    if (g_get_type_ordinal(class) != 10) {
+        throw "Not class type: " + g_to_string(class) + "." + name;
+    }
     if (g_map_contains(class, name)) {
         g_map_put(class, name, property);
         return true;

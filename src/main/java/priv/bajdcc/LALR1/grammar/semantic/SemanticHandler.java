@@ -140,13 +140,22 @@ public class SemanticHandler {
 						ExpInvokeProperty invoke = (ExpInvokeProperty) indexed.get(0).object;
 						invoke.setObj((IExp) indexed.get(1).object);
 						return invoke;
-					} else if (indexed.get(1).object instanceof ExpBinop) {
-						ExpBinop bin = (ExpBinop) indexed.get(1).object;
-						if (TokenTools.isAssignment((OperatorType) token.object)) {
-							ExpAssignProperty assign = new ExpAssignProperty();
-							assign.setObj(bin.getLeftOperand());
-							assign.setProperty(bin.getRightOperand());
-							assign.setExp((IExp) indexed.get(0).object);
+					} else if (TokenTools.isAssignment((OperatorType) token.object)) {
+						if (indexed.get(1).object instanceof ExpBinop) {
+							ExpBinop bin = (ExpBinop) indexed.get(1).object;
+							if (bin.getToken().object == OperatorType.DOT) {
+								ExpAssignProperty assign = new ExpAssignProperty();
+								assign.setObj(bin.getLeftOperand());
+								assign.setProperty(bin.getRightOperand());
+								assign.setExp((IExp) indexed.get(0).object);
+								return assign;
+							}
+						} else if (indexed.get(1).object instanceof ExpIndex) {
+							ExpIndex bin = (ExpIndex) indexed.get(1).object;
+							ExpIndexAssign assign = new ExpIndexAssign();
+							assign.setExp(bin.getExp());
+							assign.setIndex(bin.getIndex());
+							assign.setObj((IExp) indexed.get(0).object);
 							return assign;
 						}
 					}

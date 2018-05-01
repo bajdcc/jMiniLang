@@ -1027,6 +1027,29 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	}
 
 	@Override
+	public void opIndexAssign() throws RuntimeException {
+		RuntimeObject index = load();
+		RuntimeObject obj = load();
+		RuntimeObject exp = load();
+		RuntimeObjectType typeIdx = index.getType();
+		RuntimeObjectType typeObj = obj.getType();
+		if (typeIdx == RuntimeObjectType.kInt) {
+			if (typeObj == RuntimeObjectType.kArray) {
+				((RuntimeArray) obj.getObj()).set(((BigInteger) index.getObj()).intValue(), exp);
+				stack.pushData(obj);
+				return;
+			}
+		} else if (typeIdx == RuntimeObjectType.kString) {
+			if (typeObj == RuntimeObjectType.kMap) {
+				((RuntimeMap) obj.getObj()).put(String.valueOf(index.getObj()), exp);
+				stack.pushData(obj);
+				return;
+			}
+		}
+		err(RuntimeError.WRONG_ARGTYPE, obj.toString() + ", " + index.toString());
+	}
+
+	@Override
 	public void opTry() throws RuntimeException {
 		triesCount++;
 		int jmp = current();
