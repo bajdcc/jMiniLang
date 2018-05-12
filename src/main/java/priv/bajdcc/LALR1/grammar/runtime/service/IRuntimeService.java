@@ -14,4 +14,6 @@ public interface IRuntimeService {
 	IRuntimeProcessService getProcessService();
 
 	IRuntimeFileService getFileService();
+
+	IRuntimeDialogService getDialogService();
 }

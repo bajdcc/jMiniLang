@@ -112,3 +112,20 @@ var g_ui_fgc = func ~() -> g_ui_fg(0, 0, 0);
 export "g_ui_fgc";
 var g_ui_bgc = func ~() -> g_ui_bg(255, 255, 255);
 export "g_ui_bgc";
+var g_ui_dialog = func ~(caption, text, mode) {
+    var handle = g_ui_create_dialog_internal(caption, text, mode);
+    if (!g_is_valid_handle(handle)) {
+        throw "Create dialog failed.";
+    }
+    var share_name = "DIALOG#DATA#" + g_to_string(handle);
+    var share = [];
+    g_start_share(share_name, share);
+    var mutex_name = "DIALOG#SIG#" + g_to_string(handle);
+    var mutex = g_use_mutex(mutex_name);
+    g_ui_show_dialog_internal(handle);
+    g_lock_mutex(mutex);
+    g_destroy_mutex(mutex);
+    g_stop_share(share_name);
+    return share;
+};
+export "g_ui_dialog";

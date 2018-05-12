@@ -848,6 +848,36 @@ var stage_badapple = func ~() {
     g_write_pipe(out, "\f");
 };
 
+// ---------------------------------------------
+// DIALOG
+
+var show_dialog = func ~(caption, text, mode) {
+    put(caption + " " + text);
+    var r = g_ui_dialog(caption, text, mode);
+    if (!g_array_empty(r)) {
+        putn(" = " + r[0]);
+    } else {
+        putn("");
+    }
+};
+
+var stage_dialog = func ~() {
+    show_dialog("对话框测试", "模态 - 普通", 0);
+    show_dialog("对话框测试", "模态 - 错误", 1);
+    show_dialog("对话框测试", "模态 - 信息", 2);
+    show_dialog("对话框测试", "模态 - 警告", 3);
+    show_dialog("对话框测试", "模态 - 询问", 4);
+    show_dialog("对话框测试", "确认 - 普通", 10);
+    show_dialog("对话框测试", "确认 - 是/否", 11);
+    show_dialog("对话框测试", "确认 - 是/否/取消", 12);
+    show_dialog("对话框测试", "确认 - 是/取消", 13);
+    show_dialog("对话框测试", "输入 - 普通", 20);
+    show_dialog("对话框测试", "输入 - 错误", 21);
+    show_dialog("对话框测试", "输入 - 信息", 22);
+    show_dialog("对话框测试", "输入 - 警告", 23);
+    show_dialog("对话框测试", "输入 - 询问", 24);
+};
+
 var name = args[0];
 if (g_is_null(name)) {
     create_stage(stage_clear);
@@ -870,6 +900,8 @@ if (g_is_null(name)) {
     stage_try();
 } else if (name == "badapple") {
     stage_badapple();
+} else if (name == "dialog") {
+    stage_dialog();
 } else {
     g_read_pipe_args(in, lambda(ch, out) -> g_write_pipe(out, ch), out);
 }

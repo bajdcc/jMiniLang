@@ -24,6 +24,7 @@ public class UIPanel extends JPanel {
 		this.graphics = new UIGraphics(890, 655, 80, 25, 11, 25, 1);
 		moduleUI = ModuleUI.getInstance();
 		moduleUI.setGraphics(this.graphics);
+		moduleUI.setPanel(this);
 		this.setFocusable(true);
 		this.addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent e) {

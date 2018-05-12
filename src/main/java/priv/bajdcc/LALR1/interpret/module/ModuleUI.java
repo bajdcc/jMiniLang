@@ -2,9 +2,11 @@ package priv.bajdcc.LALR1.interpret.module;
 
 import priv.bajdcc.LALR1.grammar.Grammar;
 import priv.bajdcc.LALR1.grammar.runtime.*;
+import priv.bajdcc.LALR1.ui.UIPanel;
 import priv.bajdcc.LALR1.ui.drawing.UIGraphics;
 import priv.bajdcc.util.ResourceLoader;
 
+import javax.swing.*;
 import java.math.BigInteger;
 import java.util.ArrayDeque;
 import java.util.List;
@@ -21,6 +23,7 @@ public class ModuleUI implements IInterpreterModule {
 	private static final int INPUT_TIME = 10;
 	private static ModuleUI instance = new ModuleUI();
 	private UIGraphics graphics;
+	private JPanel panel;
 	private Queue<Character> queue = new LinkedBlockingDeque<>(10000);
 	private Queue<Character> queueDisplay = new ArrayDeque<>();
 	private StringBuilder sb = new StringBuilder();
@@ -29,6 +32,10 @@ public class ModuleUI implements IInterpreterModule {
 
 	public void setGraphics(UIGraphics graphics) {
 		this.graphics = graphics;
+	}
+
+	public void setPanel(JPanel panel) {
+		this.panel = panel;
 	}
 
 	public void addInputChar(char c) {
@@ -285,6 +292,44 @@ public class ModuleUI implements IInterpreterModule {
 			                                      IRuntimeStatus status) {
 				String str = String.valueOf(args.get(0).getObj());
 				return new RuntimeObject(BigInteger.valueOf(graphics.calcWidth(str)));
+			}
+		});
+		info.addExternalFunc("g_ui_create_dialog_internal", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "创建对话框";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kString, RuntimeObjectType.kString, RuntimeObjectType.kInt};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				String caption = String.valueOf(args.get(0).getObj());
+				String text = String.valueOf(args.get(1).getObj());
+				int mode = ((BigInteger)args.get(2).getObj()).intValue();
+				return new RuntimeObject(status.getService().getDialogService().create(caption, text, mode, panel));
+			}
+		});
+		info.addExternalFunc("g_ui_show_dialog_internal", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "弹出对话框";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kPtr};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				int handle = (int) args.get(0).getObj();
+				return new RuntimeObject(status.getService().getDialogService().show(handle));
 			}
 		});
 	}
