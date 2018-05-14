@@ -5,6 +5,7 @@ import priv.bajdcc.LALR1.grammar.runtime.RuntimeInst;
 import priv.bajdcc.LALR1.grammar.semantic.ISemanticRecorder;
 import priv.bajdcc.LALR1.grammar.tree.closure.IClosureScope;
 import priv.bajdcc.util.lexer.token.OperatorType;
+import priv.bajdcc.util.lexer.token.Token;
 
 /**
  * 【语义分析】间接寻址赋值
@@ -12,6 +13,11 @@ import priv.bajdcc.util.lexer.token.OperatorType;
  * @author bajdcc
  */
 public class ExpIndexAssign implements IExp {
+
+	/**
+	 * 操作符
+	 */
+	private Token token = null;
 
 	/**
 	 * 对象
@@ -27,6 +33,10 @@ public class ExpIndexAssign implements IExp {
 	 * 对象
 	 */
 	private IExp obj = null;
+
+	public void setToken(Token token) {
+		this.token = token;
+	}
 
 	public IExp getExp() {
 		return exp;
@@ -79,7 +89,40 @@ public class ExpIndexAssign implements IExp {
 
 	@Override
 	public void genCode(ICodegen codegen) {
-		obj.genCode(codegen);
+		if (token == null || token.object == OperatorType.EQ_ASSIGN) {
+			obj.genCode(codegen);
+		} else {
+			exp.genCode(codegen);
+			index.genCode(codegen);
+			codegen.genCode(RuntimeInst.iidx);
+			obj.genCode(codegen);
+			switch ((OperatorType) token.object) {
+				case PLUS_ASSIGN:
+					codegen.genCode(RuntimeInst.iadd);
+					break;
+				case MINUS_ASSIGN:
+					codegen.genCode(RuntimeInst.isub);
+					break;
+				case TIMES_ASSIGN:
+					codegen.genCode(RuntimeInst.imul);
+					break;
+				case DIV_ASSIGN:
+					codegen.genCode(RuntimeInst.idiv);
+					break;
+				case AND_ASSIGN:
+					codegen.genCode(RuntimeInst.iand);
+					break;
+				case OR_ASSIGN:
+					codegen.genCode(RuntimeInst.ior);
+					break;
+				case XOR_ASSIGN:
+					codegen.genCode(RuntimeInst.ixor);
+					break;
+				case MOD_ASSIGN:
+					codegen.genCode(RuntimeInst.imod);
+					break;
+			}
+		}
 		exp.genCode(codegen);
 		index.genCode(codegen);
 		codegen.genCode(RuntimeInst.iidxa);
@@ -98,7 +141,7 @@ public class ExpIndexAssign implements IExp {
 		sb.append(index.print(prefix));
 		sb.append(OperatorType.RSQUARE.getName());
 		sb.append(" ");
-		sb.append(OperatorType.ASSIGN.getName());
+		sb.append(((token == null) ? OperatorType.ASSIGN.getName() : token.toRealString()));
 		sb.append(" ");
 		sb.append(obj.print(prefix));
 		return sb.toString();

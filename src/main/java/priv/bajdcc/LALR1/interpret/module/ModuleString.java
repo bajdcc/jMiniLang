@@ -209,8 +209,10 @@ public class ModuleString implements IInterpreterModule {
 				String regex = (String) args.get(1).getObj();
 				Matcher m = Pattern.compile(regex).matcher(str);
 				RuntimeArray arr = new RuntimeArray();
-				while (m.find()) {
-					arr.add(new RuntimeObject(m.group()));
+				if (m.find()) {
+					for (int i = 0; i <= m.groupCount(); i++) {
+						arr.add(new RuntimeObject(m.group(i)));
+					}
 				}
 				return new RuntimeObject(arr);
 			}

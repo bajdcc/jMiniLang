@@ -15,9 +15,10 @@ import priv.bajdcc.LALR1.interpret.module.net.ModuleNetClient;
 import priv.bajdcc.LALR1.interpret.module.net.ModuleNetServer;
 import priv.bajdcc.util.ResourceLoader;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
@@ -145,6 +146,53 @@ public class ModuleNet implements IInterpreterModule {
 				try {
 					URL url = new URL(txt);
 					URLConnection urlConnection = url.openConnection(); // 打开连接
+					urlConnection.setRequestProperty("accept", "*/*");
+					urlConnection.setRequestProperty("connection", "Keep-Alive");
+					urlConnection.setRequestProperty("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)");
+					BufferedReader br = new BufferedReader(new InputStreamReader(urlConnection.getInputStream(), "utf-8")); // 获取输入流
+					String line = null;
+					StringBuilder sb = new StringBuilder();
+					while ((line = br.readLine()) != null) {
+						sb.append(line).append("\n");
+					}
+					text = sb.toString();
+					br.close();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				return parseJson(text);
+			}
+		});
+		info.addExternalFunc("g_net_post_json", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "HTTP POST - json";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kString, RuntimeObjectType.kString};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				String text = "";
+				String txt = String.valueOf(args.get(0).getObj());
+				String data = String.valueOf(args.get(1).getObj());
+				logger.debug("Request url(json): " + txt);
+				try {
+					URL url = new URL(txt);
+					HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection(); // 打开连接
+					urlConnection.setDoOutput(true);
+					urlConnection.setDoInput(true);
+					urlConnection.setRequestMethod("POST");
+					urlConnection.setRequestProperty("accept", "*/*");
+					urlConnection.setRequestProperty("connection", "Keep-Alive");
+					urlConnection.setRequestProperty("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)");
+					PrintWriter out = new PrintWriter(urlConnection.getOutputStream());
+					out.print(data);
+					out.flush();
 					BufferedReader br = new BufferedReader(new InputStreamReader(urlConnection.getInputStream(), "utf-8")); // 获取输入流
 					String line = null;
 					StringBuilder sb = new StringBuilder();
@@ -574,6 +622,11 @@ public class ModuleNet implements IInterpreterModule {
 			});
 			return new RuntimeObject(arr);
 		} else {
+			if (o instanceof Integer) {
+				return new RuntimeObject(BigInteger.valueOf((int) o));
+			} else if (o instanceof Float) {
+				return new RuntimeObject(BigDecimal.valueOf((float) o));
+			}
 			return new RuntimeObject(o);
 		}
 	}

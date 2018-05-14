@@ -68,6 +68,7 @@ Now has commands:
 - util
 - **ai**
 - **pc**
+- **music**
 
 Tasks:
 - System

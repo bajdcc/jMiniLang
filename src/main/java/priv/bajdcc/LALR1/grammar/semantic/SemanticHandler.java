@@ -145,6 +145,7 @@ public class SemanticHandler {
 							ExpBinop bin = (ExpBinop) indexed.get(1).object;
 							if (bin.getToken().object == OperatorType.DOT) {
 								ExpAssignProperty assign = new ExpAssignProperty();
+								assign.setToken(token);
 								assign.setObj(bin.getLeftOperand());
 								assign.setProperty(bin.getRightOperand());
 								assign.setExp((IExp) indexed.get(0).object);
@@ -153,6 +154,7 @@ public class SemanticHandler {
 						} else if (indexed.get(1).object instanceof ExpIndex) {
 							ExpIndex bin = (ExpIndex) indexed.get(1).object;
 							ExpIndexAssign assign = new ExpIndexAssign();
+							assign.setToken(token);
 							assign.setExp(bin.getExp());
 							assign.setIndex(bin.getIndex());
 							assign.setObj((IExp) indexed.get(0).object);
@@ -418,7 +420,7 @@ public class SemanticHandler {
 			} else {
 				Block block = (Block) indexed.get(4).object;
 				List<IStmt> stmts = block.getStmts();
-				if (!stmts.isEmpty() && !(stmts.get(stmts.size() - 1) instanceof StmtReturn))
+				if (stmts.isEmpty() || !(stmts.get(stmts.size() - 1) instanceof StmtReturn))
 					stmts.add(ret);
 				func.setBlock(block);
 			}

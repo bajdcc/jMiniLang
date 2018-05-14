@@ -1,0 +1,672 @@
+import "sys.base";
+import "sys.list";
+import "sys.proc";
+import "sys.string";
+import "sys.class";
+import "sys.task";
+import "sys.ui";
+import "sys.net";
+import "std.base";
+
+g_set_process_desc("music routine");
+var pid = g_get_pid();
+var share = g_wait_share("PID#" + pid);
+g_stop_share("PID#" + pid);
+var args = share["args"];
+
+var in = g_create_pipe("PIPEIN#" + pid);
+var out = g_create_pipe("PIPEOUT#" + pid);
+
+var signal = "PIDSIG#" + pid;
+g_start_share(signal, true);
+
+var put = func ["PIPE"] ~(ch) {
+    g_write_pipe(out, ch);
+};
+var putn = func ["PIPE"] ~(ch) {
+    g_write_pipe(out, ch);
+    g_write_pipe(out, g_endl);
+};
+
+// -----------------------------------------------------------------------------------------
+// State Machine Design and Implementation using Class
+// * Reference: https://github.com/bajdcc/NewsApp
+// ---- CODE BEGIN ----
+
+var ctx = g_create_context();
+g_import_std_base(ctx);
+
+var _ = g_null;
+
+/* -----------------------------------------------------------------
+# CLASS [app::music::util.static_timer]
+----------------------------------------------------------------- */
+g_register_class(ctx, "app::music::util.static_timer", lambda(this) { // 定时器
+    this."span" := _;
+    this."time" := _;
+    this."first" := _;
+    this."set_span" := lambda(this, span) {
+        this."span" := span * 1000;
+        this."restart"();
+    };
+    this."set_span_ms" := lambda(this, span) {
+        this."span" := span;
+        this."restart"();
+    };
+    this."is_timeout" := lambda(this) {
+        if (!this."first") { return false; }
+        var flag = g_task_get_timestamp() >= this."time";
+        if (flag) { this."first" := false; }
+        return flag;
+    };
+    this."is_timeout_once" := lambda(this) -> g_task_get_timestamp() >= this."time";
+    this."restart" := lambda(this) {
+        this."time" := g_task_get_timestamp() + this."span";
+        this."first" := true;
+    };
+    this."reset" := lambda(this) -> this."time" := 0;
+}, "object");
+/* -----------------------------------------------------------------
+# CLASS [app::music::state.interface]
+----------------------------------------------------------------- */
+g_register_class(ctx, "app::music::state.interface", lambda(this) { // 状态基类
+    // 子类使用监听模式以重写方法(AOP)
+    // 如果需要返回值，还是用方法覆盖
+    this."context" := _;
+    this."is_start" := false;
+    this."set_context" := lambda(this, context) -> this."context" := context;
+    this."on_cancel" := lambda(this, shutdown) -> _;
+    this."on_message" := lambda(this, msg) -> _;
+    this."on_reset" := lambda(this) -> _;
+    this."on_start" := lambda(this) -> _;
+    this."on_enter" := lambda(this) -> _;
+    this."on_timer" := lambda(this) -> _;
+    this."log" := lambda(this, msg) -> _;
+}, "object");
+/* -----------------------------------------------------------------
+# CLASS [app::music::state.base]
+----------------------------------------------------------------- */
+g_register_class(ctx, "app::music::state.base", lambda(this) { // 状态基类
+    g_hook_add_before(this, "on_cancel", lambda(class, name, this, next, shutdown) {
+        if (shutdown) {
+            this."context"."start_state"("app::music::state.idle");
+        } else {
+            this."context"."start_state"("app::music::state.end");
+        }
+        return next();
+    });
+}, "app::music::state.interface");
+/* -----------------------------------------------------------------
+# CLASS [app::music::state.begin]
+----------------------------------------------------------------- */
+g_register_class(ctx, "app::music::state.begin", lambda(this) { // 起始状态
+    this."overlay_animation_waiting" := g_create_class(ctx, "app::music::util.static_timer");
+    this."overlay_animation_waiting"."set_span"(1);
+    g_hook_add_before(this, "on_start", lambda(class, name, this, next) {
+        this."is_start" := true;
+        this."context"."open_overlay"();
+        return next();
+    });
+    g_hook_add_before(this, "on_timer", lambda(class, name, this, next) {
+        if (this."is_start") {
+            if (this."overlay_animation_waiting"."is_timeout"()) {
+                this."log"("[Overlay] Waiting for animation completed...");
+                this."overlay_animation_waiting"."restart"();
+                if (this."context"."is_open_overlay") {
+                    this."log"("[Overlay] Created window");
+                    this."context"."start_state"("app::music::state.queue");
+                }
+            }
+        }
+        return next();
+    });
+}, "app::music::state.base");
+/* -----------------------------------------------------------------
+# CLASS [app::music::state.end]
+----------------------------------------------------------------- */
+g_register_class(ctx, "app::music::state.end", lambda(this) { // 结束状态
+    this."overlay_animation_waiting" := g_create_class(ctx, "app::music::util.static_timer");
+    this."overlay_animation_waiting"."set_span"(1);
+    g_hook_add_before(this, "on_start", lambda(class, name, this, next) {
+        this."is_start" := true;
+        this."log"("[Overlay] Waiting for close...");
+        this."context"."close_overlay"();
+        return next();
+    });
+    g_hook_add_before(this, "on_timer", lambda(class, name, this, next) {
+        if (this."is_start") {
+            if (this."overlay_animation_waiting"."is_timeout"()) {
+                this."overlay_animation_waiting"."restart"();
+                if (this."context"."has_msg"()) {
+                    this."log"("[Overlay] Waiting for animation completed...");
+                } else {
+                    this."log"("==> Idle <==");
+                    this."context"."start_state"("app::music::state.idle");
+                }
+            }
+        }
+        return next();
+    });
+}, "app::music::state.base");
+/* -----------------------------------------------------------------
+# CLASS [app::music::state.idle]
+----------------------------------------------------------------- */
+g_register_class(ctx, "app::music::state.idle", lambda(this) { // 空闲状态
+    this."idle_timer" := g_create_class(ctx, "app::music::util.static_timer");
+    this."idle_timer"."set_span"(5);
+    g_hook_add_before(this, "on_start", lambda(class, name, this, next) {
+        this."is_start" := true;
+        this."idle_timer"."restart"();
+        return next();
+    });
+    g_hook_add_before(this, "on_message", lambda(class, name, this, next, msg) {
+        if (this."is_start") {
+            return next();
+        }
+        // else block msg
+    });
+    g_hook_add_before(this, "on_timer", lambda(class, name, this, next) {
+        if (this."is_start") {
+            if (this."idle_timer"."is_timeout"()) {
+                this."log"("Idle...");
+                this."idle_timer"."restart"();
+            }
+            // check msg coming and enter begin state
+            if (this."context"."idle_timer"."is_timeout_once"()) {
+                if (this."context"."has_msg"()) {
+                    this."context"."idle_timer"."restart"();
+                    this."context"."start_state"("app::music::state.begin");
+                }
+            }
+        }
+        return next();
+    });
+}, "app::music::state.base");
+/* -----------------------------------------------------------------
+# CLASS [app::music::state.waiting]
+----------------------------------------------------------------- */
+g_register_class(ctx, "app::music::state.waiting", lambda(this) { // 等待状态
+    this."time" := _;
+    this."retries" := 0;
+    this."max_retries" := 10;
+    this."idle_timer" := _;
+    this."retries_timer" := _;
+    g_hook_add_before(this, "on_start", lambda(class, name, this, next) {
+        this."is_start" := true;
+        this."idle_timer" := g_create_class(ctx, "app::music::util.static_timer");
+        this."idle_timer"."set_span_ms"(this."time");
+        this."retries_timer" := g_create_class(ctx, "app::music::util.static_timer");
+        this."retries_timer"."set_span"(5);
+        return next();
+    });
+    g_hook_add_before(this, "on_message", lambda(class, name, this, next, msg) {
+        this."idle_timer"."restart"();
+        this."retries" := 0;
+        return next();
+    });
+    g_hook_add_before(this, "on_timer", lambda(class, name, this, next) {
+         if (this."idle_timer"."is_timeout_once"())
+         {
+            this."idle_timer"."restart"();
+            if (this."context"."has_msg"()) {
+                this."log"("[Overlay] Ready for queue...");
+                this."context"."start_state"("app::music::state.queue");
+            } else if (this."retries_timer"."is_timeout"()) {
+                this."retries_timer"."restart"();
+                this."retries" := this."retries" + 1;
+                if (!this."context"."playing" || this."retries" >= this."max_retries") {
+                    this."log"("[Overlay] No message available");
+                    this."context"."start_state"("app::music::state.end");
+                } else {
+                    this."log"("[Overlay] Idle...");
+                }
+            }
+        }
+        return next();
+    });
+}, "app::music::state.base");
+/* -----------------------------------------------------------------
+# CLASS [app::music::state.queue]
+----------------------------------------------------------------- */
+g_register_class(ctx, "app::music::state.queue", lambda(this) { // 队列
+    g_hook_add_before(this, "on_start", lambda(class, name, this, next) {
+        this."is_start" := true;
+        this."log"("[Overlay] Ready for marquee...");
+        return next();
+    });
+    g_hook_add_before(this, "on_timer", lambda(class, name, this, next) {
+        if (this."is_start" && this."context"."has_msg"()) {
+            var time = this."context"."marquee"();
+            this."log"("[Overlay] Marquee completed, time for waiting: " + time + "ms");
+            var state = g_create_class(ctx, "app::music::state.waiting");
+            state."set_context"(this."context");
+            state."time" := time;
+            this."context"."set_state"(state);
+        }
+        return next();
+    });
+}, "app::music::state.base");
+/* -----------------------------------------------------------------
+# CLASS [app::music::state.transfer]
+----------------------------------------------------------------- */
+g_register_class(ctx, "app::music::state.transfer", lambda(this) { // 传送
+    this."idle_timer" := g_create_class(ctx, "app::music::util.static_timer");
+    this."idle_timer"."set_span"(1);
+    this."msg_queue" := g_create_class(ctx, "list::array");
+    this."old_name" := "";
+    this."old_time" := 0;
+    this."old_msg" := _;
+    g_hook_add_before(this, "on_start", lambda(class, name, this, next) {
+        this."is_start" := true;
+        this."idle_timer"."restart"();
+        this."log"("[Transfer] Started");
+        return next();
+    });
+    g_hook_add_before(this, "on_message", lambda(class, name, this, next, msg) {
+        this."msg_queue"."insert"(0, msg);
+        return next();
+    });
+    g_hook_add_before(this, "on_timer", lambda(class, name, this, next) {
+        if (this."is_start" && this."idle_timer"."is_timeout_once"()) {
+            this."idle_timer"."restart"();
+            if (!this."msg_queue"."empty"()) {
+                this."log"("[Transfer] Moved one message, rest: " + this."msg_queue"."size"());
+                var msg = this."msg_queue"."pop"();
+                var valid = msg["title"] != "#END#";
+                var origin = msg["str"];
+                if (valid) {
+                    if (g_is_null(origin) || origin == "") {
+                        this."log"("[Transfer] Null lyric");
+                        return;
+                    }
+                    var m = g_string_regex(msg["str"], "\\[(\\d{1,2}):(\\d{1,2})\\.(\\d{1,3})\\](.+)");
+                    if (g_array_empty(m)) {
+                        this."log"("[Transfer] Invalid lyric");
+                        this."idle_timer"."set_span_ms"(0);
+                        this."idle_timer"."restart"();
+                        return;
+                    }
+                    this."log"("[Transfer] Message: " + origin);
+                    msg["str"] := m[1] + ":" + m[2] + "." + m[3];
+                    msg["time"] := 1000 * (g_string_atoi(m[1]) * 60 + g_string_atoi(m[2]));
+                    if (g_string_length(m[3]) == 3) {
+                        msg["time"] += g_string_atoi(m[3]);
+                    } else if (g_string_length(m[3]) == 2) {
+                        msg["time"] += g_string_atoi(m[3]) * 10;
+                    }
+                    msg["desc"] := m[4];
+                    msg["origin"] := origin;
+                }
+                if (valid && this."old_name" != msg["title"]) {
+                    this."old_name" := msg["title"];
+                    this."old_time" := g_task_get_timestamp();
+                    this."context"."add_msg"({
+                        "title": msg["title"],
+                        "desc": "正在加载中……",
+                        "str": "正在加载中……",
+                        "origin": "正在加载中……",
+                        "time": 1000
+                    });
+                    this."old_msg" := msg;
+                    this."idle_timer"."set_span_ms"(msg["time"]);
+                    this."idle_timer"."restart"();
+                } else {
+                    var message = this."old_msg";
+                    var now = g_task_get_timestamp();
+                    var span = valid ? (msg["time"] + this."old_time" - now) : 0;
+                    span := span < 0 ? 0 : span;
+                    this."idle_timer"."set_span_ms"(span);
+                    this."idle_timer"."restart"();
+                    if (valid) {
+                        this."log"("[Transfer] Sleep: " + span + "ms"
+                            /*+ ", Past: " + (now - this."old_time") + "ms, Time: " + msg["time"] + "ms"*/);
+                        message["time"] := msg["time"] - message["time"] - 1000;
+                        message["time"] := message["time"] < 0 ? 0 : message["time"];
+                        this."context"."add_msg"(message);
+                        this."old_msg" := msg;
+                    } else {
+                        this."log"("[Transfer] Completed");
+                        if (!g_is_null(message)) {
+                            message["time"] := 5000;
+                            this."context"."add_msg"(message);
+                        }
+                        this."old_name" := "";
+                        this."old_time" := 0;
+                        this."old_msg" := _;
+                        this."context"."playing" := false;
+                    }
+                }
+            }
+        }
+        return next();
+    });
+}, "app::music::state.base");
+/* -----------------------------------------------------------------
+# CLASS [app::music::state.crawler]
+----------------------------------------------------------------- */
+g_register_class(ctx, "app::music::state.crawler", lambda(this) { // 抓取
+    this."idle_timer" := g_create_class(ctx, "app::music::util.static_timer");
+    this."idle_timer"."set_span"(3);
+    g_hook_add_before(this, "on_reset", lambda(class, name, this, next) {
+        this."idle_timer"."reset"();
+        return next();
+    });
+    g_hook_add_before(this, "on_start", lambda(class, name, this, next) {
+        this."is_start" := true;
+        this."idle_timer"."reset"();
+        this."log"("[Crawler] Started");
+        return next();
+    });
+    g_hook_add_before(this, "on_timer", lambda(class, name, this, next) {
+        if (this."is_start" && this."idle_timer"."is_timeout_once"()) {
+            this."idle_timer"."restart"();
+            if (!this."context"."has_msg"() && !this."context"."playing") {
+                var arr = g_create_class(ctx, "list::array");
+                this."log"("[Crawler] Working...");
+                g_write_pipe_n(out, "============");
+                g_write_pipe_n(out, "请输入歌曲名");
+                g_write_pipe_n(out, "============");
+                var name = g_ui_dialog("Music App", "请输入歌曲名：", 20)[0];
+                if (g_is_null(name) || name == "") {
+                    return;
+                }
+                var info = g_net_post_json("http://music.163.com/api/search/suggest/web", "s=" + name);
+                var songs = info["result"]["songs"];
+                if (g_is_null(songs)) {
+                    putn(g_ui_fg(255, 0, 0) + "找不到歌曲" + g_ui_fgc());
+                    return;
+                }
+                var i = 1;
+                g_write_pipe_n(out, "============");
+                g_write_pipe_n(out, " 请输入编号 ");
+                g_write_pipe_n(out, "============");
+                putn("" + 0 + ". " + g_ui_fg(255, 0, 0) + "重新搜索" + g_ui_fgc());
+                foreach (var s : g_range_array(songs)) {
+                    putn("" + i + ". " + g_ui_fg(15, 15, 255) + s["artists"][0]["name"] + " - " + s["name"] + g_ui_fgc());
+                    i++;
+                }
+                var no = g_ui_dialog("Music App", "请输入编号：", 20)[0];
+                if (g_is_null(no) || no == "") {
+                    return;
+                }
+                var noc = 0 + no[0];
+                if (noc < 48 && noc > 48 + g_array_size(songs)) {
+                    putn(g_ui_fg(255, 0, 0) + "编号不正确" + g_ui_fgc());
+                    return;
+                }
+                if (noc == 48) {
+                    return;
+                }
+                no := noc - 49;
+                var song = songs[no];
+                var song_name = song["artists"][0]["name"] + " - " + song["name"];
+                putn("已选择歌曲： "  + g_ui_fg(15, 15, 255) + song_name + g_ui_fgc());
+                var song_info = g_net_post_json("http://music.163.com/api/song/detail", "id=" + song["id"] + "&ids=[" + song["id"] + "]");
+                if (song_info["code"] != 200) {
+                    putn(g_ui_fg(255, 0, 0) + "歌曲查询出现问题" + g_ui_fgc());
+                    return;
+                }
+                var ss = song_info["songs"][0];
+                g_write_pipe_n(out, "============");
+                g_write_pipe_n(out, "  歌曲信息");
+                g_write_pipe_n(out, "============");
+                g_write_pipe_n(out, "编号：" + g_ui_fg(15, 15, 255) + ss["id"] + g_ui_fgc());
+                g_write_pipe_n(out, "歌名：" + g_ui_fg(15, 15, 255) + ss["name"] + g_ui_fgc());
+                g_write_pipe_n(out, "作者：" + g_ui_fg(15, 15, 255) + ss["artists"][0]["name"] + g_ui_fgc());
+                var lyric_info = g_net_get_json("http://music.163.com/api/song/media?id=" + ss["id"]);
+                if (lyric_info["code"] != 200) {
+                    putn(g_ui_fg(255, 0, 0) + "歌词查询出现问题" + g_ui_fgc());
+                    return;
+                }
+                var lyric = lyric_info["lyric"];
+                var lyric_array = g_string_split(lyric, "\n");
+                g_array_insert(lyric_array, 0, song_name);
+                arr."array" := lyric_array;
+                if (arr."empty"()) {
+                    this."log"("[Crawler] Failed!");
+                } else {
+                    this."log"("[Crawler] Fetched lyric");
+                    var title = arr."get"(0);
+                    var len = arr."size"();
+                    for (var i = 1; i < len; i++) {
+                        var msg = g_create_class(ctx, "string");
+                        msg."str" := arr."get"(i);
+                        msg."title" := title;
+                        msg."desc" := arr."get"(i);
+                        this."context"."state_transfer"."on_message"(msg);
+                    }
+                    this."context"."state_transfer"."on_message"({"title": "#END#"});
+                    this."log"("[Crawler] Completed");
+                }
+                this."context"."playing" := true;
+            }
+        }
+        return next();
+    });
+}, "app::music::state.base");
+/* -----------------------------------------------------------------
+# CLASS [app::music::music.context]
+----------------------------------------------------------------- */
+g_register_class(ctx, "app::music::music.context", lambda(this) {
+    this."state_main" := _;
+    this."state_transfer" := _;
+    this."state_crawler" := _;
+    this."msg_list" := g_create_class(ctx, "list::array");
+    this."add_msg" := lambda(this, msg) -> this."msg_list"."insert"(0, msg);
+    this."has_msg" := lambda(this) -> !this."msg_list"."empty"();
+    this."playing" := false;
+    this."start" := lambda(this, output) {
+        this."state_main"."on_start"();
+        if (g_is_null(this."state_transfer")) {
+            var transfer = g_create_class(ctx, "app::music::state.transfer");
+            transfer."set_context"(this);
+            this."state_transfer" := transfer;
+            this."hook_state"(transfer);
+            transfer."on_start"();
+        }
+        if (g_is_null(this."state_crawler")) {
+            var crawler = g_create_class(ctx, "app::music::state.crawler");
+            crawler."set_context"(this);
+            this."state_crawler" := crawler;
+            this."hook_state"(crawler);
+            crawler."on_start"();
+        }
+    };
+    this."cancel" := lambda(this, shutdown) {
+        this."state_base"."on_cancel"(shutdown);
+    };
+    this."marquee" := lambda(this) -> _;
+    this."idle_timer" := g_create_class(ctx, "app::music::util.static_timer");
+    this."idle_timer"."set_span"(5);
+    this."on_error" := lambda(this, error) -> _;
+    this."on_finish" := lambda(this) -> _;
+    this."on_progress" := lambda(this, progress) -> _;
+    this."on_log" := lambda(this, msg) -> _;
+    this."start_state" := lambda(this, state) {
+        var _state = g_create_class(ctx, state);
+        _state."set_context"(this);
+        this."set_state"(_state);
+    };
+    this."hook_state" := lambda(this, state) {
+        // 监听并打印日志
+        /*g_hook_add_before(state, "on_cancel", lambda(class, name, this, next, shutdown) {
+            g_printn(class + "::" + name); return next();
+        });
+        g_hook_add_before(state, "on_message", lambda(class, name, this, next, msg) {
+            g_printn(class + "::" + name + " " + msg."str"); return next();
+        });
+        g_hook_add_before(state, "on_reset", lambda(class, name, this, next) {
+            g_printn(class + "::" + name); return next();
+        });
+        g_hook_add_before(state, "on_start", lambda(class, name, this, next) {
+            g_printn(class + "::" + name); return next();
+        });
+        g_hook_add_before(state, "on_enter", lambda(class, name, this, next) {
+            g_printn(class + "::" + name); return next();
+        });
+        g_hook_add_before(state, "on_timer", lambda(class, name, this, next) {
+            return next();
+        });*/
+        g_hook_add_before(state, "log", lambda(class, name, this, next, msg) {
+            this."context"."on_log"(class + "." + name + " " + msg); return next();
+        });
+    };
+    this."set_state" := lambda(this, state) {
+        this."hook_state"(state);
+        this."state_main" := state;
+        state."on_enter"();
+        state."on_start"();
+    };
+    this."is_open_overlay" := false;
+    this."signal" := _;
+    this."open_overlay_callback" := lambda(this) {
+        g_set_process_desc("music overlay");
+        g_printn("Timer overlay started");
+        var ms = 20;
+        var begin = g_task_get_timestamp();
+        var final = begin + 0;
+        var end = begin + ms;
+        var signal = this."signal";
+        this."output"."write"("Loading...");
+        while (true) {
+            var s = g_query_share(signal);
+            if (g_is_null(s) || !s) {
+                g_printdn("NewsApp Overlay interrupt: #" + g_get_pid());
+                break;
+            }
+            begin := g_task_get_timestamp();
+            if (final < begin) {
+                break;
+            }
+            if (end < begin) {
+                this."output"."write"(".");
+                end += ms;
+            } else {
+                g_sleep(5);
+            }
+        }
+        this."output"."write"("\f");
+        g_printn("Timer overlay exit");
+        this."is_open_overlay" := true;
+    };
+    this."open_overlay" := lambda(this) {
+        g_create_class(ctx, "system::process")."start_args"(this."open_overlay_callback", this);
+    };
+    this."close_overlay_callback" := lambda(this) {
+        g_set_process_desc("music overlay");
+        g_printn("Timer overlay started");
+        var ms = 400;
+        var begin = g_task_get_timestamp();
+        var final = begin + 5000;
+        var end = begin + ms;
+        var signal = this."signal";
+        this."output"."write"("\v");
+        this."output"."write"("Closing...");
+        while (true) {
+            var s = g_query_share(signal);
+            if (g_is_null(s) || !s) {
+                g_printdn("NewsApp Overlay interrupt: #" + g_get_pid());
+                break;
+            }
+            begin := g_task_get_timestamp();
+            if (final < begin) {
+                break;
+            }
+            if (end < begin) {
+                this."output"."write"(".");
+                end += ms;
+            } else {
+                g_sleep(50);
+            }
+        }
+        this."output"."write"("\f");
+        g_printn("Timer overlay exit");
+        this."is_open_overlay" := false;
+    };
+    this."close_overlay" := lambda(this) {
+        g_create_class(ctx, "system::process")."start_args"(this."close_overlay_callback", this);
+    };
+}, "object");
+/* -----------------------------------------------------------------
+# CLASS [app::music::music.machine]
+----------------------------------------------------------------- */
+g_register_class(ctx, "app::music::music.machine", lambda(this) {
+    this."timer_thread" := g_create_class(ctx, "system::process");
+    this."timer_span" := 500;
+    this."output" := _;
+    this."signal" := signal;
+    this."timer_callback" := lambda(this) {
+        g_set_process_desc("music timer");
+        g_printn("Timer process started");
+        var ms = this."timer_span";
+        var begin = g_task_get_timestamp();
+        var end = begin + ms;
+        var signal = this."signal";
+        while (true) {
+            var s = g_query_share(signal);
+            if (g_is_null(s) || !s) {
+                g_printdn("NewsApp Timer interrupt: #" + g_get_pid());
+                break;
+            }
+            begin := g_task_get_timestamp();
+            if (end < begin) {
+                this."state_main"."on_timer"();
+                this."state_transfer"."on_timer"();
+                this."state_crawler"."on_timer"();
+                end += ms;
+            } else {
+                g_sleep(5);
+            }
+        }
+        g_printn("Timer process exit");
+    };
+    this."center" := lambda(this, str) {
+        var l = g_ui_text_length(str);
+        var space = (70 - l) / 2;
+        return g_string_rep(" ", space) + str;
+    };
+    g_hook_add_before(this, "marquee", lambda(class, name, this, next) {
+        var msg = this."msg_list"."pop"();
+        this."output"."writeln"("\f" + g_endl);
+        this."output"."writeln"(this."center"("【" + msg."title" + "】") + g_endl + g_endl);
+        this."output"."writeln"("    " + msg["str"] + g_endl);
+        this."output"."writeln"("    " + msg["desc"] + g_endl);
+        g_printn("Post message: " + msg["origin"]);
+        return msg["time"];
+    });
+    g_hook_add_before(this, "start", lambda(class, name, this, next, output) {
+        this."output" := output;
+        this."start_state"("app::music::state.idle");
+        return next();
+    });
+    g_hook_add_after(this, "start", lambda(class, name, this, ret, next, output) {
+        this."timer_thread"."start_args"(this."timer_callback", this);
+        return next();
+    });
+    g_hook_add_before(this, "cancel", lambda(class, name, this, next, shutdown) {
+        this."idle_timer"."reset"();
+        return next();
+    });
+    g_hook_add_before(this, "on_log", lambda(class, name, this, next, msg) {
+        g_printn(msg); return next();
+    });
+    this."reset" := lambda(this) {
+        this."idle_timer"."reset"();
+        this."state_transfer"."on_reset"();
+        this."state_crawler"."on_reset"();
+    };
+}, "app::music::music.context");
+
+// ---- CODE END ----
+// -----------------------------------------------------------------------------------------
+
+var machine = g_create_class(ctx, "app::music::music.machine");
+var output = g_create_class(ctx, "stream::output");
+output."handle" := in;
+machine."start"(output);
+
+g_read_pipe_args(in, lambda(ch, out) -> g_write_pipe(out, ch), out);
+
+g_stop_share(signal);
+g_destroy_pipe(out);
+g_destroy_pipe(in);

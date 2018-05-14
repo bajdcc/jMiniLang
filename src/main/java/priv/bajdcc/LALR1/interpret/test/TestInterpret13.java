@@ -113,6 +113,7 @@ public class TestInterpret13 {
 							"b.\"add\"(0);\n" +
 							"g_printn(a.\"get\"(0).\"size\"());\n" +
 							"a.\"get\"(0).\"c\" := 2;\n" +
+							"a.\"get\"(0).\"c\" *= 2;\n" +
 							"g_printn(a.\"get\"(0).\"c\");\n"
 			};
 
