@@ -190,7 +190,7 @@ public class ModuleNet implements IInterpreterModule {
 					urlConnection.setRequestProperty("accept", "*/*");
 					urlConnection.setRequestProperty("connection", "Keep-Alive");
 					urlConnection.setRequestProperty("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)");
-					PrintWriter out = new PrintWriter(urlConnection.getOutputStream());
+					PrintWriter out = new PrintWriter(new OutputStreamWriter(urlConnection.getOutputStream(), "utf-8"));
 					out.print(data);
 					out.flush();
 					BufferedReader br = new BufferedReader(new InputStreamReader(urlConnection.getInputStream(), "utf-8")); // 获取输入流
