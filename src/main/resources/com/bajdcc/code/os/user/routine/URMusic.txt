@@ -20,14 +20,6 @@ var out = g_create_pipe("PIPEOUT#" + pid);
 var signal = "PIDSIG#" + pid;
 g_start_share(signal, true);
 
-var put = func ["PIPE"] ~(ch) {
-    g_write_pipe(out, ch);
-};
-var putn = func ["PIPE"] ~(ch) {
-    g_write_pipe(out, ch);
-    g_write_pipe(out, g_endl);
-};
-
 // -----------------------------------------------------------------------------------------
 // State Machine Design and Implementation using Class
 // * Reference: https://github.com/bajdcc/NewsApp
@@ -188,7 +180,7 @@ g_register_class(ctx, "app::music::state.idle", lambda(this) { // 空闲状态
 g_register_class(ctx, "app::music::state.waiting", lambda(this) { // 等待状态
     this."time" := _;
     this."retries" := 0;
-    this."max_retries" := 10;
+    this."max_retries" := 200;
     this."idle_timer" := _;
     this."retries_timer" := _;
     g_hook_add_before(this, "on_start", lambda(class, name, this, next) {
@@ -196,7 +188,7 @@ g_register_class(ctx, "app::music::state.waiting", lambda(this) { // 等待状�
         this."idle_timer" := g_create_class(ctx, "app::music::util.static_timer");
         this."idle_timer"."set_span_ms"(this."time");
         this."retries_timer" := g_create_class(ctx, "app::music::util.static_timer");
-        this."retries_timer"."set_span"(5);
+        this."retries_timer"."set_span"(1);
         return next();
     });
     g_hook_add_before(this, "on_message", lambda(class, name, this, next, msg) {
@@ -218,6 +210,7 @@ g_register_class(ctx, "app::music::state.waiting", lambda(this) { // 等待状�
                     this."log"("[Overlay] No message available");
                     this."context"."start_state"("app::music::state.end");
                 } else {
+                    this."context"."output"."write"(".");
                     this."log"("[Overlay] Idle...");
                 }
             }
@@ -346,7 +339,10 @@ g_register_class(ctx, "app::music::state.transfer", lambda(this) { // 传送
 ----------------------------------------------------------------- */
 g_register_class(ctx, "app::music::state.crawler", lambda(this) { // 抓取
     this."idle_timer" := g_create_class(ctx, "app::music::util.static_timer");
-    this."idle_timer"."set_span"(3);
+    this."idle_timer"."set_span"(5);
+    this."puts" := lambda(this, str) {
+        this."context"."output"."writeln"(str);
+    };
     g_hook_add_before(this, "on_reset", lambda(class, name, this, next) {
         this."idle_timer"."reset"();
         return next();
@@ -363,9 +359,9 @@ g_register_class(ctx, "app::music::state.crawler", lambda(this) { // 抓取
             if (!this."context"."has_msg"() && !this."context"."playing") {
                 var arr = g_create_class(ctx, "list::array");
                 this."log"("[Crawler] Working...");
-                g_write_pipe_n(out, "============");
-                g_write_pipe_n(out, "请输入歌曲名");
-                g_write_pipe_n(out, "============");
+                this."puts"("============");
+                this."puts"("请输入歌曲名");
+                this."puts"("============");
                 var name = g_ui_dialog("Music App", "请输入歌曲名：", 20)[0];
                 if (g_is_null(name) || name == "") {
                     return;
@@ -373,16 +369,16 @@ g_register_class(ctx, "app::music::state.crawler", lambda(this) { // 抓取
                 var info = g_net_post_json("http://music.163.com/api/search/suggest/web", "s=" + name);
                 var songs = info["result"]["songs"];
                 if (g_is_null(songs)) {
-                    putn(g_ui_fg(255, 0, 0) + "找不到歌曲" + g_ui_fgc());
+                    this."puts"(g_ui_fg(255, 0, 0) + "找不到歌曲" + g_ui_fgc());
                     return;
                 }
                 var i = 1;
-                g_write_pipe_n(out, "============");
-                g_write_pipe_n(out, " 请输入编号 ");
-                g_write_pipe_n(out, "============");
-                putn("" + 0 + ". " + g_ui_fg(255, 0, 0) + "重新搜索" + g_ui_fgc());
+                this."puts"("============");
+                this."puts"(" 请输入编号 ");
+                this."puts"("============");
+                this."puts"("" + 0 + ". " + g_ui_fg(255, 0, 0) + "重新搜索" + g_ui_fgc());
                 foreach (var s : g_range_array(songs)) {
-                    putn("" + i + ". " + g_ui_fg(15, 15, 255) + s["artists"][0]["name"] + " - " + s["name"] + g_ui_fgc());
+                    this."puts"("" + i + ". " + g_ui_fg(15, 15, 255) + s["artists"][0]["name"] + " - " + s["name"] + g_ui_fgc());
                     i++;
                 }
                 var no = g_ui_dialog("Music App", "请输入编号：", 20)[0];
@@ -391,7 +387,7 @@ g_register_class(ctx, "app::music::state.crawler", lambda(this) { // 抓取
                 }
                 var noc = 0 + no[0];
                 if (noc < 48 && noc > 48 + g_array_size(songs)) {
-                    putn(g_ui_fg(255, 0, 0) + "编号不正确" + g_ui_fgc());
+                    this."puts"(g_ui_fg(255, 0, 0) + "编号不正确" + g_ui_fgc());
                     return;
                 }
                 if (noc == 48) {
@@ -400,22 +396,22 @@ g_register_class(ctx, "app::music::state.crawler", lambda(this) { // 抓取
                 no := noc - 49;
                 var song = songs[no];
                 var song_name = song["artists"][0]["name"] + " - " + song["name"];
-                putn("已选择歌曲： "  + g_ui_fg(15, 15, 255) + song_name + g_ui_fgc());
+                this."puts"("已选择歌曲： "  + g_ui_fg(15, 15, 255) + song_name + g_ui_fgc());
                 var song_info = g_net_post_json("http://music.163.com/api/song/detail", "id=" + song["id"] + "&ids=[" + song["id"] + "]");
                 if (song_info["code"] != 200) {
-                    putn(g_ui_fg(255, 0, 0) + "歌曲查询出现问题" + g_ui_fgc());
+                    this."puts"(g_ui_fg(255, 0, 0) + "歌曲查询出现问题" + g_ui_fgc());
                     return;
                 }
                 var ss = song_info["songs"][0];
-                g_write_pipe_n(out, "============");
-                g_write_pipe_n(out, "  歌曲信息");
-                g_write_pipe_n(out, "============");
-                g_write_pipe_n(out, "编号：" + g_ui_fg(15, 15, 255) + ss["id"] + g_ui_fgc());
-                g_write_pipe_n(out, "歌名：" + g_ui_fg(15, 15, 255) + ss["name"] + g_ui_fgc());
-                g_write_pipe_n(out, "作者：" + g_ui_fg(15, 15, 255) + ss["artists"][0]["name"] + g_ui_fgc());
+                this."puts"("============");
+                this."puts"("  歌曲信息");
+                this."puts"("============");
+                this."puts"("编号：" + g_ui_fg(15, 15, 255) + ss["id"] + g_ui_fgc());
+                this."puts"("歌名：" + g_ui_fg(15, 15, 255) + ss["name"] + g_ui_fgc());
+                this."puts"("作者：" + g_ui_fg(15, 15, 255) + ss["artists"][0]["name"] + g_ui_fgc());
                 var lyric_info = g_net_get_json("http://music.163.com/api/song/media?id=" + ss["id"]);
                 if (lyric_info["code"] != 200) {
-                    putn(g_ui_fg(255, 0, 0) + "歌词查询出现问题" + g_ui_fgc());
+                    this."puts"(g_ui_fg(255, 0, 0) + "歌词查询出现问题" + g_ui_fgc());
                     return;
                 }
                 var lyric = lyric_info["lyric"];
@@ -555,9 +551,9 @@ g_register_class(ctx, "app::music::music.context", lambda(this) {
     this."close_overlay_callback" := lambda(this) {
         g_set_process_desc("music overlay");
         g_printn("Timer overlay started");
-        var ms = 400;
+        var ms = 10;
         var begin = g_task_get_timestamp();
-        var final = begin + 5000;
+        var final = begin + 200;
         var end = begin + ms;
         var signal = this."signal";
         this."output"."write"("\v");
@@ -615,14 +611,14 @@ g_register_class(ctx, "app::music::music.machine", lambda(this) {
                 this."state_crawler"."on_timer"();
                 end += ms;
             } else {
-                g_sleep(5);
+                g_sleep(50);
             }
         }
         g_printn("Timer process exit");
     };
     this."center" := lambda(this, str) {
         var l = g_ui_text_length(str);
-        var space = (70 - l) / 2;
+        var space = (80 - l) / 2;
         return g_string_rep(" ", space) + str;
     };
     g_hook_add_before(this, "marquee", lambda(class, name, this, next) {
