@@ -11,6 +11,8 @@ import priv.bajdcc.util.lexer.token.OperatorType;
 import priv.bajdcc.util.lexer.token.Token;
 import priv.bajdcc.util.lexer.token.TokenType;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -195,7 +197,7 @@ public class SemanticHandler {
 				exp.setExp((IExp) indexed.get(1).object);
 				exp.setIndex((IExp) indexed.get(5).object);
 				return exp;
-			} else {
+			} else if (!indexed.exists(10)) {
 				Object obj = indexed.get(0).object;
 				if (obj instanceof ExpValue) {
 					ExpValue value = (ExpValue) obj;
@@ -209,6 +211,29 @@ public class SemanticHandler {
 					}
 				}
 				return obj;
+			} else {
+				ExpBinop binop = new ExpBinop();
+				Token token = indexed.get(10).token;
+				Token minus = new Token();
+				minus.object = OperatorType.MINUS;
+				minus.kToken = TokenType.OPERATOR;
+				minus.position = token.position;
+				binop.setToken(minus);
+				binop.setLeftOperand((IExp) indexed.get(0).object);
+				Token num = new Token();
+				if (token.kToken == TokenType.INTEGER) {
+					num.object = ((BigInteger) token.object).negate();
+					num.kToken = TokenType.INTEGER;
+				} else {
+					num.object = ((BigDecimal) token.object).negate();
+					num.kToken = TokenType.DECIMAL;
+				}
+				num.position = token.position;
+				num.position.iColumn++;
+				ExpValue value = new ExpValue();
+				value.setToken(num);
+				binop.setRightOperand(value);
+				return binop.simplify(recorder);
 			}
 		});
 		/* 基本数据结构 */

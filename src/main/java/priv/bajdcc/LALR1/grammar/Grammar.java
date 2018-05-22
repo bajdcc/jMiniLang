@@ -203,7 +203,7 @@ public class Grammar extends Semantic {
 				"port -> (@IMPORT[1] | @EXPORT[2]) @LITERAL[0]{lost_string} @SEMI{lost_semi}");
 		/* 表达式（算符文法） */
 		ISemanticAnalyzer exp_handler = handler.getSemanticHandler("exp");
-		infer(exp_handler, "exp -> exp01[0]");
+		infer(exp_handler, "exp -> exp01[0] [@INTEGER[10] | @DECIMAL[10]]");
 		infer(exp_handler,
 				"exp01 -> [exp01[1] (@EQ_ASSIGN[2] | @ADD_ASSIGN[2] | @SUB_ASSIGN[2] | @MUL_ASSIGN[2] | @DIV_ASSIGN[2] | @AND_ASSIGN[2] | @OR_ASSIGN[2] | @XOR_ASSIGN[2] | @MOD_ASSIGN[2])] exp0[0]");
 		infer(exp_handler,
