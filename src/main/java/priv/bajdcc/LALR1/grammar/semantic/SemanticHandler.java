@@ -168,6 +168,16 @@ public class SemanticHandler {
 				binop.setRightOperand((IExp) indexed.get(0).object);
 				return binop.simplify(recorder);
 			} else if (indexed.exists(3)) {// 单目运算
+				if (indexed.get(1).object instanceof ExpBinop) {
+					ExpBinop bin = (ExpBinop) indexed.get(1).object;
+					if (bin.getToken().object == OperatorType.DOT) {
+						ExpAssignProperty assign = new ExpAssignProperty();
+						assign.setToken(indexed.get(3).token);
+						assign.setObj(bin.getLeftOperand());
+						assign.setProperty(bin.getRightOperand());
+						return assign;
+					}
+				}
 				ExpSinop sinop = new ExpSinop();
 				sinop.setToken(indexed.get(3).token);
 				sinop.setOperand((IExp) indexed.get(1).object);
@@ -290,6 +300,10 @@ public class SemanticHandler {
 				func.setFunc((Function) indexed.get(1).object);
 				func.genClosure();
 				if (assign.isDecleared()) {
+					String funcName = func.getFunc().getRealName();
+					if (!query.getQueryScopeService().isLambda(funcName) && !funcName.equals(token.toRealString())) {
+						recorder.add(SemanticError.DIFFERENT_FUNCNAME, token);
+					}
 					func.getFunc().setRealName(token.toRealString());
 				}
 				assign.setExp(func);
@@ -397,7 +411,7 @@ public class SemanticHandler {
 			} else {
 				Block block = (Block) indexed.get(4).object;
 				List<IStmt> stmts = block.getStmts();
-				if (!stmts.isEmpty() && !(stmts.get(stmts.size() - 1) instanceof StmtReturn))
+				if (stmts.isEmpty() || !(stmts.get(stmts.size() - 1) instanceof StmtReturn))
 					stmts.add(ret);
 				func.setBlock(block);
 			}

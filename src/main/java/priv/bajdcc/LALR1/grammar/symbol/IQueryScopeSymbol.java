@@ -64,6 +64,14 @@ public interface IQueryScopeSymbol {
 	Function getLambda();
 
 	/**
+	 * 判断是否为lambda函数
+	 *
+	 * @param name 函数名
+	 * @return 是否为lambda
+	 */
+	boolean isLambda(String name);
+
+	/**
 	 * 过程名是否已被占用
 	 *
 	 * @param name 查询的过程名

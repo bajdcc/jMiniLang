@@ -132,6 +132,11 @@ public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
 	}
 
 	@Override
+	public boolean isLambda(String name) {
+		return name.startsWith(LAMBDA_PREFIX);
+	}
+
+	@Override
 	public void registerSymbol(String name) {
 		stkScope.get(0).add(name);
 		symbolList.add(name);

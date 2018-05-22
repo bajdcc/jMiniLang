@@ -27,10 +27,10 @@ public class RuntimeTools {
 					stk.store(obj);
 					return true;
 				}
-				if (obj.isReadonly()
+				/*if (obj.isReadonly()
 						&& (inst == RuntimeInst.iinc || inst == RuntimeInst.idec)) {
 					return false;
-				}
+				}*/
 				Token tk = Token.createFromObject(obj.getObj());
 				if (TokenTools.sin(TokenTools.ins2op(inst), tk)) {
 					stk.store(new RuntimeObject(tk.object));

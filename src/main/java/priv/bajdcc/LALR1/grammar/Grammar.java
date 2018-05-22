@@ -389,7 +389,7 @@ public class Grammar extends Semantic {
 		if (!recorder.isCorrect()) {
 			System.err.println(getSemanticError());
 			throw new SyntaxException(SyntaxError.COMPILE_ERROR,
-					new Position(), "请检查代码");
+					recorder.getErrorList().get(0).getPosition().position, "请检查代码");
 		}
 		return code.genCodePage();
 	}

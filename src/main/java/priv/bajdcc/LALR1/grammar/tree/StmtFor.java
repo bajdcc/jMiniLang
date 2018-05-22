@@ -124,13 +124,13 @@ public class StmtFor implements IStmt {
 		sb.append(" ( ");
 		if (var != null) {
 			sb.append(var.print(prefix));
-			sb.append(OperatorType.SEMI.getName());
 		}
+		sb.append(OperatorType.SEMI.getName());
 		if (cond != null) {
 			sb.append(" ");
 			sb.append(cond.print(prefix));
-			sb.append(OperatorType.SEMI.getName());
 		}
+		sb.append(OperatorType.SEMI.getName());
 		if (ctrl != null) {
 			sb.append(" ");
 			sb.append(ctrl.print(prefix));

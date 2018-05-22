@@ -68,6 +68,25 @@ var g_set_property = func ~(class, name, property) {
     return true;
 };
 export "g_set_property";
+var g_set_property_unary = func ~(class, name, property) {
+    if (g_get_type_ordinal(class) != 10) {
+        throw "Not class type: " + g_to_string(class) + "." + name;
+    }
+    if (g_map_contains(class, name)) {
+        g_map_put(class, name, property);
+        return property;
+    }
+    var base = class["__base__"];
+    if (g_is_null(base)) {
+        g_map_put(class, name, property);
+        return property;
+    }
+    if (!g_set_property_rec(base, name, property)) {
+        g_map_put(class, name, property);
+    }
+    return property;
+};
+export "g_set_property_unary";
 
 var g_create_method = func ~(class, name, method) {
     g_map_put(class, name, method);
@@ -572,6 +591,7 @@ var g_create_class = func ~(ctx, name) {
     }
     var class = {};
     g_create_property(class, "__type__", name);
+    g_create_property(class, "__ctx__", ctx);
     if (g_map_contains(prototype, "base")) {
         g_map_put(class, "__base__", g_create_class(ctx, prototype["base"]));
     }

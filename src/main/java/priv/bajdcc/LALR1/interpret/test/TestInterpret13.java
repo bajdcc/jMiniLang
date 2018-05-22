@@ -114,7 +114,8 @@ public class TestInterpret13 {
 							"g_printn(a.\"get\"(0).\"size\"());\n" +
 							"a.\"get\"(0).\"c\" := 2;\n" +
 							"a.\"get\"(0).\"c\" *= 2;\n" +
-							"g_printn(a.\"get\"(0).\"c\");\n"
+							"a.\"get\"(0).\"c\" ++;\n" +
+							"g_printn(a.\"get\"(0).\"c\"++);\n"
 			};
 
 			Interpreter interpreter = new Interpreter();

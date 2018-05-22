@@ -28,6 +28,9 @@ var putn = func ["PIPE"] ~(ch) {
     g_write_pipe(out, ch);
     g_write_pipe(out, g_endl);
 };
+var putln = func ["PIPE"] ~() {
+    g_write_pipe(out, g_endl);
+};
 var puts = func ["PIPE"] ~(str) {
     foreach (var c : g_range_string(str)) {
         g_write_pipe(out, c);
@@ -878,6 +881,22 @@ var stage_dialog = func ~() {
     show_dialog("对话框测试", "输入 - 询问", 24);
 };
 
+// ---------------------------------------------
+// LINQ
+
+var stage_linq = func ~() {
+    var ctx = g_create_context();
+    g_import_std_base(ctx);
+    putn("\n  [[ Enumerator ]]\n");
+    var array = g_new_class(ctx, "list::array", [["array", [1, 2, 3, 4, 5]]], []);
+    putn("array = " + array."to_string"());
+    var arr_enum = array."enumerator"();
+    while (arr_enum."next"()) {
+        putn("enumerator [" + arr_enum."index"() + "] = " + arr_enum."current"());
+    }
+    putln();
+};
+
 var name = args[0];
 if (g_is_null(name)) {
     create_stage(stage_clear);
@@ -902,6 +921,8 @@ if (g_is_null(name)) {
     stage_badapple();
 } else if (name == "dialog") {
     stage_dialog();
+} else if (name == "linq") {
+    stage_linq();
 } else {
     g_read_pipe_args(in, lambda(ch, out) -> g_write_pipe(out, ch), out);
 }

@@ -111,6 +111,7 @@ Tests:
 - `test try`: Test try/catch
 - `test badapple`: Test ascii output, code in [BadApple](https://github.com/bajdcc/tinix/blob/master/user/app/badapple.c)
 - `test dialog`: Test **JOptionPane.showXXXDialog**
+- `test linq`: Test LINQ
 
 Implemented MSG, usage:
 - Create server: `msg server PORT | filter pipe`

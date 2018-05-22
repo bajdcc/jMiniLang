@@ -82,7 +82,8 @@ public class ExpAssignProperty implements IExp {
 	public void analysis(ISemanticRecorder recorder) {
 		obj.analysis(recorder);
 		property.analysis(recorder);
-		exp.analysis(recorder);
+		if (exp != null)
+			exp.analysis(recorder);
 	}
 
 	@Override
@@ -96,6 +97,27 @@ public class ExpAssignProperty implements IExp {
 			exp.genCode(codegen);
 			codegen.genCode(RuntimeInst.ipusha);
 			codegen.genCode(RuntimeInst.ipush, codegen.genDataRef("g_set_property"));
+			codegen.genCode(RuntimeInst.icallx);
+		} else if (token.object == OperatorType.PLUS_PLUS || token.object == OperatorType.MINUS_MINUS) {
+			codegen.genCode(RuntimeInst.iopena);
+			obj.genCode(codegen);
+			codegen.genCode(RuntimeInst.ipusha);
+			property.genCode(codegen);
+			codegen.genCode(RuntimeInst.ipusha);
+			codegen.genCode(RuntimeInst.iopena);
+			obj.genCode(codegen);
+			codegen.genCode(RuntimeInst.ipusha);
+			property.genCode(codegen);
+			codegen.genCode(RuntimeInst.ipusha);
+			codegen.genCode(RuntimeInst.ipush, codegen.genDataRef("g_get_property"));
+			codegen.genCode(RuntimeInst.icallx);
+			if (token.object == OperatorType.PLUS_PLUS) {
+				codegen.genCode(RuntimeInst.iinc);
+			} else {
+				codegen.genCode(RuntimeInst.idec);
+			}
+			codegen.genCode(RuntimeInst.ipusha);
+			codegen.genCode(RuntimeInst.ipush, codegen.genDataRef("g_set_property_unary"));
 			codegen.genCode(RuntimeInst.icallx);
 		} else {
 			codegen.genCode(RuntimeInst.iopena);
@@ -150,6 +172,10 @@ public class ExpAssignProperty implements IExp {
 
 	@Override
 	public String print(StringBuilder prefix) {
+		if (token != null && (token.object == OperatorType.PLUS_PLUS || token.object == OperatorType.MINUS_MINUS)) {
+			return obj.print(prefix) + "." + property.print(prefix) +
+					" " + token.toRealString();
+		}
 		return obj.print(prefix) + "." + property.print(prefix) +
 				" " + ((token == null) ? OperatorType.ASSIGN.getName() : token.toRealString()) + " " +
 				exp.print(prefix);
@@ -157,7 +183,8 @@ public class ExpAssignProperty implements IExp {
 
 	@Override
 	public void addClosure(IClosureScope scope) {
-		exp.addClosure(scope);
+		if (exp != null)
+			exp.addClosure(scope);
 	}
 
 	@Override
