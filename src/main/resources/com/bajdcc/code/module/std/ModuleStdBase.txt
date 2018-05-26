@@ -7,14 +7,36 @@ import "sys.class";
 
 var _ = g_null;
 
-var import_list_class = func ~(ctx) {
-    var to_string = func to_string(exp) {
-        if (g_get_type_ordinal(exp) == 9) {
-            return "[" + g_string_join_array(g_func_map(exp, to_string), ", ") + "]";
-        } else {
-            return g_to_string(exp);
-        }
-    };
+// -----------------------------------------------------------------------------------------
+// LINQ Design
+// @ Refer: https://github.com/vczh-libraries/vlpp
+// ---- CODE BEGIN ----
+
+var import_linq_class = func ~(ctx) {
+
+    // LINQ Operator Class
+
+    g_register_class(ctx, "linq::class", lambda(this) {
+        this."__doc__" := "LINQ接口";
+        this."__from_array" := lambda(this, arr) ->
+            g_new_class(this."__ctx__", "list::from.iterator::enumerable", [["__array__", arr]], []);
+        this."from" := lambda(this, arr) {
+            var t = g_get_type_ordinal(arr);
+            if (t == 9) {
+                return this."__from_array"(g_new_class(this."__ctx__", "list::array", [["array", arr]], []));
+            } else if (t == 10) {
+                if (g_is_null(arr["__type__"]) || arr."__type__" != "list::array") {
+                    throw "LINQ ERROR: " + "<From> Invalid class type";
+                }
+                return this."__from_array"(arr);
+            } else {
+                throw "LINQ ERROR: " + "<From> Invalid type";
+            }
+        };
+    }, "object");
+
+    // Enumerator Class
+
     g_register_class(ctx, "linq::enumerator", lambda(this) {
         this."__doc__" := "枚举器接口";
         this."current" := lambda(this) -> _; // 当前指针所在元素
@@ -22,10 +44,7 @@ var import_list_class = func ~(ctx) {
         this."next" := lambda(this) -> _; // 指针指向下一个，返回是否还有元素
         this."reset" := lambda(this) -> _; // 重置
     }, "object");
-    g_register_class(ctx, "linq::enumerable", lambda(this) {
-        this."__doc__" := "可枚举接口";
-        this."enumerator" := lambda(this) -> _; // 创建枚举器
-    }, "object");
+
     g_register_class(ctx, "list::array::enumerator", lambda(this) {
         this."__doc__" := "数组枚举器";
         this."__array__" := _; // 包装的数组
@@ -38,6 +57,34 @@ var import_list_class = func ~(ctx) {
         };
         this."reset" := lambda(this) -> this."__index__" := -1;
     }, "linq::enumerator");
+
+    // Enumerable Class
+
+    g_register_class(ctx, "linq::enumerable", lambda(this) {
+        this."__doc__" := "可枚举接口";
+        this."enumerator" := lambda(this) -> _; // 创建枚举器
+    }, "object");
+
+    g_register_class(ctx, "list::from.iterator::enumerable", lambda(this) {
+        this."__doc__" := "<From>枚举接口";
+        this."__array__" := _; // 包装的数组
+        this."enumerator" := lambda(this) ->
+            g_new_class(this."__ctx__", "list::array::enumerator", [["__array__", this."__array__"]], []);
+    }, "linq::enumerable");
+};
+
+// ---- CODE END ----
+// -----------------------------------------------------------------------------------------
+
+
+var import_list_class = func ~(ctx) {
+    var to_string = func to_string(exp) {
+        if (g_get_type_ordinal(exp) == 9) {
+            return "[" + g_string_join_array(g_func_map(exp, to_string), ", ") + "]";
+        } else {
+            return g_to_string(exp);
+        }
+    };
     g_register_class(ctx, "list::array", lambda(this) {
         this."__doc__" := "数组";
         this."array" := g_new_array;
@@ -141,6 +188,8 @@ var g_import_std_base = func ~(ctx) {
     }, g_null);
     // List
     import_list_class(ctx);
+    // LINQ
+    import_linq_class(ctx);
     // String
     import_string_class(ctx);
     // Process

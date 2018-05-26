@@ -887,10 +887,11 @@ var stage_dialog = func ~() {
 var stage_linq = func ~() {
     var ctx = g_create_context();
     g_import_std_base(ctx);
+    var linq = g_create_class(ctx, "linq::class");
     putn("\n  [[ Enumerator ]]\n");
-    var array = g_new_class(ctx, "list::array", [["array", [1, 2, 3, 4, 5]]], []);
-    putn("array = " + array."to_string"());
+    var array = linq."from"([1, 2, 3, 4, 5]);
     var arr_enum = array."enumerator"();
+    putn("array = " + arr_enum."__array__"."to_string"());
     while (arr_enum."next"()) {
         putn("enumerator [" + arr_enum."index"() + "] = " + arr_enum."current"());
     }
