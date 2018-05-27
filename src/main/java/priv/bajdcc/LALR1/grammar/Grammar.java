@@ -228,9 +228,9 @@ public class Grammar extends Semantic {
 				"call -> @CALL (@LPA{lost_lpa} func[0]{lost_call} @RPA{lost_rpa} | @ID[1]{lost_call}) @LPA{lost_lpa} [exp_list[2]] @RPA{lost_rpa}");
 		/* 函数定义 */
 		infer(handler.getSemanticHandler("token_list"),
-				"var_list -> @ID[0]#declear_param# [@COMMA var_list[1]]");
+				"var_list -> @ID[0]#declear_param#{lost_token} [@COMMA var_list[1]{lost_token}]");
 		infer(handler.getSemanticHandler("exp_list"),
-				"exp_list -> exp[0] [@COMMA exp_list[1]]");
+				"exp_list -> exp[0] [@COMMA exp_list[1]{lost_exp}]");
 		infer(handler.getSemanticHandler("token_list"),
 				"doc_list -> @LITERAL[0] [@COMMA doc_list[1]]");
 		/* 函数主体 */

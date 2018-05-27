@@ -96,7 +96,7 @@ public class ExpAssignProperty implements IExp {
 			codegen.genCode(RuntimeInst.ipusha);
 			exp.genCode(codegen);
 			codegen.genCode(RuntimeInst.ipusha);
-			codegen.genCode(RuntimeInst.ipush, codegen.genDataRef("g_set_property"));
+			codegen.genCode(RuntimeInst.ipush, codegen.genDataRef("g_set_property_unary"));
 			codegen.genCode(RuntimeInst.icallx);
 		} else if (token.object == OperatorType.PLUS_PLUS || token.object == OperatorType.MINUS_MINUS) {
 			codegen.genCode(RuntimeInst.iopena);
@@ -160,7 +160,7 @@ public class ExpAssignProperty implements IExp {
 					break;
 			}
 			codegen.genCode(RuntimeInst.ipusha);
-			codegen.genCode(RuntimeInst.ipush, codegen.genDataRef("g_set_property"));
+			codegen.genCode(RuntimeInst.ipush, codegen.genDataRef("g_set_property_unary"));
 			codegen.genCode(RuntimeInst.icallx);
 		}
 	}

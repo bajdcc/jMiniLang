@@ -431,8 +431,7 @@ public class Semantic extends Syntax implements IErrorHandler {
 		}
 		/* 判断该跟踪器是否有继续分析的价值 */
 		if (tracker != null) {
-			Position position = new Position(fatal ? tracker.iter.position() : tracker.iter
-					.ex().lastPosition());
+			Position position = new Position(tracker.iter.position());
 			TrackerError error = new TrackerError(position);
 			/* 寻找合适的错误处理器并处理 */
 			boolean processed = findCorrectHandler(tracker, error, position);

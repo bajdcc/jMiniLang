@@ -122,6 +122,10 @@ PC command:
 - `pc remove A`
 - `pc msg A B`
 
+LINQ:
+- `from(list)` or `from(array)`
+- `range(begin, end)`
+
 #### Manual
 
 [*Simplified Chinese Version*](https://raw.githubusercontent.com/bajdcc/jMiniLang/master/%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.pdf "Manual - Simplified Chinese")

@@ -33,6 +33,9 @@ var import_linq_class = func ~(ctx) {
                 throw "LINQ ERROR: " + "<From> Invalid type";
             }
         };
+        this."range" := lambda(this, begin, end) ->
+            g_new_class(this."__ctx__", "list::lazy::enumerable", [["__enumerator__",
+                g_new_class(this."__ctx__", "list::range::enumerator", [], [["init", begin, end]])]], []);
     }, "object");
 
     // Enumerator Class
@@ -52,10 +55,47 @@ var import_linq_class = func ~(ctx) {
         this."current" := lambda(this) -> this."__array__"."get"(this."__index__");
         this."index" := lambda(this) -> this."__index__";
         this."next" := lambda(this) {
-            this."__index__"++;
-            return this."__index__" >= 0 && this."__index__" < this."__array__"."size"();
+            var idx = this."__index__" + 1;
+            var res = idx >= 0 && idx < this."__array__"."size"();
+            if (res) { this."__index__" := idx; return true; }
+            return false;
         };
         this."reset" := lambda(this) -> this."__index__" := -1;
+    }, "linq::enumerator");
+
+    g_register_class(ctx, "list::range::enumerator", lambda(this) {
+        this."__doc__" := "范围枚举器";
+        this."__dir__" := _; // 是否正序
+        this."__begin__" := _; // 起点
+        this."__end__" := _; // 终点
+        this."__index__" := _; // 当前位置
+        this."init" := lambda(this, begin, end) {
+            if (this."__dir__" := begin <= end) {
+                this."__begin__" := begin;
+                this."__end__" := end;
+                this."__index__" := begin - 1;
+            } else {
+                this."__begin__" := end;
+                this."__end__" := begin;
+                this."__index__" := begin + 1;
+            }
+        };
+        this."current" := lambda(this) -> this."__index__";
+        this."index" := lambda(this) ->
+            this."__dir__" ? (this."__index__" - this."__begin__") : (this."__end__" - this."__index__");
+        this."next" := lambda(this) {
+            var idx = this."__dir__" ? (this."__index__" + 1) : (this."__index__" - 1);
+            var res = idx >= this."__begin__" && idx <= this."__end__";
+            if (res) { this."__index__" := idx; return true; }
+            return false;
+        };
+        this."reset" := lambda(this) {
+            if (this."__dir__") {
+                this."__index__" := this."__begin__" - 1;
+            } else {
+                this."__index__" := this."__end__" + 1;
+            }
+        };
     }, "linq::enumerator");
 
     // Enumerable Class
@@ -70,6 +110,12 @@ var import_linq_class = func ~(ctx) {
         this."__array__" := _; // 包装的数组
         this."enumerator" := lambda(this) ->
             g_new_class(this."__ctx__", "list::array::enumerator", [["__array__", this."__array__"]], []);
+    }, "linq::enumerable");
+
+    g_register_class(ctx, "list::lazy::enumerable", lambda(this) {
+        this."__doc__" := "<Lazy>惰性计算枚举接口";
+        this."__enumerator__" := _; // 包装的枚举器
+        this."enumerator" := lambda(this) -> this."__enumerator__";
     }, "linq::enumerable");
 };
 
