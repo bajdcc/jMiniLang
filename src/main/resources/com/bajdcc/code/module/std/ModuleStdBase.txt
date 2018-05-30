@@ -116,15 +116,42 @@ var import_linq_class = func ~(ctx) {
         this."reset" := lambda(this) -> this."__enumerator__"."reset"();
     }, "linq::enumerator");
 
+    g_register_class(ctx, "linq::where::enumerator", lambda(this) {
+        this."__doc__" := "过滤器";
+        this."__enumerator__" := _; // 包装的枚举器
+        this."__index__" := -1; // 当前索引
+        this."__where__" := lambda(a) -> true; // 过滤函数
+        this."current" := lambda(this) -> this."__enumerator__"."current"();
+        this."index" := lambda(this) -> this."__index__";
+        this."next" := lambda(this) {
+            while (this."__enumerator__"."next"()) {
+                var f = this."__where__";
+                if (f(this."__enumerator__"."current"())) {
+                    this."__index__"++;
+                    return true;
+                }
+            }
+            return false;
+        };
+        this."reset" := lambda(this) {
+            this."__enumerator__"."reset"();
+            this."__index__" := -1;
+        };
+    }, "linq::enumerator");
+
     // Enumerable Class
 
     g_register_class(ctx, "linq::enumerable", lambda(this) {
         this."__doc__" := "可枚举接口";
         this."enumerator" := lambda(this) -> _; // 创建枚举器
         this."select" := lambda(this, f) ->
-        g_new_class(this."__ctx__", "linq::lazy::enumerable", [["__enumerator__",
-            g_new_class(this."__ctx__", "linq::select::enumerator",
-                [["__enumerator__", this."enumerator"()], ["__select__", f]], [])]], []);
+            g_new_class(this."__ctx__", "linq::lazy::enumerable", [["__enumerator__",
+                g_new_class(this."__ctx__", "linq::select::enumerator",
+                    [["__enumerator__", this."enumerator"()], ["__select__", f]], [])]], []);
+        this."where" := lambda(this, f) ->
+            g_new_class(this."__ctx__", "linq::lazy::enumerable", [["__enumerator__",
+                g_new_class(this."__ctx__", "linq::where::enumerator",
+                    [["__enumerator__", this."enumerator"()], ["__where__", f]], [])]], []);
     }, "object");
 
     g_register_class(ctx, "linq::from.iterator::enumerable", lambda(this) {

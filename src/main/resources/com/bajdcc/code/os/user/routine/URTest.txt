@@ -917,7 +917,12 @@ var stage_linq = func ~() {
     // LINQ::SELECT(a -> 2*a+1)
     array := linq."range"(1, 5)."select"(lambda(a) -> 2*a)."select"(lambda(a) -> a+1);
     arr_enum := array."enumerator"();
-    print_list("LINQ::SELECT(a->2*a+1)", arr_enum);
+    print_list("LINQ::RANGE(1,5)::SELECT(a->2*a+1)", arr_enum);
+
+    // LINQ::WHERE(a -> a%2==0)
+    array := linq."range"(1, 5)."where"(lambda(a) -> a%2==0);
+    arr_enum := array."enumerator"();
+    print_list("LINQ::RANGE(1,5)::WHERE(a->a%2==0)", arr_enum);
 };
 
 var name = args[0];
