@@ -888,7 +888,11 @@ var stage_linq = func ~() {
     var ctx = g_create_context();
     g_import_std_base(ctx);
     var linq = g_create_class(ctx, "linq::class");
-    var print_list = lambda(name, e) {
+    var print_list = lambda(name, list) {
+        putn("N=" + list."count"() + " F=" + list."first"() + " L=" + list."last"() +
+            " MA=" + list."max"() + " MI=" + list."min"() +
+            " AN=" + list."any"(lambda(a)->a>10) + " AL=" + list."all"(lambda(a)->a<6));
+        var e = list."enumerator"();
         e."reset"();
         while (e."next"()) {
             putn(name + " [" + e."index"() + "] = " + e."current"());
@@ -899,30 +903,21 @@ var stage_linq = func ~() {
     putn("\n  [[ Enumerator ]]\n");
 
     // LINQ::FROM[1..5]
-    var array = linq."from"([1, 2, 3, 4, 5]);
-    var arr_enum = array."enumerator"();
-    putn("array = " + arr_enum."__array__"."to_string"());
-    print_list("LINQ::FROM[1..5]", arr_enum);
+    print_list("LINQ::FROM[1..5]", linq."from"([1, 2, 3, 4, 5]));
 
     // LINQ::RANGE(1,5)
-    array := linq."range"(1, 5);
-    arr_enum := array."enumerator"();
-    print_list("LINQ::RANGE(1,5)", arr_enum);
+    print_list("LINQ::RANGE(1,5)", linq."range"(1, 5));
 
     // LINQ::RANGE(5,1)
-    array := linq."range"(5, 1);
-    arr_enum := array."enumerator"();
-    print_list("LINQ::RANGE(5,1)", arr_enum);
+    print_list("LINQ::RANGE(5,1)", linq."range"(5, 1));
 
     // LINQ::SELECT(a -> 2*a+1)
-    array := linq."range"(1, 5)."select"(lambda(a) -> 2*a)."select"(lambda(a) -> a+1);
-    arr_enum := array."enumerator"();
-    print_list("LINQ::RANGE(1,5)::SELECT(a->2*a+1)", arr_enum);
+    print_list("LINQ::RANGE(1,5)::SELECT(a->2*a+1)",
+        linq."range"(1, 5)."select"(lambda(a) -> 2*a)."select"(lambda(a) -> a+1));
 
     // LINQ::WHERE(a -> a%2==0)
-    array := linq."range"(1, 5)."where"(lambda(a) -> a%2==0);
-    arr_enum := array."enumerator"();
-    print_list("LINQ::RANGE(1,5)::WHERE(a->a%2==0)", arr_enum);
+    print_list("LINQ::RANGE(1,5)::WHERE(a->a%2==0)",
+        linq."range"(1, 5)."where"(lambda(a) -> a%2==0));
 };
 
 var name = args[0];

@@ -46,6 +46,7 @@ var import_linq_class = func ~(ctx) {
         this."index" := lambda(this) -> _; // 当前位置
         this."next" := lambda(this) -> _; // 指针指向下一个，返回是否还有元素
         this."reset" := lambda(this) -> _; // 重置
+        this."clone" := lambda(this) -> _; // 拷贝
     }, "object");
 
     g_register_class(ctx, "linq::array::enumerator", lambda(this) {
@@ -61,6 +62,8 @@ var import_linq_class = func ~(ctx) {
             return false;
         };
         this."reset" := lambda(this) -> this."__index__" := -1;
+        this."clone" := lambda(this) ->
+            g_new_class(this."__ctx__", "linq::array::enumerator", [["__array__", this."__array__"]], []);
     }, "linq::enumerator");
 
     g_register_class(ctx, "linq::range::enumerator", lambda(this) {
@@ -96,13 +99,16 @@ var import_linq_class = func ~(ctx) {
                 this."__index__" := this."__end__" + 1;
             }
         };
+        this."clone" := lambda(this) ->
+            g_new_class(this."__ctx__", "linq::range::enumerator", [], [
+                this."__dir__" ? ["init", this."__begin__", this."__end__"] : ["init", this."__end__", this."__begin__"]]);
     }, "linq::enumerator");
 
     g_register_class(ctx, "linq::select::enumerator", lambda(this) {
         this."__doc__" := "选择器";
         this."__enumerator__" := _; // 包装的枚举器
         this."__current__" := _; // 当前元素
-        this."__select__" := lambda(a) -> a; // 选择函数
+        this."__select__" := g_func_1; // 选择函数
         this."current" := lambda(this) -> this."__current__";
         this."index" := lambda(this) -> this."__enumerator__"."index"();
         this."next" := lambda(this) {
@@ -114,13 +120,16 @@ var import_linq_class = func ~(ctx) {
             return false;
         };
         this."reset" := lambda(this) -> this."__enumerator__"."reset"();
+        this."clone" := lambda(this) ->
+            g_new_class(this."__ctx__", "linq::select::enumerator",
+                [["__enumerator__", this."__enumerator__"."clone"()], ["__select__", this."__select__"]], []);
     }, "linq::enumerator");
 
     g_register_class(ctx, "linq::where::enumerator", lambda(this) {
         this."__doc__" := "过滤器";
         this."__enumerator__" := _; // 包装的枚举器
         this."__index__" := -1; // 当前索引
-        this."__where__" := lambda(a) -> true; // 过滤函数
+        this."__where__" := g_func_always_true; // 过滤函数
         this."current" := lambda(this) -> this."__enumerator__"."current"();
         this."index" := lambda(this) -> this."__index__";
         this."next" := lambda(this) {
@@ -137,6 +146,9 @@ var import_linq_class = func ~(ctx) {
             this."__enumerator__"."reset"();
             this."__index__" := -1;
         };
+        this."clone" := lambda(this) ->
+            g_new_class(this."__ctx__", "linq::where::enumerator",
+                [["__enumerator__", this."__enumerator__"."clone"()], ["__where__", this."__where__"]], []);
     }, "linq::enumerator");
 
     // Enumerable Class
@@ -152,6 +164,73 @@ var import_linq_class = func ~(ctx) {
             g_new_class(this."__ctx__", "linq::lazy::enumerable", [["__enumerator__",
                 g_new_class(this."__ctx__", "linq::where::enumerator",
                     [["__enumerator__", this."enumerator"()], ["__where__", f]], [])]], []);
+
+        this."count" := lambda(this) {
+            var count = 0;
+            var enumerator = this."enumerator"();
+            while (enumerator."next"()) {
+                count++;
+            }
+            return count;
+        };
+        this."empty" := lambda(this) -> this."enumerator"()."next"();
+        this."first" := lambda(this) {
+            var enumerator = this."enumerator"();
+            if (enumerator."next"()) {
+                return enumerator."current"();
+            }
+            throw "LINQ::FIRST Error: empty list";
+        };
+        this."first_or_default" := lambda(this, def) {
+            var enumerator = this."enumerator"();
+            if (enumerator."next"()) {
+                return enumerator."current"();
+            }
+            return def;
+        };
+        this."last" := lambda(this) {
+            var enumerator = this."enumerator"();
+            if (enumerator."next"()) {
+                var current = enumerator."current"();
+                while (enumerator."next"()) {
+                    current := enumerator."current"();
+                }
+                return current;
+            }
+            throw "LINQ::LAST Error: empty list";
+        };
+        this."last_or_default" := lambda(this, def) {
+            var enumerator = this."enumerator"();
+            var current = def;
+            while (enumerator."next"()) {
+                current := enumerator."current"();
+            }
+            return current;
+        };
+
+        this."aggregate" := lambda(this, f) {
+            var enumerator = this."enumerator"();
+            if (enumerator."next"()) {
+                var current = enumerator."current"();
+                while (enumerator."next"()) {
+                    current := f(current, enumerator."current"());
+                }
+                return current;
+            }
+            throw "LINQ::AGGREGATE Error: empty list";
+        };
+        this."aggregate_seed" := lambda(this, init, f) {
+            var enumerator = this."enumerator"();
+            var current = init;
+            while (enumerator."next"()) {
+                current := f(current, enumerator."current"());
+            }
+            return current;
+        };
+        this."max" := lambda(this) -> this."aggregate"(g_func_max);
+        this."min" := lambda(this) -> this."aggregate"(g_func_min);
+        this."all" := lambda(this, f) -> this."select"(f)."aggregate_seed"(true, g_func_and);
+        this."any" := lambda(this, f) -> this."select"(f)."aggregate_seed"(false, g_func_or);
     }, "object");
 
     g_register_class(ctx, "linq::from.iterator::enumerable", lambda(this) {
@@ -164,7 +243,7 @@ var import_linq_class = func ~(ctx) {
     g_register_class(ctx, "linq::lazy::enumerable", lambda(this) {
         this."__doc__" := "<Lazy>惰性计算枚举接口";
         this."__enumerator__" := _; // 包装的枚举器
-        this."enumerator" := lambda(this) -> this."__enumerator__";
+        this."enumerator" := lambda(this) -> this."__enumerator__"."clone"();
     }, "linq::enumerable");
 };
 
