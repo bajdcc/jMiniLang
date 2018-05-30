@@ -1066,6 +1066,8 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 		if (triesCount <= 0) {
 			if (obj.getType() != RuntimeObjectType.kNull) {
 				err(RuntimeError.THROWS_EXCEPTION, String.valueOf(obj.getObj()));
+			} else {
+				err(RuntimeError.THROWS_EXCEPTION, "NULL");
 			}
 		}
 		if (!stack.hasTry()) {

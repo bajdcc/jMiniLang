@@ -19,7 +19,7 @@ var import_linq_class = func ~(ctx) {
     g_register_class(ctx, "linq::class", lambda(this) {
         this."__doc__" := "LINQ接口";
         this."__from_array" := lambda(this, arr) ->
-            g_new_class(this."__ctx__", "list::from.iterator::enumerable", [["__array__", arr]], []);
+            g_new_class(this."__ctx__", "linq::from.iterator::enumerable", [["__array__", arr]], []);
         this."from" := lambda(this, arr) {
             var t = g_get_type_ordinal(arr);
             if (t == 9) {
@@ -34,8 +34,8 @@ var import_linq_class = func ~(ctx) {
             }
         };
         this."range" := lambda(this, begin, end) ->
-            g_new_class(this."__ctx__", "list::lazy::enumerable", [["__enumerator__",
-                g_new_class(this."__ctx__", "list::range::enumerator", [], [["init", begin, end]])]], []);
+            g_new_class(this."__ctx__", "linq::lazy::enumerable", [["__enumerator__",
+                g_new_class(this."__ctx__", "linq::range::enumerator", [], [["init", begin, end]])]], []);
     }, "object");
 
     // Enumerator Class
@@ -48,7 +48,7 @@ var import_linq_class = func ~(ctx) {
         this."reset" := lambda(this) -> _; // 重置
     }, "object");
 
-    g_register_class(ctx, "list::array::enumerator", lambda(this) {
+    g_register_class(ctx, "linq::array::enumerator", lambda(this) {
         this."__doc__" := "数组枚举器";
         this."__array__" := _; // 包装的数组
         this."__index__" := -1; // 访问的索引
@@ -63,7 +63,7 @@ var import_linq_class = func ~(ctx) {
         this."reset" := lambda(this) -> this."__index__" := -1;
     }, "linq::enumerator");
 
-    g_register_class(ctx, "list::range::enumerator", lambda(this) {
+    g_register_class(ctx, "linq::range::enumerator", lambda(this) {
         this."__doc__" := "范围枚举器";
         this."__dir__" := _; // 是否正序
         this."__begin__" := _; // 起点
@@ -98,21 +98,43 @@ var import_linq_class = func ~(ctx) {
         };
     }, "linq::enumerator");
 
+    g_register_class(ctx, "linq::select::enumerator", lambda(this) {
+        this."__doc__" := "选择器";
+        this."__enumerator__" := _; // 包装的枚举器
+        this."__current__" := _; // 当前元素
+        this."__select__" := lambda(a) -> a; // 选择函数
+        this."current" := lambda(this) -> this."__current__";
+        this."index" := lambda(this) -> this."__enumerator__"."index"();
+        this."next" := lambda(this) {
+            if (this."__enumerator__"."next"()) {
+                var f = this."__select__";
+                this."__current__" := f(this."__enumerator__"."current"());
+                return true;
+            }
+            return false;
+        };
+        this."reset" := lambda(this) -> this."__enumerator__"."reset"();
+    }, "linq::enumerator");
+
     // Enumerable Class
 
     g_register_class(ctx, "linq::enumerable", lambda(this) {
         this."__doc__" := "可枚举接口";
         this."enumerator" := lambda(this) -> _; // 创建枚举器
+        this."select" := lambda(this, f) ->
+        g_new_class(this."__ctx__", "linq::lazy::enumerable", [["__enumerator__",
+            g_new_class(this."__ctx__", "linq::select::enumerator",
+                [["__enumerator__", this."enumerator"()], ["__select__", f]], [])]], []);
     }, "object");
 
-    g_register_class(ctx, "list::from.iterator::enumerable", lambda(this) {
+    g_register_class(ctx, "linq::from.iterator::enumerable", lambda(this) {
         this."__doc__" := "<From>枚举接口";
         this."__array__" := _; // 包装的数组
         this."enumerator" := lambda(this) ->
-            g_new_class(this."__ctx__", "list::array::enumerator", [["__array__", this."__array__"]], []);
+            g_new_class(this."__ctx__", "linq::array::enumerator", [["__array__", this."__array__"]], []);
     }, "linq::enumerable");
 
-    g_register_class(ctx, "list::lazy::enumerable", lambda(this) {
+    g_register_class(ctx, "linq::lazy::enumerable", lambda(this) {
         this."__doc__" := "<Lazy>惰性计算枚举接口";
         this."__enumerator__" := _; // 包装的枚举器
         this."enumerator" := lambda(this) -> this."__enumerator__";
@@ -150,7 +172,7 @@ var import_list_class = func ~(ctx) {
         this."empty" := lambda(this) -> g_array_empty(this."array");
         this."fill" := lambda(this, obj) -> g_array_fill(this."array", obj);
         this."enumerator" := lambda(this) ->
-            g_new_class(this."__ctx__", "list::array::enumerator", [["__array__", this]], []);
+            g_new_class(this."__ctx__", "linq::array::enumerator", [["__array__", this]], []);
         this."to_string" := lambda(this) -> to_string(this."array");
     }, "linq::enumerable");
     g_register_class(ctx, "list::map", lambda(this) {

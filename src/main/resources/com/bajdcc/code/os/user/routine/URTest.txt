@@ -913,6 +913,11 @@ var stage_linq = func ~() {
     array := linq."range"(5, 1);
     arr_enum := array."enumerator"();
     print_list("LINQ::RANGE(5,1)", arr_enum);
+
+    // LINQ::SELECT(a -> 2*a+1)
+    array := linq."range"(1, 5)."select"(lambda(a) -> 2*a)."select"(lambda(a) -> a+1);
+    arr_enum := array."enumerator"();
+    print_list("LINQ::SELECT(a->2*a+1)", arr_enum);
 };
 
 var name = args[0];
