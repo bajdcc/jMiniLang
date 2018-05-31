@@ -931,7 +931,7 @@ var stage_linq = func ~() {
     print_list("LINQ::SELECT_MANY", linq."range"(1, 3)."select_many"(lambda(a)->linq."from"([a, 2*a])));
 
     // LINQ::UNION
-    print_list("LINQ::SELECT_MANY", linq."range"(4, 8)."union"(linq."range"(5, 1)."select"(lambda(a)->2*a)));
+    print_list("LINQ::UNION", linq."range"(4, 8)."union"(linq."range"(5, 1)."select"(lambda(a)->2*a)));
 
     // LINQ::GROUP_BY
     print_list2("LINQ::GROUP_BY",

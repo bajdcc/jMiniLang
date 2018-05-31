@@ -125,6 +125,7 @@ PC command:
 LINQ:
 - `from(list)` or `from(array)`
 - `range(begin, end)`
+- Function: select, where, first, last, max, sum, for_each, group_by, distinct, union, etc.
 
 #### Manual
 
