@@ -151,6 +151,123 @@ var import_linq_class = func ~(ctx) {
                 [["__enumerator__", this."__enumerator__"."clone"()], ["__where__", this."__where__"]], []);
     }, "linq::enumerator");
 
+    g_register_class(ctx, "linq::concat::enumerator", lambda(this) {
+        this."__doc__" := "连接器";
+        this."__enumerator1__" := _; // 包装的枚举器1
+        this."__enumerator2__" := _; // 包装的枚举器2
+        this."__index__" := -1; // 当前索引
+        this."__use1__" := true; // 是否使用枚举器1
+        this."current" := lambda(this) -> this."__use1__" ? this."__enumerator1__"."current"() : this."__enumerator2__"."current"();
+        this."index" := lambda(this) -> this."__index__";
+        this."next" := lambda(this) {
+            if (this."__use1__") {
+                if (this."__enumerator1__"."next"()) {
+                    this."__index__"++;
+                    return true;
+                }
+                this."__use1__" := false;
+                return this."next"();
+            } else {
+                if (this."__enumerator2__"."next"()) {
+                    this."__index__"++;
+                    return true;
+                }
+                return false;
+            }
+        };
+        this."reset" := lambda(this) {
+            this."__enumerator1__"."reset"();
+            this."__enumerator2__"."reset"();
+            this."__index__" := -1;
+            this."__use1__" := true;
+        };
+        this."clone" := lambda(this) ->
+            g_new_class(this."__ctx__", "linq::concat::enumerator",
+                [["__enumerator1__", this."__enumerator1__"."clone"()],
+                 ["__enumerator2__", this."__enumerator2__"."clone"()],
+                 ["__index__", this."__index__"], ["__use1__", this."__use1__"]], []);
+    }, "linq::enumerator");
+
+    g_register_class(ctx, "linq::take::enumerator", lambda(this) {
+        this."__doc__" := "挑选";
+        this."__enumerator__" := _; // 包装的枚举器
+        this."__count__" := -1; // 指定数量
+        this."current" := lambda(this) -> this."__enumerator__"."current"();
+        this."index" := lambda(this) -> this."__enumerator__"."index"();
+        this."next" := lambda(this) {
+            if (this."index"() < this."__count__" - 1) {
+                return this."__enumerator__"."next"();
+            }
+            return false;
+        };
+        this."reset" := lambda(this) {
+            this."__enumerator__"."reset"();
+        };
+        this."clone" := lambda(this) ->
+            g_new_class(this."__ctx__", "linq::take::enumerator",
+                [["__enumerator__", this."__enumerator__"."clone"()], ["__count__", this."__count__"]], []);
+    }, "linq::enumerator");
+
+    g_register_class(ctx, "linq::skip::enumerator", lambda(this) {
+        this."__doc__" := "跳过";
+        this."__enumerator__" := _; // 包装的枚举器
+        this."__count__" := -1; // 指定数量
+        this."__skipped__" := false; // 是否跳过
+        this."current" := lambda(this) -> this."__enumerator__"."current"();
+        this."index" := lambda(this) -> this."__enumerator__"."index"() - this."__count__";
+        this."next" := lambda(this) {
+            if (!this."__skipped__") {
+                this."__skipped__" := true;
+                var count = this."__count__";
+                for (var i = 0; i < count; i++) {
+                    if (!this."__enumerator__"."next"()) {
+                        return false;
+                    }
+                }
+            }
+            return this."__enumerator__"."next"();
+        };
+        this."reset" := lambda(this) {
+            this."__enumerator__"."reset"();
+            this."__skipped__" := false;
+        };
+        this."clone" := lambda(this) ->
+            g_new_class(this."__ctx__", "linq::skip::enumerator",
+                [["__enumerator__", this."__enumerator__"."clone"()],
+                ["__count__", this."__count__"], ["__skipped__", this."__skipped__"]], []);
+    }, "linq::enumerator");
+
+    g_register_class(ctx, "linq::repeat::enumerator", lambda(this) {
+        this."__doc__" := "重复";
+        this."__enumerator__" := _; // 包装的枚举器
+        this."__count__" := -1; // 指定数量
+        this."__index__" := -1; // 当前位置
+        this."__repeat_count__" := 0; // 已重复次数
+        this."current" := lambda(this) -> this."__enumerator__"."current"();
+        this."index" := lambda(this) -> this."__index__";
+        this."next" := lambda(this) {
+            while (this."__repeat_count__" <this."__count__") {
+                if (this."__enumerator__"."next"()) {
+                    this."__index__"++;
+                    return true;
+                }
+                this."__repeat_count__"++;
+                this."__enumerator__"."reset"();
+            }
+            return false;
+        };
+        this."reset" := lambda(this) {
+            this."__enumerator__"."reset"();
+            this."__index__" := -1;
+            this."__repeat_count__" := 0;
+        };
+        this."clone" := lambda(this) ->
+            g_new_class(this."__ctx__", "linq::repeat::enumerator",
+                [["__enumerator__", this."__enumerator__"."clone"()],
+                ["__count__", this."__count__"], ["__index__", this."__index__"],
+                ["__repeat_count__", this."__repeat_count__"]], []);
+    }, "linq::enumerator");
+
     // Enumerable Class
 
     g_register_class(ctx, "linq::enumerable", lambda(this) {
@@ -164,6 +281,22 @@ var import_linq_class = func ~(ctx) {
             g_new_class(this."__ctx__", "linq::lazy::enumerable", [["__enumerator__",
                 g_new_class(this."__ctx__", "linq::where::enumerator",
                     [["__enumerator__", this."enumerator"()], ["__where__", f]], [])]], []);
+        this."concat" := lambda(this, x) ->
+            g_new_class(this."__ctx__", "linq::lazy::enumerable", [["__enumerator__",
+                g_new_class(this."__ctx__", "linq::concat::enumerator",
+                    [["__enumerator1__", this."enumerator"()], ["__enumerator2__", x."enumerator"()]], [])]], []);
+        this."take" := lambda(this, n) ->
+            g_new_class(this."__ctx__", "linq::lazy::enumerable", [["__enumerator__",
+                g_new_class(this."__ctx__", "linq::take::enumerator",
+                    [["__enumerator__", this."enumerator"()], ["__count__", n]], [])]], []);
+        this."skip" := lambda(this, n) ->
+            g_new_class(this."__ctx__", "linq::lazy::enumerable", [["__enumerator__",
+                g_new_class(this."__ctx__", "linq::skip::enumerator",
+                    [["__enumerator__", this."enumerator"()], ["__count__", n]], [])]], []);
+        this."repeat" := lambda(this, n) ->
+            g_new_class(this."__ctx__", "linq::lazy::enumerable", [["__enumerator__",
+                g_new_class(this."__ctx__", "linq::repeat::enumerator",
+                    [["__enumerator__", this."enumerator"()], ["__count__", n]], [])]], []);
 
         this."count" := lambda(this) {
             var count = 0;

@@ -918,6 +918,13 @@ var stage_linq = func ~() {
     // LINQ::WHERE(a -> a%2==0)
     print_list("LINQ::RANGE(1,5)::WHERE(a->a%2==0)",
         linq."range"(1, 5)."where"(lambda(a) -> a%2==0));
+
+    // LINQ::CONCAT
+    print_list("LINQ::CONCAT",
+        linq."range"(2, 6)."select"(lambda(a)->2*a-1)."concat"(linq."range"(10, 3)."where"(lambda(a)->a%2==0)));
+
+    // LINQ::TAKE,SKIP,REPEAT
+        print_list("LINQ::TAKE,SKIP,REPEAT", linq."range"(1, 10)."skip"(3)."take"(3)."repeat"(2));
 };
 
 var name = args[0];

@@ -170,14 +170,18 @@ public class SemanticHandler {
 				binop.setRightOperand((IExp) indexed.get(0).object);
 				return binop.simplify(recorder);
 			} else if (indexed.exists(3)) {// 单目运算
-				if (indexed.get(1).object instanceof ExpBinop) {
-					ExpBinop bin = (ExpBinop) indexed.get(1).object;
-					if (bin.getToken().object == OperatorType.DOT) {
-						ExpAssignProperty assign = new ExpAssignProperty();
-						assign.setToken(indexed.get(3).token);
-						assign.setObj(bin.getLeftOperand());
-						assign.setProperty(bin.getRightOperand());
-						return assign;
+				Token token = indexed.get(3).token;
+				if (token.kToken == TokenType.OPERATOR) {
+					if ((token.object == OperatorType.PLUS_PLUS || token.object == OperatorType.MINUS_MINUS)
+							&& indexed.get(1).object instanceof ExpBinop) {
+						ExpBinop bin = (ExpBinop) indexed.get(1).object;
+						if (bin.getToken().object == OperatorType.DOT) {
+							ExpAssignProperty assign = new ExpAssignProperty();
+							assign.setToken(token);
+							assign.setObj(bin.getLeftOperand());
+							assign.setProperty(bin.getRightOperand());
+							return assign;
+						}
 					}
 				}
 				ExpSinop sinop = new ExpSinop();
