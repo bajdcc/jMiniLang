@@ -218,6 +218,12 @@ public class RuntimeObject implements Cloneable {
 		return o;
 	}
 
+	private static boolean equals_flag(long a[], long b[]) {
+		if (a == null || b == null)
+			return false;
+		return a[0] == b[0];
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == null)
@@ -225,10 +231,23 @@ public class RuntimeObject implements Cloneable {
 		if (obj instanceof RuntimeObject) {
 			RuntimeObject o = (RuntimeObject) obj;
 			if (this.obj == null)
-				return o.obj == null && this.type.equals(o.type) && this.flag == o.flag;
-			return this.obj.equals(o.obj) && this.type.equals(o.type) && this.flag == o.flag;
+				return o.obj == null && this.type.equals(o.type) && equals_flag(this.flag, o.flag);
+			if (this.type.equals(o.type) && equals_flag(this.flag, o.flag)) {
+				switch (this.type) {
+					case kInt:
+						return ((BigInteger) this.obj).compareTo((BigInteger) o.obj) == 0;
+					case kReal:
+						return ((BigDecimal) this.obj).compareTo((BigDecimal) o.obj) == 0;
+				}
+				return this.obj.equals(o.obj);
+			}
+			return false;
 		}
 		return super.equals(obj);
+	}
+	@Override
+	public int hashCode() {
+		return obj == null ? super.hashCode() : obj.hashCode();
 	}
 
 	@Override

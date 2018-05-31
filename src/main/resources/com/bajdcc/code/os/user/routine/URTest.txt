@@ -892,11 +892,12 @@ var stage_linq = func ~() {
         putn("N=" + list."count"() + " F=" + list."first"() + " L=" + list."last"() +
             " MA=" + list."max"() + " MI=" + list."min"() +
             " AN=" + list."any"(lambda(a)->a>10) + " AL=" + list."all"(lambda(a)->a<6));
-        var e = list."enumerator"();
-        e."reset"();
-        while (e."next"()) {
-            putn(name + " [" + e."index"() + "] = " + e."current"());
-        }
+        list."for_each"(lambda(i, e) -> putn(name + " [" + i + "] = " + e));
+        putln();
+    };
+
+    var print_list2 = lambda(name, list) {
+        list."for_each"(lambda(i, e) -> putn(name + " [" + i + "] = " + e));
         putln();
     };
 
@@ -924,7 +925,19 @@ var stage_linq = func ~() {
         linq."range"(2, 6)."select"(lambda(a)->2*a-1)."concat"(linq."range"(10, 3)."where"(lambda(a)->a%2==0)));
 
     // LINQ::TAKE,SKIP,REPEAT
-        print_list("LINQ::TAKE,SKIP,REPEAT", linq."range"(1, 10)."skip"(3)."take"(3)."repeat"(2));
+    print_list("LINQ::TAKE,SKIP,REPEAT", linq."range"(1, 10)."skip"(3)."take"(3)."repeat"(2));
+
+    // LINQ::SELECT_MANY
+    print_list("LINQ::SELECT_MANY", linq."range"(1, 3)."select_many"(lambda(a)->linq."from"([a, 2*a])));
+
+    // LINQ::UNION
+    print_list("LINQ::SELECT_MANY", linq."range"(4, 8)."union"(linq."range"(5, 1)."select"(lambda(a)->2*a)));
+
+    // LINQ::GROUP_BY
+    print_list2("LINQ::GROUP_BY",
+        linq."range"(1, 5)."select"(lambda(a)->{"a":a})."repeat"(2)
+            ."group_by"(lambda(a)->a["a"])
+            ."select"(lambda(a)->"key: " + a."key" + ", count: " + a."value"."count"() + ", sum: " + a."value"."sum"()));
 };
 
 var name = args[0];

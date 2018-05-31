@@ -62,6 +62,10 @@ public class RuntimeArray implements Cloneable {
 		return array.remove(array.size() - 1);
 	}
 
+	public RuntimeArray distinct() {
+		return new RuntimeArray(array.stream().distinct().collect(Collectors.toList()));
+	}
+
 	public RuntimeObject get(int index) {
 		if (index >= 0 && index < array.size()) {
 			return array.get(index);

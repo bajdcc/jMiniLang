@@ -20,10 +20,11 @@ var import_linq_class = func ~(ctx) {
         this."__doc__" := "LINQ接口";
         this."__from_array" := lambda(this, arr) ->
             g_new_class(this."__ctx__", "linq::from.iterator::enumerable", [["__array__", arr]], []);
+        this."cast_array" := lambda(this, arr) -> g_new_class(this."__ctx__", "list::array", [["array", arr]], []);
         this."from" := lambda(this, arr) {
             var t = g_get_type_ordinal(arr);
             if (t == 9) {
-                return this."__from_array"(g_new_class(this."__ctx__", "list::array", [["array", arr]], []));
+                return this."__from_array"(this."cast_array"(arr));
             } else if (t == 10) {
                 if (g_is_null(arr["__type__"]) || arr."__type__" != "list::array") {
                     throw "LINQ ERROR: " + "<From> Invalid class type";
@@ -362,9 +363,33 @@ var import_linq_class = func ~(ctx) {
         };
         this."max" := lambda(this) -> this."aggregate"(g_func_max);
         this."min" := lambda(this) -> this."aggregate"(g_func_min);
+        this."sum" := lambda(this) -> this."aggregate_seed"(0, g_func_add);
+        this."product" := lambda(this) -> this."aggregate_seed"(1, g_func_mul);
         this."all" := lambda(this, f) -> this."select"(f)."aggregate_seed"(true, g_func_and);
         this."any" := lambda(this, f) -> this."select"(f)."aggregate_seed"(false, g_func_or);
-    }, "object");
+        this."select_many" := lambda(this, f) -> this."select"(f)."aggregate_seed"(this."from"([]), lambda(a, b) -> a."concat"(b));
+        this."union" := lambda(this, x) -> this."concat"(x)."distinct"();
+        this."to_list" := lambda(this) -> this."aggregate_seed"([], lambda(a, b) -> g_array_add(a, b));
+        this."distinct" := lambda(this) -> this."from"(g_array_distinct(this."to_list"())); // 暂时用内置的去重算法
+        this."group_by" := lambda(this, f) {
+            var s = this."select"(f)."distinct"();
+            var se = s."enumerator"();
+            var a = g_create_class(this."__ctx__", "list::array");
+            while (se."next"()) {
+                var sec = se."current"();
+                var v = this."where"(lambda(a) -> sec == f(a))."select"(f);
+                a."add"({"key": sec, "value": v});
+            }
+            return this."from"(a);
+        };
+
+        this."for_each" := lambda(this, f) {
+            var enumerator = this."enumerator"();
+            while (enumerator."next"()) {
+                f(enumerator."index"(), enumerator."current"());
+            }
+        };
+    }, "linq::class");
 
     g_register_class(ctx, "linq::from.iterator::enumerable", lambda(this) {
         this."__doc__" := "<From>枚举接口";
@@ -410,6 +435,7 @@ var import_list_class = func ~(ctx) {
         this."delete" := lambda(this, obj) -> g_array_delete(this."array", obj);
         this."empty" := lambda(this) -> g_array_empty(this."array");
         this."fill" := lambda(this, obj) -> g_array_fill(this."array", obj);
+        this."distinct" := lambda(this) -> g_array_distinct(this."array");
         this."enumerator" := lambda(this) ->
             g_new_class(this."__ctx__", "linq::array::enumerator", [["__array__", this]], []);
         this."to_string" := lambda(this) -> to_string(this."array");

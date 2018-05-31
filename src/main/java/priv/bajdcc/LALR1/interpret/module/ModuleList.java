@@ -381,6 +381,24 @@ public class ModuleList implements IInterpreterModule {
 				return new RuntimeObject(array);
 			}
 		});
+		info.addExternalFunc("g_array_distinct", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "数组去重";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kArray};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				RuntimeArray array = (RuntimeArray) args.get(0).getObj();
+				return new RuntimeObject(array.distinct());
+			}
+		});
 	}
 
 	/**
