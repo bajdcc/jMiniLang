@@ -2,7 +2,7 @@ import "sys.base";
 import "sys.list";
 import "sys.proc";
 
-var g_create_context = func ~() -> g_new_map;
+var g_create_context = func ~() -> g_class_context;
 export "g_create_context";
 
 var g_create_property = func ~(class, name, property) {
@@ -583,6 +583,16 @@ var g_register_class = func ~(ctx, name, init, base) {
     g_map_put(ctx, name, class);
 };
 export "g_register_class";
+var g_class = func ~(name, base, init) {
+    var class = {};
+    g_create_property(class, "name", name);
+    if (!g_is_null(base) && g_map_contains(g_class_context, base)) {
+        g_create_property(class, "base", base);
+    }
+    g_create_method(class, "init", init);
+    g_map_put(g_class_context, name, class);
+};
+export "g_register_class";
 
 var g_create_class = func ~(ctx, name) {
     var prototype = ctx[name];
@@ -591,7 +601,6 @@ var g_create_class = func ~(ctx, name) {
     }
     var class = {};
     g_create_property(class, "__type__", name);
-    g_create_property(class, "__ctx__", ctx);
     if (g_map_contains(prototype, "base")) {
         g_map_put(class, "__base__", g_create_class(ctx, prototype["base"]));
     }
@@ -739,8 +748,12 @@ var g_invoke_apply = func ~(class, fun, args) {
     return fn(class, fun, args);
 };
 export "g_invoke_apply";
-var g_new_class = func ~(ctx, name, data, method) {
-    var class = g_create_class(ctx, name);
+var g_new = func ~(name) {
+    return g_create_class(g_class_context, name);
+};
+export "g_new";
+var g_new_class = func ~(name, data, method) {
+    var class = g_new(name);
     foreach (var d : g_range_array(data)) {
         set class::d[0] = d[1];
     }

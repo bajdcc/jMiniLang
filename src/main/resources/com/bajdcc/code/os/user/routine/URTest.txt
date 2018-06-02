@@ -588,10 +588,10 @@ var stage_class = func ~() {
         this."to_string" := lambda(this) -> this."type" + " r=" + this."r" + " area=" + this."get_area"();
     }, "shape");
 
-    var square = g_create_class(ctx, "square");
+    var square = g_new("square");
     square."a" := 5;
     square."b" := 6;
-    var circle = g_create_class(ctx, "circle");
+    var circle = g_new("circle");
     circle."r" := 10;
     circle."s" := square;
 
@@ -713,7 +713,7 @@ var stage_bash = func ~() {
     var ctx = g_create_context();
     g_import_std_base(ctx);
     g_import_std_shell(ctx);
-    var shell = g_create_class(ctx, "system::shell");
+    var shell = g_new("system::shell");
     shell."out" := out;
 
     var exec = func ~(cmd) {
@@ -887,7 +887,7 @@ var stage_dialog = func ~() {
 var stage_linq = func ~() {
     var ctx = g_create_context();
     g_import_std_base(ctx);
-    var linq = g_create_class(ctx, "linq::class");
+    var linq = g_new("linq::class");
     var print_list = lambda(name, list) {
         putn("N=" + list."count"() + " F=" + list."first"() + " L=" + list."last"() +
             " MA=" + list."max"() + " MI=" + list."min"() +

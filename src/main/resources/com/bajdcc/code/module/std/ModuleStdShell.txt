@@ -159,6 +159,9 @@ var import_shell_class = func ~(ctx) {
 };
 
 var g_import_std_shell = func ~(ctx) {
+    if (g_map_contains(ctx, "system::shell")) {
+        return;
+    }
     import_shell_class(ctx);
 };
 export "g_import_std_shell";

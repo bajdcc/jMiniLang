@@ -133,6 +133,141 @@ LINQ:
 
 #### Example
 
+**LINQ Example**
+```javascript
+var linq = g_new("linq::class");
+var print_list = lambda(name, list) {
+    putn("N=" + list."count"() + " F=" + list."first"() + " L=" + list."last"() +
+        " MA=" + list."max"() + " MI=" + list."min"() +
+        " AN=" + list."any"(lambda(a)->a>10) + " AL=" + list."all"(lambda(a)->a<6));
+    list."for_each"(lambda(i, e) -> putn(name + " [" + i + "] = " + e));
+    putln();
+};
+
+var print_list2 = lambda(name, list) {
+    list."for_each"(lambda(i, e) -> putn(name + " [" + i + "] = " + e));
+    putln();
+};
+
+putn("\n  [[ Enumerator ]]\n");
+
+// LINQ::FROM[1..5]
+print_list("LINQ::FROM[1..5]", linq."from"([1, 2, 3, 4, 5]));
+
+// LINQ::RANGE(1,5)
+print_list("LINQ::RANGE(1,5)", linq."range"(1, 5));
+
+// LINQ::RANGE(5,1)
+print_list("LINQ::RANGE(5,1)", linq."range"(5, 1));
+
+// LINQ::SELECT(a -> 2*a+1)
+print_list("LINQ::RANGE(1,5)::SELECT(a->2*a+1)",
+    linq."range"(1, 5)."select"(lambda(a) -> 2*a)."select"(lambda(a) -> a+1));
+
+// LINQ::WHERE(a -> a%2==0)
+print_list("LINQ::RANGE(1,5)::WHERE(a->a%2==0)",
+    linq."range"(1, 5)."where"(lambda(a) -> a%2==0));
+
+// LINQ::CONCAT
+print_list("LINQ::CONCAT",
+    linq."range"(2, 6)."select"(lambda(a)->2*a-1)."concat"(linq."range"(10, 3)."where"(lambda(a)->a%2==0)));
+
+// LINQ::TAKE,SKIP,REPEAT
+print_list("LINQ::TAKE,SKIP,REPEAT", linq."range"(1, 10)."skip"(3)."take"(3)."repeat"(2));
+
+// LINQ::SELECT_MANY
+print_list("LINQ::SELECT_MANY", linq."range"(1, 3)."select_many"(lambda(a)->linq."from"([a, 2*a])));
+
+// LINQ::UNION
+print_list("LINQ::UNION", linq."range"(4, 8)."union"(linq."range"(5, 1)."select"(lambda(a)->2*a)));
+
+// LINQ::GROUP_BY
+print_list2("LINQ::GROUP_BY",
+    linq."range"(1, 5)."select"(lambda(a)->{"a":a})."repeat"(2)
+        ."group_by"(lambda(a)->a["a"])
+        ."select"(lambda(a)->"key: " + a."key" + ", count: " + a."value"."count"() + ", sum: " + a."value"."sum"()));
+```
+
+Output:
+```
+
+  [[ Enumerator ]]
+
+N=5 F=1 L=5 MA=5 MI=1 AN=false AL=true
+LINQ::FROM[1..5] [0] = 1
+LINQ::FROM[1..5] [1] = 2
+LINQ::FROM[1..5] [2] = 3
+LINQ::FROM[1..5] [3] = 4
+LINQ::FROM[1..5] [4] = 5
+
+N=5 F=1 L=5 MA=5 MI=1 AN=false AL=true
+LINQ::RANGE(1,5) [0] = 1
+LINQ::RANGE(1,5) [1] = 2
+LINQ::RANGE(1,5) [2] = 3
+LINQ::RANGE(1,5) [3] = 4
+LINQ::RANGE(1,5) [4] = 5
+
+N=5 F=5 L=1 MA=5 MI=1 AN=false AL=true
+LINQ::RANGE(5,1) [0] = 5
+LINQ::RANGE(5,1) [1] = 4
+LINQ::RANGE(5,1) [2] = 3
+LINQ::RANGE(5,1) [3] = 2
+LINQ::RANGE(5,1) [4] = 1
+
+N=5 F=3 L=11 MA=11 MI=3 AN=true AL=false
+LINQ::RANGE(1,5)::SELECT(a->2*a+1) [0] = 3
+LINQ::RANGE(1,5)::SELECT(a->2*a+1) [1] = 5
+LINQ::RANGE(1,5)::SELECT(a->2*a+1) [2] = 7
+LINQ::RANGE(1,5)::SELECT(a->2*a+1) [3] = 9
+LINQ::RANGE(1,5)::SELECT(a->2*a+1) [4] = 11
+
+N=2 F=2 L=4 MA=4 MI=2 AN=false AL=true
+LINQ::RANGE(1,5)::WHERE(a->a%2==0) [0] = 2
+LINQ::RANGE(1,5)::WHERE(a->a%2==0) [1] = 4
+
+N=9 F=3 L=4 MA=11 MI=3 AN=true AL=false
+LINQ::CONCAT [0] = 3
+LINQ::CONCAT [1] = 5
+LINQ::CONCAT [2] = 7
+LINQ::CONCAT [3] = 9
+LINQ::CONCAT [4] = 11
+LINQ::CONCAT [5] = 10
+LINQ::CONCAT [6] = 8
+LINQ::CONCAT [7] = 6
+LINQ::CONCAT [8] = 4
+
+N=6 F=4 L=6 MA=6 MI=4 AN=false AL=false
+LINQ::TAKE,SKIP,REPEAT [0] = 4
+LINQ::TAKE,SKIP,REPEAT [1] = 5
+LINQ::TAKE,SKIP,REPEAT [2] = 6
+LINQ::TAKE,SKIP,REPEAT [3] = 4
+LINQ::TAKE,SKIP,REPEAT [4] = 5
+LINQ::TAKE,SKIP,REPEAT [5] = 6
+
+N=6 F=1 L=6 MA=6 MI=1 AN=false AL=false
+LINQ::SELECT_MANY [0] = 1
+LINQ::SELECT_MANY [1] = 2
+LINQ::SELECT_MANY [2] = 2
+LINQ::SELECT_MANY [3] = 4
+LINQ::SELECT_MANY [4] = 3
+LINQ::SELECT_MANY [5] = 6
+
+N=7 F=4 L=2 MA=10 MI=2 AN=false AL=false
+LINQ::UNION [0] = 4
+LINQ::UNION [1] = 5
+LINQ::UNION [2] = 6
+LINQ::UNION [3] = 7
+LINQ::UNION [4] = 8
+LINQ::UNION [5] = 10
+LINQ::UNION [6] = 2
+
+LINQ::GROUP_BY [0] = key: 1, count: 2, sum: 2
+LINQ::GROUP_BY [1] = key: 2, count: 2, sum: 4
+LINQ::GROUP_BY [2] = key: 3, count: 2, sum: 6
+LINQ::GROUP_BY [3] = key: 4, count: 2, sum: 8
+LINQ::GROUP_BY [4] = key: 5, count: 2, sum: 10
+```
+
 **Bash Example**
 
 See `test bash` command.
