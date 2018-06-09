@@ -38,7 +38,7 @@ public class TestInterpret2 {
 					//e.printStackTrace();
 				} catch (RuntimeException e) {
 					System.err.println(e.getPosition() + ": " + e.getInfo());
-					if (e.getkError() == RuntimeError.EXIT) {
+					if (e.getError() == RuntimeError.EXIT) {
 						break;
 					}
 					//e.printStackTrace();

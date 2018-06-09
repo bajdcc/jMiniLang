@@ -187,7 +187,7 @@ public class UIMainFrame extends JFrame {
 			e.printStackTrace();
 		} catch (RuntimeException e) {
 			System.err.println();
-			System.err.println(e.getkError().getMessage() + " " + e.getPosition() + ": " + e.getInfo());
+			System.err.println(e.getError().getMessage() + " " + e.getPosition() + ": " + e.getInfo());
 			e.printStackTrace();
 		} catch (Exception e) {
 			System.err.println();

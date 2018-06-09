@@ -39,13 +39,13 @@ public class RuntimeStack {
 		this.level = prev.level + 1;
 	}
 
-	public void pushData(RuntimeObject obj) {
+	public void pushData(RuntimeObject obj) throws RuntimeException {
 		if (obj == null) {
 			throw new NullPointerException("obj");
 		}
 		stkData.push(obj);
 		if (stkData.size() > MAX_DATASTACKSIZE) {
-			throw new StackOverflowError("数据堆栈溢出");
+			throw new RuntimeException(RuntimeException.RuntimeError.THROWS_EXCEPTION, 0, "堆栈溢出");
 		}
 	}
 

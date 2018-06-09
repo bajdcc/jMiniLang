@@ -943,18 +943,25 @@ var stage_linq = func ~() {
 // ---------------------------------------------
 // PROC
 
-var stage_proc = func ~() {
+var stage_proc = func ~(def) {
     var exec = func ~(code) {
         putn("------  Code  ------");
         putn(code);
         putn("------ Result ------");
         var pid = g_task_get_fast_arg("proc", "exec", code);
         if (g_is_null(pid)) {
-            putn("运行出错");
+            putn(g_ui_fg(255, 0, 0) + "出错" + g_ui_fgc());
+            putln();
             return;
         }
+        if (pid["error"]) {
+            putn("编译出错");
+            putn(g_ui_fg(255, 0, 0) + pid["val"] + g_ui_fgc());
+            putln();
+            return;
+        }
+        pid := pid["val"];
         putn("运行成功，PID：" + pid);
-        put("等待中");
         var kill = false;
         for (var i = 0; g_live_process(pid); i++) {
             if (i != 5) {
@@ -962,16 +969,30 @@ var stage_proc = func ~() {
             } else {
                 kill := true;
                 putln();
-                put("强制退出");
                 g_task_get_fast_arg("proc", "kill", pid);
             }
             g_task_sleep_signal(1, signal);
         }
-        putln();
+        var ret = g_task_get_fast_arg("proc", "info", pid);
+        if (!g_is_null(ret)) {
+            putn(g_ui_fg(255, 0, 0) + ret + g_ui_fgc());
+        }
         putln();
     };
-    exec("var a = 1; var b = 2; var c = a + b;");
-    exec("while (true) {}");
+    if (def) {
+        exec("var a = 1; var b = 2; var c = a + b;");
+        exec("var 3 = 4;");
+        exec("var a = #d123;");
+        exec("import \"sys.base\";");
+        exec("var a = func a() -> a(); a();");
+        exec("throw \"Hello world!\";");
+        exec("while (true) {}");
+    } else {
+        var r = g_ui_dialog("运行代码", "请输入代码", 20);
+        if (!g_array_empty(r)) {
+            exec(r[0]);
+        }
+    }
 };
 
 var name = args[0];
@@ -1001,7 +1022,9 @@ if (g_is_null(name)) {
 } else if (name == "linq") {
     stage_linq();
 } else if (name == "proc") {
-    stage_proc();
+    stage_proc(true);
+} else if (name == "proc2") {
+    stage_proc(false);
 } else {
     g_read_pipe_args(in, lambda(ch, out) -> g_write_pipe(out, ch), out);
 }

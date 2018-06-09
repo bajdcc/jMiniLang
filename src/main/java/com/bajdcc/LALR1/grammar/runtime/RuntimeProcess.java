@@ -163,21 +163,49 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		for (int pid : pids) {
 			SchdProcess process = arrProcess[pid];
 			if (process != null && process.runnable) {
-				int cycle = MAX_CYCLE - process.priority;
-				for (int i = 0; i < cycle; i++) {
-					if (process.sleep > 0) {
-						process.sleep--;
-						sleep++;
-						break;
-					}
-					if (process.runnable) {
-						stat.cycle++;
-						switch (process.machine.runStep()) {
-							case 1:
-								return false;
-							case 2:
-								break LABEL_PID;
+				if (process.ring < 3) {
+					int cycle = MAX_CYCLE - process.priority;
+					for (int i = 0; i < cycle; i++) {
+						if (process.sleep > 0) {
+							process.sleep--;
+							break ;
 						}
+						if (process.runnable) {
+							stat.cycle++;
+							switch (process.machine.runStep()) {
+								case 1:
+									return false;
+								case 2:
+									break LABEL_PID;
+							}
+						}
+					}
+				} else {
+					int cycle = MAX_CYCLE - process.priority;
+					sleep++;
+					try {
+						for (int i = 0; i < cycle; i++) {
+							if (process.sleep > 0) {
+								process.sleep--;
+								break ;
+							}
+							if (process.runnable) {
+								stat.cycle++;
+								switch (process.machine.runStep()) {
+									case 1:
+										return false;
+									case 2:
+										service.getFileService().addVfs("/proc/" + pid, "正常退出");
+										break LABEL_PID;
+								}
+							}
+						}
+					} catch (RuntimeException e) {
+						String error = e.getError().getMessage() + " " + e.getPosition() + ": " + e.getInfo();
+						System.err.println(error);
+						e.printStackTrace();
+						ring3Kill(pid);
+						service.getFileService().addVfs("/proc/" + pid, error);
 					}
 				}
 			} else {

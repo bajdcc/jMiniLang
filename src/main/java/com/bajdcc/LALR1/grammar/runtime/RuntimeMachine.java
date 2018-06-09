@@ -85,8 +85,8 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 
 	public RuntimeMachine(String name, int ring, int id, int parentId, RuntimeProcess process) throws Exception {
 		this();
-		this.name = name;
-		this.description = "none";
+		this.name = ring == 3 ? ("/proc/" + id) : name;
+		this.description = ring == 3 ? ("user proc") : "none";
 		this.ring = ring;
 		this.pid = id;
 		this.parentId = parentId;
@@ -251,7 +251,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	}
 
 	@Override
-	public void store(RuntimeObject obj) {
+	public void store(RuntimeObject obj) throws RuntimeException {
 		stack.pushData(obj);
 	}
 
@@ -348,6 +348,11 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	public void err(RuntimeError type, String message) throws RuntimeException {
 		System.err.println(stack);
 		throw new RuntimeException(type, stack.reg.execId, type.getMessage() + " " + message + "\n\n[ CODE ]\n" + currentPage.getDebugInfoByInc(stack.reg.execId));
+	}
+
+	public void errRT(RuntimeError type, String message) throws RuntimeException {
+		System.err.println(stack);
+		throw new RuntimeException(type, stack.reg.execId, message);
 	}
 
 	@Override
@@ -450,18 +455,14 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 			return process.createProcess(pid, 3, name, grammar.getCodePage(), 0, null);
 		} catch (RegexException e) {
 			e.printStackTrace();
-			opPushObj(new RuntimeObject(e.getPosition() + ", " + e.getMessage()));
-			opThrow();
+			errRT(RuntimeError.THROWS_EXCEPTION, e.getPosition() + ", " + e.getMessage());
 		} catch (SyntaxException e) {
 			e.printStackTrace();
-			opPushObj(new RuntimeObject(String.format("模块名：%s. 位置：%s. 错误：%s-%s(%s:%d)",
-					e.getPageName(), e.getPosition(), e.getMessage(),
-					e.getInfo(), e.getFileName(), e.getPosition().iLine + 1)));
-			opThrow();
+			errRT(RuntimeError.THROWS_EXCEPTION, String.format("%s %s %s",
+					e.getPosition(), e.getMessage(),e .getInfo()));
 		}
 		return -1;
 	}
-
 	@Override
 	public RuntimeObject getFuncArgs(int index) {
 		return stack.getFuncArgs(index);
@@ -660,27 +661,27 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	}
 
 	@Override
-	public void opPushNull() {
+	public void opPushNull() throws RuntimeException {
 		store(new RuntimeObject(null, true, false));
 	}
 
 	@Override
-	public void opPushZero() {
+	public void opPushZero() throws RuntimeException {
 		store(new RuntimeObject(0, true, false));
 	}
 
 	@Override
-	public void opPushNan() {
+	public void opPushNan() throws RuntimeException {
 		store(new RuntimeObject(null, RuntimeObjectType.kNan, true, false));
 	}
 
 	@Override
-	public void opPushPtr(int pc) {
+	public void opPushPtr(int pc) throws RuntimeException {
 		store(new RuntimeObject(pc));
 	}
 
 	@Override
-	public void opPushObj(RuntimeObject obj) {
+	public void opPushObj(RuntimeObject obj) throws RuntimeException {
 		store(obj);
 	}
 
@@ -750,6 +751,9 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	public void opImport() throws RuntimeException {
 		int idx = loadInt();
 		RuntimeObject obj = fetchFromGlobalData(idx);
+		if (ring == 3 && !obj.getObj().toString().startsWith("user.")) {
+			err(RuntimeError.WRONG_IMPORT, obj.toString());
+		}
 		RuntimeCodePage page = pageMap.get(obj.getObj().toString());
 		if (page == null) {
 			err(RuntimeError.WRONG_IMPORT, obj.toString());
@@ -886,7 +890,17 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 				}
 				stack.opCall(stack.reg.execId, stack.reg.pageId,
 						stack.reg.execId, stack.reg.pageId, name);
-				RuntimeObject retVal = exec.ExternalProcCall(args, this);
+				RuntimeObject retVal;
+				try {
+					retVal = exec.ExternalProcCall(args, this);
+				} catch (RuntimeException e) {
+					if (e.getError() == RuntimeError.THROWS_EXCEPTION) {
+						opPushObj(new RuntimeObject(e.getInfo()));
+						opThrow();
+						return;
+					}
+					throw e;
+				}
 				if (retVal == null) {
 					store(new RuntimeObject(null));
 				} else {

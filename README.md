@@ -115,6 +115,7 @@ Tests:
 - `test dialog`: Test **JOptionPane.showXXXDialog**
 - `test linq`: Test LINQ
 - `test proc`: Test Ring 3 API
+- `test proc2`: Test Ring 3 code with input
 
 Implemented MSG, usage:
 - Create server: `msg server PORT | filter pipe`
@@ -133,6 +134,7 @@ LINQ:
 TASK PROC:
 - exec
 - kill
+- info
 
 #### Manual
 

@@ -3,6 +3,7 @@ import "sys.list";
 import "sys.proc";
 import "sys.task";
 import "sys.func";
+import "sys.file";
 import "sys.string";
 
 g_set_process_desc("proc service");
@@ -31,14 +32,24 @@ var time = func ~(msg, caller) {
     if (id == "exec") {
         try {
             var val = g_proc_exec(key);
-            g_map_put(msg, "val", val);
+            g_map_put(msg, "val", { "error": false, "val": val });
         } catch (e) {
-            g_map_put(msg, "error", 1);
-            g_map_put(msg, "val", e);
+            g_map_put(msg, "val", { "error": true, "val": e });
         }
     } else if (id == "kill") {
         var val = g_proc_kill(key);
         g_map_put(msg, "val", val);
+    } else if (id == "info") {
+        var val = [""];
+        var callback = func ~(ch, out) {
+            val[0] += ch;
+        };
+        if (g_read_file_utf8_args("$/proc/" + key, callback, val)) {
+            g_map_put(msg, "val", val[0]);
+        } else {
+            g_map_put(msg, "val", "Invalid PID");
+            g_map_put(msg, "error", 1);
+        }
     } else {
         g_map_put(msg, "error", 1);
         g_map_put(msg, "val", "invalid argument");

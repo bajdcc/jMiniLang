@@ -75,11 +75,11 @@ public class RuntimeException extends Exception {
 		this.position = position;
 	}
 
-	public RuntimeError getkError() {
+	public RuntimeError getError() {
 		return kError;
 	}
 
-	public void setkError(RuntimeError kError) {
+	public void setError(RuntimeError kError) {
 		this.kError = kError;
 	}
 

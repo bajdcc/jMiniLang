@@ -9,7 +9,7 @@ public interface IRuntimeStack {
 
 	RuntimeObject load() throws RuntimeException;
 
-	void store(RuntimeObject obj);
+	void store(RuntimeObject obj) throws RuntimeException;
 
 	void push() throws RuntimeException;
 
@@ -35,15 +35,15 @@ public interface IRuntimeStack {
 
 	void opCall() throws RuntimeException;
 
-	void opPushNull();
+	void opPushNull() throws RuntimeException;
 
-	void opPushZero();
+	void opPushZero() throws RuntimeException;
 
-	void opPushNan();
+	void opPushNan() throws RuntimeException;
 
-	void opPushPtr(int pc);
+	void opPushPtr(int pc) throws RuntimeException;
 
-	void opPushObj(RuntimeObject obj);
+	void opPushObj(RuntimeObject obj) throws RuntimeException;
 
 	void opLoadVar() throws RuntimeException;
 

@@ -664,6 +664,7 @@ public class ModuleProc implements IInterpreterModule {
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
 				BigInteger pid = (BigInteger) args.get(0).getObj();
+				status.getService().getFileService().addVfs("/proc/" + pid, "强制退出");
 				return new RuntimeObject(BigInteger.valueOf(
 						status.getService().getProcessService().ring3Kill(pid.intValue())));
 			}
