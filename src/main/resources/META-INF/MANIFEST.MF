@@ -1,3 +1,3 @@
 Manifest-Version: 1.0
-Main-Class: priv.bajdcc.LALR1.ui.UIMainFrame
+Main-Class: com.bajdcc.LALR1.ui.UIMainFrame
 

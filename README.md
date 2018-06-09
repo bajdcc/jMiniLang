@@ -35,6 +35,7 @@
 22. Array/Map initialize list.
 23. **Try/Catch/Throw**.
 24. **Behavior Tree**, including PC network simulator.
+25. **RING 3 Process**.
 
 #### What it generates
 
@@ -76,6 +77,7 @@ Tasks:
 - Remote
 - UI
 - Store
+- Proc
 
 UI:
 - Clock
@@ -112,6 +114,7 @@ Tests:
 - `test badapple`: Test ascii output, code in [BadApple](https://github.com/bajdcc/tinix/blob/master/user/app/badapple.c)
 - `test dialog`: Test **JOptionPane.showXXXDialog**
 - `test linq`: Test LINQ
+- `test proc`: Test Ring 3 API
 
 Implemented MSG, usage:
 - Create server: `msg server PORT | filter pipe`
@@ -126,6 +129,10 @@ LINQ:
 - `from(list)` or `from(array)`
 - `range(begin, end)`
 - Function: select, where, first, last, max, sum, for_each, group_by, distinct, union, etc.
+
+TASK PROC:
+- exec
+- kill
 
 #### Manual
 
