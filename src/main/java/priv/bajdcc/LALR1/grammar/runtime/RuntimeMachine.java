@@ -13,6 +13,7 @@ import priv.bajdcc.LALR1.interpret.module.std.ModuleStdBase;
 import priv.bajdcc.LALR1.interpret.module.std.ModuleStdShell;
 import priv.bajdcc.LALR1.syntax.handler.SyntaxException;
 import priv.bajdcc.util.HashListMapEx;
+import priv.bajdcc.util.lexer.error.RegexException;
 import priv.bajdcc.util.lexer.token.OperatorType;
 import priv.bajdcc.util.lexer.token.Token;
 import priv.bajdcc.util.lexer.token.TokenType;
@@ -43,6 +44,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	private String name;
 	private String description;
 	private RuntimeProcess process;
+	private int ring;
 	private int pid;
 	private int parentId;
 	private int triesCount;
@@ -81,10 +83,11 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 		}
 	}
 
-	public RuntimeMachine(String name, int id, int parentId, RuntimeProcess process) throws Exception {
+	public RuntimeMachine(String name, int ring, int id, int parentId, RuntimeProcess process) throws Exception {
 		this();
 		this.name = name;
 		this.description = "none";
+		this.ring = ring;
 		this.pid = id;
 		this.parentId = parentId;
 		this.process = process;
@@ -121,7 +124,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 		br.close();
 		logger.debug("Loading file: " + name);
 		Grammar grammar = new Grammar(sb.toString());
-		return process.createProcess(pid, true, name, grammar.getCodePage(), 0, null);
+		return process.createProcess(pid, 0, name, grammar.getCodePage(), 0, null);
 	}
 
 	@Override
@@ -130,7 +133,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 		if (page == null) {
 			return -1;
 		}
-		return process.createProcess(pid, true, name, page, 0, null);
+		return process.createProcess(pid, 0, name, page, 0, null);
 	}
 
 	@Override
@@ -144,7 +147,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 		}
 		br.close();
 		Grammar grammar = new Grammar(sb.toString());
-		return process.createProcess(pid, false, name, grammar.getCodePage(), 0, null);
+		return process.createProcess(pid, 1, name, grammar.getCodePage(), 0, null);
 	}
 
 	@Override
@@ -153,7 +156,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 		if (page == null) {
 			return -1;
 		}
-		return process.createProcess(pid, false, name, page, 0, null);
+		return process.createProcess(pid, 1, name, page, 0, null);
 	}
 
 	public void add(String name, RuntimeCodePage page) {
@@ -354,22 +357,22 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 
 	@Override
 	public int createProcess(RuntimeFuncObject func) throws Exception {
-		return process.createProcess(pid, true, func.getPage(), pageMap.get(func.getPage()), func.getAddr(), null);
+		return process.createProcess(pid, 0, func.getPage(), pageMap.get(func.getPage()), func.getAddr(), null);
 	}
 
 	@Override
 	public int createProcess(RuntimeFuncObject func, RuntimeObject obj) throws Exception {
-		return process.createProcess(pid, true, func.getPage(), pageMap.get(func.getPage()), func.getAddr(), obj);
+		return process.createProcess(pid, 0, func.getPage(), pageMap.get(func.getPage()), func.getAddr(), obj);
 	}
 
 	@Override
 	public int createUsrProcess(RuntimeFuncObject func) throws Exception {
-		return process.createProcess(pid, false, func.getPage(), pageMap.get(func.getPage()), func.getAddr(), null);
+		return process.createProcess(pid, 1, func.getPage(), pageMap.get(func.getPage()), func.getAddr(), null);
 	}
 
 	@Override
 	public int createUsrProcess(RuntimeFuncObject func, RuntimeObject obj) throws Exception {
-		return process.createProcess(pid, false, func.getPage(), pageMap.get(func.getPage()), func.getAddr(), obj);
+		return process.createProcess(pid, 1, func.getPage(), pageMap.get(func.getPage()), func.getAddr(), obj);
 	}
 
 	@Override
@@ -427,7 +430,8 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 		String funcName = stack.getFuncSimpleName();
 		return new Object[]{
 				process.isBlock(pid) ? " " : "*",
-				pid,
+				String.valueOf(ring),
+				String.valueOf(pid),
 				name,
 				funcName.substring(0, Math.min(funcName.length(), 20)),
 				description,
@@ -437,6 +441,35 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	@Override
 	public void setProcDesc(String desc) {
 		description = desc;
+	}
+
+	@Override
+	public int ring3Exec(String code) throws Exception {
+		try {
+			Grammar grammar = new Grammar(code);
+			return process.createProcess(pid, 3, name, grammar.getCodePage(), 0, null);
+		} catch (RegexException e) {
+			e.printStackTrace();
+			opPushObj(new RuntimeObject(e.getPosition() + ", " + e.getMessage()));
+			opThrow();
+		} catch (SyntaxException e) {
+			e.printStackTrace();
+			opPushObj(new RuntimeObject(String.format("模块名：%s. 位置：%s. 错误：%s-%s(%s:%d)",
+					e.getPageName(), e.getPosition(), e.getMessage(),
+					e.getInfo(), e.getFileName(), e.getPosition().iLine + 1)));
+			opThrow();
+		}
+		return -1;
+	}
+
+	@Override
+	public RuntimeObject getFuncArgs(int index) {
+		return stack.getFuncArgs(index);
+	}
+
+	@Override
+	public int getFuncArgsCount() {
+		return stack.getFuncArgsCount1();
 	}
 
 	@Override

@@ -632,6 +632,42 @@ public class ModuleProc implements IInterpreterModule {
 				return new RuntimeObject(false);
 			}
 		});
+		info.addExternalFunc("g_proc_exec", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "运行用户态代码";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kString};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				return new RuntimeObject(BigInteger.valueOf(status.ring3Exec(args.get(0).getObj().toString())));
+			}
+		});
+		info.addExternalFunc("g_proc_kill", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "强制结束用户态进程";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kInt};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				BigInteger pid = (BigInteger) args.get(0).getObj();
+				return new RuntimeObject(BigInteger.valueOf(
+						status.getService().getProcessService().ring3Kill(pid.intValue())));
+			}
+		});
 	}
 
 	static class ProcInfoHelper {
@@ -645,11 +681,11 @@ public class ModuleProc implements IInterpreterModule {
 
 		static RuntimeArray getProcInfo2(IRuntimeStatus status, List<Object[]> objs) {
 			RuntimeArray array = new RuntimeArray();
-			array.add(new RuntimeObject(String.format(" %s  %-5s   %-15s   %-20s   %s",
-					" ", "Pid", "Name", "Function", "Description")));
+			array.add(new RuntimeObject(String.format(" %s  %s %-5s   %-15s   %-25s   %s",
+					" ", "环", "标识", "名称", "过程", "描述")));
 			for (Object[] obj : objs) {
-				array.add(new RuntimeObject(String.format(" %s  %-5d   %-15s   %-20s   %s",
-						obj[0], obj[1], obj[2], obj[3], obj[4])));
+				array.add(new RuntimeObject(String.format(" %s  %s %5s   %-15s   %-25s   %s",
+						obj[0], obj[1], obj[2], obj[3], obj[4], obj[5])));
 			}
 			return array;
 		}

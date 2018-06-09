@@ -1,8 +1,10 @@
 package priv.bajdcc.LALR1.grammar.runtime;
 
+import priv.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
 import priv.bajdcc.LALR1.grammar.runtime.data.RuntimeFuncObject;
 import priv.bajdcc.LALR1.grammar.runtime.service.IRuntimeService;
 
+import java.math.BigInteger;
 import java.util.List;
 
 /**
@@ -229,4 +231,25 @@ public interface IRuntimeStatus {
 	 * @param desc 说明信息
 	 */
 	void setProcDesc(String desc);
+
+	/**
+	 * 获取函数参数
+	 * @param index 第几个参数
+	 * @return 参数
+	 */
+	RuntimeObject getFuncArgs(int index);
+
+	/**
+	 * 获取函数参数数量
+	 * @return 参数数量
+	 */
+	int getFuncArgsCount();
+
+	/**
+	 * 运行用户态代码
+	 * @param code 代码
+	 * @return PID
+	 * @throws Exception 系统异常
+	 */
+	int ring3Exec(String code) throws Exception;
 }

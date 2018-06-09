@@ -10,12 +10,19 @@ var g_ui_print = func ~(str) {
 };
 export "g_ui_print";
 var g_ui_printn = func ~(str) {
-    g_ui_print(str);
-    g_ui_println();
+    g_ui_println(str);
 };
 export "g_ui_printn";
 var g_ui_println = func ~() {
-    g_ui_print(g_endl);
+    var c = g_args_count();
+    if (c == 0) {
+        g_ui_print(g_endl);
+        return;
+    }
+    for (var i = 0; i < c; i++) {
+        g_ui_print(g_args_index(i));
+        g_ui_print(g_endl);
+    }
 };
 export "g_ui_println";
 var g_ui_print_safe = func ~(str) {

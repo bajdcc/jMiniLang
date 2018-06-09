@@ -117,6 +117,16 @@ public class RuntimeStack {
 		return stkCall.get(0).getParams().size();
 	}
 
+	public int getFuncArgsCount1() {
+		return stkCall.get(1).getParams().size();
+	}
+
+	public RuntimeObject getFuncArgs(int index) {
+		if (index >= 0 && index < stkCall.get(2).getParams().size())
+			return stkCall.get(2).getParams().get(index);
+		return null;
+	}
+
 	public int getFuncLevel() {
 		return stkCall.size();
 	}

@@ -17,6 +17,7 @@ g_array_set(task_name_table, 2, "util");
 g_array_set(task_name_table, 3, "ui");
 g_array_set(task_name_table, 4, "net");
 g_array_set(task_name_table, 5, "store");
+g_array_set(task_name_table, 6, "proc");
 
 var handles = [];
 g_start_share("TASK#PIDS", handles);

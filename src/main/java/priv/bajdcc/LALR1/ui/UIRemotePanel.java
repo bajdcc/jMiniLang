@@ -14,8 +14,11 @@ public class UIRemotePanel extends JPanel {
 
 	private UIRemoteGraphics graphics;
 
+	public static int w = 890;
+	public static int h = 655;
+
 	public UIRemotePanel() {
-		this.graphics = new UIRemoteGraphics(800, 600);
+		this.graphics = new UIRemoteGraphics(w, h);
 		this.setFocusable(false);
 	}
 

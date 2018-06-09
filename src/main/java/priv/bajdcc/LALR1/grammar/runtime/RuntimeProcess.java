@@ -21,7 +21,7 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		public RuntimeMachine machine;
 		public int priority;
 		public int sleep;
-		public boolean kernel;
+		public int ring;
 		public boolean runnable;
 		public Queue<Integer> waiting_pids;
 
@@ -29,14 +29,14 @@ public class RuntimeProcess implements IRuntimeProcessService {
 			this.machine = machine;
 			this.priority = 128;
 			this.sleep = 0;
-			this.kernel = true;
+			this.ring = 0;
 			this.runnable = true;
 			this.waiting_pids = new ArrayDeque<>();
 		}
 
-		public SchdProcess(RuntimeMachine machine, boolean kernel) {
+		public SchdProcess(RuntimeMachine machine, int ring) {
 			this(machine);
-			this.kernel = kernel;
+			this.ring = ring;
 		}
 	}
 
@@ -102,11 +102,11 @@ public class RuntimeProcess implements IRuntimeProcessService {
 	}
 
 	public List<Integer> getUsrProcs() {
-		return setProcessId.stream().filter(id -> !arrProcess[id].kernel).collect(Collectors.toList());
+		return setProcessId.stream().filter(id -> arrProcess[id].ring != 0).collect(Collectors.toList());
 	}
 
 	public List<Integer> getSysProcs() {
-		return setProcessId.stream().filter(id -> arrProcess[id].kernel).collect(Collectors.toList());
+		return setProcessId.stream().filter(id -> arrProcess[id].ring == 0).collect(Collectors.toList());
 	}
 
 	public List<Integer> getAllProcs() {
@@ -162,7 +162,7 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		LABEL_PID:
 		for (int pid : pids) {
 			SchdProcess process = arrProcess[pid];
-			if (process.runnable) {
+			if (process != null && process.runnable) {
 				int cycle = MAX_CYCLE - process.priority;
 				for (int i = 0; i < cycle; i++) {
 					if (process.sleep > 0) {
@@ -215,7 +215,7 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		this.arrPages = new HashMap<>();
 		this.setProcessId = new HashSet<>();
 		this.service = new RuntimeService(this);
-		RuntimeMachine machine = new RuntimeMachine(name, cyclePtr, -1, this);
+		RuntimeMachine machine = new RuntimeMachine(name, 0, cyclePtr, -1, this);
 		machine.initStep(name, codePage, Collections.emptyList(), 0, null);
 		setProcessId.add(cyclePtr);
 		arrProcess[cyclePtr++] = new SchdProcess(machine);
@@ -225,7 +225,7 @@ public class RuntimeProcess implements IRuntimeProcessService {
 	 * 创建进程
 	 *
 	 * @param creatorId 创建者ID
-	 * @param kernel    是否为内核进程
+	 * @param ring      RING层数
 	 * @param name      页名
 	 * @param page      页
 	 * @param pc        起始指令
@@ -233,23 +233,23 @@ public class RuntimeProcess implements IRuntimeProcessService {
 	 * @return 进程ID
 	 * @throws Exception 运行时异常
 	 */
-	public int createProcess(int creatorId, boolean kernel, String name, RuntimeCodePage page, int pc, RuntimeObject obj) throws Exception {
+	public int createProcess(int creatorId, int ring, String name, RuntimeCodePage page, int pc, RuntimeObject obj) throws Exception {
 		if (setProcessId.size() >= MAX_PROCESS) {
 			arrProcess[creatorId].machine.err(
 					RuntimeException.RuntimeError.PROCESS_OVERFLOW, String.valueOf(page));
 		}
-		if (!arrProcess[creatorId].kernel && kernel) {
+		if (!(arrProcess[creatorId].ring == 0) && ring == 0) {
 			arrProcess[creatorId].machine.err(
 					RuntimeException.RuntimeError.ACCESS_FORBIDDEN, String.valueOf(page));
 		}
 		int pid;
 		for (; ; ) {
 			if (arrProcess[cyclePtr] == null) {
-				RuntimeMachine machine = new RuntimeMachine(name, cyclePtr, creatorId, this);
+				RuntimeMachine machine = new RuntimeMachine(name, ring, cyclePtr, creatorId, this);
 				machine.initStep(name, page, arrProcess[creatorId].machine.getPageRefers(name), pc, obj);
 				setProcessId.add(cyclePtr);
 				pid = cyclePtr;
-				arrProcess[cyclePtr++] = new SchdProcess(machine, kernel);
+				arrProcess[cyclePtr++] = new SchdProcess(machine, ring);
 				if (cyclePtr >= MAX_PROCESS) {
 					cyclePtr -= MAX_PROCESS;
 				}
@@ -260,7 +260,7 @@ public class RuntimeProcess implements IRuntimeProcessService {
 				cyclePtr -= MAX_PROCESS;
 			}
 		}
-		logger.debug((kernel ? "Kernel" : "User") + " process #" + pid + " '" + name + "' created, " + setProcessId.size() + " now.");
+		logger.debug("RING-" + ring + " process #" + pid + " '" + name + "' created, " + setProcessId.size() + " now.");
 		return pid;
 	}
 
@@ -376,5 +376,17 @@ public class RuntimeProcess implements IRuntimeProcessService {
 
 	public void halt() {
 		needToExit = true;
+	}
+
+	@Override
+	public int ring3Kill(int pid) {
+		if (!setProcessId.contains(pid)) {
+			return -1;
+		}
+		//TODO: 完成清理RING3进程创建的共享、管道、文件句柄
+		setProcessId.remove(pid);
+		arrProcess[pid] = null;
+		logger.debug("RING3 proc #" + pid + " exit, " + setProcessId.size() + " left.");
+		return 0;
 	}
 }

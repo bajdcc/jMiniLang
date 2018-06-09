@@ -191,3 +191,5 @@ var g_unlock_mutex = func ~(handle) {
     g_write_pipe(handle, "*");
 };
 export "g_unlock_mutex";
+
+// USER PROC API

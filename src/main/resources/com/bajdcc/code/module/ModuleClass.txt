@@ -592,7 +592,7 @@ var g_class = func ~(name, base, init) {
     g_create_method(class, "init", init);
     g_map_put(g_class_context, name, class);
 };
-export "g_register_class";
+export "g_class";
 
 var g_create_class = func ~(ctx, name) {
     var prototype = ctx[name];
@@ -748,12 +748,12 @@ var g_invoke_apply = func ~(class, fun, args) {
     return fn(class, fun, args);
 };
 export "g_invoke_apply";
-var g_new = func ~(name) {
+var g_new_class = func ~(name) {
     return g_create_class(g_class_context, name);
 };
-export "g_new";
-var g_new_class = func ~(name, data, method) {
-    var class = g_new(name);
+export "g_new_class";
+var g_new_class_ctx = func ~(ctx, name, data, method) {
+    var class = g_create_class(ctx, name);
     foreach (var d : g_range_array(data)) {
         set class::d[0] = d[1];
     }
@@ -765,4 +765,18 @@ var g_new_class = func ~(name, data, method) {
     }
     return class;
 };
-export "g_new_class";
+export "g_new_class_ctx";
+var g_new_class_init = func ~(name, data, method) {
+    var class = g_new_class(name);
+    foreach (var d : g_range_array(data)) {
+        set class::d[0] = d[1];
+    }
+    var m_ = g_null;
+    foreach (var m : g_range_array(method)) {
+        m_ := m[0];
+        g_array_remove(m, 0);
+        g_invoke_apply(class, m_, m);
+    }
+    return class;
+};
+export "g_new_class_init";

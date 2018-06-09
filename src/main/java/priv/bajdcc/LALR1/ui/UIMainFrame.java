@@ -122,6 +122,7 @@ public class UIMainFrame extends JFrame {
 				new TKUI(),
 				new TKNet(),
 				new TKStore(),
+				new TKProc(),
 				// UI
 				new UIMain(),
 				new UIClock(),

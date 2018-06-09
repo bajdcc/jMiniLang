@@ -26,7 +26,7 @@ g_start_share(signal, true);
 // ---- CODE BEGIN ----
 
 var ctx = g_create_context();
-g_import_std_base(ctx);
+g_import_std_base();
 
 var _ = g_null;
 
@@ -245,7 +245,7 @@ g_register_class(ctx, "app::music::state.queue", lambda(this) { // 队列
 g_register_class(ctx, "app::music::state.transfer", lambda(this) { // 传送
     this."idle_timer" := g_create_class(ctx, "app::music::util.static_timer");
     this."idle_timer"."set_span"(1);
-    this."msg_queue" := g_create_class(ctx, "list::array");
+    this."msg_queue" := g_new_class("list::array");
     this."old_name" := "";
     this."old_time" := 0;
     this."old_msg" := _;
@@ -357,7 +357,7 @@ g_register_class(ctx, "app::music::state.crawler", lambda(this) { // 抓取
         if (this."is_start" && this."idle_timer"."is_timeout_once"()) {
             this."idle_timer"."restart"();
             if (!this."context"."has_msg"() && !this."context"."playing") {
-                var arr = g_create_class(ctx, "list::array");
+                var arr = g_new_class("list::array");
                 this."log"("[Crawler] Working...");
                 this."puts"("============");
                 this."puts"("请输入歌曲名");
@@ -447,7 +447,7 @@ g_register_class(ctx, "app::music::music.context", lambda(this) {
     this."state_main" := _;
     this."state_transfer" := _;
     this."state_crawler" := _;
-    this."msg_list" := g_create_class(ctx, "list::array");
+    this."msg_list" := g_new_class("list::array");
     this."add_msg" := lambda(this, msg) -> this."msg_list"."insert"(0, msg);
     this."has_msg" := lambda(this) -> !this."msg_list"."empty"();
     this."playing" := false;

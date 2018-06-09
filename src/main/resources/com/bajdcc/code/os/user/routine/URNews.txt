@@ -25,7 +25,7 @@ g_start_share(signal, true);
 // ---- CODE BEGIN ----
 
 var ctx = g_create_context();
-g_import_std_base(ctx);
+g_import_std_base();
 
 var _ = g_null;
 
@@ -241,7 +241,7 @@ g_register_class(ctx, "app::news::state.queue", lambda(this) { // 队列
 g_register_class(ctx, "app::news::state.transfer", lambda(this) { // 传送
     this."idle_timer" := g_create_class(ctx, "app::news::util.static_timer");
     this."idle_timer"."set_span"(6);
-    this."msg_queue" := g_create_class(ctx, "list::array");
+    this."msg_queue" := g_new_class("list::array");
     g_hook_add_before(this, "on_start", lambda(class, name, this, next) {
         this."is_start" := true;
         this."idle_timer"."restart"();
@@ -273,7 +273,7 @@ g_register_class(ctx, "app::news::state.crawler", lambda(this) { // 抓取
     this."idle_timer"."set_span"(60);
     this."rss_index" := 0;
     this."rss_end" := 0;
-    this."rss_list" := g_create_class(ctx, "list::array");
+    this."rss_list" := g_new_class("list::array");
     this."rss_list"."add"("http://news.baidu.com/n?cmd=1&class=civilnews&tn=rss");
     this."rss_list"."add"("http://news.baidu.com/n?cmd=1&class=internews&tn=rss");
     this."rss_list"."add"("http://news.baidu.com/n?cmd=1&class=mil&tn=rss");
@@ -327,7 +327,7 @@ g_register_class(ctx, "app::news::state.crawler", lambda(this) { // 抓取
         if (this."is_start" && this."idle_timer"."is_timeout_once"()) {
             this."idle_timer"."restart"();
             if (!this."context"."has_msg"()) {
-                var arr = g_create_class(ctx, "list::array");
+                var arr = g_new_class("list::array");
                 this."log"("[Crawler] Working...");
                 arr."array" := g_task_get_fast_arg("net", "rss", this."get_rss"());
                 if (arr."empty"()) {
@@ -358,7 +358,7 @@ g_register_class(ctx, "app::news::news.context", lambda(this) {
     this."state_main" := _;
     this."state_transfer" := _;
     this."state_crawler" := _;
-    this."msg_list" := g_create_class(ctx, "list::array");
+    this."msg_list" := g_new_class("list::array");
     this."add_msg" := lambda(this, msg) -> this."msg_list"."insert"(0, msg);
     this."has_msg" := lambda(this) -> !this."msg_list"."empty"();
     this."start" := lambda(this, output) {

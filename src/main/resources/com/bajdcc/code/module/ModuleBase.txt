@@ -1,7 +1,15 @@
 var g_author = func ["标准库的作者：bajdcc"] ~() -> "bajdcc";
 export "g_author";
 var g_println = func ~() {
-    g_print(g_endl);
+    var c = g_args_count();
+    if (c == 0) {
+        g_print(g_endl);
+        return;
+    }
+    for (var i = 0; i < c; i++) {
+        g_print(g_args_index(i));
+        g_print(g_endl);
+    }
 };
 export "g_println";
 var g_range = yield ~(a, b) {

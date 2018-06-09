@@ -65,19 +65,21 @@ public class StmtTry implements IStmt {
 	@Override
 	public void genCode(ICodegen codegen) {
 		RuntimeInstUnary t = codegen.genCode(RuntimeInst.itry, -1);
-		codegen.genCode(RuntimeInst.iscpi);
 		tryBlock.genCode(codegen);
 		RuntimeInstUnary jmp = codegen.genCode(RuntimeInst.ijmp, -1);
 		t.op1 = codegen.getCodeIndex();
+		codegen.genCode(RuntimeInst.iscpi);
 		if (token != null) {
 			// 'throw' push exp to stack top
 			codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(token.object));
 			codegen.genCode(RuntimeInst.ialloc);
 		}
 		catchBlock.genCode(codegen);
-		jmp.op1 = codegen.getCodeIndex();
-		codegen.genCode(RuntimeInst.ipop);
+		if (token != null) {
+			codegen.genCode(RuntimeInst.ipop);
+		}
 		codegen.genCode(RuntimeInst.iscpo);
+		jmp.op1 = codegen.getCodeIndex();
 		codegen.genCode(RuntimeInst.itry, -1);
 	}
 

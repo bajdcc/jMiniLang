@@ -23,7 +23,7 @@ public class UIRemoteWindow extends JFrame {
 		panel = new UIRemotePanel();
 		this.setTitle("jMiniOS Remote Window");
 		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		this.setPreferredSize(new Dimension(800, 600));
+		this.setPreferredSize(new Dimension(UIRemotePanel.w, UIRemotePanel.h));
 		this.setContentPane(panel);
 		this.pack();
 		this.setLocationRelativeTo(null);

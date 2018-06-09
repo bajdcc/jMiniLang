@@ -29,7 +29,7 @@ var log = func ~(str) -> g_write_pipe_n(out, str);
 // ---- CODE BEGIN ----
 
 var ctx = g_create_context();
-g_import_std_base(ctx);
+g_import_std_base();
 
 var _ = g_null;
 
@@ -55,7 +55,7 @@ g_register_class(ctx, "app::ai::node.base", lambda(this) {
     /* 方法 */
     this."add_child" := lambda(this, node) { // 添加子结点
         if (g_is_null(this."children")) {
-            this."children" := g_create_class(ctx, "list::array");
+            this."children" := g_new_class("list::array");
         }
         this."children"."add"(node);
         node."parent" := this;
@@ -63,7 +63,7 @@ g_register_class(ctx, "app::ai::node.base", lambda(this) {
     };
     this."add_child_at" := lambda(this, node, i) { // 添加子结点
         if (g_is_null(this."children")) {
-            this."children" := g_create_class(ctx, "list::array");
+            this."children" := g_new_class("list::array");
         }
         this."children"."insert"(i, node);
         node."parent" := this;
@@ -156,7 +156,7 @@ g_register_class(ctx, "app::ai::node.loop", lambda(this) {
 g_register_class(ctx, "app::ai::node.parallel", lambda(this) {
     /* 数据 */
     this."or" := true; // 指定是“或”(1)还是“与”(0)
-    this."children_status" := g_create_class(ctx, "list::array"); // 子结点测试状态
+    this."children_status" := g_new_class("list::array"); // 子结点测试状态
     /* 事件 */
     g_hook_add_before(this, "do_evaluate", lambda(class, name, this, next, input) { // 测试事件
         var len = this."children"."size"();
@@ -673,8 +673,8 @@ g_register_class(ctx, "app::ai::test", lambda(this) {
     this."output" := _;
     /* 方法 */
     this."init" := lambda(this, out) { // 初始化
-        this."input" := g_create_class(ctx, "list::map");
-        this."output" := g_create_class(ctx, "list::map");
+        this."input" := g_new_class("list::map");
+        this."output" := g_new_class("list::map");
 
         this."input"."put"("out", out);
         this."input"."put"("target", [100.0, 100.0]);
@@ -686,23 +686,23 @@ g_register_class(ctx, "app::ai::test", lambda(this) {
         this."output"."put"("dir", 0);
 
 
-        this."root" := g_new_class(ctx, "app::ai::node.priority",
+        this."root" := g_new_class_ctx(ctx, "app::ai::node.priority",
             [["name", "root"]],
-            [["add_child", g_new_class(ctx, "app::ai::node.sequence",
+            [["add_child", g_new_class_ctx(ctx, "app::ai::node.sequence",
                 [["name", "move"]],
                 [["set_cond", g_create_class(ctx, "app::ai::cond::test.reached_target")],
                 ["add_child", g_create_class(ctx, "app::ai::node.terminal::test.face_to")],
                 ["add_child", g_create_class(ctx, "app::ai::node.terminal::test.idle")],
                 ["add_child", g_create_class(ctx, "app::ai::node.terminal::test.move_to")],
                 ["add_child", g_create_class(ctx, "app::ai::node.terminal::test.look_around")]])],
-            ["add_child", g_new_class(ctx, "app::ai::node.parallel",
+            ["add_child", g_new_class_ctx(ctx, "app::ai::node.parallel",
                 [["name", "patrol"]],
                 [["add_child", g_create_class(ctx, "app::ai::node.terminal::test.hovering")],
-                ["add_child", g_new_class(ctx, "app::ai::node.priority.always",
+                ["add_child", g_new_class_ctx(ctx, "app::ai::node.priority.always",
                     [["name", "smoking"]],
-                    [["add_child", g_new_class(ctx, "app::ai::node.terminal::test.smoking", [],
+                    [["add_child", g_new_class_ctx(ctx, "app::ai::node.terminal::test.smoking", [],
                         [["set_cond", g_create_class(ctx, "app::ai::cond::test.smoke")]])],
-                    ["add_child", g_new_class(ctx, "app::ai::node.terminal::test.coughing", [],
+                    ["add_child", g_new_class_ctx(ctx, "app::ai::node.terminal::test.coughing", [],
                         [["set_cond", g_create_class(ctx, "app::ai::cond::test.cough")]])]])]])]]);
     };
     this."tick" := lambda(this) { // 每帧事件

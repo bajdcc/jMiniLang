@@ -46,7 +46,7 @@ public interface IRuntimeProcessService {
 	/**
 	 * 进行存活
 	 *
-	 * @param pid 页名
+	 * @param pid 进程标识
 	 * @return 是否存活
 	 */
 	boolean live(int pid);
@@ -92,4 +92,11 @@ public interface IRuntimeProcessService {
 	 * @param mode 是否不休眠
 	 */
 	void setHighSpeed(boolean mode);
+
+	/**
+	 * 强制结束用户态进程
+	 * @param pid PID
+	 * @return 状态码
+	 */
+	int ring3Kill(int pid);
 }

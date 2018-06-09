@@ -5,6 +5,7 @@ import priv.bajdcc.LALR1.grammar.Grammar;
 import priv.bajdcc.LALR1.grammar.runtime.*;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeException;
 import priv.bajdcc.LALR1.grammar.runtime.RuntimeException.RuntimeError;
+import priv.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
 import priv.bajdcc.util.ResourceLoader;
 
 import java.io.BufferedReader;
@@ -527,6 +528,41 @@ public class ModuleBase implements IInterpreterModule {
 					System.err.println(e.getMessage());
 				}
 				return null;
+			}
+		});
+		info.addExternalFunc("g_args_count", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "取得函数参数数量";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return null;
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				return new RuntimeObject(BigInteger.valueOf(status.getFuncArgsCount()));
+			}
+		});
+		info.addExternalFunc("g_args_index", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "取得函数参数";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kInt};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				BigInteger index = (BigInteger) args.get(0).getObj();
+				return status.getFuncArgs(index.intValue());
 			}
 		});
 		buildIORead(info);

@@ -258,7 +258,7 @@ var sshd_msg_receive = func ~(port) {
             import "std.base";
             import "std.shell";
             var ctx = g_create_context();
-            g_import_std_base(ctx);
+            g_import_std_base();
             g_import_std_shell(ctx);
             var shell = g_create_class(ctx, "system::shell");
             var out = g_create_pipe("SSHD#BASH.OUT");

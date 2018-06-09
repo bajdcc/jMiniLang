@@ -588,10 +588,10 @@ var stage_class = func ~() {
         this."to_string" := lambda(this) -> this."type" + " r=" + this."r" + " area=" + this."get_area"();
     }, "shape");
 
-    var square = g_new("square");
+    var square = g_new_class("square");
     square."a" := 5;
     square."b" := 6;
-    var circle = g_new("circle");
+    var circle = g_new_class("circle");
     circle."r" := 10;
     circle."s" := square;
 
@@ -711,9 +711,9 @@ var stage_class = func ~() {
 
 var stage_bash = func ~() {
     var ctx = g_create_context();
-    g_import_std_base(ctx);
+    g_import_std_base();
     g_import_std_shell(ctx);
-    var shell = g_new("system::shell");
+    var shell = g_new_class("system::shell");
     shell."out" := out;
 
     var exec = func ~(cmd) {
@@ -886,8 +886,8 @@ var stage_dialog = func ~() {
 
 var stage_linq = func ~() {
     var ctx = g_create_context();
-    g_import_std_base(ctx);
-    var linq = g_new("linq::class");
+    g_import_std_base();
+    var linq = g_new_class("linq::class");
     var print_list = lambda(name, list) {
         putn("N=" + list."count"() + " F=" + list."first"() + " L=" + list."last"() +
             " MA=" + list."max"() + " MI=" + list."min"() +
@@ -940,6 +940,40 @@ var stage_linq = func ~() {
             ."select"(lambda(a)->"key: " + a."key" + ", count: " + a."value"."count"() + ", sum: " + a."value"."sum"()));
 };
 
+// ---------------------------------------------
+// PROC
+
+var stage_proc = func ~() {
+    var exec = func ~(code) {
+        putn("------  Code  ------");
+        putn(code);
+        putn("------ Result ------");
+        var pid = g_task_get_fast_arg("proc", "exec", code);
+        if (g_is_null(pid)) {
+            putn("运行出错");
+            return;
+        }
+        putn("运行成功，PID：" + pid);
+        put("等待中");
+        var kill = false;
+        for (var i = 0; g_live_process(pid); i++) {
+            if (i != 5) {
+                put(".");
+            } else {
+                kill := true;
+                putln();
+                put("强制退出");
+                g_task_get_fast_arg("proc", "kill", pid);
+            }
+            g_task_sleep_signal(1, signal);
+        }
+        putln();
+        putln();
+    };
+    exec("var a = 1; var b = 2; var c = a + b;");
+    exec("while (true) {}");
+};
+
 var name = args[0];
 if (g_is_null(name)) {
     create_stage(stage_clear);
@@ -966,6 +1000,8 @@ if (g_is_null(name)) {
     stage_dialog();
 } else if (name == "linq") {
     stage_linq();
+} else if (name == "proc") {
+    stage_proc();
 } else {
     g_read_pipe_args(in, lambda(ch, out) -> g_write_pipe(out, ch), out);
 }
