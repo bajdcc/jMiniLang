@@ -3,6 +3,7 @@ package com.bajdcc.LALR1.grammar.runtime.service;
 import org.apache.log4j.Logger;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -15,6 +16,7 @@ import java.util.Set;
  */
 public class RuntimeFileService implements IRuntimeFileService {
 
+	public static Charset UTF8 = Charset.forName("UTF-8");
 	private static final int OFFSET_FILE = 20000;
 	private static final int MAX_FILE = 1000;
 	private static final String VFS_PREFIX = "$";
@@ -37,7 +39,7 @@ public class RuntimeFileService implements IRuntimeFileService {
 
 	@Override
 	public void addVfs(String name, String content) {
-		mapVfs.put(VFS_PREFIX + name, new VfsStruct(content.getBytes(), true));
+		mapVfs.put(VFS_PREFIX + name, new VfsStruct(content.getBytes(UTF8), true));
 	}
 
 	@Override
