@@ -19,7 +19,11 @@ public class SemanticRecorder implements ISemanticRecorder {
 
 	@Override
 	public void add(SemanticError error, Token token) {
-		errors.add(new SemanticException(error, token));
+		if (errors.isEmpty())
+			errors.add(new SemanticException(error, token));
+		SemanticException e = errors.get(errors.size() - 1);
+		if (e.getErrorCode() != error || e.getPosition().position.different(token.position))
+			errors.add(new SemanticException(error, token));
 	}
 
 	@Override

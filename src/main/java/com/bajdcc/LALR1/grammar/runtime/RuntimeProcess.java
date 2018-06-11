@@ -273,6 +273,8 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		int pid;
 		for (; ; ) {
 			if (arrProcess[cyclePtr] == null) {
+				if (ring == 3)
+					name = "/proc/" + cyclePtr;
 				RuntimeMachine machine = new RuntimeMachine(name, ring, cyclePtr, creatorId, this);
 				machine.initStep(name, page, arrProcess[creatorId].machine.getPageRefers(name), pc, obj);
 				setProcessId.add(cyclePtr);

@@ -38,4 +38,8 @@ public class Position implements Cloneable {
 	public Object clone() throws CloneNotSupportedException {
 		return super.clone();
 	}
+
+	public boolean different(Position obj) {
+		return this.iLine != obj.iLine || this.iColumn != obj.iColumn;
+	}
 }

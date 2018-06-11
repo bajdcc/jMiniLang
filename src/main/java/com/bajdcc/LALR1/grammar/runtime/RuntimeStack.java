@@ -162,7 +162,7 @@ public class RuntimeStack {
 		stkCall.get(0).setCurrentPage(jmpPage);
 		stkCall.get(0).setRetPc(retPc);
 		stkCall.get(0).setRetPage(retPage);
-		stkCall.get(0).setName(funcName);
+		stkCall.get(0).setName(funcName == null ? "unknown" : funcName);
 	}
 
 	public boolean hasCatch() {

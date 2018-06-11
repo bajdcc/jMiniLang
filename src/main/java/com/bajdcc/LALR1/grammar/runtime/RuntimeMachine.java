@@ -85,7 +85,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 
 	public RuntimeMachine(String name, int ring, int id, int parentId, RuntimeProcess process) throws Exception {
 		this();
-		this.name = ring == 3 ? ("/proc/" + id) : name;
+		this.name = name;
 		this.description = ring == 3 ? ("user proc") : "none";
 		this.ring = ring;
 		this.pid = id;

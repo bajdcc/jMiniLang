@@ -93,7 +93,11 @@ public class RuntimeFunc {
 	}
 
 	public void setName(String name) {
-		this.name = name;
+		String[] s = name.split("\\$");
+		if (s.length == 1 || !s[0].equals(s[1]))
+			this.name = name;
+		else
+			this.name = s[0];
 	}
 
 	public int getCurrentPc() {
