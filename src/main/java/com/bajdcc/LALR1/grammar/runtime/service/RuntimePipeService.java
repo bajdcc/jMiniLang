@@ -123,6 +123,19 @@ public class RuntimePipeService implements IRuntimePipeService {
 	}
 
 	@Override
+	public char readNoBlock(int pid, int handle) {
+		handle = decodeHandle(handle);
+		if (!setPipeId.contains(handle)) {
+			return '\uffff';
+		}
+		PipeStruct ps = arrPipes[handle];
+		if (ps.queue.isEmpty()) { // 阻塞进程
+			return '\ufffe';
+		}
+		return ps.queue.poll();
+	}
+
+	@Override
 	public boolean write(int handle, char ch) {
 		handle = decodeHandle(handle);
 		if (setPipeId.contains(handle)) {

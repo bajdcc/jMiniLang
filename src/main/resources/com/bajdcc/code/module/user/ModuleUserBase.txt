@@ -10,3 +10,34 @@ var g_println = func ~() {
     }
 };
 export "g_println";
+var g_puts = func ~() {
+    var c = g_args_count();
+    if (c == 0) {
+        return;
+    }
+    for (var i = 0; i < c; i++) {
+        g_put(g_args_index(i));
+        g_put(g_endl);
+    }
+};
+export "g_puts";
+var g_sleep_s = func ~(second) {
+    if (second < 1) { return; }
+    var begin = g_get_timestamp();
+    var end = begin + second * 1000;
+    while (begin < end) {
+        begin := g_get_timestamp();
+        g_sleep(500);
+    }
+};
+export "g_sleep_s";
+var g_sleep_ms = func ~(ms) {
+    if (ms < 1) { return; }
+    var begin = g_get_timestamp();
+    var end = begin + ms;
+    while (begin < end) {
+        begin := g_get_timestamp();
+        g_sleep(20);
+    }
+};
+export "g_sleep_ms";

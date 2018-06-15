@@ -46,6 +46,8 @@ public class RuntimeProcess implements IRuntimeProcessService {
 	private static final int TIME_SLEEP_FULL = 5;
 	private static final int CLOCK_ONCE_SLEEP = 50;
 	private static final int CLOCK_WAIT_UI = 500;
+	public static final String USER_PROC_FILE_PREFIX = "/proc/";
+	public static final String USER_PROC_PIPE_PREFIX = "!USER_PROC#";
 	private int cyclePtr = 0;
 	private String name;
 	private RuntimeCodePage codePage;
@@ -195,7 +197,7 @@ public class RuntimeProcess implements IRuntimeProcessService {
 									case 1:
 										return false;
 									case 2:
-										service.getFileService().addVfs("/proc/" + pid, "正常退出");
+										ring3Kill(pid, "正常退出");
 										break LABEL_PID;
 								}
 							}
@@ -204,8 +206,7 @@ public class RuntimeProcess implements IRuntimeProcessService {
 						String error = e.getError().getMessage() + " " + e.getPosition() + ": " + e.getInfo();
 						System.err.println(error);
 						e.printStackTrace();
-						ring3Kill(pid);
-						service.getFileService().addVfs("/proc/" + pid, error);
+						ring3Kill(pid, error);
 					}
 				}
 			} else {
@@ -273,8 +274,9 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		int pid;
 		for (; ; ) {
 			if (arrProcess[cyclePtr] == null) {
-				if (ring == 3)
-					name = "/proc/" + cyclePtr;
+				if (ring == 3) {
+					name = USER_PROC_FILE_PREFIX + cyclePtr;
+				}
 				RuntimeMachine machine = new RuntimeMachine(name, ring, cyclePtr, creatorId, this);
 				machine.initStep(name, page, arrProcess[creatorId].machine.getPageRefers(name), pc, obj);
 				setProcessId.add(cyclePtr);
@@ -409,11 +411,16 @@ public class RuntimeProcess implements IRuntimeProcessService {
 	}
 
 	@Override
-	public int ring3Kill(int pid) {
+	public int ring3Kill(int pid, String error) {
 		if (!setProcessId.contains(pid)) {
 			return -1;
 		}
 		//TODO: 完成清理RING3进程创建的共享、管道、文件句柄
+		service.getFileService().addVfs(USER_PROC_FILE_PREFIX + pid, error);
+		service.getPipeService().destroyByName(pid, USER_PROC_PIPE_PREFIX + pid);
+		for (int id : arrProcess[pid].waiting_pids) {
+			wakeup(id);
+		}
 		setProcessId.remove(pid);
 		arrProcess[pid] = null;
 		logger.debug("RING3 proc #" + pid + " exit, " + setProcessId.size() + " left.");

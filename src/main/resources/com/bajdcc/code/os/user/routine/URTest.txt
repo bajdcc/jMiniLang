@@ -961,17 +961,19 @@ var stage_proc = func ~(def) {
             return;
         }
         pid := pid["val"];
+        var user_pipe = g_create_pipe("!USER_PROC#" + pid);
         putn("运行成功，PID：" + pid);
         var kill = false;
         for (var i = 0; g_live_process(pid); i++) {
-            if (i != 2) {
-                put(".");
+            if (i / 10 != 3) {
+                put("已等待" + (i / 10) + "秒\r");
             } else {
                 kill := true;
                 putln();
                 g_task_get_fast_arg("proc", "kill", pid);
             }
-            g_task_sleep_signal(1, signal);
+            g_read_pipe_args_timeout(user_pipe, lambda(ch, out) -> g_write_pipe(out, ch), out, 100);
+            //g_task_sleep_signal(1, signal);
         }
         var ret = g_task_get_fast_arg("proc", "info", pid);
         if (!g_is_null(ret)) {
@@ -987,9 +989,20 @@ var stage_proc = func ~(def) {
         exec("import \"sys.base\";");
         exec("var a = func a() -> a(); a();");
         exec("throw \"Hello world!\";");
-        exec("while (true) {}");
         // module base
-        exec("import \"user.base\";\ng_println(g_doc(\"g_author\"));");
+        exec(
+"import \"user.base\";
+g_println(g_doc(\"g_author\"));");
+        exec(
+"import \"user.base\";
+g_puts(\"Hello world!\", \"    -- bajdcc\");
+while (true) {}");
+        exec(
+"import \"user.base\";
+for (var i = 0;;i++) {
+    g_puts(\"Hello world, bajdcc! \" + i);
+    g_sleep_ms(400);
+}");
     } else {
         var r = g_ui_dialog("运行代码", "请输入代码", 20);
         if (!g_array_empty(r)) {

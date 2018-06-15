@@ -564,6 +564,23 @@ public class ModuleBase implements IInterpreterModule {
 				return status.getFuncArgs(index.intValue());
 			}
 		});
+		info.addExternalFunc("g_get_timestamp", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "获取当前时间戳";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return null;
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				return new RuntimeObject(BigInteger.valueOf(System.currentTimeMillis()));
+			}
+		});
 		buildIORead(info);
 
 		return runtimeCodePage = page;

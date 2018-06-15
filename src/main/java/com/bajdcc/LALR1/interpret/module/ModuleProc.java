@@ -462,6 +462,25 @@ public class ModuleProc implements IInterpreterModule {
 				return new RuntimeObject(ch);
 			}
 		});
+		info.addExternalFunc("g_read_pipe_char_no_block", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "管道读（非阻塞）";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kPtr};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				int handle = (int) args.get(0).getObj();
+				char ch = status.getService().getPipeService().readNoBlock(status.getPid(), handle);
+				return new RuntimeObject(ch);
+			}
+		});
 		info.addExternalFunc("g_write_pipe_char", new IRuntimeDebugExec() {
 			@Override
 			public String getDoc() {
@@ -646,7 +665,7 @@ public class ModuleProc implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) throws Exception {
-				return new RuntimeObject(BigInteger.valueOf(status.ring3Exec(args.get(0).getObj().toString())));
+				return new RuntimeObject(BigInteger.valueOf(status.getRing3().exec(args.get(0).getObj().toString())));
 			}
 		});
 		info.addExternalFunc("g_proc_kill", new IRuntimeDebugExec() {
@@ -664,9 +683,8 @@ public class ModuleProc implements IInterpreterModule {
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
 				BigInteger pid = (BigInteger) args.get(0).getObj();
-				status.getService().getFileService().addVfs("/proc/" + pid, "强制退出");
 				return new RuntimeObject(BigInteger.valueOf(
-						status.getService().getProcessService().ring3Kill(pid.intValue())));
+						status.getService().getProcessService().ring3Kill(pid.intValue(), "强制退出")));
 			}
 		});
 	}

@@ -85,6 +85,24 @@ var g_read_pipe_args = func ~(handle, callback, args) {
     g_printdn("Reading pipe: #" + g_get_pid() + " -> #" + handle + " ok");
 };
 export "g_read_pipe_args";
+var g_read_pipe_args_timeout = func ~(handle, callback, args, time) {
+    g_printdn("Reading pipe: #" + g_get_pid() + " -> #" + handle);
+    var data = '\0';
+    var begin = g_get_timestamp();
+    var end = begin + time;
+    while (begin < end) {
+        data := g_read_pipe_char_no_block(handle);
+        if (data == '\uffff') {
+            break;
+        }
+        if (data != '\ufffe') {
+            callback(data, args);
+        }
+        begin := g_get_timestamp();
+    }
+    g_printdn("Reading pipe: #" + g_get_pid() + " -> #" + handle + " ok");
+};
+export "g_read_pipe_args_timeout";
 var g_write_pipe = func ~(handle, data) {
     foreach (var ch : g_range_string(data)) {
         g_write_pipe_char(handle, ch);

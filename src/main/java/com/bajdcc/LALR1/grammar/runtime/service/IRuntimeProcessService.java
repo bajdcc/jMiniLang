@@ -96,7 +96,8 @@ public interface IRuntimeProcessService {
 	/**
 	 * 强制结束用户态进程
 	 * @param pid PID
+	 * @param error 错误原因
 	 * @return 状态码
 	 */
-	int ring3Kill(int pid);
+	int ring3Kill(int pid, String error);
 }

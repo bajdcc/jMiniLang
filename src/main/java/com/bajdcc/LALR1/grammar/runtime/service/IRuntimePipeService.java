@@ -44,6 +44,15 @@ public interface IRuntimePipeService {
 	char read(int pid, int handle);
 
 	/**
+	 * 管道读
+	 *
+	 * @param pid    进程ID
+	 * @param handle 管道句柄
+	 * @return 读取的字符
+	 */
+	char readNoBlock(int pid, int handle);
+
+	/**
 	 * 管道写
 	 *
 	 * @param handle 管道句柄

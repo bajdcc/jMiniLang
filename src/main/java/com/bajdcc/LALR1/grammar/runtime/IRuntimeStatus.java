@@ -243,10 +243,8 @@ public interface IRuntimeStatus {
 	int getFuncArgsCount();
 
 	/**
-	 * 运行用户态代码
-	 * @param code 代码
-	 * @return PID
-	 * @throws Exception 系统异常
+	 * 获取RING3接口
+	 * @return RING3接口
 	 */
-	int ring3Exec(String code) throws Exception;
+	IRuntimeRing3 getRing3();
 }

@@ -1,5 +1,6 @@
 package com.bajdcc.LALR1.grammar.runtime;
 
+import com.bajdcc.LALR1.grammar.runtime.service.IRuntimePipeService;
 import com.bajdcc.LALR1.interpret.module.user.ModuleUserBase;
 import org.apache.log4j.Logger;
 import com.bajdcc.LALR1.grammar.Grammar;
@@ -26,16 +27,26 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.Map.Entry;
 
+import static com.bajdcc.LALR1.grammar.runtime.RuntimeProcess.USER_PROC_PIPE_PREFIX;
+
 /**
  * 【虚拟机】运行时自动机
  *
  * @author bajdcc
  */
-public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
+public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRing3 {
 
 	private static Logger logger = Logger.getLogger("machine");
 	private static IInterpreterModule[] modulesSystem;
 	private static IInterpreterModule[] modulesUser;
+
+	private class Ring3Struct {
+		public int putHandle;
+		private Ring3Struct() {
+			putHandle = -1;
+		}
+	}
+	private Ring3Struct ring3Struct;
 
 	private HashListMapEx<String, RuntimeCodePage> pageMap = new HashListMapEx<>();
 	private Map<String, ArrayList<RuntimeCodePage>> pageRefer = new HashMap<>();
@@ -116,6 +127,10 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 		this.pid = id;
 		this.parentId = parentId;
 		this.process = process;
+		if (ring == 3) {
+			ring3Struct = new Ring3Struct();
+			ring3Struct.putHandle = process.getService().getPipeService().create(USER_PROC_PIPE_PREFIX + pid);
+		}
 	}
 
 	public void run(String name, InputStream input) throws Exception {
@@ -474,7 +489,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	}
 
 	@Override
-	public int ring3Exec(String code) throws Exception {
+	public int exec(String code) throws Exception {
 		try {
 			Grammar grammar = new Grammar(code);
 			return process.createProcess(pid, 3, name, grammar.getCodePage(), 0, null);
@@ -488,6 +503,15 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 		}
 		return -1;
 	}
+
+	@Override
+	public void put(String text) {
+		final IRuntimePipeService pipe = process.getService().getPipeService();
+		for (int i = 0; i < text.length(); i++) {
+			pipe.write(ring3Struct.putHandle, text.charAt(i));
+		}
+	}
+
 	@Override
 	public RuntimeObject getFuncArgs(int index) {
 		return stack.getFuncArgs(index);
@@ -496,6 +520,11 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	@Override
 	public int getFuncArgsCount() {
 		return stack.getFuncArgsCount1();
+	}
+
+	@Override
+	public IRuntimeRing3 getRing3() {
+		return this;
 	}
 
 	@Override
