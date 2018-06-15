@@ -142,6 +142,9 @@ TASK PROC:
 
 #### Example
 
+**User mode**
+![Screenshot 100](https://raw.githubusercontent.com/bajdcc/jMiniLang/master/screenshots/usermode-1.gif)
+
 **LINQ Example**
 ```javascript
 var linq = g_new("linq::class");

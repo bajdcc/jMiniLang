@@ -170,7 +170,8 @@ public class RuntimeProcess implements IRuntimeProcessService {
 					for (int i = 0; i < cycle; i++) {
 						if (process.sleep > 0) {
 							process.sleep--;
-							break ;
+							sleep++;
+							break;
 						}
 						if (process.runnable) {
 							stat.cycle++;
