@@ -964,7 +964,7 @@ var stage_proc = func ~(def) {
         putn("运行成功，PID：" + pid);
         var kill = false;
         for (var i = 0; g_live_process(pid); i++) {
-            if (i != 5) {
+            if (i != 2) {
                 put(".");
             } else {
                 kill := true;
@@ -980,6 +980,7 @@ var stage_proc = func ~(def) {
         putln();
     };
     if (def) {
+        // base
         exec("var a = 1; var b = 2; var c = a + b;");
         exec("var 3 = 4;");
         exec("var a = #d123;");
@@ -987,6 +988,8 @@ var stage_proc = func ~(def) {
         exec("var a = func a() -> a(); a();");
         exec("throw \"Hello world!\";");
         exec("while (true) {}");
+        // module base
+        exec("import \"user.base\";\ng_println(g_doc(\"g_author\"));");
     } else {
         var r = g_ui_dialog("运行代码", "请输入代码", 20);
         if (!g_array_empty(r)) {

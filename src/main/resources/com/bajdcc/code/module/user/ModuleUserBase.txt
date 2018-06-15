@@ -1,0 +1,12 @@
+var g_author = func ["用户态模块的作者：bajdcc"] ~() -> "bajdcc";
+export "g_author";
+var g_println = func ~() {
+    var c = g_args_count();
+    if (c == 0) {
+        return;
+    }
+    for (var i = 0; i < c; i++) {
+        g_printn(g_args_index(i));
+    }
+};
+export "g_println";

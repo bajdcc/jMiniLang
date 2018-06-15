@@ -1,5 +1,6 @@
 package com.bajdcc.LALR1.grammar.runtime;
 
+import com.bajdcc.LALR1.interpret.module.user.ModuleUserBase;
 import org.apache.log4j.Logger;
 import com.bajdcc.LALR1.grammar.Grammar;
 import com.bajdcc.LALR1.grammar.runtime.RuntimeException.RuntimeError;
@@ -33,7 +34,8 @@ import java.util.Map.Entry;
 public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 
 	private static Logger logger = Logger.getLogger("machine");
-	private static IInterpreterModule[] modules;
+	private static IInterpreterModule[] modulesSystem;
+	private static IInterpreterModule[] modulesUser;
 
 	private HashListMapEx<String, RuntimeCodePage> pageMap = new HashListMapEx<>();
 	private Map<String, ArrayList<RuntimeCodePage>> pageRefer = new HashMap<>();
@@ -50,10 +52,10 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	private int triesCount;
 	private boolean debug = false;
 
-	public RuntimeMachine() throws Exception {
-		if (modules == null) {
+	public RuntimeMachine(int ring) throws Exception {
+		if (modulesSystem == null) {
 			logger.debug("Loading modules...");
-			modules = new IInterpreterModule[]{
+			modulesSystem = new IInterpreterModule[]{
 					ModuleBase.getInstance(),
 					ModuleMath.getInstance(),
 					ModuleList.getInstance(),
@@ -72,22 +74,45 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 			};
 		}
 
-		for (IInterpreterModule module : modules) {
-			try {
-				run(module.getModuleName(), module.getCodePage());
-			} catch (SyntaxException e) {
-				e.setPageName(module.getModuleName());
-				e.setFileName(module.getClass().getSimpleName() + ".txt");
-				throw e;
+		if (modulesUser == null) {
+			logger.debug("Loading user modules...");
+			modulesUser = new IInterpreterModule[]{
+					ModuleUserBase.getInstance()
+			};
+		}
+
+		this.ring = ring;
+		if (ring < 3) {
+			for (IInterpreterModule module : modulesSystem) {
+				try {
+					run(module.getModuleName(), module.getCodePage());
+				} catch (SyntaxException e) {
+					e.setPageName(module.getModuleName());
+					e.setFileName(module.getClass().getSimpleName() + ".txt");
+					throw e;
+				}
+			}
+		} else {
+			for (IInterpreterModule module : modulesUser) {
+				try {
+					run(module.getModuleName(), module.getCodePage());
+				} catch (SyntaxException e) {
+					e.setPageName(module.getModuleName());
+					e.setFileName(module.getClass().getSimpleName() + ".txt");
+					throw e;
+				}
 			}
 		}
 	}
 
+	public RuntimeMachine() throws Exception {
+		this(0);
+	}
+
 	public RuntimeMachine(String name, int ring, int id, int parentId, RuntimeProcess process) throws Exception {
-		this();
+		this(ring);
 		this.name = name;
 		this.description = ring == 3 ? ("user proc") : "none";
-		this.ring = ring;
 		this.pid = id;
 		this.parentId = parentId;
 		this.process = process;
@@ -751,12 +776,13 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus {
 	public void opImport() throws RuntimeException {
 		int idx = loadInt();
 		RuntimeObject obj = fetchFromGlobalData(idx);
-		if (ring == 3 && !obj.getObj().toString().startsWith("user.")) {
-			err(RuntimeError.WRONG_IMPORT, obj.toString());
+		String name = obj.getObj().toString();
+		if (ring == 3 && !name.startsWith("user.")) {
+			err(RuntimeError.WRONG_IMPORT, name);
 		}
-		RuntimeCodePage page = pageMap.get(obj.getObj().toString());
+		RuntimeCodePage page = pageMap.get(name);
 		if (page == null) {
-			err(RuntimeError.WRONG_IMPORT, obj.toString());
+			err(RuntimeError.WRONG_IMPORT, name);
 		}
 		pageRefer.get(pageName).add(page);
 	}

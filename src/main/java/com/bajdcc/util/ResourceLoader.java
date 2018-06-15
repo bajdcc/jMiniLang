@@ -16,23 +16,30 @@ public class ResourceLoader {
 	private static final String PACKAGE_NAME = "/com/bajdcc/code";
 
 	private static String getPrefix(String name) {
-		if (name.startsWith("ModuleStd")) {
-			return "/module/std/" + name;
-		} else if (name.startsWith("Module")) {
+		if (name.startsWith("Module")) {
+			if (name.startsWith("ModuleUser")) {
+				return "/module/user/" + name;
+			} else if (name.startsWith("ModuleStd")) {
+				return "/module/std/" + name;
+			}
 			return "/module/" + name;
+		} else if (name.startsWith("U")) {
+			if (name.startsWith("URFile")) {
+				return "/os/user/routine/file/" + name;
+			} else if (name.startsWith("UR")) {
+				return "/os/user/routine/" + name;
+			} else if (name.startsWith("UI")) {
+				return "/os/ui/" + name;
+			}  else {
+				return "/os/user/" + name;
+			}
 		} else if (name.startsWith("IR")) {
 			return "/os/irq/" + name;
 		} else if (name.startsWith("OS")) {
 			return "/os/kern/" + name;
 		} else if (name.startsWith("TK")) {
 			return "/os/task/" + name;
-		} else if (name.startsWith("UI")) {
-			return "/os/ui/" + name;
-		} else if (name.startsWith("URFile")) {
-			return "/os/user/routine/file/" + name;
-		} else if (name.startsWith("UR")) {
-			return "/os/user/routine/" + name;
-		} else {
+		}  else {
 			return "/os/user/" + name;
 		}
 	}
