@@ -3,6 +3,7 @@ package com.bajdcc.LALR1.interpret.module;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.bajdcc.LALR1.interpret.module.web.ModuleNetWebServer;
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.Node;
@@ -41,6 +42,7 @@ public class ModuleNet implements IInterpreterModule {
 	private ModuleNetServer server;
 	private ModuleNetClient client;
 	private String lastError = "";
+	private ModuleNetWebServer webServer;
 
 	public static ModuleNet getInstance() {
 		return instance;
@@ -604,6 +606,32 @@ public class ModuleNet implements IInterpreterModule {
 				return new RuntimeObject(array);
 			}
 		});
+		info.addExternalFunc("g_net_start_web", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "WEB SERVER";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kString};
+			}
+
+			@SuppressWarnings("unchecked")
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				try {
+					String text = String.valueOf(args.get(0).getObj());
+					int port = Integer.parseInt(text);
+					new Thread(new ModuleNetWebServer(port)).start();
+					return new RuntimeObject(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				return new RuntimeObject(false);
+			}
+		});
 	}
 
 	private static RuntimeObject parseInternal(Object o) {
@@ -643,5 +671,13 @@ public class ModuleNet implements IInterpreterModule {
 
 	public void setClient(ModuleNetClient client) {
 		this.client = client;
+	}
+
+	public ModuleNetWebServer getWebServer() {
+		return webServer;
+	}
+
+	public void setWebServer(ModuleNetWebServer webServer) {
+		this.webServer = webServer;
 	}
 }

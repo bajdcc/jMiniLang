@@ -1,7 +1,6 @@
 package com.bajdcc.LALR1.interpret.module.net;
 
 import com.alibaba.fastjson.JSON;
-import com.bajdcc.LALR1.grammar.runtime.service.RuntimeFileService;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -21,6 +20,8 @@ import io.netty.util.concurrent.GlobalEventExecutor;
 import java.nio.charset.Charset;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * 【模块】通讯服务端
@@ -76,8 +77,8 @@ public class ModuleNetServer extends Thread {
 							ch.pipeline()
 									.addLast("decoder", new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4))
 									.addLast("encoder", new LengthFieldPrepender(4, false))
-									.addLast(new StringDecoder(RuntimeFileService.UTF8))
-									.addLast(new StringEncoder(RuntimeFileService.UTF8))
+									.addLast(new StringDecoder(UTF_8))
+									.addLast(new StringEncoder(UTF_8))
 									.addLast(new ModuleNetServerHandler(msgQueue));
 						}
 					})

@@ -1011,6 +1011,13 @@ for (var i = 0;;i++) {
     }
 };
 
+// ---------------------------------------------
+// JAVA NIO WEB SERVER
+
+var stage_web = func ~() {
+    g_task_get_fast_arg("net", "start_web", "8080");
+};
+
 var name = args[0];
 if (g_is_null(name)) {
     create_stage(stage_clear);
@@ -1041,6 +1048,8 @@ if (g_is_null(name)) {
     stage_proc(true);
 } else if (name == "proc2") {
     stage_proc(false);
+} else if (name == "web") {
+    stage_web();
 } else {
     g_read_pipe_args(in, lambda(ch, out) -> g_write_pipe(out, ch), out);
 }

@@ -9,6 +9,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 /**
  * 【运行时】运行时文件服务
  *
@@ -16,7 +18,6 @@ import java.util.Set;
  */
 public class RuntimeFileService implements IRuntimeFileService {
 
-	public static Charset UTF8 = Charset.forName("UTF-8");
 	private static final int OFFSET_FILE = 20000;
 	private static final int MAX_FILE = 1000;
 	private static final String VFS_PREFIX = "$";
@@ -39,7 +40,7 @@ public class RuntimeFileService implements IRuntimeFileService {
 
 	@Override
 	public void addVfs(String name, String content) {
-		mapVfs.put(VFS_PREFIX + name, new VfsStruct(content.getBytes(UTF8), true));
+		mapVfs.put(VFS_PREFIX + name, new VfsStruct(content.getBytes(UTF_8), true));
 	}
 
 	@Override
