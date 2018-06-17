@@ -161,6 +161,17 @@ public class RuntimeFileService implements IRuntimeFileService {
 		return setFileId.contains(handle) && arrFiles[handle].writeString(str);
 	}
 
+	@Override
+	public boolean exists(String filename) {
+		if (filename.startsWith(VFS_PREFIX)) {
+			return mapVfs.containsKey(filename);
+		} else if (filename.startsWith(RESOURCE_PREFIX)) {
+			return getClass().getResourceAsStream(filename.substring(1)) != null;
+		} else {
+			return mapFileNames.containsKey(filename);
+		}
+	}
+
 	enum FileStatus {
 		ERROR,
 		READING,

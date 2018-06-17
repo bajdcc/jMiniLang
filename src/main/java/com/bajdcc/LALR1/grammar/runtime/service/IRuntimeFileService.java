@@ -74,4 +74,12 @@ public interface IRuntimeFileService {
 	 * @return 是否成功
 	 */
 	boolean writeString(int handle, String str);
+
+	/**
+	 * 文件是否存在
+	 *
+	 * @param filename 文件名
+	 * @return 文件是否存在
+	 */
+	boolean exists(String filename);
 }

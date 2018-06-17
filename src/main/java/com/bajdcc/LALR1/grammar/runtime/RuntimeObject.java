@@ -18,8 +18,6 @@ public class RuntimeObject implements Cloneable {
 	private Object obj = null;
 	private Object symbol = null;
 	private RuntimeObjectType type = RuntimeObjectType.kNull;
-	private boolean readonly = false;
-	private boolean copyable = true;
 	private long[] flag = null;
 
 	public RuntimeObject(Object obj) {
@@ -32,26 +30,6 @@ public class RuntimeObject implements Cloneable {
 		this.type = type;
 	}
 
-	public RuntimeObject(Object obj, boolean readonly) {
-		this.obj = obj;
-		this.readonly = readonly;
-		calcTypeFromObject();
-	}
-
-	public RuntimeObject(Object obj, boolean readonly, boolean copyable) {
-		this.obj = obj;
-		this.readonly = readonly;
-		this.copyable = copyable;
-		calcTypeFromObject();
-	}
-
-	public RuntimeObject(Object obj, RuntimeObjectType type, boolean readonly, boolean copyable) {
-		this.obj = obj;
-		this.type = type;
-		this.readonly = readonly;
-		this.copyable = copyable;
-	}
-
 	public RuntimeObject(RuntimeObject obj) {
 		copyFrom(obj);
 	}
@@ -59,8 +37,6 @@ public class RuntimeObject implements Cloneable {
 	public void copyFrom(RuntimeObject obj) {
 		if (obj != null) {
 			this.obj = obj.obj; // 注意：这里是浅拷贝！
-			this.readonly = obj.readonly;
-			this.copyable = obj.copyable;
 			this.type = obj.type;
 			this.symbol = obj.symbol;
 			if (obj.flag != null)
@@ -106,27 +82,6 @@ public class RuntimeObject implements Cloneable {
 
 	public void setType(RuntimeObjectType type) {
 		this.type = type;
-	}
-
-	public boolean isReadonly() {
-		return readonly;
-	}
-
-	public void setReadonly(boolean readonly) {
-		switch (this.type) {
-			case kArray:
-			case kMap:
-				return;
-		}
-		this.readonly = readonly;
-	}
-
-	public boolean isCopyable() {
-		return copyable;
-	}
-
-	public void setCopyable(boolean copyable) {
-		this.copyable = copyable;
 	}
 
 	public void setSymbol(Object symbol) {
@@ -178,7 +133,7 @@ public class RuntimeObject implements Cloneable {
 		if (obj instanceof RuntimeMap) {
 			return RuntimeObjectType.kMap;
 		}
-		return RuntimeObjectType.kNull;
+		return RuntimeObjectType.kObject;
 	}
 
 	public static TokenType toTokenType(RuntimeObjectType obj) {
@@ -254,9 +209,7 @@ public class RuntimeObject implements Cloneable {
 	@Override
 	public String toString() {
 		return " " + String.valueOf(symbol) + " " + type.getName() +
-				(obj == null ? "(null)" : "(" + obj.toString() + ")") +
-				(readonly ? 'R' : 'r') +
-				(copyable ? 'C' : 'c') +
+				(obj == null ? "(null)" : "(" + obj.getClass().getName() + ")") +
 				"#" + (flag == null ? "" : String.valueOf(flag[0]));
 	}
 }

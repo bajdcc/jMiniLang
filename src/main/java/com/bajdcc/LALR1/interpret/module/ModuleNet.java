@@ -617,7 +617,6 @@ public class ModuleNet implements IInterpreterModule {
 				return new RuntimeObjectType[]{RuntimeObjectType.kString};
 			}
 
-			@SuppressWarnings("unchecked")
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
@@ -630,6 +629,69 @@ public class ModuleNet implements IInterpreterModule {
 					e.printStackTrace();
 				}
 				return new RuntimeObject(false);
+			}
+		});
+		info.addExternalFunc("g_net_stop_web", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "STOP WEB SERVER";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return null;
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				ModuleNetWebServer server = getWebServer();
+				if (server != null) {
+					server.setRunning(false);
+				} else {
+					return new RuntimeObject(false);
+				}
+				setWebServer(null);
+				return new RuntimeObject(true);
+			}
+		});
+		info.addExternalFunc("g_net_query_web", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "QUERY WEB SERVER";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return null;
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				return new RuntimeObject(getWebServer() != null);
+			}
+		});
+		info.addExternalFunc("g_net_has_request", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "WEB SERVER - REQUEST";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return null;
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				ModuleNetWebServer server = getWebServer();
+				if (server != null) {
+					return new RuntimeObject(server.hasRequest());
+				} else {
+					return new RuntimeObject(false);
+				}
 			}
 		});
 	}
@@ -673,11 +735,11 @@ public class ModuleNet implements IInterpreterModule {
 		this.client = client;
 	}
 
-	public ModuleNetWebServer getWebServer() {
+	public synchronized ModuleNetWebServer getWebServer() {
 		return webServer;
 	}
 
-	public void setWebServer(ModuleNetWebServer webServer) {
+	public synchronized void setWebServer(ModuleNetWebServer webServer) {
 		this.webServer = webServer;
 	}
 }

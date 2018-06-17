@@ -208,3 +208,17 @@ var g_write_file_sa_utf8 = func ~(name, str) {
     return write_file_s(name, true, "UTF-8", str);
 };
 export "g_write_file_sa_utf8";
+
+// HELPER
+var g_read_file_utf8_all = func ~(name) {
+    var val = [""];
+    var callback = func ~(ch, out) {
+        val[0] += ch;
+    };
+    if (g_read_file_utf8_args(name, callback, val)) {
+        return val[0];
+    } else {
+        return;
+    }
+};
+export "g_read_file_utf8_all";

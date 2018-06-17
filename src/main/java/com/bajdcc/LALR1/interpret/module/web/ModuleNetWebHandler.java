@@ -1,13 +1,14 @@
 package com.bajdcc.LALR1.interpret.module.web;
 
-import org.apache.log4j.Logger;
-
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
-import java.nio.charset.Charset;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
 
+import static com.bajdcc.LALR1.interpret.module.web.ModuleNetWebHelper.getStatusCodeText;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
@@ -17,31 +18,44 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  */
 public class ModuleNetWebHandler implements Runnable {
 
-	private SelectionKey key;
-	private String requestHeader;
+	private static String defaultTitle = "jMiniLang Web Server";
+	private ModuleNetWebContext ctx;
 
-	public ModuleNetWebHandler(String requestHeader, SelectionKey key) {
-		this.key = key;
-		this.requestHeader = requestHeader;
+	public ModuleNetWebHandler(ModuleNetWebContext context) {
+		this.ctx = context;
+	}
+
+	private static String getHtml(String title, String notice, String message) {
+		return "<html><head><title>" + title + "</title></head><body><h1>" + notice + "</h1><h2><pre>"
+				+ message + "</pre></h2></body></html>";
 	}
 
 	@Override
 	public void run() {
 		final String endl = "\r\n";
-		String html = "<html><head><title>jMiniLang Web Server</title></head><body><h1>jMiniLang Web Server -- bajdcc</h1><h2><pre>"
-				+ requestHeader + "</pre></h2></body></html>";
+		try {
+			Semaphore sem = ctx.block();
+			if (!sem.tryAcquire(3, TimeUnit.SECONDS)) {
+				throw new InterruptedException("Timed out.");
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			ctx.setCode(500);
+			ctx.setResponse(getHtml(defaultTitle, "Internal Server Error", e.getMessage()));
+		}
+		String html = ctx.getResponse();
 		StringBuilder sb = new StringBuilder();
-		sb.append("HTTP/1.1 200 OK").append(endl);
+		sb.append("HTTP/1.1 ").append(ctx.getCode() + " ").append(getStatusCodeText(ctx.getCode())).append(endl);
 		sb.append("Server: jMiniLang Web Server").append(endl);
-		sb.append("Content-Type: text/html").append(endl);
+		sb.append("Content-Type: text/html;charset=utf-8").append(endl);
 		sb.append("Content-Length: ").append(html.getBytes(UTF_8).length);
 		sb.append(endl).append(endl);
 		sb.append(html);
 		ByteBuffer buffer = ByteBuffer.allocate(1024);
 		buffer.put(sb.toString().getBytes(UTF_8));
 		buffer.flip();
-		Selector selector = key.selector();
-		SocketChannel channel = (SocketChannel) key.channel();
+		Selector selector = ctx.getKey().selector();
+		SocketChannel channel = (SocketChannel) ctx.getKey().channel();
 		try {
 			channel.register(selector, SelectionKey.OP_WRITE);
 			channel.write(buffer);

@@ -163,5 +163,23 @@ public class ModuleFile implements IInterpreterModule {
 				return new RuntimeObject(str);
 			}
 		});
+		info.addExternalFunc("g_query_file", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "判断文件是否存在";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kString};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				String filename = String.valueOf(args.get(0).getObj());
+				return new RuntimeObject(status.getService().getFileService().exists(filename));
+			}
+		});
 	}
 }

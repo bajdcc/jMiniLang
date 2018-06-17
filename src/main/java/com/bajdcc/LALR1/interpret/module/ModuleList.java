@@ -79,7 +79,6 @@ public class ModuleList implements IInterpreterModule {
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
 				RuntimeArray array = (RuntimeArray) args.get(0).getObj();
-				args.get(1).setReadonly(false);
 				array.add(args.get(1));
 				return args.get(0);
 			}
@@ -99,7 +98,6 @@ public class ModuleList implements IInterpreterModule {
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
 				RuntimeArray array = (RuntimeArray) args.get(0).getObj();
-				args.get(1).setReadonly(false);
 				return new RuntimeObject(array.contains(args.get(1)));
 			}
 		});
@@ -120,7 +118,6 @@ public class ModuleList implements IInterpreterModule {
 				RuntimeArray array = (RuntimeArray) args.get(0).getObj();
 				RuntimeArray array2 = (RuntimeArray) args.get(1).getObj();
 				array.add(array2);
-				args.get(1).setReadonly(false);
 				return args.get(0);
 			}
 		});
@@ -140,7 +137,6 @@ public class ModuleList implements IInterpreterModule {
 			                                      IRuntimeStatus status) {
 				RuntimeArray array = (RuntimeArray) args.get(0).getObj();
 				BigInteger n = (BigInteger) args.get(1).getObj();
-				args.get(2).setReadonly(false);
 				array.insert(n.intValue(), args.get(2));
 				return args.get(0);
 			}
@@ -161,7 +157,6 @@ public class ModuleList implements IInterpreterModule {
 			                                      IRuntimeStatus status) throws Exception {
 				RuntimeArray array = (RuntimeArray) args.get(0).getObj();
 				BigInteger index = (BigInteger) args.get(1).getObj();
-				args.get(2).setReadonly(false);
 				if (!array.set(index.intValue(), args.get(2))) {
 					status.err(RuntimeException.RuntimeError.INVALID_INDEX, "array.set");
 				}

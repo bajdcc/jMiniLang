@@ -14,7 +14,9 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.Charset;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -29,6 +31,7 @@ public class ModuleNetWebServer implements Runnable {
 
 	private int port;
 	private boolean running = true;
+	private ConcurrentLinkedDeque<ModuleNetWebContext> queue = new ConcurrentLinkedDeque<>();
 
 	public boolean isRunning() {
 		return running;
@@ -36,6 +39,14 @@ public class ModuleNetWebServer implements Runnable {
 
 	public void setRunning(boolean running) {
 		this.running = running;
+	}
+
+	public ModuleNetWebContext dequeue() {
+		return queue.poll();
+	}
+
+	public boolean hasRequest() {
+		return !queue.isEmpty();
 	}
 
 	public ModuleNetWebServer(int port) {
@@ -55,7 +66,7 @@ public class ModuleNetWebServer implements Runnable {
 			serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
 			ModuleNet.getInstance().setWebServer(this);
 			while(running) {
-				int readyChannels = selector.select();
+				int readyChannels = selector.select(1000);
 				if(readyChannels == 0)
 					continue;
 				Set<SelectionKey> keys = selector.selectedKeys();
@@ -74,7 +85,10 @@ public class ModuleNetWebServer implements Runnable {
 						SocketChannel socketChannel = (SocketChannel) key.channel();
 						String requestHeader = handleHeader(socketChannel);
 						if(requestHeader != null) {
-							new Thread(new ModuleNetWebHandler(requestHeader, key)).start();
+							ModuleNetWebContext ctx = new ModuleNetWebContext(key);
+							ctx.setHeader(requestHeader);
+							new Thread(new ModuleNetWebHandler(ctx)).start();
+							queue.add(ctx);
 						}
 					} else if (key.isWritable()) {
 						SocketChannel socketChannel = (SocketChannel) key.channel();
@@ -84,6 +98,10 @@ public class ModuleNetWebServer implements Runnable {
 					iterator.remove();
 				}
 			}
+			serverSocket.close();
+			serverSocketChannel.close();
+			selector.close();
+			logger.info("Web server exit");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

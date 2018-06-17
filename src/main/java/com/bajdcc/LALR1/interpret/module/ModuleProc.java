@@ -668,6 +668,25 @@ public class ModuleProc implements IInterpreterModule {
 				return new RuntimeObject(BigInteger.valueOf(status.getRing3().exec(args.get(0).getObj().toString())));
 			}
 		});
+		info.addExternalFunc("g_proc_exec_file", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "运行用户态代码";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kString, RuntimeObjectType.kString};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				return new RuntimeObject(BigInteger.valueOf(status.getRing3().exec_file(
+						String.valueOf(args.get(0).getObj()),
+						String.valueOf(args.get(1).getObj()))));
+			}
+		});
 		info.addExternalFunc("g_proc_kill", new IRuntimeDebugExec() {
 			@Override
 			public String getDoc() {

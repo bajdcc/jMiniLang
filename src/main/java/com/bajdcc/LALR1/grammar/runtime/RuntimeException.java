@@ -18,7 +18,6 @@ public class RuntimeException extends Exception {
 		NULL_QUEUE("队列为空"),
 		WRONG_OPERATOR("非法操作"),
 		DUP_PAGENAME("代码页名称冲突"),
-		READONLY_VAR("变量不可修改"),
 		WRONG_IMPORT("导入模块名错误"),
 		WRONG_EXPORT("导出模块名错误"),
 		WRONG_LOAD_EXTERN("导入外部符号错误"),

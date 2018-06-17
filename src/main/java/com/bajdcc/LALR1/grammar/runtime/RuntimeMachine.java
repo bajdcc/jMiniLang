@@ -1,24 +1,23 @@
 package com.bajdcc.LALR1.grammar.runtime;
 
-import com.bajdcc.LALR1.grammar.runtime.service.IRuntimePipeService;
-import com.bajdcc.LALR1.interpret.module.user.ModuleUserBase;
-import org.apache.log4j.Logger;
 import com.bajdcc.LALR1.grammar.Grammar;
 import com.bajdcc.LALR1.grammar.runtime.RuntimeException.RuntimeError;
 import com.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
 import com.bajdcc.LALR1.grammar.runtime.data.RuntimeFuncObject;
 import com.bajdcc.LALR1.grammar.runtime.data.RuntimeMap;
+import com.bajdcc.LALR1.grammar.runtime.service.IRuntimePipeService;
 import com.bajdcc.LALR1.grammar.runtime.service.IRuntimeService;
 import com.bajdcc.LALR1.grammar.type.TokenTools;
 import com.bajdcc.LALR1.interpret.module.*;
-import com.bajdcc.LALR1.interpret.module.std.ModuleStdBase;
-import com.bajdcc.LALR1.interpret.module.std.ModuleStdShell;
+import com.bajdcc.LALR1.interpret.module.std.*;
+import com.bajdcc.LALR1.interpret.module.user.*;
 import com.bajdcc.LALR1.syntax.handler.SyntaxException;
 import com.bajdcc.util.HashListMapEx;
 import com.bajdcc.util.lexer.error.RegexException;
 import com.bajdcc.util.lexer.token.OperatorType;
 import com.bajdcc.util.lexer.token.Token;
 import com.bajdcc.util.lexer.token.TokenType;
+import org.apache.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -50,6 +49,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 
 	private HashListMapEx<String, RuntimeCodePage> pageMap = new HashListMapEx<>();
 	private Map<String, ArrayList<RuntimeCodePage>> pageRefer = new HashMap<>();
+	private Map<String, RuntimeCodePage> codeCache = new HashMap<>();
 	private Stack<RuntimeObject> stkYieldData = new Stack<>();
 	private RuntimeStack stack = new RuntimeStack();
 	private RuntimeCodePage currentPage;
@@ -88,7 +88,8 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 		if (modulesUser == null) {
 			logger.debug("Loading user modules...");
 			modulesUser = new IInterpreterModule[]{
-					ModuleUserBase.getInstance()
+					ModuleUserBase.getInstance(),
+					ModuleUserWeb.getInstance()
 			};
 		}
 
@@ -348,7 +349,6 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 	@Override
 	public void push() throws RuntimeException {
 		RuntimeObject obj = new RuntimeObject(current());
-		obj.setReadonly(true);
 		store(obj);
 		next();
 	}
@@ -493,6 +493,26 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 		try {
 			Grammar grammar = new Grammar(code);
 			return process.createProcess(pid, 3, name, grammar.getCodePage(), 0, null);
+		} catch (RegexException e) {
+			e.printStackTrace();
+			errRT(RuntimeError.THROWS_EXCEPTION, e.getPosition() + ", " + e.getMessage());
+		} catch (SyntaxException e) {
+			e.printStackTrace();
+			errRT(RuntimeError.THROWS_EXCEPTION, String.format("%s %s %s",
+					e.getPosition(), e.getMessage(),e .getInfo()));
+		}
+		return -1;
+	}
+
+	@Override
+	public int exec_file(String filename, String code) throws Exception {
+		try {
+			RuntimeCodePage page;
+			if (codeCache.containsKey(filename))
+				page = codeCache.get(filename);
+			else
+				page = new Grammar(code).getCodePage();
+			return process.createProcess(pid, 3, filename.substring(1), page, 0, null);
 		} catch (RegexException e) {
 			e.printStackTrace();
 			errRT(RuntimeError.THROWS_EXCEPTION, e.getPosition() + ", " + e.getMessage());
@@ -651,9 +671,6 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 		if (target == null) {
 			err(RuntimeError.WRONG_OPERATOR);
 		}
-		if (target.isReadonly()) {
-			err(RuntimeError.READONLY_VAR, target.toString());
-		}
 		target.copyFrom(obj);
 		store(target);
 	}
@@ -662,7 +679,6 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 	public void opStoreDirect() throws RuntimeException {
 		int idx = loadInt();
 		RuntimeObject obj = load();
-		obj.setReadonly(false);
 		if (obj.getSymbol() == null)
 			obj.setSymbol(currentPage.getData().get(idx));
 		stack.storeVariableDirect(idx, obj);
@@ -690,7 +706,6 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 	@Override
 	public void opPushArgs() throws RuntimeException {
 		RuntimeObject obj = load();
-		obj.setReadonly(true);
 		if (!stack.pushFuncArgs(obj)) {
 			err(RuntimeError.ARG_OVERFLOW, obj.toString());
 		}
@@ -716,17 +731,17 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 
 	@Override
 	public void opPushNull() throws RuntimeException {
-		store(new RuntimeObject(null, true, false));
+		store(new RuntimeObject(null));
 	}
 
 	@Override
 	public void opPushZero() throws RuntimeException {
-		store(new RuntimeObject(0, true, false));
+		store(new RuntimeObject(0));
 	}
 
 	@Override
 	public void opPushNan() throws RuntimeException {
-		store(new RuntimeObject(null, RuntimeObjectType.kNan, true, false));
+		store(new RuntimeObject(null, RuntimeObjectType.kNan));
 	}
 
 	@Override
@@ -873,7 +888,6 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 						if (o != null) {
 							if (o.getSymbol() == null)
 								o.setSymbol(currentPage.getData().get(id));
-							o.setReadonly(false);
 						}
 						stack.storeClosure(id, o);
 					}

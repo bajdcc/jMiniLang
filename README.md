@@ -36,6 +36,7 @@
 23. **Try/Catch/Throw**.
 24. **Behavior Tree**, including PC network simulator.
 25. **RING 3 Process**.
+26. **Web Server**.
 
 #### What it generates
 
@@ -116,6 +117,7 @@ Tests:
 - `test linq`: Test LINQ
 - `test proc`: Test Ring 3 API
 - `test proc2`: Test Ring 3 code with input
+- `test web`: HTTP Web Server
 
 Implemented MSG, usage:
 - Create server: `msg server PORT | filter pipe`
@@ -141,6 +143,75 @@ TASK PROC:
 [*Simplified Chinese Version*](https://raw.githubusercontent.com/bajdcc/jMiniLang/master/%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.pdf "Manual - Simplified Chinese")
 
 #### Example
+
+**Web Server**
+```javascript
+var stage_web = func ~() {
+    if (!g_query_file("$/test/web")) { // Run code from VFS (Compiled once)
+        g_write_file_s_utf8("$/test/web",
+"
+import \"user.base\";
+import \"user.web\";
+var ctx = g_web_get_context();
+if (g_is_null(ctx)) { return; }
+var html =
+\"
+<html>
+<head>
+    <title>jMiniLang Web Server</title>
+</head>
+<body>
+    <h1>jMiniLang 语言实现的网页服务器</h1>
+    <h3>作者：\" + g_author() + \"</h3>
+    <h3>链接：\" + g_github_repo() + \"</h3>
+    <hr>
+    <h2><pre>\" + ctx[1] + \"</pre></h2></body></html>
+\";
+ctx[2] := html;
+g_web_set_context(ctx);
+");
+    }
+    var handle_request = func ~() { // Thread handler
+        var pid = g_task_get_fast_arg("proc", "exec_file", "$/test/web"); // Create new user process!
+        if (g_is_null(pid)) {
+            putn(g_ui_fg(255, 0, 0) + "出错" + g_ui_fgc());
+            return;
+        }
+        if (pid["error"]) {
+            putn("编译出错");
+            putn(g_ui_fg(255, 0, 0) + pid["val"] + g_ui_fgc());
+            return;
+        }
+        pid := pid["val"];
+        putn("运行成功，PID：" + pid);
+    };
+
+    var mutex = g_create_one_semaphore("TEST#WEB#MUTEX");
+    g_lock_mutex(mutex);
+    if (g_net_query_web()) { // mutex, forbid 'test web | test web'
+        g_unlock_mutex(mutex);
+        return;
+    }
+    g_task_get_fast_arg("net", "start_web", "8080");
+    while (!g_net_query_web()) { g_sleep(50); } // wait until server start
+    g_unlock_mutex(mutex);
+
+    var s = g_null;
+    var ctx = g_null;
+    while (g_net_query_web()) {
+        s := g_query_share(signal);
+        if (g_is_null(s) || !s) {
+            break;
+        }
+        g_sleep(50);
+        if (g_net_has_request()) { // has request
+            handle_request();
+        }
+    }
+    g_task_get_fast("net", "stop_web"); // stop server
+    while (g_net_query_web()) { g_sleep(50); } // wait until server exit
+};
+```
 
 **User mode**
 ![Screenshot 100](https://raw.githubusercontent.com/bajdcc/jMiniLang/master/screenshots/usermode-1.gif)

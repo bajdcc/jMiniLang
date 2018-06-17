@@ -190,7 +190,7 @@ public class RuntimeProcess implements IRuntimeProcessService {
 						for (int i = 0; i < cycle; i++) {
 							if (process.sleep > 0) {
 								process.sleep--;
-								break ;
+								break;
 							}
 							if (process.runnable) {
 								stat.cycle++;
@@ -217,7 +217,7 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		if (sleep == pids.size()) { // 都在休眠，等待并减掉休眠时间
 			for (int pid : pids) {
 				SchdProcess process = arrProcess[pid];
-				if (process.runnable) {
+				if (process != null && process.runnable) {
 					if (process.sleep < CLOCK_ONCE_SLEEP)
 						process.sleep = 0;
 					else
@@ -276,7 +276,8 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		for (; ; ) {
 			if (arrProcess[cyclePtr] == null) {
 				if (ring == 3) {
-					name = USER_PROC_FILE_PREFIX + cyclePtr;
+					if (!name.startsWith("/"))
+						name = USER_PROC_FILE_PREFIX + cyclePtr;
 				}
 				RuntimeMachine machine = new RuntimeMachine(name, ring, cyclePtr, creatorId, this);
 				machine.initStep(name, page, arrProcess[creatorId].machine.getPageRefers(name), pc, obj);

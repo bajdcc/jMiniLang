@@ -21,6 +21,15 @@ public interface IRuntimeRing3 {
 	int exec(String code) throws Exception;
 
 	/**
+	 * 运行用户态代码（文件名）
+	 * @param filename 文件名
+	 * @param code 代码
+	 * @return PID
+	 * @throws Exception 系统异常
+	 */
+	int exec_file(String filename, String code) throws Exception;
+
+	/**
 	 * 流输出
 	 * @param text 内容
 	 */
