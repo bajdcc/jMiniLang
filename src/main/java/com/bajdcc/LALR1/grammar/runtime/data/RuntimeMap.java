@@ -4,6 +4,7 @@ import com.bajdcc.LALR1.grammar.runtime.RuntimeObject;
 
 import java.math.BigInteger;
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 /**
@@ -75,6 +76,10 @@ public class RuntimeMap implements Cloneable {
 		for (Map.Entry<String, RuntimeObject> o : obj.map.entrySet()) {
 			map.put(o.getKey(), o.getValue().clone());
 		}
+	}
+
+	public void forEach(BiConsumer<String, RuntimeObject> action) {
+		map.forEach(action);
 	}
 
 	public RuntimeMap clone() {

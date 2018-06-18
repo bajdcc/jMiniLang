@@ -2,9 +2,8 @@ package com.bajdcc.LALR1.interpret.module.user;
 
 import com.bajdcc.LALR1.grammar.Grammar;
 import com.bajdcc.LALR1.grammar.runtime.*;
-import com.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
+import com.bajdcc.LALR1.grammar.runtime.data.RuntimeMap;
 import com.bajdcc.LALR1.interpret.module.IInterpreterModule;
-import com.bajdcc.LALR1.interpret.module.ModuleBase;
 import com.bajdcc.LALR1.interpret.module.ModuleNet;
 import com.bajdcc.LALR1.interpret.module.web.ModuleNetWebContext;
 import com.bajdcc.LALR1.interpret.module.web.ModuleNetWebServer;
@@ -68,12 +67,15 @@ public class ModuleUserWeb implements IInterpreterModule {
 				if (server != null) {
 					ModuleNetWebContext ctx = server.dequeue();
 					if (ctx != null) {
-						RuntimeArray array = new RuntimeArray();
-						array.add(new RuntimeObject(BigInteger.valueOf(ctx.getCode())));
-						array.add(new RuntimeObject(ctx.getHeader()));
-						array.add(new RuntimeObject(ctx.getResponse()));
-						array.add(new RuntimeObject(ctx));
-						return new RuntimeObject(array);
+						RuntimeMap map = new RuntimeMap();
+						map.put("code", new RuntimeObject(BigInteger.valueOf(ctx.getCode())));
+						map.put("request", new RuntimeObject(ctx.getReqHeader()));
+						map.put("response", new RuntimeObject(ctx.getResponse()));
+						map.put("header", new RuntimeObject(ctx.getRespHeader()));
+						map.put("mime", new RuntimeObject(ctx.getMIME())); // TODO: Add helper
+						map.put("content_type", new RuntimeObject(BigInteger.valueOf(ctx.getContentType())));
+						map.put("__ctx__", new RuntimeObject(ctx));
+						return new RuntimeObject(map);
 					}
 				}
 				return null;
@@ -87,17 +89,19 @@ public class ModuleUserWeb implements IInterpreterModule {
 
 			@Override
 			public RuntimeObjectType[] getArgsType() {
-				return new RuntimeObjectType[]{RuntimeObjectType.kArray};
+				return new RuntimeObjectType[]{RuntimeObjectType.kMap};
 			}
 
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				RuntimeArray array = (RuntimeArray) args.get(0).getObj();
-				ModuleNetWebContext ctx = (ModuleNetWebContext) array.get(3).getObj();
-				ctx.setCode(((BigInteger) array.get(0).getObj()).intValue());
-				ctx.setHeader(String.valueOf(array.get(1).getObj()));
-				ctx.setResponse(String.valueOf(array.get(2).getObj()));
+				RuntimeMap map = (RuntimeMap) args.get(0).getObj();
+				ModuleNetWebContext ctx = (ModuleNetWebContext) map.get("__ctx__").getObj();
+				ctx.setCode(((BigInteger) map.get("code").getObj()).intValue());
+				ctx.setResponse(String.valueOf(map.get("response").getObj()));
+				ctx.setRespHeader((RuntimeMap) map.get("header").getObj());
+				ctx.setMIME(String.valueOf(map.get("mime").getObj()));
+				ctx.setContentType(((BigInteger) map.get("content_type").getObj()).intValue());
 				ctx.unblock();
 				return null;
 			}

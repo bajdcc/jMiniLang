@@ -1,0 +1,43 @@
+import "user.base";
+import "user.web";
+/*
+    g_web_get_context = map(code, request, response, header, mime, __ctx__)
+    code* - 数字状态码, 200
+    request - (headers(map), method, uri, version, protocol, url, port, host, path, query, authority)
+    response* - support string, ""
+    mime* - MIME, application/octet-stream
+    content_type* - {0: string, 1: VFS, 2: Resource, 3: File}, 0
+    __ctx__ - http context
+*/
+var ctx = g_web_get_context();
+if (g_is_null(ctx)) { return; }
+var html =
+"
+<html>
+<head>
+    <title>jMiniLang Web Server</title>
+</head>
+<body>
+    <h1>jMiniLang 语言实现的网页服务器</h1>
+    <h3>作者：" + g_author() + "</h3>
+    <h3>链接：" + g_github_repo() + "</h3>
+    <hr>
+    <h2>
+        <pre>
+             URL: " + g_to_string(ctx["request"]["url"]) + "
+             Port: " + g_to_string(ctx["request"]["port"]) + "
+             Host: " + g_to_string(ctx["request"]["host"]) + "
+             Path: " + g_to_string(ctx["request"]["path"]) + "
+             Query: " + g_to_string(ctx["request"]["query"]) + "
+             Authority: " + g_to_string(ctx["request"]["authority"]) + "
+             User-Agent: " + g_to_string(ctx["request"]["headers"]["User-Agent"]) + "
+             Accept: " + g_to_string(ctx["request"]["headers"]["Accept"]) + "
+             Accept-Encoding: " + g_to_string(ctx["request"]["headers"]["Accept-Encoding"]) + "
+        </pre>
+    </h2>
+</body>
+</html>
+";
+ctx["response"] := html;
+ctx["mime"] := "text/html;charset=utf-8";
+g_web_set_context(ctx);

@@ -1018,42 +1018,18 @@ for (var i = 0;;i++) {
 /*
     ---=== 后面的工作 ===---
     1. 给USER进程加路由选择，返回的内容有文本、二进制，来源有VFS、资源、文件
-    2. 加入HTTP请求头分析模块
+    2. 加入HTTP请求头分析模块（完成）
     3. 完善HTTP模版渲染
-    4. 将代码移到资源文件中
+    4. 将代码移到资源文件中（完成）
 */
 
 var stage_web = func ~() {
     if (!g_query_file("$/test/web")) {
-        g_write_file_s_utf8("$/test/web",
-"
-import \"user.base\";
-import \"user.web\";
-var ctx = g_web_get_context();
-if (g_is_null(ctx)) { return; }
-var html =
-\"
-<html>
-<head>
-    <title>jMiniLang Web Server</title>
-</head>
-<body>
-    <h1>jMiniLang 语言实现的网页服务器</h1>
-    <h3>作者：\" + g_author() + \"</h3>
-    <h3>链接：\" + g_github_repo() + \"</h3>
-    <hr>
-    <h2><pre>\" + ctx[1] + \"</pre></h2></body></html>
-\";
-ctx[2] := html;
-g_web_set_context(ctx);
-");
+        g_write_file_s_utf8("$/test/web", g_read_file_utf8_all("!/com/bajdcc/code/fs/web.txt"));
     }
     var handle_request = func ~() {
         var req = g_net_get_request();
-        putn("=========================");
-        putn(g_ui_fg(0, 0, 255) + "收到请求" + g_ui_fgc());
-        putn("--------");
-        putn(req);
+        putn(g_ui_fg(0, 0, 255) + "收到请求 " + g_ui_fgc() + req["url"]);
         var pid = g_task_get_fast_arg("proc", "exec_file", "$/test/web");
         if (g_is_null(pid)) {
             putn(g_ui_fg(255, 0, 0) + "出错" + g_ui_fgc());

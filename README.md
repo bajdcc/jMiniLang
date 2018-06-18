@@ -145,72 +145,53 @@ TASK PROC:
 #### Example
 
 **Web Server**
+
+![Screenshot 101](https://raw.githubusercontent.com/bajdcc/jMiniLang/master/screenshots/web-1.png)
+
 ```javascript
-var stage_web = func ~() {
-    if (!g_query_file("$/test/web")) { // Run code from VFS (Compiled once)
-        g_write_file_s_utf8("$/test/web",
-"
-import \"user.base\";
-import \"user.web\";
+import "user.base";
+import "user.web";
+/*
+    g_web_get_context = map(code, request, response, header, mime, __ctx__)
+    code* - 数字状态码, 200
+    request - (headers(map), method, uri, version, protocol, url, port, host, path, query, authority)
+    response* - support string, ""
+    mime* - MIME, application/octet-stream
+    content_type* - {0: string, 1: VFS, 2: Resource, 3: File}, 0
+    __ctx__ - http context
+*/
 var ctx = g_web_get_context();
 if (g_is_null(ctx)) { return; }
 var html =
-\"
+"
 <html>
 <head>
     <title>jMiniLang Web Server</title>
 </head>
 <body>
     <h1>jMiniLang 语言实现的网页服务器</h1>
-    <h3>作者：\" + g_author() + \"</h3>
-    <h3>链接：\" + g_github_repo() + \"</h3>
+    <h3>作者：" + g_author() + "</h3>
+    <h3>链接：" + g_github_repo() + "</h3>
     <hr>
-    <h2><pre>\" + ctx[1] + \"</pre></h2></body></html>
-\";
-ctx[2] := html;
+    <h2>
+        <pre>
+             URL: " + g_to_string(ctx["request"]["url"]) + "
+             Port: " + g_to_string(ctx["request"]["port"]) + "
+             Host: " + g_to_string(ctx["request"]["host"]) + "
+             Path: " + g_to_string(ctx["request"]["path"]) + "
+             Query: " + g_to_string(ctx["request"]["query"]) + "
+             Authority: " + g_to_string(ctx["request"]["authority"]) + "
+             User-Agent: " + g_to_string(ctx["request"]["headers"]["User-Agent"]) + "
+             Accept: " + g_to_string(ctx["request"]["headers"]["Accept"]) + "
+             Accept-Encoding: " + g_to_string(ctx["request"]["headers"]["Accept-Encoding"]) + "
+        </pre>
+    </h2>
+</body>
+</html>
+";
+ctx["response"] := html;
+ctx["mime"] := "text/html;charset=utf-8";
 g_web_set_context(ctx);
-");
-    }
-    var handle_request = func ~() { // Thread handler
-        var pid = g_task_get_fast_arg("proc", "exec_file", "$/test/web"); // Create new user process!
-        if (g_is_null(pid)) {
-            putn(g_ui_fg(255, 0, 0) + "出错" + g_ui_fgc());
-            return;
-        }
-        if (pid["error"]) {
-            putn("编译出错");
-            putn(g_ui_fg(255, 0, 0) + pid["val"] + g_ui_fgc());
-            return;
-        }
-        pid := pid["val"];
-        putn("运行成功，PID：" + pid);
-    };
-
-    var mutex = g_create_one_semaphore("TEST#WEB#MUTEX");
-    g_lock_mutex(mutex);
-    if (g_net_query_web()) { // mutex, forbid 'test web | test web'
-        g_unlock_mutex(mutex);
-        return;
-    }
-    g_task_get_fast_arg("net", "start_web", "8080");
-    while (!g_net_query_web()) { g_sleep(50); } // wait until server start
-    g_unlock_mutex(mutex);
-
-    var s = g_null;
-    var ctx = g_null;
-    while (g_net_query_web()) {
-        s := g_query_share(signal);
-        if (g_is_null(s) || !s) {
-            break;
-        }
-        g_sleep(50);
-        if (g_net_has_request()) { // has request
-            handle_request();
-        }
-    }
-    g_task_get_fast("net", "stop_web"); // stop server
-    while (g_net_query_web()) { g_sleep(50); } // wait until server exit
-};
 ```
 
 **User mode**
@@ -1238,25 +1219,25 @@ export "g_func_import_string_module";
 ![Screenshot 4](https://bajdcc.github.io/host/screenshot/jMiniLang_4.png)
 
 *Screenshot 5 - Remote window*
-![Screenshot 5](https://pic1.zhimg.com/v2-5072f9061e3bd1c5d8457bdeff24064c_r.png)
+![Screenshot 5](https://raw.githubusercontent.com/bajdcc/jMiniLang/master/screenshots/zhihu-1.png)
 
 *Screenshot 6 - Functional programming*
-![Screenshot 6](https://pic4.zhimg.com/v2-3b2c7ba9dd8d494555bd2b260c07e87f_r.png)
+![Screenshot 6](https://raw.githubusercontent.com/bajdcc/jMiniLang/master/screenshots/zhihu-2.png)
 
 *Screenshot 7 - 哲学家就餐*
 
 专栏：https://zhuanlan.zhihu.com/p/29008180
 
-![Screenshot 7](https://pic1.zhimg.com/v2-15c59a7711011767c2279f9a23e16c78_r.png)
+![Screenshot 7](https://raw.githubusercontent.com/bajdcc/jMiniLang/master/screenshots/zhihu-3.png)
 
 *Screenshot 8 - LISP*
 
 专栏：https://zhuanlan.zhihu.com/p/29243574
 
-![Screenshot 8](https://pic1.zhimg.com/v2-1b12b80741e7b0fcd4f3102f462a7780_r.png)
+![Screenshot 8](https://raw.githubusercontent.com/bajdcc/jMiniLang/master/screenshots/zhihu-4.png)
 
 *Screenshot 9 - 网络流*
 
 专栏：https://zhuanlan.zhihu.com/p/32692408
 
-![Screenshot 9](https://pic1.zhimg.com/v2-17290335f4d3e9e278b114882956975c_r.jpg)
+![Screenshot 9](https://raw.githubusercontent.com/bajdcc/jMiniLang/master/screenshots/zhihu-5.png)

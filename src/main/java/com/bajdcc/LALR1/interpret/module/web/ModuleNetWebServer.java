@@ -1,5 +1,6 @@
 package com.bajdcc.LALR1.interpret.module.web;
 
+import com.bajdcc.LALR1.grammar.runtime.data.RuntimeMap;
 import com.bajdcc.LALR1.interpret.module.ModuleNet;
 import org.apache.log4j.Logger;
 
@@ -12,9 +13,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.nio.charset.Charset;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
@@ -49,8 +48,11 @@ public class ModuleNetWebServer implements Runnable {
 		return !queue.isEmpty();
 	}
 
-	public String peekRequest() {
-		return queue.peek().getHeader();
+	public RuntimeMap peekRequest() {
+		ModuleNetWebContext ctx = queue.peek();
+		if (ctx == null)
+			return null;
+		return ctx.getReqHeader();
 	}
 
 	public ModuleNetWebServer(int port) {
@@ -90,7 +92,7 @@ public class ModuleNetWebServer implements Runnable {
 						String requestHeader = handleHeader(socketChannel);
 						if(requestHeader != null) {
 							ModuleNetWebContext ctx = new ModuleNetWebContext(key);
-							ctx.setHeader(requestHeader);
+							ctx.setReqHeader(requestHeader);
 							new Thread(new ModuleNetWebHandler(ctx)).start();
 							queue.add(ctx);
 						}
