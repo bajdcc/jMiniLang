@@ -82,4 +82,12 @@ public interface IRuntimeFileService {
 	 * @return 文件是否存在
 	 */
 	boolean exists(String filename);
+
+	/**
+	 * 一次性读文件（UTF-8），仅限VFS
+	 *
+	 * @param filename 文件名
+	 * @return 文件内容
+	 */
+	String readAll(String filename);
 }

@@ -49,6 +49,10 @@ public class ModuleNetWebServer implements Runnable {
 		return !queue.isEmpty();
 	}
 
+	public String peekRequest() {
+		return queue.peek().getHeader();
+	}
+
 	public ModuleNetWebServer(int port) {
 		this.port = port;
 	}

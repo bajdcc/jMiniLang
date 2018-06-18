@@ -1015,6 +1015,14 @@ for (var i = 0;;i++) {
 // ---------------------------------------------
 // JAVA NIO WEB SERVER
 
+/*
+    ---=== 后面的工作 ===---
+    1. 给USER进程加路由选择，返回的内容有文本、二进制，来源有VFS、资源、文件
+    2. 加入HTTP请求头分析模块
+    3. 完善HTTP模版渲染
+    4. 将代码移到资源文件中
+*/
+
 var stage_web = func ~() {
     if (!g_query_file("$/test/web")) {
         g_write_file_s_utf8("$/test/web",
@@ -1041,6 +1049,11 @@ g_web_set_context(ctx);
 ");
     }
     var handle_request = func ~() {
+        var req = g_net_get_request();
+        putn("=========================");
+        putn(g_ui_fg(0, 0, 255) + "收到请求" + g_ui_fgc());
+        putn("--------");
+        putn(req);
         var pid = g_task_get_fast_arg("proc", "exec_file", "$/test/web");
         if (g_is_null(pid)) {
             putn(g_ui_fg(255, 0, 0) + "出错" + g_ui_fgc());
@@ -1052,7 +1065,7 @@ g_web_set_context(ctx);
             return;
         }
         pid := pid["val"];
-        putn("运行成功，PID：" + pid);
+        //putn("运行成功，PID：" + pid);
     };
 
     var mutex = g_create_one_semaphore("TEST#WEB#MUTEX");
@@ -1061,9 +1074,21 @@ g_web_set_context(ctx);
         g_unlock_mutex(mutex);
         return;
     }
-    g_task_get_fast_arg("net", "start_web", "8080");
-    while (!g_net_query_web()) { g_sleep(50); }
+    var port = "8080";
+    g_task_get_fast_arg("net", "start_web", port);
+    g_task_sleep_signal(1, signal);
+    var timed = 0;
+    while (!g_net_query_web() && timed < 2) {
+        timed++;
+        g_task_sleep_signal(1, signal);
+    }
+    if (!g_net_query_web()) {
+        putn(g_ui_fg(255, 0, 0) + "启动失败" + g_ui_fgc());
+        g_unlock_mutex(mutex);
+        return;
+    }
     g_unlock_mutex(mutex);
+    putn("监听端口：" + g_ui_fg(0, 0, 255) + port + g_ui_fgc());
 
     var s = g_null;
     var ctx = g_null;

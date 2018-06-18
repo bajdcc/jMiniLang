@@ -694,6 +694,28 @@ public class ModuleNet implements IInterpreterModule {
 				}
 			}
 		});
+		info.addExternalFunc("g_net_get_request", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "WEB SERVER - PEEK REQUEST";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return null;
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				ModuleNetWebServer server = getWebServer();
+				if (server != null) {
+					return new RuntimeObject(server.peekRequest());
+				} else {
+					return new RuntimeObject(false);
+				}
+			}
+		});
 	}
 
 	private static RuntimeObject parseInternal(Object o) {

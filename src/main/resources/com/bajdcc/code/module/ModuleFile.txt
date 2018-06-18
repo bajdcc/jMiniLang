@@ -61,9 +61,9 @@ var g_read_file_gbk_args = func ~(name, callback, args) {
 };
 export "g_read_file_gbk_args";
 var g_read_file_utf8 = func ~(name, callback) {
-    return read_file(name, "UTF-8", callback);
-};
-export "g_read_file_utf8";
+                              return read_file(name, "UTF-8", callback);
+                          };
+                          export "g_read_file_utf8";
 var g_read_file_utf8_args = func ~(name, callback, args) {
     return read_file_args(name, "UTF-8", callback, args);
 };
@@ -211,6 +211,8 @@ export "g_write_file_sa_utf8";
 
 // HELPER
 var g_read_file_utf8_all = func ~(name) {
+    var str = g_read_file_vfs_utf8(name);
+    if (g_not_null(str)) { return str; }
     var val = [""];
     var callback = func ~(ch, out) {
         val[0] += ch;

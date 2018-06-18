@@ -172,6 +172,16 @@ public class RuntimeFileService implements IRuntimeFileService {
 		}
 	}
 
+	@Override
+	public String readAll(String filename) {
+		if (filename.startsWith(VFS_PREFIX)) {
+			if (mapVfs.containsKey(filename)) {
+				return new String(mapVfs.get(filename).data, UTF_8);
+			}
+		}
+		return null;
+	}
+
 	enum FileStatus {
 		ERROR,
 		READING,

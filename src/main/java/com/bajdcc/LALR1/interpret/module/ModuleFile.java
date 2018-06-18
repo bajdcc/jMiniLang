@@ -181,5 +181,23 @@ public class ModuleFile implements IInterpreterModule {
 				return new RuntimeObject(status.getService().getFileService().exists(filename));
 			}
 		});
+		info.addExternalFunc("g_read_file_vfs_utf8", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "读文件（一次性），限VFS";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kString};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				String filename = String.valueOf(args.get(0).getObj());
+				return new RuntimeObject(status.getService().getFileService().readAll(filename));
+			}
+		});
 	}
 }
