@@ -48,7 +48,7 @@ if (ctx["request"]["uri"] == "/") {
           </tr>
         </thead>
         <tbody>
-          <tr><td>URL</td><td>" + ctx["request"]["url"]+ "</td></tr>
+          <tr><td>Url</td><td>" + ctx["request"]["url"]+ "</td></tr>
           <tr><td>Port</td><td>" + ctx["request"]["port"]+ "</td></tr>
           <tr><td>Host</td><td>" + ctx["request"]["host"]+ "</td></tr>
           <tr><td>Path</td><td>" + ctx["request"]["path"]+ "</td></tr>

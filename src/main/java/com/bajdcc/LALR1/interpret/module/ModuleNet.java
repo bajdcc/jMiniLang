@@ -19,9 +19,7 @@ import com.bajdcc.util.ResourceLoader;
 import java.io.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
+import java.net.*;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -714,6 +712,52 @@ public class ModuleNet implements IInterpreterModule {
 				} else {
 					return new RuntimeObject(false);
 				}
+			}
+		});
+		info.addExternalFunc("g_web_get_ip", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "获取IP地址";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return null;
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				try {
+					InetAddress address = InetAddress.getLocalHost();
+					return new RuntimeObject(address.getHostAddress());
+				} catch (UnknownHostException e) {
+					e.printStackTrace();
+				}
+				return new RuntimeObject("Unknown IP Address");
+			}
+		});
+		info.addExternalFunc("g_web_get_hostname", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "获取主机名";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return null;
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				try {
+					InetAddress address = InetAddress.getLocalHost();
+					return new RuntimeObject(address.getHostName());
+				} catch (UnknownHostException e) {
+					e.printStackTrace();
+				}
+				return new RuntimeObject("Unknown Hostname");
 			}
 		});
 	}

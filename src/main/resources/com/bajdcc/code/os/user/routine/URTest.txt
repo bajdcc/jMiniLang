@@ -1064,7 +1064,10 @@ var stage_web = func ~() {
         return;
     }
     g_unlock_mutex(mutex);
-    putn("监听端口：" + g_ui_fg(0, 0, 255) + port + g_ui_fgc());
+    put("地址：" + g_ui_fg(255, 0, 0) + g_web_get_ip() + g_ui_fgc());
+    put("，主机名：" + g_ui_fg(255, 0, 0) + g_web_get_hostname() + g_ui_fgc());
+    put("，监听端口：" + g_ui_fg(255, 0, 0) + port + g_ui_fgc());
+    putn("");
 
     var s = g_null;
     var ctx = g_null;

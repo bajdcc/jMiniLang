@@ -6,8 +6,10 @@ import org.apache.log4j.Logger;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
+import java.net.StandardSocketOptions;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
@@ -67,6 +69,9 @@ public class ModuleNetWebServer implements Runnable {
 			ServerSocket serverSocket = serverSocketChannel.socket();
 			serverSocket.setReuseAddress(true);
 			serverSocket.bind(new InetSocketAddress(port));
+			InetAddress address = InetAddress.getLocalHost();
+			logger.info("Web server ip: " + address.getHostAddress());
+			logger.info("Web server hostname: " + address.getHostName());
 			logger.info("Web server port: " + port);
 			serverSocketChannel.configureBlocking(false);
 			serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
@@ -79,29 +84,44 @@ public class ModuleNetWebServer implements Runnable {
 				Iterator<SelectionKey> iterator = keys.iterator();
 				while(iterator.hasNext()) {
 					SelectionKey key = iterator.next();
-					if(key.isAcceptable()) {
-						ServerSocketChannel server = (ServerSocketChannel) key.channel();
-						SocketChannel socketChannel = server.accept();
-						if(socketChannel != null) {
-							logger.info("Request from: " + ((InetSocketAddress)socketChannel.getRemoteAddress()).getHostString());
-							socketChannel.configureBlocking(false);
-							socketChannel.register(selector, SelectionKey.OP_READ);
+					SocketChannel socketChannel = null;
+					try {
+						if(key.isAcceptable()) {
+							ServerSocketChannel server = (ServerSocketChannel) key.channel();
+							socketChannel = server.accept();
+							if(socketChannel != null) {
+								socketChannel.configureBlocking(false);
+								socketChannel.register(selector, SelectionKey.OP_READ);
+							}
+						} else if (key.isReadable()) {
+							socketChannel = (SocketChannel) key.channel();
+							String requestHeader = handleHeader(socketChannel);
+							if (requestHeader != null) {
+								ModuleNetWebContext ctx = new ModuleNetWebContext(key);
+								ctx.setReqHeader(requestHeader);
+								logger.info(String.format("From: %s, Url: %s",
+										((InetSocketAddress) socketChannel.getRemoteAddress()).getHostString(),
+										ctx.getUrl()));
+								new Thread(new ModuleNetWebHandler(ctx)).start();
+								queue.add(ctx);
+							} else {
+								socketChannel.close();
+							}
+						} else if (key.isWritable()) {
+							socketChannel = (SocketChannel) key.channel();
+							if (socketChannel.getOption(StandardSocketOptions.SO_KEEPALIVE)) {
+								socketChannel.register(selector, SelectionKey.OP_READ);
+							} else {
+								socketChannel.close();
+							}
 						}
-					} else if (key.isReadable()) {
-						SocketChannel socketChannel = (SocketChannel) key.channel();
-						String requestHeader = handleHeader(socketChannel);
-						if(requestHeader != null) {
-							ModuleNetWebContext ctx = new ModuleNetWebContext(key);
-							ctx.setReqHeader(requestHeader);
-							new Thread(new ModuleNetWebHandler(ctx)).start();
-							queue.add(ctx);
-						}
-					} else if (key.isWritable()) {
-						SocketChannel socketChannel = (SocketChannel) key.channel();
-						socketChannel.shutdownInput();
-						socketChannel.close();
+					} catch (IOException e) {
+						if (socketChannel != null)
+							socketChannel.close();
+						e.printStackTrace();
+					} finally {
+						iterator.remove();
 					}
-					iterator.remove();
 				}
 			}
 			serverSocket.close();
@@ -114,24 +134,21 @@ public class ModuleNetWebServer implements Runnable {
 		ModuleNet.getInstance().setWebServer(null);
 	}
 
-	private String handleHeader(SocketChannel socketChannel) {
+	private String handleHeader(SocketChannel socketChannel) throws IOException {
 		ByteBuffer buffer = ByteBuffer.allocate(1024);
 		byte[] bytes;
 		int size;
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		try {
-			while ((size = socketChannel.read(buffer)) > 0) {
-				bytes = new byte[size];
-				buffer.flip();
-				buffer.get(bytes);
-				baos.write(bytes);
-				buffer.clear();
-			}
-			bytes = baos.toByteArray();
-			return new String(bytes, UTF_8);
-		} catch (IOException e) {
-			e.printStackTrace();
+		while ((size = socketChannel.read(buffer)) > 0) {
+			bytes = new byte[size];
+			buffer.flip();
+			buffer.get(bytes);
+			baos.write(bytes);
+			buffer.clear();
 		}
-		return null;
+		bytes = baos.toByteArray();
+		if (bytes.length == 0)
+			return null;
+		return new String(bytes, UTF_8);
 	}
 }

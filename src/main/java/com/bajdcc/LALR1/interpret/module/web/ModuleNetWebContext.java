@@ -50,7 +50,6 @@ public class ModuleNetWebContext {
 		req.put("uri", new RuntimeObject(uri));
 		req.put("version", new RuntimeObject(version));
 		req.put("protocol", new RuntimeObject(protocol.toLowerCase()));
-		url = String.format("%s://%s%s", protocol, mapReqHeaders.get("Host"), uri);
 		req.put("url", new RuntimeObject(url));
 		try {
 			URL u = new URL(url);
@@ -75,6 +74,10 @@ public class ModuleNetWebContext {
 		initHeader();
 	}
 
+	public String getReqHeaderValue(String key) {
+		return mapReqHeaders.getOrDefault(key, "");
+	}
+
 	public RuntimeMap getRespHeader() {
 		RuntimeMap resp = new RuntimeMap();
 		mapRespHeaders.forEach((key, value) -> resp.put(key, new RuntimeObject(value)));
@@ -89,16 +92,13 @@ public class ModuleNetWebContext {
 		map.forEach((key, value) -> mapRespHeaders.put(key, String.valueOf(value.getObj())));
 	}
 
+	public String getRespHeaderValue(String key) {
+		return mapRespHeaders.getOrDefault(key, "");
+	}
+
 	private void initHeader() {
 		final Pattern re1 = Pattern.compile("([A-Z]+) ([^ ]+) ([A-Z]+)/(\\d\\.\\d)");
 		String[] headers = header.split("\r\n");
-		Matcher m = re1.matcher(headers[0]);
-		if (m.find()) {
-			method = m.group(1).trim();
-			uri = m.group(2).trim();
-			protocol = m.group(3).trim();
-			version = m.group(4).trim();
-		}
 		for (int i = 1; i < headers.length; i++) {
 			int colon = headers[i].indexOf(':');
 			if (colon != -1) {
@@ -106,6 +106,14 @@ public class ModuleNetWebContext {
 				String value = headers[i].substring(colon + 1);
 				mapReqHeaders.put(key.trim(), value.trim());
 			}
+		}
+		Matcher m = re1.matcher(headers[0]);
+		if (m.find()) {
+			method = m.group(1).trim();
+			uri = m.group(2).trim();
+			protocol = m.group(3).trim();
+			version = m.group(4).trim();
+			url = String.format("%s://%s%s", protocol.toLowerCase(), mapReqHeaders.getOrDefault("Host", "unknown"), uri);
 		}
 		mapRespHeaders.put("Server", "jMiniLang Server");
 	}
@@ -164,6 +172,13 @@ public class ModuleNetWebContext {
 	}
 
 	public void unblock() {
+		try {
+			while (sem == null) {
+				Thread.sleep(100);
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		sem.release();
 	}
 }

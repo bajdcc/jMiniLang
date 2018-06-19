@@ -18,31 +18,18 @@ if (!g_is_null(g_query_share("cmd#histroy"))) {
 
 // PRINT WELCOME
 var welcome = func ["WELCOME"] ~() {
-    var print_logo = func ~(str) -> g_ui_printn(str);
-    if (!g_read_file_s_ascii("$LOGO", print_logo)) {
-        var logo_s = "       ________  ________        ___  ________  ________  ________
-      |\\   __  \\|\\   __  \\      |\\  \\|\\   ___ \\|\\   ____\\|\\   ____\\
-      \\ \\  \\|\\ /\\ \\  \\|\\  \\     \\ \\  \\ \\  \\_|\\ \\ \\  \\___|\\ \\  \\___|
-       \\ \\   __  \\ \\   __  \\  __ \\ \\  \\ \\  \\ \\\\ \\ \\  \\    \\ \\  \\
-         \\ \\  \\|\\  \\ \\  \\ \\  \\|\\  \\\\_\\  \\ \\  \\_\\\\ \\ \\  \\____\\ \\  \\____
-         \\ \\_______\\ \\__\\ \\__\\ \\________\\ \\_______\\ \\_______\\ \\_______\\
-          \\|_______|\\|__|\\|__|\\|________|\\|_______|\\|_______|\\|_______|
-
-";
-        while (g_is_null(g_task_get_fast("system", "guid"))) {
-            g_sleep(10);
-        }
-        g_write_file_s_utf8("$LOGO", logo_s);
-        g_write_file_sa_utf8("$LOGO", "      唯一标识： " + g_task_get_fast("system", "guid") + g_endl + g_endl);
-        g_ui_print("                   ");
-        g_ui_fgcolor(106, 0, 122);
-        g_ui_bgcolor(230, 230, 230);
-        g_ui_printn("--== jMiniOS 脚本操作系统 Made by bajdcc ==--");
-        g_ui_bgclear();
-        g_ui_fgcolor(0, 0, 255);
-        g_read_file_s_utf8("$LOGO", print_logo);
-        g_ui_fgclear();
+    while (g_is_null(g_task_get_fast("system", "guid"))) {
+        g_sleep(10);
     }
+    g_ui_print("                   ");
+    g_ui_fgcolor(106, 0, 122);
+    g_ui_bgcolor(230, 230, 230);
+    g_ui_printn("--== jMiniOS 脚本操作系统 Made by bajdcc ==--");
+    g_ui_bgclear();
+    g_ui_fgcolor(0, 0, 255);
+    g_read_file_s_utf8("!/com/bajdcc/code/fs/logo.txt", lambda(s) -> g_ui_printn(s));
+    g_ui_printn("      唯一标识： " + g_task_get_fast("system", "guid") + g_endl + g_endl);
+    g_ui_fgclear();
     g_printn("Running...");
 };
 g_join_process(g_create_user_process(welcome));
