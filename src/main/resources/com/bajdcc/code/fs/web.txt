@@ -5,39 +5,79 @@ import "user.web";
     code* - 数字状态码, 200
     request - (headers(map), method, uri, version, protocol, url, port, host, path, query, authority)
     response* - support string, ""
-    mime* - MIME, application/octet-stream
+    mime* - mime, application/octet-stream
     content_type* - {0: string, 1: VFS, 2: Resource, 3: File}, 0
     __ctx__ - http context
 */
 var ctx = g_web_get_context();
 if (g_is_null(ctx)) { return; }
-var html =
+if (ctx["request"]["uri"] == "/") {
+    // 主页
+    var html =
 "
 <html>
 <head>
+    <meta charset=\"UTF-8\">
+    <link rel=\"shortcut icon\" href=\"/favicon.ico\" />
+    <meta name=\"renderer\" content=\"webkit\">
+    <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge,chrome=1\">
+    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1, maximum-scale=1\">
+    <link rel=\"stylesheet\" href=\"/layui/css/layui.css\"  media=\"all\">
     <title>jMiniLang Web Server</title>
 </head>
 <body>
-    <h1>jMiniLang 语言实现的网页服务器</h1>
-    <h3>作者：" + g_author() + "</h3>
-    <h3>链接：" + g_github_repo() + "</h3>
-    <hr>
-    <h2>
-        <pre>
-             URL: " + g_to_string(ctx["request"]["url"]) + "
-             Port: " + g_to_string(ctx["request"]["port"]) + "
-             Host: " + g_to_string(ctx["request"]["host"]) + "
-             Path: " + g_to_string(ctx["request"]["path"]) + "
-             Query: " + g_to_string(ctx["request"]["query"]) + "
-             Authority: " + g_to_string(ctx["request"]["authority"]) + "
-             User-Agent: " + g_to_string(ctx["request"]["headers"]["User-Agent"]) + "
-             Accept: " + g_to_string(ctx["request"]["headers"]["Accept"]) + "
-             Accept-Encoding: " + g_to_string(ctx["request"]["headers"]["Accept-Encoding"]) + "
-        </pre>
-    </h2>
+    <blockquote class=\"layui-elem-quote layui-text\">
+      <p>jMiniLang 语言实现的网页服务器</p>
+      <p>作者：" + g_author() + "</p>
+      <p>链接：" + g_github_repo() + "</p>
+      <p>前端：LayUI</p>
+    </blockquote>
+    <fieldset class=\"layui-elem-field layui-field-title\" style=\"margin-top: 20px; padding: 10px;\">
+      <legend>请求内容</legend>
+    </fieldset>
+    <div class=\"layui-form\">
+      <table class=\"layui-table\">
+        <colgroup>
+          <col width=\"100\">
+          <col width=\"450\">
+        </colgroup>
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>URL</td><td>" + ctx["request"]["url"]+ "</td></tr>
+          <tr><td>Port</td><td>" + ctx["request"]["port"]+ "</td></tr>
+          <tr><td>Host</td><td>" + ctx["request"]["host"]+ "</td></tr>
+          <tr><td>Path</td><td>" + ctx["request"]["path"]+ "</td></tr>
+          <tr><td>Extension</td><td>" + ctx["request"]["ext"]+ "</td></tr>
+          <tr><td>Query</td><td>" + ctx["request"]["query"]+ "</td></tr>
+          <tr><td>Authority</td><td>" + ctx["request"]["authority"]+ "</td></tr>
+          <tr><td>User-Agent</td><td>" + ctx["request"]["headers"]["User-Agent"]+ "</td></tr>
+          <tr><td>Accept</td><td>" + ctx["request"]["headers"]["Accept"]+ "</td></tr>
+          <tr><td>Accept-Encoding</td><td>" + ctx["request"]["headers"]["Accept-Encoding"]+ "</td></tr>
+          <tr><td>Accept-Language</td><td>" + ctx["request"]["headers"]["Accept-Language"]+ "</td></tr>
+          <tr><td>Cache-Control</td><td>" + ctx["request"]["headers"]["Cache-Control"]+ "</td></tr>
+          <tr><td>Connection</td><td>" + ctx["request"]["headers"]["Connection"]+ "</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <script src=\"/layui/layui.js\" charset=\"utf-8\"></script>
 </body>
 </html>
 ";
-ctx["response"] := html;
-ctx["mime"] := "text/html;charset=utf-8";
+    ctx["response"] := html;
+    ctx["mime"] := "html-utf8";
+} else {
+    var ext = ctx["request"]["ext"];
+    if (g_is_null(ext)) {
+        ctx["code"] := 404;
+    } else {
+        ctx["response"] := ctx["request"]["path"];
+        ctx["mime"] := ext;
+        ctx["content_type"] := 2;
+    }
+}
 g_web_set_context(ctx);

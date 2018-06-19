@@ -72,7 +72,7 @@ public class ModuleUserWeb implements IInterpreterModule {
 						map.put("request", new RuntimeObject(ctx.getReqHeader()));
 						map.put("response", new RuntimeObject(ctx.getResponse()));
 						map.put("header", new RuntimeObject(ctx.getRespHeader()));
-						map.put("mime", new RuntimeObject(ctx.getMIME())); // TODO: Add helper
+						map.put("mime", new RuntimeObject(ctx.getMime()));
 						map.put("content_type", new RuntimeObject(BigInteger.valueOf(ctx.getContentType())));
 						map.put("__ctx__", new RuntimeObject(ctx));
 						return new RuntimeObject(map);
@@ -100,7 +100,7 @@ public class ModuleUserWeb implements IInterpreterModule {
 				ctx.setCode(((BigInteger) map.get("code").getObj()).intValue());
 				ctx.setResponse(String.valueOf(map.get("response").getObj()));
 				ctx.setRespHeader((RuntimeMap) map.get("header").getObj());
-				ctx.setMIME(String.valueOf(map.get("mime").getObj()));
+				ctx.setMime(String.valueOf(map.get("mime").getObj()));
 				ctx.setContentType(((BigInteger) map.get("content_type").getObj()).intValue());
 				ctx.unblock();
 				return null;

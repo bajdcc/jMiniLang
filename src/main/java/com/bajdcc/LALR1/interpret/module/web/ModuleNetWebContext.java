@@ -24,11 +24,11 @@ public class ModuleNetWebContext {
 	private SelectionKey selectionKey;
 	private String header;
 	private String response = "";
-	private String MIME = "application/octet-stream";
+	private String mime = "html-utf8";
 	private int code = 200;
 	private int content_type = 0;
 
-	private String method, uri, protocol, version;
+	private String method, uri, protocol, version, url;
 	private Map<String, String> mapReqHeaders = new HashMap<>();
 	private Map<String, String> mapRespHeaders = new HashMap<>();
 
@@ -49,8 +49,8 @@ public class ModuleNetWebContext {
 		req.put("method", new RuntimeObject(method));
 		req.put("uri", new RuntimeObject(uri));
 		req.put("version", new RuntimeObject(version));
-		req.put("protocol", new RuntimeObject(protocol));
-		String url = String.format("%s://%s%s", protocol, mapReqHeaders.get("Host"), uri);
+		req.put("protocol", new RuntimeObject(protocol.toLowerCase()));
+		url = String.format("%s://%s%s", protocol, mapReqHeaders.get("Host"), uri);
 		req.put("url", new RuntimeObject(url));
 		try {
 			URL u = new URL(url);
@@ -59,6 +59,11 @@ public class ModuleNetWebContext {
 			req.put("path", new RuntimeObject(u.getPath()));
 			req.put("query", new RuntimeObject(u.getQuery()));
 			req.put("authority", new RuntimeObject(u.getAuthority()));
+			int idx = u.getPath().lastIndexOf(".");
+			if (idx >= 0) {
+				String postfix = u.getPath().substring(idx + 1);
+				req.put("ext", new RuntimeObject(postfix));
+			}
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}
@@ -91,7 +96,7 @@ public class ModuleNetWebContext {
 		if (m.find()) {
 			method = m.group(1).trim();
 			uri = m.group(2).trim();
-			protocol = m.group(3).trim().toLowerCase();
+			protocol = m.group(3).trim();
 			version = m.group(4).trim();
 		}
 		for (int i = 1; i < headers.length; i++) {
@@ -117,12 +122,16 @@ public class ModuleNetWebContext {
 		this.response = response;
 	}
 
-	public String getMIME() {
-		return MIME;
+	public String getMime() {
+		return mime;
 	}
 
-	public void setMIME(String MIME) {
-		this.MIME = MIME;
+	public String getMimeString() {
+		return ModuleNetWebHelper.getMimeByExtension(mime);
+	}
+
+	public void setMime(String mime) {
+		this.mime = mime;
 	}
 
 	public int getCode() {
@@ -143,6 +152,10 @@ public class ModuleNetWebContext {
 
 	public SelectionKey getKey() {
 		return selectionKey;
+	}
+
+	public String getUrl() {
+		return url;
 	}
 
 	public Semaphore block() {
