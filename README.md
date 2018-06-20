@@ -146,10 +146,38 @@ TASK PROC:
 
 **Web Server**
 
-1. **Spring Boot**, port 8080
+1. **Spring Boot API**, port 8080
 2. **Java NIO**, port 8088
 
 *Front-end: LayUI*
+
+**1. Spring Boot API**
+
+> Front-end: LayUI + Vue.js
+> API: Json + RestController
+> Back-end: jMiniLang API Handler (RING 3 Process)
+
+![Screenshot 102](https://raw.githubusercontent.com/bajdcc/jMiniLang/master/screenshots/web-2.png)
+
+**Back-end**
+
+```javascript
+import "user.base";
+import "user.web";
+var ctx = g_web_get_api();
+if (g_is_null(ctx)) { return; }
+ctx["resp"] := [
+    [ "唯一标识", g_env_get_guid() ],
+    [ "作者", g_author() ],
+    [ "当前版本", g_version() ],
+    [ "仓库地址", g_github_repo() ]
+];
+g_web_set_api(ctx);
+```
+
+----
+
+**2. Java NIO**
 
 ![Screenshot 101](https://raw.githubusercontent.com/bajdcc/jMiniLang/master/screenshots/web-1.png)
 

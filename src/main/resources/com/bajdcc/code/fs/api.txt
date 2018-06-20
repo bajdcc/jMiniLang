@@ -3,6 +3,9 @@ import "user.web";
 var ctx = g_web_get_api();
 if (g_is_null(ctx)) { return; }
 ctx["resp"] := [
-    [ "GUID", g_env_get_guid() ]
+    [ "唯一标识", g_env_get_guid() ],
+    [ "作者", g_author() ],
+    [ "当前版本", g_version() ],
+    [ "仓库地址", g_github_repo() ]
 ];
 g_web_set_api(ctx);
