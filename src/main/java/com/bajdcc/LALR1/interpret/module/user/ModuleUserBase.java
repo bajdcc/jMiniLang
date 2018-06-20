@@ -2,8 +2,7 @@ package com.bajdcc.LALR1.interpret.module.user;
 
 import com.bajdcc.LALR1.grammar.Grammar;
 import com.bajdcc.LALR1.grammar.runtime.*;
-import com.bajdcc.LALR1.interpret.module.IInterpreterModule;
-import com.bajdcc.LALR1.interpret.module.ModuleBase;
+import com.bajdcc.LALR1.interpret.module.*;
 import com.bajdcc.util.ResourceLoader;
 import org.apache.log4j.Logger;
 
@@ -20,7 +19,6 @@ public class ModuleUserBase implements IInterpreterModule {
 	private static ModuleUserBase instance = new ModuleUserBase();
 	private RuntimeCodePage runtimeCodePage;
 	private static Logger logger = Logger.getLogger("user");
-	private RuntimeCodePage pageBase;
 
 	public static ModuleUserBase getInstance() {
 		return instance;
@@ -43,28 +41,12 @@ public class ModuleUserBase implements IInterpreterModule {
 
 		String base = ResourceLoader.load(getClass());
 
-		ModuleBase moduleBase = ModuleBase.getInstance();
-		pageBase = moduleBase.getCodePage();
-
 		Grammar grammar = new Grammar(base);
 		RuntimeCodePage page = grammar.getCodePage();
 		IRuntimeDebugInfo info = page.getInfo();
 
-		String[] importValueFromBase = new String[]{
-				"g_null","g_minus_1","g_true","g_false","g_endl","g_nullptr"
-		};
-		for (String key : importValueFromBase) {
-			info.addExternalValue(key, pageBase.getInfo().getValueCallByName(key));
-		}
-
-		String[] importFuncFromBase = new String[]{
-				"g_is_null","g_set_debug","g_not_null",
-				"g_to_string","g_new","g_doc","g_get_type","g_get_type_ordinal","g_type",
-				"g_args_count","g_args_index","g_get_timestamp"
-		};
-		for (String key : importFuncFromBase) {
-			info.addExternalFunc(key, pageBase.getInfo().getExecCallByName(key));
-		}
+		importFromBase(info, ModuleBase.getInstance().getCodePage().getInfo());
+		importFromTask(info, ModuleTask.getInstance().getCodePage().getInfo());
 
 		info.addExternalFunc("g_print", new IRuntimeDebugExec() {
 			@Override
@@ -199,5 +181,27 @@ public class ModuleUserBase implements IInterpreterModule {
 		});
 
 		return runtimeCodePage = page;
+	}
+
+	private static void importFromBase(IRuntimeDebugInfo info, IRuntimeDebugInfo refer) {
+		String[] importValue = new String[]{
+				"g_null","g_minus_1","g_true","g_false","g_endl","g_nullptr"
+		};
+		for (String key : importValue) {
+			info.addExternalValue(key,refer.getValueCallByName(key));
+		}
+
+		String[] importFunc = new String[]{
+				"g_is_null","g_set_debug","g_not_null",
+				"g_to_string","g_new","g_doc","g_get_type","g_get_type_ordinal","g_type",
+				"g_args_count","g_args_index","g_get_timestamp"
+		};
+		for (String key : importFunc) {
+			info.addExternalFunc(key, refer.getExecCallByName(key));
+		}
+	}
+
+	private static void importFromTask(IRuntimeDebugInfo info, IRuntimeDebugInfo refer) {
+		info.addExternalFunc("g_env_get_guid", refer.getExecCallByName("g_task_get_guid"));
 	}
 }

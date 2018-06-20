@@ -3,6 +3,7 @@ package com.bajdcc.LALR1.interpret.module;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.bajdcc.LALR1.interpret.module.api.ModuleNetWebApi;
 import com.bajdcc.LALR1.interpret.module.web.ModuleNetWebServer;
 import com.bajdcc.LALR1.ui.UIMainFrame;
 import com.bajdcc.web.SpringBootstrap;
@@ -43,6 +44,7 @@ public class ModuleNet implements IInterpreterModule {
 	private ModuleNetClient client;
 	private String lastError = "";
 	private ModuleNetWebServer webServer;
+	private ModuleNetWebApi webApi;
 	private SpringBootstrap bootstrap;
 
 	public static ModuleNet getInstance() {
@@ -777,6 +779,7 @@ public class ModuleNet implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
+				webApi = new ModuleNetWebApi();
 				bootstrap = new SpringBootstrap();
 				bootstrap.start();
 				return null;
@@ -796,6 +799,7 @@ public class ModuleNet implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) throws InterruptedException {
+				webApi = null;
 				bootstrap.terminate();
 				bootstrap.join();
 				return null;
@@ -848,5 +852,13 @@ public class ModuleNet implements IInterpreterModule {
 
 	public synchronized void setWebServer(ModuleNetWebServer webServer) {
 		this.webServer = webServer;
+	}
+
+	public synchronized ModuleNetWebApi getWebApi() {
+		return webApi;
+	}
+
+	public synchronized void setWebApi(ModuleNetWebApi webApi) {
+		this.webApi = webApi;
 	}
 }

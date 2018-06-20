@@ -1,5 +1,6 @@
 package com.bajdcc.LALR1.grammar.runtime;
 
+import javafx.util.Pair;
 import org.apache.log4j.Logger;
 import com.bajdcc.LALR1.grammar.Grammar;
 import com.bajdcc.LALR1.grammar.runtime.service.IRuntimeProcessService;
@@ -8,6 +9,7 @@ import com.bajdcc.LALR1.syntax.handler.SyntaxException;
 
 import java.io.InputStream;
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.stream.Collectors;
 
 /**
@@ -16,6 +18,11 @@ import java.util.stream.Collectors;
  * @author bajdcc
  */
 public class RuntimeProcess implements IRuntimeProcessService {
+
+	private static Deque<Pair<String, String>> pipeDeque = new ConcurrentLinkedDeque<>();
+	public static void writePipe(String name, String msg) {
+		pipeDeque.add(new Pair<>(name, msg));
+	}
 
 	private class SchdProcess {
 		public RuntimeMachine machine;
@@ -225,6 +232,10 @@ public class RuntimeProcess implements IRuntimeProcessService {
 				}
 			}
 			Thread.sleep(TIME_SLEEP_FULL);
+			if (!pipeDeque.isEmpty()) {
+				Pair<String, String> pair = pipeDeque.poll();
+				service.getPipeService().writeString(pair.getKey(), pair.getValue());
+			}
 		}
 		return true;
 	}

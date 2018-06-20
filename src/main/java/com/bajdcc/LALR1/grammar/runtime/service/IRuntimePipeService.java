@@ -90,4 +90,13 @@ public interface IRuntimePipeService {
 	 * @return 列表
 	 */
 	RuntimeArray stat();
+
+	/**
+	 * 写入数据
+	 *
+	 * @param name 管道名
+	 * @param data 数据
+	 * @return 管道是否存在
+	 */
+	boolean writeString(String name, String data);
 }

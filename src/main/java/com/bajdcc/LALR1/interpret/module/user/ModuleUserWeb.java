@@ -5,6 +5,8 @@ import com.bajdcc.LALR1.grammar.runtime.*;
 import com.bajdcc.LALR1.grammar.runtime.data.RuntimeMap;
 import com.bajdcc.LALR1.interpret.module.IInterpreterModule;
 import com.bajdcc.LALR1.interpret.module.ModuleNet;
+import com.bajdcc.LALR1.interpret.module.api.ModuleNetWebApi;
+import com.bajdcc.LALR1.interpret.module.api.ModuleNetWebApiContext;
 import com.bajdcc.LALR1.interpret.module.web.ModuleNetWebContext;
 import com.bajdcc.LALR1.interpret.module.web.ModuleNetWebServer;
 import com.bajdcc.util.ResourceLoader;
@@ -102,6 +104,51 @@ public class ModuleUserWeb implements IInterpreterModule {
 				ctx.setRespHeader((RuntimeMap) map.get("header").getObj());
 				ctx.setMime(String.valueOf(map.get("mime").getObj()));
 				ctx.setContentType(((BigInteger) map.get("content_type").getObj()).intValue());
+				ctx.unblock();
+				return null;
+			}
+		});
+		info.addExternalFunc("g_web_get_api", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "获取API请求上下文";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return null;
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				ModuleNetWebApi api = ModuleNet.getInstance().getWebApi();
+				if (api != null) {
+					ModuleNetWebApiContext ctx = api.dequeue();
+					if (ctx != null) {
+						return new RuntimeObject(ctx.getReq());
+					}
+				}
+				return null;
+			}
+		});
+		info.addExternalFunc("g_web_set_api", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "设置API请求上下文";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kMap};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				RuntimeMap map = (RuntimeMap) args.get(0).getObj();
+				ModuleNetWebApiContext ctx = (ModuleNetWebApiContext) map.get("__ctx__").getObj();
+				ctx.setResp(map.get("resp"));
 				ctx.unblock();
 				return null;
 			}

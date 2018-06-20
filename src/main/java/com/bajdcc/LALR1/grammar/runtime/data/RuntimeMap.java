@@ -78,10 +78,6 @@ public class RuntimeMap implements Cloneable {
 		}
 	}
 
-	public void forEach(BiConsumer<String, RuntimeObject> action) {
-		map.forEach(action);
-	}
-
 	public RuntimeMap clone() {
 		try {
 			return (RuntimeMap) super.clone();
@@ -89,6 +85,10 @@ public class RuntimeMap implements Cloneable {
 			e.printStackTrace();
 		}
 		return new RuntimeMap();
+	}
+
+	public Map<String, RuntimeObject> getMap() {
+		return Collections.unmodifiableMap(map);
 	}
 
 	@Override

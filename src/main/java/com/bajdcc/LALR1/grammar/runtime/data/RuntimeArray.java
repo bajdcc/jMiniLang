@@ -145,6 +145,10 @@ public class RuntimeArray implements Cloneable {
 		return new RuntimeArray();
 	}
 
+	public List<RuntimeObject> getArray() {
+		return Collections.unmodifiableList(array);
+	}
+
 	@Override
 	public String toString() {
 		return String.valueOf(array.size());

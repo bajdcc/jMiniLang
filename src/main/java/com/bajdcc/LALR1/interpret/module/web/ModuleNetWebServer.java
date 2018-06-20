@@ -15,6 +15,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.util.Deque;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -32,7 +33,7 @@ public class ModuleNetWebServer implements Runnable {
 
 	private int port;
 	private boolean running = true;
-	private ConcurrentLinkedDeque<ModuleNetWebContext> queue = new ConcurrentLinkedDeque<>();
+	private Deque<ModuleNetWebContext> queue = new ConcurrentLinkedDeque<>();
 
 	public boolean isRunning() {
 		return running;

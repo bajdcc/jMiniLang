@@ -139,11 +139,31 @@ public class RuntimePipeService implements IRuntimePipeService {
 	public boolean write(int handle, char ch) {
 		handle = decodeHandle(handle);
 		if (setPipeId.contains(handle)) {
-			if (!arrPipes[handle].waiting_pids.isEmpty())
-				service.getProcessService().wakeup(arrPipes[handle].waiting_pids.poll());
+			if (!arrPipes[handle].waiting_pids.isEmpty()) {
+				Integer pid = arrPipes[handle].waiting_pids.poll();
+				if (pid != null)
+					service.getProcessService().wakeup(pid);
+			}
 			return arrPipes[handle].queue.add(ch);
 		}
 		return false;
+	}
+
+	@Override
+	public boolean writeString(String name, String data) {
+		if (!mapPipeNames.containsKey(name)) {
+			return false;
+		}
+		int handle = mapPipeNames.get(name);
+		if (!arrPipes[handle].waiting_pids.isEmpty()) {
+			Integer pid = arrPipes[handle].waiting_pids.poll();
+			if (pid != null)
+				service.getProcessService().wakeup(pid);
+		}
+		for (int i = 0; i < data.length(); i++) {
+			arrPipes[handle].queue.add(data.charAt(i));
+		}
+		return true;
 	}
 
 	@Override

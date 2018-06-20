@@ -1,0 +1,8 @@
+import "user.base";
+import "user.web";
+var ctx = g_web_get_api();
+if (g_is_null(ctx)) { return; }
+ctx["resp"] := [
+    [ "GUID", g_env_get_guid() ]
+];
+g_web_set_api(ctx);

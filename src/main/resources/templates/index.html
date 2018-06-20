@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:v-on="http://www.w3.org/1999/xhtml"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorator="layout">
+<head>
+    <title>主页</title>
+</head>
+<body>
+<div layout:fragment="content" id="app">
+    <div class="site-text">
+        <h1 class="site-h1">基本信息</h1>
+        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+            <legend>参数</legend>
+        </fieldset>
+        <div class="layui-form">
+            <table class="layui-table">
+                <colgroup>
+                    <col width="150">
+                    <col>
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>名称</th>
+                    <th>值</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="item in env">
+                    <td v-text="item[0]"></td>
+                    <td v-text="item[1]"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<th:block layout:fragment="bottom_script_block">
+</th:block>
+<script layout:fragment="script">
+    var App = new Vue({
+        el: '#app',
+        data: {
+            env: []
+        },
+        mounted: function () {
+                this.getEnv();
+        },
+        methods: {
+            getEnv: function (e) {
+                var vm = this;
+                vm.$http.get('/api/env').then(function (response) {
+                    vm.env = response.data;
+                }, function (response) {
+                    console.error('cannot get env');
+                });
+            }
+        }
+    })
+</script>
+</body>
+</html>

@@ -89,7 +89,7 @@ public class ModuleNetWebContext {
 	}
 
 	public void setRespHeader(RuntimeMap map) {
-		map.forEach((key, value) -> mapRespHeaders.put(key, String.valueOf(value.getObj())));
+		map.getMap().forEach((key, value) -> mapRespHeaders.put(key, String.valueOf(value.getObj())));
 	}
 
 	public String getRespHeaderValue(String key) {
