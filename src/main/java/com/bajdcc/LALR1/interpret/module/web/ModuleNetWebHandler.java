@@ -28,7 +28,7 @@ public class ModuleNetWebHandler implements Runnable {
 
 	private final static String DEFAULT_TITLE = "jMiniLang Web Server";
 	private final static String ENDL = "\r\n";
-	private final static String RESOURCE_PATH = "/com/bajdcc/www";
+	private final static String RESOURCE_PATH = "/static";
 	private ModuleNetWebContext ctx;
 
 	public ModuleNetWebHandler(ModuleNetWebContext context) {

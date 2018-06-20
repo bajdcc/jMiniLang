@@ -80,7 +80,6 @@ public class UIMainFrame extends JFrame {
 	}
 
 	public static void main(String[] args) {
-
 		UIMainFrame frame = new UIMainFrame();
 		ModuleRemote.enabled();
 		ModuleRemote.setMainFrame(frame);

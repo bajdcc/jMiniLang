@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.bajdcc.LALR1.interpret.module.web.ModuleNetWebServer;
+import com.bajdcc.LALR1.ui.UIMainFrame;
+import com.bajdcc.web.SpringBootstrap;
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.Node;
@@ -41,6 +43,7 @@ public class ModuleNet implements IInterpreterModule {
 	private ModuleNetClient client;
 	private String lastError = "";
 	private ModuleNetWebServer webServer;
+	private SpringBootstrap bootstrap;
 
 	public static ModuleNet getInstance() {
 		return instance;
@@ -758,6 +761,44 @@ public class ModuleNet implements IInterpreterModule {
 					e.printStackTrace();
 				}
 				return new RuntimeObject("Unknown Hostname");
+			}
+		});
+		info.addExternalFunc("g_web_start_spring", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "启动Spring Boot";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return null;
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				bootstrap = new SpringBootstrap();
+				bootstrap.start();
+				return null;
+			}
+		});
+		info.addExternalFunc("g_web_stop_spring", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "关闭Spring Boot";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return null;
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws InterruptedException {
+				bootstrap.terminate();
+				bootstrap.join();
+				return null;
 			}
 		});
 	}

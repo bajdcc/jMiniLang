@@ -14,6 +14,8 @@ g_printn("Running...");
 var tid = 4;
 var handle = g_create_pipe("TASKSEND#" + tid);
 
+g_web_start_spring();
+
 var time = func ~(msg, caller) {
     var id = msg["id"];
     if (g_is_null(id)) {
@@ -114,5 +116,7 @@ var data = {};
 g_task_add_proc(4, data);
 
 g_read_pipe(handle, handler);
+
+g_web_stop_spring();
 
 g_printn("Exit.");

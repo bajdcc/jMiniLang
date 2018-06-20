@@ -1050,7 +1050,7 @@ var stage_web = func ~() {
         g_unlock_mutex(mutex);
         return;
     }
-    var port = "8080";
+    var port = "8088";
     g_task_get_fast_arg("net", "start_web", port);
     g_task_sleep_signal(1, signal);
     var timed = 0;
