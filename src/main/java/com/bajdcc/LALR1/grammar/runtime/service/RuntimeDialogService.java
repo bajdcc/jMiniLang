@@ -76,7 +76,7 @@ public class RuntimeDialogService implements IRuntimeDialogService {
 					arrDialogs[handle] = null;
 					setDialogId.remove(handle);
 				}
-				service.getPipeService().write(service.getPipeService().create("DIALOG#SIG#" + handle), '*');
+				service.getPipeService().write(service.getPipeService().create("DIALOG#SIG#" + handle, "/dialog/0"), '*');
 			});
 		} else if (mode >= 10 && mode <= 13) {
 			int type = mode - 11;
@@ -91,7 +91,7 @@ public class RuntimeDialogService implements IRuntimeDialogService {
 					arrDialogs[handle] = null;
 					setDialogId.remove(handle);
 				}
-				service.getPipeService().write(service.getPipeService().create("DIALOG#SIG#" + handle), '*');
+				service.getPipeService().write(service.getPipeService().create("DIALOG#SIG#" + handle, "/dialog/1"), '*');
 			});
 		} else if (mode >= 20 && mode <= 24) {
 			int type = mode - 21;
@@ -106,14 +106,14 @@ public class RuntimeDialogService implements IRuntimeDialogService {
 					arrDialogs[handle] = null;
 					setDialogId.remove(handle);
 				}
-				service.getPipeService().write(service.getPipeService().create("DIALOG#SIG#" + handle), '*');
+				service.getPipeService().write(service.getPipeService().create("DIALOG#SIG#" + handle, "/dialog/2"), '*');
 			});
 		} else {
 			synchronized (setDialogId) {
 				arrDialogs[handle] = null;
 				setDialogId.remove(handle);
 			}
-			service.getPipeService().write(service.getPipeService().create("DIALOG#SIG#" + handle), '*');
+			service.getPipeService().write(service.getPipeService().create("DIALOG#SIG#" + handle, "/dialog/?"), '*');
 		}
 		return true;
 	}

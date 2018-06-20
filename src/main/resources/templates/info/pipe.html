@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:v-on="http://www.w3.org/1999/xhtml"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorator="layout">
+<head>
+    <title>管道</title>
+</head>
+<body>
+<div layout:fragment="content" id="app">
+    <div class="site-text">
+        <h1 class="site-h1">管道</h1>
+        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+            <legend>管道列表</legend>
+        </fieldset>
+        <div class="layui-form">
+            <table class="layui-table">
+                <colgroup>
+                    <col width="200">
+                    <col width="200">
+                    <col width="200">
+                    <col width="200">
+                    <col width="200">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>管道标识</th>
+                    <th>管道名称</th>
+                    <th>创建页面</th>
+                    <th>队列长度</th>
+                    <th>等待长度</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="item in pipe">
+                    <td v-text="item[0]"></td>
+                    <td v-text="item[1]"></td>
+                    <td v-text="item[2]"></td>
+                    <td v-text="item[3]"></td>
+                    <td v-text="item[4]"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<th:block layout:fragment="bottom_script_block">
+</th:block>
+<script layout:fragment="script">
+    var App = new Vue({
+        el: '#app',
+        data: {
+            pipe: []
+        },
+        mounted: function () {
+                this.getInfo("pipe");
+        },
+        methods: {
+            getInfo: function (name) {
+                var vm = this;
+                vm.$http.get('/api/' + name).then(function (response) {
+                    var data = response.data;
+                    if (data.code == 200)
+                        vm[name] = data.data;
+                    else
+                        vm[name] = [ [ "发生错误", "错误代码：" + data.code, "", "", "" ] ];
+                }, function (response) {
+                    console.error('cannot get ' + name);
+                });
+            }
+        }
+    })
+</script>
+</body>
+</html>

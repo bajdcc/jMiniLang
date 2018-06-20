@@ -130,7 +130,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 		this.process = process;
 		if (ring == 3) {
 			ring3Struct = new Ring3Struct();
-			ring3Struct.putHandle = process.getService().getPipeService().create(USER_PROC_PIPE_PREFIX + pid);
+			ring3Struct.putHandle = process.getService().getPipeService().create(USER_PROC_PIPE_PREFIX + pid, name);
 		}
 	}
 
@@ -245,7 +245,8 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 	public int runStep() throws Exception {
 		RuntimeInst inst = RuntimeInst.values()[currentInst()];
 		if (inst == RuntimeInst.ihalt) {
-			process.destroyProcess(pid);
+			if (ring < 3)
+				process.destroyProcess(pid);
 			return 2;
 		}
 		return runByStep() ? 0 : 1;
@@ -478,7 +479,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 				String.valueOf(ring),
 				String.valueOf(pid),
 				name,
-				funcName.substring(0, Math.min(funcName.length(), 20)),
+				funcName,
 				description,
 		};
 	}
@@ -875,20 +876,19 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 				obj = itStack.findVariable(pageName, idx);
 				itStack = itStack.prev;
 			}
-			if (obj == null) {
+			if (obj == null || obj.getType() == null) {
 				err(RuntimeError.WRONG_LOAD_EXTERN, String.valueOf(idx));
-			}
-			if (obj.getType() == RuntimeObjectType.kFunc) {
+			} else if (obj.getType() == RuntimeObjectType.kFunc) {
 				RuntimeFuncObject func = (RuntimeFuncObject) obj.getObj();
 				Map<Integer, RuntimeObject> env = func.getEnv();
 				if (env != null) {
 					for (Entry<Integer, RuntimeObject> entry : env.entrySet()) {
 						int id = entry.getKey();
 						RuntimeObject o = entry.getValue();
-						if (o != null) {
+						/*if (o != null) {
 							if (o.getSymbol() == null)
 								o.setSymbol(currentPage.getData().get(id));
-						}
+						}*/
 						stack.storeClosure(id, o);
 					}
 					stack.pushData(obj);

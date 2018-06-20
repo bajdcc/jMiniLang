@@ -24,12 +24,14 @@ public class RuntimeShareService implements IRuntimeShareService {
 	class ShareStruct {
 		public String name;
 		public RuntimeObject obj;
+		public String page;
 		public int reference;
 		public boolean locked;
 
-		public ShareStruct(String name, RuntimeObject obj) {
+		public ShareStruct(String name, RuntimeObject obj, String page) {
 			this.name = name;
 			this.obj = obj;
+			this.page = page;
 			this.reference = 1;
 			this.locked = false;
 		}
@@ -49,21 +51,21 @@ public class RuntimeShareService implements IRuntimeShareService {
 	private Map<String, ShareStruct> mapShares;
 
 	@Override
-	public int startSharing(String name, RuntimeObject obj) {
+	public int startSharing(String name, RuntimeObject obj, String page) {
 		if (mapShares.size() >= MAX_SHARING)
 			return -1;
 		if (mapShares.containsKey(name))
 			return 0;
-		mapShares.put(name, new ShareStruct(name, obj));
+		mapShares.put(name, new ShareStruct(name, obj, page));
 		logger.debug("Sharing '" + name + "' created");
 		return 1;
 	}
 
 	@Override
-	public int createSharing(String name, RuntimeObject obj) {
+	public int createSharing(String name, RuntimeObject obj, String page) {
 		if (mapShares.size() >= MAX_SHARING)
 			return -1;
-		mapShares.put(name, new ShareStruct(name, obj));
+		mapShares.put(name, new ShareStruct(name, obj, page));
 		logger.debug("Sharing '" + name + "' created");
 		return 1;
 	}
@@ -112,14 +114,28 @@ public class RuntimeShareService implements IRuntimeShareService {
 	}
 
 	@Override
-	public RuntimeArray stat() {
+	public RuntimeArray stat(boolean api) {
 		RuntimeArray array = new RuntimeArray();
-		array.add(new RuntimeObject(String.format("   %-15s   %-15s   %-5s   %-5s",
-				"Name", "Type", "Ref", "Locked")));
-		mapShares.values().stream().sorted(Comparator.comparing(ShareStruct::getObjType).thenComparing(ShareStruct::getName))
-				.collect(Collectors.toList())
-				.forEach((value) -> array.add(new RuntimeObject(String.format("   %-15s   %-15s   %-5s   %-5s",
-						value.name, value.obj.getType().name(), String.valueOf(value.reference), String.valueOf(value.locked)))));
+		if (api) {
+			mapShares.values().stream().sorted(Comparator.comparing(ShareStruct::getObjType).thenComparing(ShareStruct::getName))
+					.collect(Collectors.toList())
+					.forEach((value) -> {
+						RuntimeArray item = new RuntimeArray();
+						item.add(new RuntimeObject(value.name));
+						item.add(new RuntimeObject(value.obj.getType().getName()));
+						item.add(new RuntimeObject(value.page));
+						item.add(new RuntimeObject(String.valueOf(value.reference)));
+						item.add(new RuntimeObject(value.locked ? "是" : "否"));
+						array.add(new RuntimeObject(item));
+					});
+		} else {
+			array.add(new RuntimeObject(String.format("   %-15s   %-15s   %-5s   %-5s",
+					"Name", "Type", "Ref", "Locked")));
+			mapShares.values().stream().sorted(Comparator.comparing(ShareStruct::getObjType).thenComparing(ShareStruct::getName))
+					.collect(Collectors.toList())
+					.forEach((value) -> array.add(new RuntimeObject(String.format("   %-15s   %-15s   %-5s   %-5s",
+							value.name, value.obj.getType().name(), String.valueOf(value.reference), String.valueOf(value.locked)))));
+		}
 		return array;
 	}
 }

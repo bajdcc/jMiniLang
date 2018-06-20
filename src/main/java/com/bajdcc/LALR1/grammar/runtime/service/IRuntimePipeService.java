@@ -13,9 +13,10 @@ public interface IRuntimePipeService {
 	 * 创建管道
 	 *
 	 * @param name 管道名称
+	 * @param page 创建时的页面
 	 * @return 管道句柄
 	 */
-	int create(String name);
+	int create(String name, String page);
 
 	/**
 	 * 销毁管道
@@ -87,9 +88,10 @@ public interface IRuntimePipeService {
 	/**
 	 * 获取列表
 	 *
+	 * @param api 是否API调用
 	 * @return 列表
 	 */
-	RuntimeArray stat();
+	RuntimeArray stat(boolean api);
 
 	/**
 	 * 写入数据

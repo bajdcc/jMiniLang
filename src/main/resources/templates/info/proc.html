@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:v-on="http://www.w3.org/1999/xhtml"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorator="layout">
+<head>
+    <title>进程</title>
+</head>
+<body>
+<div layout:fragment="content" id="app">
+    <div class="site-text">
+        <h1 class="site-h1">进程</h1>
+        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+            <legend>进程列表</legend>
+        </fieldset>
+        <div class="layui-form">
+            <table class="layui-table">
+                <colgroup>
+                    <col width="200">
+                    <col width="200">
+                    <col width="200">
+                    <col width="200">
+                    <col width="200">
+                    <col width="200">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>是否活动</th>
+                    <th>内核等级</th>
+                    <th>进程标识</th>
+                    <th>进程名称</th>
+                    <th>过程名称</th>
+                    <th>进程描述</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="item in proc">
+                    <td v-text="item[0]"></td>
+                    <td v-text="item[1]"></td>
+                    <td v-text="item[2]"></td>
+                    <td v-text="item[3]"></td>
+                    <td v-text="item[4]"></td>
+                    <td v-text="item[5]"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<th:block layout:fragment="bottom_script_block">
+</th:block>
+<script layout:fragment="script">
+    var App = new Vue({
+        el: '#app',
+        data: {
+            proc: []
+        },
+        mounted: function () {
+                this.getInfo("proc");
+        },
+        methods: {
+            getInfo: function (name) {
+                var vm = this;
+                vm.$http.get('/api/' + name).then(function (response) {
+                    var data = response.data;
+                    if (data.code == 200)
+                        vm[name] = data.data;
+                    else
+                        vm[name] = [ [ "发生错误", "错误代码：" + data.code, "", "", "", "" ] ];
+                }, function (response) {
+                    console.error('cannot get ' + name);
+                });
+            }
+        }
+    })
+</script>
+</body>
+</html>

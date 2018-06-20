@@ -113,7 +113,7 @@ public class ModuleTask implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				return new RuntimeObject(status.getService().getPipeService().stat());
+				return new RuntimeObject(status.getService().getPipeService().stat(false));
 			}
 		});
 		info.addExternalFunc("g_task_get_share_stat", new IRuntimeDebugExec() {
@@ -130,7 +130,7 @@ public class ModuleTask implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				return new RuntimeObject(status.getService().getShareService().stat());
+				return new RuntimeObject(status.getService().getShareService().stat(false));
 			}
 		});
 		info.addExternalFunc("g_task_get_guid", new IRuntimeDebugExec() {

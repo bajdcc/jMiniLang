@@ -1083,6 +1083,7 @@ var stage_web = func ~() {
     }
     g_task_get_fast("net", "stop_web");
     while (g_net_query_web()) { g_sleep(50); }
+    g_destroy_semaphore(mutex);
 };
 
 var name = args[0];

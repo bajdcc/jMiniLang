@@ -2,12 +2,15 @@ package com.bajdcc.web;
 
 import com.bajdcc.LALR1.interpret.module.ModuleNet;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 【Web服务】启动类
@@ -18,12 +21,16 @@ import java.util.List;
 @RequestMapping("/api")
 public class SpringApiController {
 
-	@RequestMapping(value = "/env", method = RequestMethod.GET, produces = { MediaType.APPLICATION_JSON_VALUE })
-	public Object environment() {
-		Object obj = ModuleNet.getInstance().getWebApi().sendRequest("env");
+	@RequestMapping(value = "/{item}", method = RequestMethod.GET, produces = { MediaType.APPLICATION_JSON_UTF8_VALUE })
+	public Object queryItem(@PathVariable(value = "item") String item) {
+		Map<String, Object> map = new HashMap<>();
+		Object obj = ModuleNet.getInstance().getWebApi().sendRequest(item);
 		if (obj != null) {
-			return obj;
+			map.put("code", 200);
+			map.put("data", obj);
+		} else {
+			map.put("code", 404);
 		}
-		return "";
+		return map;
 	}
 }

@@ -23,11 +23,13 @@ public class RuntimePipeService implements IRuntimePipeService {
 
 	class PipeStruct {
 		public String name;
+		public String page;
 		public Queue<Character> queue;
 		public Queue<Integer> waiting_pids;
 
-		public PipeStruct(String name) {
+		public PipeStruct(String name, String page) {
 			this.name = name;
+			this.page = page;
 			this.queue = new ArrayDeque<>();
 			this.waiting_pids = new ArrayDeque<>();
 		}
@@ -55,7 +57,7 @@ public class RuntimePipeService implements IRuntimePipeService {
 	}
 
 	@Override
-	public int create(String name) {
+	public int create(String name, String page) {
 		if (setPipeId.size() >= MAX_PIPE) {
 			return -1;
 		}
@@ -68,7 +70,7 @@ public class RuntimePipeService implements IRuntimePipeService {
 				handle = cyclePtr;
 				setPipeId.add(cyclePtr);
 				mapPipeNames.put(name, cyclePtr);
-				arrPipes[cyclePtr++] = new PipeStruct(name);
+				arrPipes[cyclePtr++] = new PipeStruct(name, page);
 				if (cyclePtr >= MAX_PIPE) {
 					cyclePtr -= MAX_PIPE;
 				}
@@ -183,14 +185,28 @@ public class RuntimePipeService implements IRuntimePipeService {
 	}
 
 	@Override
-	public RuntimeArray stat() {
+	public RuntimeArray stat(boolean api) {
 		RuntimeArray array = new RuntimeArray();
-		array.add(new RuntimeObject(String.format("   %-5s   %-15s   %-15s   %-15s",
-				"Id", "Name", "Queue", "Waiting")));
-		mapPipeNames.values().stream().sorted(Comparator.naturalOrder())
-				.collect(Collectors.toList())
-				.forEach((value) -> array.add(new RuntimeObject(String.format("   %-5s   %-15s   %-15d   %-15d",
-						String.valueOf(value), arrPipes[value].name, arrPipes[value].queue.size(), arrPipes[value].waiting_pids.size()))));
+		if (api) {
+			mapPipeNames.values().stream().sorted(Comparator.naturalOrder())
+					.collect(Collectors.toList())
+					.forEach((value) -> {
+						RuntimeArray item = new RuntimeArray();
+						item.add(new RuntimeObject(String.valueOf(value)));
+						item.add(new RuntimeObject(arrPipes[value].name));
+						item.add(new RuntimeObject(arrPipes[value].page));
+						item.add(new RuntimeObject(arrPipes[value].queue.size()));
+						item.add(new RuntimeObject(arrPipes[value].waiting_pids.size()));
+						array.add(new RuntimeObject(item));
+					});
+		} else {
+			array.add(new RuntimeObject(String.format("   %-5s   %-15s   %-15s   %-15s",
+					"Id", "Name", "Queue", "Waiting")));
+			mapPipeNames.values().stream().sorted(Comparator.naturalOrder())
+					.collect(Collectors.toList())
+					.forEach((value) -> array.add(new RuntimeObject(String.format("   %-5s   %-15s   %-15d   %-15d",
+							String.valueOf(value), arrPipes[value].name, arrPipes[value].queue.size(), arrPipes[value].waiting_pids.size()))));
+		}
 		return array;
 	}
 }

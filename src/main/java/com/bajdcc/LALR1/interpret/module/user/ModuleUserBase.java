@@ -2,10 +2,12 @@ package com.bajdcc.LALR1.interpret.module.user;
 
 import com.bajdcc.LALR1.grammar.Grammar;
 import com.bajdcc.LALR1.grammar.runtime.*;
+import com.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
 import com.bajdcc.LALR1.interpret.module.*;
 import com.bajdcc.util.ResourceLoader;
 import org.apache.log4j.Logger;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -47,6 +49,28 @@ public class ModuleUserBase implements IInterpreterModule {
 
 		importFromBase(info, ModuleBase.getInstance().getCodePage().getInfo());
 		importFromTask(info, ModuleTask.getInstance().getCodePage().getInfo());
+		importFromList(info, ModuleList.getInstance().getCodePage().getInfo());
+		importFromProc(info, ModuleProc.getInstance().getCodePage().getInfo());
+
+		return runtimeCodePage = page;
+	}
+
+	private static void importFromBase(IRuntimeDebugInfo info, IRuntimeDebugInfo refer) {
+		String[] importValue = new String[]{
+				"g_null", "g_minus_1", "g_true", "g_false", "g_endl", "g_nullptr"
+		};
+		for (String key : importValue) {
+			info.addExternalValue(key, refer.getValueCallByName(key));
+		}
+
+		String[] importFunc = new String[]{
+				"g_is_null", "g_set_debug", "g_not_null",
+				"g_to_string", "g_new", "g_doc", "g_get_type", "g_get_type_ordinal", "g_type",
+				"g_args_count", "g_args_index", "g_get_timestamp"
+		};
+		for (String key : importFunc) {
+			info.addExternalFunc(key, refer.getExecCallByName(key));
+		}
 
 		info.addExternalFunc("g_print", new IRuntimeDebugExec() {
 			@Override
@@ -179,29 +203,109 @@ public class ModuleUserBase implements IInterpreterModule {
 						status.getService().getProcessService().sleep(status.getPid(), time > 0 ? time : 0)));
 			}
 		});
-
-		return runtimeCodePage = page;
 	}
 
-	private static void importFromBase(IRuntimeDebugInfo info, IRuntimeDebugInfo refer) {
-		String[] importValue = new String[]{
-				"g_null","g_minus_1","g_true","g_false","g_endl","g_nullptr"
-		};
-		for (String key : importValue) {
-			info.addExternalValue(key,refer.getValueCallByName(key));
-		}
+	private static void importFromTask(IRuntimeDebugInfo info, IRuntimeDebugInfo refer) {
+		info.addExternalFunc("g_env_get_guid", refer.getExecCallByName("g_task_get_guid"));
+		info.addExternalFunc("g_res_get_speed", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "管道列表";
+			}
 
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return null;
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				long speed = BigDecimal.valueOf(status.getService().getProcessService().getSpeed()).longValue();
+				if (speed > 1000000L) {
+					return new RuntimeObject(String.valueOf(speed / 1000000L) + "M");
+				} else if (speed > 1000L) {
+					return new RuntimeObject(String.valueOf(speed / 1000L) + "K");
+				}
+				return new RuntimeObject(String.valueOf(speed));
+			}
+		});
+		info.addExternalFunc("g_res_get_pipe", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "管道列表";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return null;
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				return new RuntimeObject(status.getService().getPipeService().stat(true));
+			}
+		});
+		info.addExternalFunc("g_res_get_share", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "共享列表";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return null;
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				return new RuntimeObject(status.getService().getShareService().stat(true));
+			}
+		});
+	}
+
+	private static void importFromList(IRuntimeDebugInfo info, IRuntimeDebugInfo refer) {
 		String[] importFunc = new String[]{
-				"g_is_null","g_set_debug","g_not_null",
-				"g_to_string","g_new","g_doc","g_get_type","g_get_type_ordinal","g_type",
-				"g_args_count","g_args_index","g_get_timestamp"
+				"g_array_add", "g_array_contains", "g_array_append", "g_array_insert",
+				"g_array_set", "g_array_pop", "g_array_clear", "g_array_reverse", "g_array_get",
+				"g_array_get_ex", "g_array_size", "g_array_remove", "g_array_delete", "g_array_empty",
+				"g_array_fill", "g_map_keys", "g_map_values", "g_map_put", "g_map_contains",
+				"g_map_get", "g_map_size", "g_map_remove", "g_map_clear", "g_map_empty",
+				"g_array_range"
 		};
 		for (String key : importFunc) {
 			info.addExternalFunc(key, refer.getExecCallByName(key));
 		}
 	}
 
-	private static void importFromTask(IRuntimeDebugInfo info, IRuntimeDebugInfo refer) {
-		info.addExternalFunc("g_env_get_guid", refer.getExecCallByName("g_task_get_guid"));
+	private static void importFromProc(IRuntimeDebugInfo info, IRuntimeDebugInfo refer) {
+		info.addExternalFunc("g_res_get_proc", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "进程列表";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return null;
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				List<Object[]> info = status.getService().getProcessService().getProcInfoCache();
+				RuntimeArray array = new RuntimeArray();
+				for (Object[] i : info) {
+					RuntimeArray item = new RuntimeArray();
+					for (int j = 0; j < i.length; j++) {
+						item.add(new RuntimeObject(i[j]));
+					}
+					array.add(new RuntimeObject(item));
+				}
+				return new RuntimeObject(array);
+			}
+		});
 	}
 }

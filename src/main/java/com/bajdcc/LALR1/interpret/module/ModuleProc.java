@@ -364,7 +364,7 @@ public class ModuleProc implements IInterpreterModule {
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) throws Exception {
 				String name = args.get(0).getObj().toString();
-				int handle = status.getService().getPipeService().create(name);
+				int handle = status.getService().getPipeService().create(name, String.valueOf(status.getProcInfo()[3]));
 				if (handle == -1)
 					status.err(RuntimeException.RuntimeError.MAX_HANDLE);
 				return new RuntimeObject(handle);
@@ -518,7 +518,7 @@ public class ModuleProc implements IInterpreterModule {
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) throws Exception {
 				String name = args.get(0).getObj().toString();
-				int result = status.getService().getShareService().startSharing(name, args.get(1));
+				int result = status.getService().getShareService().startSharing(name, args.get(1), String.valueOf(status.getProcInfo()[3]));
 				if (result == -1)
 					status.err(RuntimeException.RuntimeError.MAX_HANDLE, name);
 				if (result == 0)
@@ -541,7 +541,7 @@ public class ModuleProc implements IInterpreterModule {
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) throws Exception {
 				String name = args.get(0).getObj().toString();
-				int result = status.getService().getShareService().createSharing(name, args.get(1));
+				int result = status.getService().getShareService().createSharing(name, args.get(1), String.valueOf(status.getProcInfo()[3]));
 				if (result == -1)
 					status.err(RuntimeException.RuntimeError.MAX_HANDLE, name);
 				return new RuntimeObject(BigInteger.valueOf(result));
@@ -722,8 +722,10 @@ public class ModuleProc implements IInterpreterModule {
 			array.add(new RuntimeObject(String.format(" %s  %s %-5s   %-15s   %-25s   %s",
 					" ", "环", "标识", "名称", "过程", "描述")));
 			for (Object[] obj : objs) {
+				String name = String.valueOf(obj[4]);
+				name = name.substring(0, Math.min(name.length(), 20));
 				array.add(new RuntimeObject(String.format(" %s  %s %5s   %-15s   %-25s   %s",
-						obj[0], obj[1], obj[2], obj[3], obj[4], obj[5])));
+						obj[0], obj[1], obj[2], obj[3], name, obj[5])));
 			}
 			return array;
 		}

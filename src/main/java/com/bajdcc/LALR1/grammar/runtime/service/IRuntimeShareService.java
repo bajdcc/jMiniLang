@@ -15,18 +15,20 @@ public interface IRuntimeShareService {
 	 *
 	 * @param name 共享名称
 	 * @param obj  变量
+	 * @param page 创建时的页名
 	 * @return 操作状态
 	 */
-	int startSharing(String name, RuntimeObject obj);
+	int startSharing(String name, RuntimeObject obj, String page);
 
 	/**
 	 * 创建共享（可覆盖）
 	 *
 	 * @param name 共享名称
 	 * @param obj  变量
+	 * @param page 创建时的页名
 	 * @return 操作状态
 	 */
-	int createSharing(String name, RuntimeObject obj);
+	int createSharing(String name, RuntimeObject obj, String page);
 
 	/**
 	 * 查询共享
@@ -71,7 +73,8 @@ public interface IRuntimeShareService {
 	/**
 	 * 获取列表
 	 *
+	 * @param api 是否API调用
 	 * @return 列表
 	 */
-	RuntimeArray stat();
+	RuntimeArray stat(boolean api);
 }
