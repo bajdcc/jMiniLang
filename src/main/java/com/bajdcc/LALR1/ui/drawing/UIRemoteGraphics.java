@@ -1,6 +1,6 @@
 package com.bajdcc.LALR1.ui.drawing;
 
-import sun.awt.SunHints;
+import java.awt.RenderingHints;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -50,12 +50,12 @@ public class UIRemoteGraphics {
 		this.gimage.setColor(fg);
 		this.gimage.setFont(new Font("楷体", Font.PLAIN, 20));
 		Graphics2D g2d = (Graphics2D) gimage;
-		g2d.setRenderingHint(SunHints.KEY_ANTIALIASING, SunHints.VALUE_ANTIALIAS_ON);
-		g2d.setRenderingHint(SunHints.KEY_TEXT_ANTIALIASING, SunHints.VALUE_TEXT_ANTIALIAS_DEFAULT);
-		g2d.setRenderingHint(SunHints.KEY_STROKE_CONTROL, SunHints.VALUE_STROKE_DEFAULT);
-		g2d.setRenderingHint(SunHints.KEY_TEXT_ANTIALIAS_LCD_CONTRAST, 140);
-		g2d.setRenderingHint(SunHints.KEY_FRACTIONALMETRICS, SunHints.VALUE_FRACTIONALMETRICS_OFF);
-		g2d.setRenderingHint(SunHints.KEY_RENDERING, SunHints.VALUE_RENDER_DEFAULT);
+		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_DEFAULT);
+		g2d.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_DEFAULT);
+		g2d.setRenderingHint(RenderingHints.KEY_TEXT_LCD_CONTRAST, 140);
+		g2d.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_OFF);
+		g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_DEFAULT);
 	}
 
 	public void paint(Graphics2D g) {

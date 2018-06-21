@@ -36,6 +36,6 @@ public class SpringInfoController extends Thread {
 	public String info(@PathVariable(value = "item") String item) {
 		if (pages.contains(item))
 			return "info/" + item;
-		return "/info/home";
+		return "info/home";
 	}
 }

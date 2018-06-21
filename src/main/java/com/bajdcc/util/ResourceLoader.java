@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 public class ResourceLoader {
 
 	private static Logger logger = Logger.getLogger("loader");
-	private static String sep = System.lineSeparator();
 
 	private static final String PACKAGE_NAME = "/com/bajdcc/code";
 
@@ -45,11 +44,12 @@ public class ResourceLoader {
 	}
 
 	public static String load(Class cls) {
-		BufferedReader buffer = null;
+		BufferedReader buffer;
 		try {
 			logger.debug("Load txt: " + cls.getResource(PACKAGE_NAME + getPrefix(cls.getSimpleName()) + ".txt").toURI());
 			buffer = new BufferedReader(new InputStreamReader(cls.getResourceAsStream(PACKAGE_NAME + getPrefix(cls.getSimpleName()) + ".txt"), "UTF-8"));
-			return buffer.lines().collect(Collectors.joining(System.lineSeparator()));
+			String code = buffer.lines().collect(Collectors.joining(System.lineSeparator()));
+			return code.isEmpty() ? ";" : code;
 		} catch (UnsupportedEncodingException | URISyntaxException e) {
 			e.printStackTrace();
 		}

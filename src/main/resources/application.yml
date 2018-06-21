@@ -1,0 +1,6 @@
+server:
+  port: 8080
+spring:
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .ftl

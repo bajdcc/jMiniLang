@@ -4,14 +4,14 @@
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
       layout:decorator="layout">
 <head>
-    <title>进程</title>
+    <title>共享</title>
 </head>
 <body>
 <div layout:fragment="content" id="app">
     <div class="site-text">
-        <h1 class="site-h1">进程</h1>
+        <h1 class="site-h1">共享</h1>
         <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
-            <legend>进程列表</legend>
+            <legend>共享列表</legend>
         </fieldset>
         <div class="layui-form">
             <table class="layui-table">

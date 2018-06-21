@@ -21,7 +21,7 @@ public class SpringBootstrap extends Thread {
 
 	@RequestMapping("/")
 	public String home() {
-		return "redirect:/info/home";
+		return "redirect:info/home";
 	}
 
 	@Override
