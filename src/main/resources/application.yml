@@ -3,4 +3,4 @@ server:
 spring:
   thymeleaf:
     prefix: classpath:/templates/
-    suffix: .ftl
+    suffix: .html
