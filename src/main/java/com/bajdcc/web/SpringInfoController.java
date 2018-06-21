@@ -1,7 +1,5 @@
 package com.bajdcc.web;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,6 +24,8 @@ public class SpringInfoController extends Thread {
 	public SpringInfoController() {
 		if (pages == null) {
 			pages = new HashSet<>();
+			pages.add("env");
+			pages.add("resource");
 			pages.add("proc");
 			pages.add("pipe");
 			pages.add("share");
@@ -36,6 +36,6 @@ public class SpringInfoController extends Thread {
 	public String info(@PathVariable(value = "item") String item) {
 		if (pages.contains(item))
 			return "info/" + item;
-		return "info/home";
+		return "info/info";
 	}
 }

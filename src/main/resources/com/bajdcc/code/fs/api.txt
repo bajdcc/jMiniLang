@@ -2,7 +2,40 @@ import "user.base";
 import "user.web";
 var ctx = g_web_get_api();
 if (g_is_null(ctx)) { return; }
-if (ctx["route"] == "env") {
+if (ctx["route"] == "info") {
+    ctx["resp"] := [
+        [ "主机名", g_info_get_hostname() ],
+        [ "IP地址", g_info_get_ip() ],
+        [ "Java 运行时环境版本", g_env_get("java.version") ],
+        [ "Java 运行时环境供应商", g_env_get("java.vendor") ],
+        [ "Java 供应商的 URL", g_env_get("java.vendor.url") ],
+        [ "Java 安装目录", g_env_get("java.home") ],
+        [ "Java 虚拟机规范版本", g_env_get("java.vm.specification.version") ],
+        [ "Java 虚拟机规范供应商", g_env_get("java.vm.specification.vendor") ],
+        [ "Java 虚拟机规范名称", g_env_get("java.vm.specification.name") ],
+        [ "Java 虚拟机实现版本", g_env_get("java.vm.version") ],
+        [ "Java 虚拟机实现供应商", g_env_get("java.vm.vendor") ],
+        [ "Java 虚拟机实现名称", g_env_get("java.vm.name") ],
+        [ "Java 运行时环境规范版本", g_env_get("java.specification.version") ],
+        [ "Java 运行时环境规范供应商", g_env_get("java.specification.vendor") ],
+        [ "Java 运行时环境规范名称", g_env_get("java.specification.name") ],
+        [ "Java 类格式版本号", g_env_get("java.class.version") ],
+        //[ "Java 类路径", g_env_get("java.class.path") ],
+        //[ "加载库时搜索的路径列表", g_env_get("java.library.path") ],
+        //[ "默认的临时文件路径", g_env_get("java.io.tmpdir") ],
+        //[ "要使用的 JIT 编译器的名称", g_env_get("java.compiler") ],
+        //[ "一个或多个扩展目录的路径", g_env_get("java.ext.dirs") ],
+        [ "操作系统的名称", g_env_get("os.name") ],
+        [ "操作系统的架构", g_env_get("os.arch") ],
+        [ "操作系统的版本", g_env_get("os.version") ],
+        //[ "文件分隔符(在 UNIX 系统中是\"/\")", g_env_get("file.separator") ],
+        //[ "路径分隔符(在 UNIX 系统中是\":\")", g_env_get("path.separator") ],
+        //[ "行分隔符(在 UNIX 系统中是\"/n\")", g_env_get("line.separator") ],
+        [ "用户的账户名称", g_env_get("user.name") ],
+        [ "用户的主目录", g_env_get("user.home") ],
+        [ "用户的当前工作目录", g_env_get("user.dir") ]
+    ];
+} else if (ctx["route"] == "env") {
     ctx["resp"] := [
         [ "唯一标识", g_env_get_guid() ],
         [ "作者", g_author() ],

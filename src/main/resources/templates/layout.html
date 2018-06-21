@@ -30,21 +30,21 @@
     <div class="layui-side layui-bg-black">
         <div class="layui-side-scroll">
             <!-- 左侧导航区域 -->
-            <ul class="layui-nav layui-nav-tree" lay-filter="test">
+            <ul class="layui-nav layui-nav-tree">
                 <li class="layui-nav-item layui-nav-itemed">
-                    <a class="" href="#">系统</a>
+                    <a href="#">系统</a>
                     <dl class="layui-nav-child">
-                        <dd><a href="/info/home">基本信息</a></dd>
+                        <dd><a href="/info/info">信息</a></dd>
+                        <dd><a href="/info/env">参数</a></dd>
+                        <dd><a href="/info/resource">资源</a></dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item layui-nav-itemed">
+                    <a class="" href="#">资源</a>
+                    <dl class="layui-nav-child">
                         <dd><a href="/info/proc">进程</a></dd>
                         <dd><a href="/info/pipe">管道</a></dd>
                         <dd><a href="/info/share">共享</a></dd>
-                    </dl>
-                </li>
-                <li class="layui-nav-item">
-                    <a href="#">其他</a>
-                    <dl class="layui-nav-child">
-                        <dd><a href="#">1</a></dd>
-                        <dd><a href="#">2</a></dd>
                     </dl>
                 </li>
             </ul>

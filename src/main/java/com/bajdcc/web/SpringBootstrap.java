@@ -3,10 +3,8 @@ package com.bajdcc.web;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
  * 【Web服务】启动类
@@ -21,7 +19,7 @@ public class SpringBootstrap extends Thread {
 
 	@RequestMapping("/")
 	public String home() {
-		return "redirect:info/home";
+		return "redirect:info/env";
 	}
 
 	@Override

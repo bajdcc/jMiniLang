@@ -3,40 +3,31 @@
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
       layout:decorator="layout">
 <head>
-    <title>共享</title>
+    <title>信息</title>
 </head>
 <body>
 <div layout:fragment="content" id="app">
     <div class="site-text">
-        <h1 class="site-h1">资源</h1>
+        <h1 class="site-h1">系统</h1>
         <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
-            <legend>共享列表</legend>
+            <legend>信息</legend>
         </fieldset>
         <div class="layui-form">
             <table class="layui-table">
                 <colgroup>
-                    <col width="200">
-                    <col width="200">
-                    <col width="200">
-                    <col width="200">
-                    <col width="200">
+                    <col width="300">
+                    <col>
                 </colgroup>
                 <thead>
                 <tr>
-                    <th>共享名称</th>
-                    <th>共享类型</th>
-                    <th>创建页面</th>
-                    <th>引用计数</th>
-                    <th>是否锁定</th>
+                    <th>名称</th>
+                    <th>值</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr v-for="item in share">
+                <tr v-for="item in info">
                     <td v-text="item[0]"></td>
                     <td v-text="item[1]"></td>
-                    <td v-text="item[2]"></td>
-                    <td v-text="item[3]"></td>
-                    <td v-text="item[4]"></td>
                 </tr>
                 </tbody>
             </table>
@@ -49,10 +40,10 @@
     var App = new Vue({
         el: '#app',
         data: {
-            share: []
+            info: []
         },
         mounted: function () {
-                this.getInfo("share");
+                this.getInfo("info");
         },
         methods: {
             getInfo: function (name) {
@@ -62,7 +53,7 @@
                     if (data.code == 200)
                         vm[name] = data.data;
                     else
-                        vm[name] = [ [ "发生错误", "错误代码：" + data.code, "", "", "" ] ];
+                        vm[name] = [ [ "发生错误", "错误代码：" + data.code ] ];
                 }, function (response) {
                     console.error('cannot get ' + name);
                 });

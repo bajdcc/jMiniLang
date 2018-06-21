@@ -51,6 +51,7 @@ public class ModuleUserBase implements IInterpreterModule {
 		importFromTask(info, ModuleTask.getInstance().getCodePage().getInfo());
 		importFromList(info, ModuleList.getInstance().getCodePage().getInfo());
 		importFromProc(info, ModuleProc.getInstance().getCodePage().getInfo());
+		importFromNet(info, ModuleNet.getInstance().getCodePage().getInfo());
 
 		return runtimeCodePage = page;
 	}
@@ -203,6 +204,23 @@ public class ModuleUserBase implements IInterpreterModule {
 						status.getService().getProcessService().sleep(status.getPid(), time > 0 ? time : 0)));
 			}
 		});
+		info.addExternalFunc("g_env_get", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "获取系统变量";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kString};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				return new RuntimeObject(String.valueOf(System.getProperty(String.valueOf(args.get(0).getObj()))));
+			}
+		});
 	}
 
 	private static void importFromTask(IRuntimeDebugInfo info, IRuntimeDebugInfo refer) {
@@ -307,5 +325,10 @@ public class ModuleUserBase implements IInterpreterModule {
 				return new RuntimeObject(array);
 			}
 		});
+	}
+
+	private static void importFromNet(IRuntimeDebugInfo info, IRuntimeDebugInfo refer) {
+		info.addExternalFunc("g_info_get_ip", refer.getExecCallByName("g_web_get_ip"));
+		info.addExternalFunc("g_info_get_hostname", refer.getExecCallByName("g_web_get_hostname"));
 	}
 }
