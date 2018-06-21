@@ -11,7 +11,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="format-detection" content="telephone=no">
-    <link rel="stylesheet" href="/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/webjars/layui/css/layui.css" media="all">
     <link rel="stylesheet" href="/layui/css/global.css" media="all">
     <title>jMiniLang Server</title>
 </head>
@@ -66,9 +66,9 @@
         2018 © jMiniLang
     </div>
 </div>
-<script src="/layui/layui.js" charset="utf-8"></script>
-<script src="/js/vue.min.js" charset="utf-8"></script>
-<script src="/js/vue-resource.min.js" charset="utf-8"></script>
+<script src="/webjars/layui/layui.js" charset="utf-8"></script>
+<script src="/webjars/vue/vue.min.js" charset="utf-8"></script>
+<script src="/webjars/vue-resource/dist/vue-resource.min.js" charset="utf-8"></script>
 <th:block layout:fragment="bottom_script_block">
     <!-- script -->
 </th:block>
@@ -81,7 +81,7 @@ window.global = {
   }()
 };
 layui.config({
-  base: '/layui/lay/modules/'
+  base: '/layui/js/'
   ,version: '20180620'
 }).use('global');
 layui.use('layer', function(){
