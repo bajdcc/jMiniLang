@@ -64,6 +64,35 @@ if (route[1] == "info") {
 } else if (route[0] == "md") {
     if (route[1] == "readme") {
         ctx["resp"] := g_web_markdown(g_load_resource("/com/bajdcc/code/fs/md/readme.md"));
+    } else if (route[1] == "api") {
+        var code = g_load_resource("/com/bajdcc/code/fs/api.txt");
+        var a = "`";
+        var md = "
+# API 接口
+
+## 介绍
+
+### 方法
+
+- g_web_get_api: 取得请求上下文
+
+- g_web_set_api: 设置请求上下文
+
+- g_load_resource: 获取资源文件内容（UTF-8）
+
+- g_web_markdown: 将Markdown文本转换成HTML格式（采用FlexMark包）
+
+### 结构
+
+- `ctx[\"route\"]`: 请求路径，如`/api/query/info`
+
+- `ctx[\"resp\"]`: 响应内容，将转换成Json
+
+## 代码
+
+" + a + a + a + "javascript
+" + code + a + a + a;
+        ctx["resp"] := g_web_markdown(md);
     }
 }
 g_web_set_api(ctx);
