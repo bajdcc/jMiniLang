@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 【Web服务】启动类
+ * 【Web服务】API接口
  *
  * @author bajdcc
  */
@@ -19,10 +19,23 @@ import java.util.Map;
 @RequestMapping("/api")
 public class SpringApiController {
 
-	@RequestMapping(value = "/{item}", method = RequestMethod.GET, produces = { MediaType.APPLICATION_JSON_UTF8_VALUE })
+	@RequestMapping(value = "/query/{item}", method = RequestMethod.GET, produces = { MediaType.APPLICATION_JSON_UTF8_VALUE })
 	public Object queryItem(@PathVariable(value = "item") String item) {
 		Map<String, Object> map = new HashMap<>();
-		Object obj = ModuleNet.getInstance().getWebApi().sendRequest(item);
+		Object obj = ModuleNet.getInstance().getWebApi().sendRequest("query/" + item);
+		if (obj != null) {
+			map.put("code", 200);
+			map.put("data", obj);
+		} else {
+			map.put("code", 404);
+		}
+		return map;
+	}
+
+	@RequestMapping(value = "/md/{item}", method = RequestMethod.GET, produces = { MediaType.APPLICATION_JSON_UTF8_VALUE })
+	public Object getMarkdown(@PathVariable(value = "item") String item) {
+		Map<String, Object> map = new HashMap<>();
+		Object obj = ModuleNet.getInstance().getWebApi().sendRequest("md/" + item);
 		if (obj != null) {
 			map.put("code", 200);
 			map.put("data", obj);

@@ -7,9 +7,15 @@ import com.bajdcc.LALR1.interpret.module.*;
 import com.bajdcc.util.ResourceLoader;
 import org.apache.log4j.Logger;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * 【模块】用户态-基类
@@ -48,6 +54,7 @@ public class ModuleUserBase implements IInterpreterModule {
 		IRuntimeDebugInfo info = page.getInfo();
 
 		importFromBase(info, ModuleBase.getInstance().getCodePage().getInfo());
+		importFromString(info, ModuleString.getInstance().getCodePage().getInfo());
 		importFromTask(info, ModuleTask.getInstance().getCodePage().getInfo());
 		importFromList(info, ModuleList.getInstance().getCodePage().getInfo());
 		importFromProc(info, ModuleProc.getInstance().getCodePage().getInfo());
@@ -221,6 +228,42 @@ public class ModuleUserBase implements IInterpreterModule {
 				return new RuntimeObject(String.valueOf(System.getProperty(String.valueOf(args.get(0).getObj()))));
 			}
 		});
+		info.addExternalFunc("g_load_resource", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "读资源文件";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kString};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				String filename = String.valueOf(args.get(0).getObj());
+				InputStream is = getClass().getResourceAsStream(filename);
+				if (is == null)
+					return null;
+				BufferedReader reader = new BufferedReader(new InputStreamReader(is, UTF_8));
+				String content = reader.lines().collect(Collectors.joining(System.lineSeparator()));
+				return new RuntimeObject(content);
+			}
+		});
+	}
+
+	private static void importFromString(IRuntimeDebugInfo info, IRuntimeDebugInfo refer) {
+		String[] importFunc = new String[]{
+				"g_string_replace","g_string_split","g_string_splitn","g_string_trim","g_string_length",
+				"g_string_empty","g_string_get","g_string_regex","g_string_build","g_string_atoi",
+				"g_string_atoi_s","g_string_join_array","g_string_toupper","g_string_tolower",
+				"g_string_rep","g_string_to_number","g_string_equal","g_string_not_equal","g_string_start_with",
+				"g_string_end_with","g_string_substr","g_string_left","g_string_right"
+		};
+		for (String key : importFunc) {
+			info.addExternalFunc(key, refer.getExecCallByName(key));
+		}
 	}
 
 	private static void importFromTask(IRuntimeDebugInfo info, IRuntimeDebugInfo refer) {

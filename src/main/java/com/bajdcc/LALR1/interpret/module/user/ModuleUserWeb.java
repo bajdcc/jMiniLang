@@ -10,9 +10,18 @@ import com.bajdcc.LALR1.interpret.module.api.ModuleNetWebApiContext;
 import com.bajdcc.LALR1.interpret.module.web.ModuleNetWebContext;
 import com.bajdcc.LALR1.interpret.module.web.ModuleNetWebServer;
 import com.bajdcc.util.ResourceLoader;
+import com.vladsch.flexmark.Extension;
+import com.vladsch.flexmark.ast.Node;
+import com.vladsch.flexmark.ext.tables.TablesExtension;
+import com.vladsch.flexmark.html.HtmlRenderer;
+import com.vladsch.flexmark.parser.Parser;
+import com.vladsch.flexmark.parser.ParserEmulationProfile;
+import com.vladsch.flexmark.util.options.MutableDataSet;
 import org.apache.log4j.Logger;
 
 import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -25,6 +34,8 @@ public class ModuleUserWeb implements IInterpreterModule {
 	private static ModuleUserWeb instance = new ModuleUserWeb();
 	private RuntimeCodePage runtimeCodePage;
 	private static Logger logger = Logger.getLogger("web");
+	private HtmlRenderer renderer;
+	private Parser parser;
 
 	public static ModuleUserWeb getInstance() {
 		return instance;
@@ -151,6 +162,31 @@ public class ModuleUserWeb implements IInterpreterModule {
 				ctx.setResp(map.get("resp"));
 				ctx.unblock();
 				return null;
+			}
+		});
+		MutableDataSet options = new MutableDataSet();
+		options.setFrom(ParserEmulationProfile.MARKDOWN);
+		options.set(Parser.EXTENSIONS, Collections.singletonList(TablesExtension.create()));
+		parser = Parser.builder(options).build();
+		renderer = HtmlRenderer.builder(options).build();
+		info.addExternalFunc("g_web_markdown", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "MD转HTML";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kString};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				String md = String.valueOf(args.get(0).getObj());
+				Node document = parser.parse(md);
+				String html = renderer.render(document);
+				return new RuntimeObject(html);
 			}
 		});
 

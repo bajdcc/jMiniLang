@@ -2,7 +2,11 @@ import "user.base";
 import "user.web";
 var ctx = g_web_get_api();
 if (g_is_null(ctx)) { return; }
-if (ctx["route"] == "info") {
+var route = g_string_split(ctx["route"], "/");
+
+// QUERY
+if (route[0] == "query") {
+if (route[1] == "info") {
     ctx["resp"] := [
         [ "主机名", g_info_get_hostname() ],
         [ "IP地址", g_info_get_ip() ],
@@ -35,7 +39,7 @@ if (ctx["route"] == "info") {
         [ "用户的主目录", g_env_get("user.home") ],
         [ "用户的当前工作目录", g_env_get("user.dir") ]
     ];
-} else if (ctx["route"] == "env") {
+} else if (route[1] == "env") {
     ctx["resp"] := [
         [ "唯一标识", g_env_get_guid() ],
         [ "作者", g_author() ],
@@ -49,11 +53,17 @@ if (ctx["route"] == "info") {
         [ "管道数", g_array_size(g_res_get_pipe()) ],
         [ "共享数", g_array_size(g_res_get_share()) ]
     ];
-} else if (ctx["route"] == "proc") {
+} else if (route[1] == "proc") {
     ctx["resp"] := g_res_get_proc();
-} else if (ctx["route"] == "pipe") {
+} else if (route[1] == "pipe") {
     ctx["resp"] := g_res_get_pipe();
-} else if (ctx["route"] == "share") {
+} else if (route[1] == "share") {
     ctx["resp"] := g_res_get_share();
+}
+// MARKDOWN
+} else if (route[0] == "md") {
+    if (route[1] == "readme") {
+        ctx["resp"] := g_web_markdown(g_load_resource("/com/bajdcc/code/fs/md/readme.md"));
+    }
 }
 g_web_set_api(ctx);
