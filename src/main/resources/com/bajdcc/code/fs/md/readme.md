@@ -1290,16 +1290,16 @@ export "g_func_import_string_module";
 #### Screenshot
 
 *Screenshot 1 - Code*
-![Screenshot 1](https://bajdcc.github.io/host/screenshot/jMiniLang_1.png)
+![Screenshot 1](https://raw.githubusercontent.com/bajdcc/jMiniLang/master/screenshots/jMiniLang_1.png)
 
 *Screenshot 2 - Results*
-![Screenshot 2](https://bajdcc.github.io/host/screenshot/jMiniLang_2.png)
+![Screenshot 2](https://raw.githubusercontent.com/bajdcc/jMiniLang/master/screenshots/jMiniLang_2.png)
 
 *Screenshot 3 - Y-Combinator*
-![Screenshot 3](https://bajdcc.github.io/host/screenshot/jMiniLang_3.png)
+![Screenshot 3](https://raw.githubusercontent.com/bajdcc/jMiniLang/master/screenshots/jMiniLang_3.png)
 
 *Screenshot 4 - OS Virtual Machine with GUI*
-![Screenshot 4](https://bajdcc.github.io/host/screenshot/jMiniLang_4.png)
+![Screenshot 4](https://raw.githubusercontent.com/bajdcc/jMiniLang/master/screenshots/jMiniLang_4.png)
 
 *Screenshot 5 - Remote window*
 ![Screenshot 5](https://raw.githubusercontent.com/bajdcc/jMiniLang/master/screenshots/zhihu-1.png)

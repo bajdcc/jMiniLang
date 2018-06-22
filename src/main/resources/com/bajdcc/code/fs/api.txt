@@ -46,7 +46,7 @@ if (route[1] == "info") {
         [ "当前版本", g_version() ],
         [ "仓库地址", g_github_repo() ]
     ];
-} else if (ctx["route"] == "resource") {
+} else if (route[1] == "resource") {
     ctx["resp"] := [
         [ "速度", g_res_get_speed() ],
         [ "进程数", g_array_size(g_res_get_proc()) ],
