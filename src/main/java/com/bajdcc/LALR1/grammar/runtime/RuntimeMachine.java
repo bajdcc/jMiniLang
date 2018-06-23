@@ -41,8 +41,10 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 
 	private class Ring3Struct {
 		public int putHandle;
+		public boolean saveRunResult;
 		private Ring3Struct() {
 			putHandle = -1;
+			saveRunResult = true;
 		}
 	}
 	private Ring3Struct ring3Struct;
@@ -63,7 +65,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 	private int triesCount;
 	private boolean debug = false;
 
-	public RuntimeMachine(int ring) throws Exception {
+	public RuntimeMachine(int ring, RuntimeProcess process) throws Exception {
 		if (modulesSystem == null) {
 			logger.debug("Loading modules...");
 			modulesSystem = new IInterpreterModule[]{
@@ -92,10 +94,11 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 					ModuleUserWeb.getInstance()
 			};
 		}
-
+		this.process = process;
 		this.ring = ring;
 		if (ring < 3) {
 			for (IInterpreterModule module : modulesSystem) {
+				process.getService().getFileService().addVfs(module.getModuleName(), module.getModuleCode());
 				try {
 					run(module.getModuleName(), module.getCodePage());
 				} catch (SyntaxException e) {
@@ -106,6 +109,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 			}
 		} else {
 			for (IInterpreterModule module : modulesUser) {
+				process.getService().getFileService().addVfs(module.getModuleName(), module.getModuleCode());
 				try {
 					run(module.getModuleName(), module.getCodePage());
 				} catch (SyntaxException e) {
@@ -118,16 +122,15 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 	}
 
 	public RuntimeMachine() throws Exception {
-		this(0);
+		this(0, null);
 	}
 
 	public RuntimeMachine(String name, int ring, int id, int parentId, RuntimeProcess process) throws Exception {
-		this(ring);
+		this(ring, process);
 		this.name = name;
 		this.description = ring == 3 ? ("user proc") : "none";
 		this.pid = id;
 		this.parentId = parentId;
-		this.process = process;
 		if (ring == 3) {
 			ring3Struct = new Ring3Struct();
 			ring3Struct.putHandle = process.getService().getPipeService().create(USER_PROC_PIPE_PREFIX + pid, name);
@@ -534,6 +537,11 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 	}
 
 	@Override
+	public boolean isEnableResult() {
+		return ring3Struct.saveRunResult;
+	}
+
+	@Override
 	public RuntimeObject getFuncArgs(int index) {
 		return stack.getFuncArgs(index);
 	}
@@ -546,6 +554,12 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 	@Override
 	public IRuntimeRing3 getRing3() {
 		return this;
+	}
+
+	@Override
+	public void disableResult() {
+		if (ring == 3)
+			ring3Struct.saveRunResult = false;
 	}
 
 	@Override

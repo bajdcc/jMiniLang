@@ -3,31 +3,43 @@
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
       layout:decorate="~{layout}">
 <head>
-    <title>信息</title>
+    <title>文件</title>
 </head>
 <body>
 <div layout:fragment="content" id="app">
     <div class="site-text">
-        <h1 class="site-h1">系统</h1>
+        <h1 class="site-h1">资源</h1>
         <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
-            <legend>信息</legend>
+            <legend>文件列表</legend>
         </fieldset>
         <div class="layui-form">
             <table class="layui-table">
                 <colgroup>
-                    <col width="300">
-                    <col>
+                    <col width="200">
+                    <col width="200">
+                    <col width="200">
+                    <col width="200">
+                    <col width="200">
+                    <col width="200">
                 </colgroup>
                 <thead>
                 <tr>
-                    <th>名称</th>
-                    <th>值</th>
+                    <th>文件名称</th>
+                    <th>文件模式</th>
+                    <th>创建页面</th>
+                    <th>文件状态</th>
+                    <th>文件编码</th>
+                    <th>虚拟文件</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr v-for="item in items">
                     <td v-text="item[0]"></td>
                     <td v-text="item[1]"></td>
+                    <td v-text="item[2]"></td>
+                    <td v-text="item[3]"></td>
+                    <td v-text="item[4]"></td>
+                    <td v-text="item[5]"></td>
                 </tr>
                 </tbody>
             </table>
@@ -43,7 +55,7 @@
             items: []
         },
         mounted: function () {
-                this.getInfo("info");
+                this.getInfo("file");
         },
         methods: {
             getInfo: function (name) {
@@ -53,7 +65,7 @@
                     if (data.code == 200)
                         vm.items = data.data;
                     else
-                        vm.items = [ [ "发生错误", "错误代码：" + data.code ] ];
+                        vm.items = [ [ "发生错误", "错误代码：" + data.code, "", "", "", "" ] ];
                 }, function (response) {
                     console.error('cannot get ' + name);
                 });

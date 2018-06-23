@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>虚拟文件 - [[${path}]]</title>
+    <link rel="stylesheet" href="/css/github-markdown.css" media="all">
+</head>
+<body>
+<div layout:fragment="content" id="app">
+    <div v-html="markdown" class="markdown-body"></div>
+</div>
+<th:block layout:fragment="bottom_script_block">
+</th:block>
+<script layout:fragment="script">
+    var App = new Vue({
+        el: '#app',
+        data: {
+            markdown: ""
+        },
+        mounted: function () {
+                this.getMarkdown("[[${path}]]");
+        },
+        methods: {
+            getMarkdown: function (name) {
+                var vm = this;
+                vm.$http.get('/api/vfs', {"params": {"path": name}}).then(function (response) {
+                    var data = response.data;
+                    if (data.code == 200)
+                        vm.markdown = data.data;
+                    else
+                        vm.markdown = "<h1 class=\"site-h1\">页面不存在</h1>" +
+                            "<h2 class=\"site-h2\">错误代码：" + data.code + "</h2>";
+                }, function (response) {
+                    console.error('cannot get ' + name);
+                });
+            }
+        }
+    })
+</script>
+</body>
+</html>

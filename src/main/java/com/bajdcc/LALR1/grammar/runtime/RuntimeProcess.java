@@ -429,7 +429,8 @@ public class RuntimeProcess implements IRuntimeProcessService {
 			return -1;
 		}
 		//TODO: 完成清理RING3进程创建的共享、管道、文件句柄
-		service.getFileService().addVfs(USER_PROC_FILE_PREFIX + pid, error);
+		if (arrProcess[pid].machine.getRing3().isEnableResult())
+			service.getFileService().addVfs(USER_PROC_FILE_PREFIX + pid, error);
 		service.getPipeService().destroyByName(pid, USER_PROC_PIPE_PREFIX + pid);
 		for (int id : arrProcess[pid].waiting_pids) {
 			wakeup(id);

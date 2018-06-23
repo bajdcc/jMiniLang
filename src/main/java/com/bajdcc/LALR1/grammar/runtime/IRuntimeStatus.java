@@ -247,4 +247,9 @@ public interface IRuntimeStatus {
 	 * @return RING3接口
 	 */
 	IRuntimeRing3 getRing3();
+
+	/**
+	 * 禁用输出文件
+	 */
+	void disableResult();
 }

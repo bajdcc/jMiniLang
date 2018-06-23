@@ -59,6 +59,7 @@ public class ModuleUserBase implements IInterpreterModule {
 		importFromList(info, ModuleList.getInstance().getCodePage().getInfo());
 		importFromProc(info, ModuleProc.getInstance().getCodePage().getInfo());
 		importFromNet(info, ModuleNet.getInstance().getCodePage().getInfo());
+		importFromFile(info, ModuleFile.getInstance().getCodePage().getInfo());
 
 		return runtimeCodePage = page;
 	}
@@ -251,6 +252,24 @@ public class ModuleUserBase implements IInterpreterModule {
 				return new RuntimeObject(content);
 			}
 		});
+		info.addExternalFunc("g_disable_result", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "禁用输出结果";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return null;
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				status.disableResult();
+				return null;
+			}
+		});
 	}
 
 	private static void importFromString(IRuntimeDebugInfo info, IRuntimeDebugInfo refer) {
@@ -308,6 +327,23 @@ public class ModuleUserBase implements IInterpreterModule {
 				return new RuntimeObject(status.getService().getPipeService().stat(true));
 			}
 		});
+		info.addExternalFunc("g_res_get_pipe_size", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "管道列表数量";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return null;
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				return new RuntimeObject(BigInteger.valueOf(status.getService().getPipeService().size()));
+			}
+		});
 		info.addExternalFunc("g_res_get_share", new IRuntimeDebugExec() {
 			@Override
 			public String getDoc() {
@@ -323,6 +359,23 @@ public class ModuleUserBase implements IInterpreterModule {
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
 				return new RuntimeObject(status.getService().getShareService().stat(true));
+			}
+		});
+		info.addExternalFunc("g_res_get_share_size", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "共享列表数量";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return null;
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				return new RuntimeObject(BigInteger.valueOf(status.getService().getShareService().size()));
 			}
 		});
 	}
@@ -368,10 +421,99 @@ public class ModuleUserBase implements IInterpreterModule {
 				return new RuntimeObject(array);
 			}
 		});
+		info.addExternalFunc("g_res_get_proc_size", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "进程列表数量";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return null;
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				return new RuntimeObject(BigInteger.valueOf(status.getService().getProcessService().getProcInfoCache().size()));
+			}
+		});
 	}
 
 	private static void importFromNet(IRuntimeDebugInfo info, IRuntimeDebugInfo refer) {
 		info.addExternalFunc("g_info_get_ip", refer.getExecCallByName("g_web_get_ip"));
 		info.addExternalFunc("g_info_get_hostname", refer.getExecCallByName("g_web_get_hostname"));
+	}
+
+	private static void importFromFile(IRuntimeDebugInfo info, IRuntimeDebugInfo refer) {
+		info.addExternalFunc("g_res_get_file", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "文件列表";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return null;
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				return new RuntimeObject(status.getService().getFileService().stat(true));
+			}
+		});
+		info.addExternalFunc("g_res_get_file_size", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "文件列表数量";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return null;
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				return new RuntimeObject(status.getService().getFileService().size());
+			}
+		});
+		info.addExternalFunc("g_res_get_vfs", refer.getExecCallByName("g_read_file_vfs_utf8"));
+		info.addExternalFunc("g_res_get_vfs_list", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "获取VFS列表";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return null;
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				return new RuntimeObject(status.getService().getFileService().getVfsList(true));
+			}
+		});
+		info.addExternalFunc("g_res_get_vfs_size", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "VFS列表数量";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return null;
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				return new RuntimeObject(BigInteger.valueOf(status.getService().getFileService().getVfsListSize()));
+			}
+		});
 	}
 }

@@ -1,8 +1,11 @@
 import "user.base";
 import "user.web";
+g_disable_result();
 var ctx = g_web_get_api();
 if (g_is_null(ctx)) { return; }
 var route = g_string_split(ctx["route"], "/");
+
+g_printn("API Request: " + ctx["route"]);
 
 // QUERY
 if (route[0] == "query") {
@@ -49,9 +52,11 @@ if (route[1] == "info") {
 } else if (route[1] == "resource") {
     ctx["resp"] := [
         [ "速度", g_res_get_speed() ],
-        [ "进程数", g_array_size(g_res_get_proc()) ],
-        [ "管道数", g_array_size(g_res_get_pipe()) ],
-        [ "共享数", g_array_size(g_res_get_share()) ]
+        [ "进程数", g_res_get_proc_size() ],
+        [ "管道数", g_res_get_pipe_size() ],
+        [ "共享数", g_res_get_share_size() ],
+        [ "文件数", g_res_get_file_size() ],
+        [ "虚拟文件数", g_res_get_vfs_size() ]
     ];
 } else if (route[1] == "proc") {
     ctx["resp"] := g_res_get_proc();
@@ -59,6 +64,10 @@ if (route[1] == "info") {
     ctx["resp"] := g_res_get_pipe();
 } else if (route[1] == "share") {
     ctx["resp"] := g_res_get_share();
+} else if (route[1] == "file") {
+    ctx["resp"] := g_res_get_file();
+} else if (route[1] == "vfs") {
+    ctx["resp"] := g_res_get_vfs_list();
 }
 // MARKDOWN
 } else if (route[0] == "md") {
@@ -66,7 +75,7 @@ if (route[1] == "info") {
         ctx["resp"] := g_web_markdown(g_load_resource("/com/bajdcc/code/fs/md/readme.md"));
     } else if (route[1] == "api") {
         var code = g_load_resource("/com/bajdcc/code/fs/api.txt");
-        var a = "`";
+        var a = "`" + "`" + "`";
         var md = "
 # API 接口
 
@@ -90,9 +99,21 @@ if (route[1] == "info") {
 
 ## 代码
 
-" + a + a + a + "javascript
-" + code + a + a + a;
+" + a + "javascript
+" + code + a;
         ctx["resp"] := g_web_markdown(md);
+    }
+} else if (route[0] == "vfs") { // VFS
+    var url = route[1];
+    url := g_string_replace(url, "_", "/");
+    var file = g_res_get_vfs(url);
+    var txt = "";
+    if (g_not_null(file)) {
+        txt := "# File: " + url + g_endl + "```" + g_endl + file + g_endl + "```";
+        ctx["resp"] := g_web_markdown(txt);
+    } else {
+        txt := "# File not exists";
+        ctx["resp"] := g_web_markdown(txt);
     }
 }
 g_web_set_api(ctx);

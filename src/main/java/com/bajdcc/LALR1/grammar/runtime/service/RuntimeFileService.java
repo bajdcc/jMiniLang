@@ -1,13 +1,11 @@
 package com.bajdcc.LALR1.grammar.runtime.service;
 
+import com.bajdcc.LALR1.grammar.runtime.RuntimeObject;
+import com.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
 import org.apache.log4j.Logger;
 
 import java.io.*;
-import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -57,7 +55,7 @@ public class RuntimeFileService implements IRuntimeFileService {
 	}
 
 	@Override
-	public int create(String name, int mode, String encoding) {
+	public int create(String name, int mode, String encoding, String page) {
 		if (setFileId.size() >= MAX_FILE) {
 			return -1;
 		}
@@ -65,7 +63,7 @@ public class RuntimeFileService implements IRuntimeFileService {
 			return -1;
 		}
 		int handle;
-		FileStruct fs = new FileStruct(name, mode, encoding, mapVfs);
+		FileStruct fs = new FileStruct(name, mode, encoding, mapVfs, page);
 		if (fs.status == FileStatus.ERROR) {
 			return -1;
 		}
@@ -182,6 +180,65 @@ public class RuntimeFileService implements IRuntimeFileService {
 		return null;
 	}
 
+	@Override
+	public long size() {
+		return mapFileNames.size();
+	}
+
+	@Override
+	public RuntimeArray stat(boolean api) {
+		final String[] modeString = new String[]{null, "读取", "截断", "追加"};
+		final String[] statusString = new String[]{"错误", "读取", "写入"};
+		RuntimeArray array = new RuntimeArray();
+		if (api) {
+			mapFileNames.values().stream().sorted(Comparator.naturalOrder())
+					.forEach((value) -> {
+						RuntimeArray item = new RuntimeArray();
+						item.add(new RuntimeObject(arrFiles[value].name));
+						item.add(new RuntimeObject(modeString[arrFiles[value].mode]));
+						item.add(new RuntimeObject(arrFiles[value].page));
+						item.add(new RuntimeObject(statusString[arrFiles[value].status.ordinal()]));
+						item.add(new RuntimeObject(arrFiles[value].encoding));
+						item.add(new RuntimeObject(arrFiles[value].vfs ? "是" : "否"));
+						array.add(new RuntimeObject(item));
+					});
+		} else {
+			array.add(new RuntimeObject(String.format("   %-30s   %-5s   %-10s   %-10s",
+					"Name", "Mode", "Status", "Encoding")));
+			mapFileNames.values().stream().sorted(Comparator.naturalOrder())
+					.forEach((value) -> array.add(new RuntimeObject(String.format("   %-30s   %-5s   %-10s   %-10s",
+							arrFiles[value].name, arrFiles[value].mode, arrFiles[value].status.toString(), arrFiles[value].encoding))));
+		}
+		return array;
+	}
+
+	@Override
+	public long getVfsListSize() {
+		return mapVfs.size();
+	}
+
+	@Override
+	public RuntimeArray getVfsList(boolean api) {
+		RuntimeArray array = new RuntimeArray();
+		if (api) {
+			mapVfs.entrySet().stream().sorted(Comparator.comparing(Map.Entry::getKey))
+					.forEach((value) -> {
+						RuntimeArray item = new RuntimeArray();
+						item.add(new RuntimeObject(value.getKey()));
+						item.add(new RuntimeObject(value.getValue().data.length));
+						item.add(new RuntimeObject(value.getValue().readonly ? "是" : "否"));
+						array.add(new RuntimeObject(item));
+					});
+		} else {
+			array.add(new RuntimeObject(String.format("   %-25s   %-5s   %-5s",
+					"Name", "Size", "Readonly")));
+			mapVfs.entrySet().stream().sorted(Comparator.comparing(Map.Entry::getKey))
+					.forEach((value) -> array.add(new RuntimeObject(String.format("   %-25s   %-15s   %-5s",
+							value.getKey(), value.getValue().data.length, value.getValue().readonly))));
+		}
+		return array;
+	}
+
 	enum FileStatus {
 		ERROR,
 		READING,
@@ -193,15 +250,17 @@ public class RuntimeFileService implements IRuntimeFileService {
 		public FileStatus status;
 		private int mode;
 		private String encoding;
+		private String page;
 		private BufferedReader reader;
 		private BufferedWriter writer;
 		private boolean vfs;
 		private ByteArrayOutputStream baos;
 
-		FileStruct(String filename, int mode, String encoding, Map<String, VfsStruct> mapVfs) {
+		FileStruct(String filename, int mode, String encoding, Map<String, VfsStruct> mapVfs, String page) {
 			this.name = filename;
 			this.mode = mode;
 			this.encoding = encoding;
+			this.page = page;
 			this.status = FileStatus.ERROR;
 			this.vfs = false;
 			if (mode == 1) { // read

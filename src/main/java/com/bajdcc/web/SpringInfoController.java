@@ -1,6 +1,5 @@
 package com.bajdcc.web;
 
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,7 +17,6 @@ import java.util.Set;
 @RequestMapping("/info")
 public class SpringInfoController extends Thread {
 
-	private ConfigurableApplicationContext ctx;
 	private static Set<String> pages;
 
 	public SpringInfoController() {
@@ -29,6 +27,8 @@ public class SpringInfoController extends Thread {
 			pages.add("proc");
 			pages.add("pipe");
 			pages.add("share");
+			pages.add("file");
+			pages.add("vfs");
 		}
 	}
 

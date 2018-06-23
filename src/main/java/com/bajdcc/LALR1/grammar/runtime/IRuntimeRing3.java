@@ -34,4 +34,10 @@ public interface IRuntimeRing3 {
 	 * @param text 内容
 	 */
 	void put(String text);
+
+	/**
+	 * 是否启用输出文件
+	 * @return 是否启用
+	 */
+	boolean isEnableResult();
 }

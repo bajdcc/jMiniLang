@@ -45,3 +45,197 @@ var g_sleep_ms = func ~(ms) {
     }
 };
 export "g_sleep_ms";
+
+// -----------------------------------------
+// Functional
+var g_func_not = func ~(a) -> !a;
+var g_func_max = func ~(a, b) -> a > b ? a : b;
+var g_func_min = func ~(a, b) -> a < b ? a : b;
+var g_func_lt = func ~(a, b) -> a < b;
+var g_func_lte = func ~(a, b) -> a <= b;
+var g_func_gt = func ~(a, b) -> a > b;
+var g_func_gte = func ~(a, b) -> a >= b;
+var g_func_eq = func ~(a, b) -> a == b;
+var g_func_neq = func ~(a, b) -> a != b;
+var g_func_add = func ~(a, b) -> a + b;
+var g_func_sub = func ~(a, b) -> a - b;
+var g_func_mul = func ~(a, b) -> a * b;
+var g_func_div = func ~(a, b) -> a / b;
+var g_func_and = func ~(a, b) -> a && b;
+var g_func_or = func ~(a, b) -> a || b;
+var g_func_mod = func ~(a, b) -> a % b;
+export "g_func_max";
+export "g_func_min";
+export "g_func_lt";
+export "g_func_lte";
+export "g_func_gt";
+export "g_func_gte";
+export "g_func_eq";
+export "g_func_neq";
+export "g_func_add";
+export "g_func_sub";
+export "g_func_mul";
+export "g_func_div";
+export "g_func_and";
+export "g_func_or";
+export "g_func_mod";
+var g_func_curry = func ~(a, b) -> lambda(c) -> a(b, c);
+export "g_func_curry";
+var g_func_swap = func ~(a) -> lambda(b, c) -> a(c, b);
+export "g_func_swap";
+var g_func_1 = func ~(a) -> a;
+export "g_func_1";
+var g_func_always_1 = func ~(a) -> 1;
+export "g_func_always_1";
+var g_func_always_true = func ~(a) -> true;
+export "g_func_always_true";
+
+var g_func_xsl = func ["数组遍历闭包-foldl"] ~(l) {
+    var len = g_array_size(l);
+    var idx = 0;
+    return lambda() {
+        if (idx == len) { return; }
+        var d = l[idx];
+        idx++;
+        return lambda() -> d;
+    };
+};
+export "g_func_xsl";
+var g_func_xsr = func ["数组遍历闭包-foldr"] ~(l) {
+    var idx = g_array_size(l) - 1;
+    return lambda() {
+        if (idx < 0) { return; }
+        var d = l[idx];
+        idx--;
+        return lambda() -> d;
+    };
+};
+export "g_func_xsr";
+// ----------------------------------------------
+var g_func_fold = func
+    [
+        "函数名：g_func_fold",
+        "参数解释：",
+        "  - name: 套用的折叠函数",
+        "  - list: 需处理的数组",
+        "  - init: 初始值(不用则为空)",
+        "  - xs: 数组遍历方式(xsl=从左到右,xsr=从右到左)",
+        "  - map: 对遍历的每个元素施加的变换",
+        "  - arg: 对二元操作进行包装(默认=g_func_1,例=g_func_swap)",
+        "  - filter: 对map后的元素进行过滤(true则处理)"
+    ]
+    ~(name, list, init, xs, map, arg, filter) {
+    var len = g_array_size(list);
+    if (len == 0) { return []; }
+    var val = g_null;
+    var x = g_null;
+    if (g_is_null(init)) { // 没初值的话，取第一个元素为初值
+        if (len == 1) { return list[0]; }
+        x := xs(list);// 创建遍历闭包
+        val := x();// 取第一个元素
+        val := val();
+        val := map(val);// 对元素进行变换
+    } else {
+        x := xs(list);
+        val := init;
+    }
+    var n = name;// 对数组进行变换
+    n := arg(n);// 对卷积方式进行变换
+    for (;;) {// 遍历数组
+        var v2 = x();// 取得下一元素
+        if (g_is_null(v2)) { break; }// 没有下一元素，中止
+        v2 := v2();// 下一元素
+        v2 := map(v2);// 对下一元素进行变换
+        if (filter(v2)) {// 过滤控制
+            val := n(val, v2);// 将两元素进行处理
+        }
+    }
+    return val;
+};
+export "g_func_fold";
+// ----------------------------------------------
+var g_func_apply = func ~(name, list) ->
+    g_func_apply_arg(name, list, "g_func_1");
+export "g_func_apply";
+var g_func_apply_arg = func ~(name, list, arg) ->
+    g_func_fold(name, list, g_null, "g_func_xsl", "g_func_1", arg, "g_func_always_true");
+export "g_func_apply_arg";
+var g_func_applyr = func ~(name, list) ->
+    g_func_applyr_arg(name, list, "g_func_1");
+export "g_func_applyr";
+var g_func_applyr_arg = func ~(name, list, arg) ->
+    g_func_fold(name, list, g_null, "g_func_xsr", "g_func_1", arg, "g_func_always_true");
+export "g_func_applyr_arg";
+// ----------------------------------------------
+var g_func_apply_gen = func ~(name) {
+    return lambda(args) -> g_func_apply(name, args);
+};
+export "g_func_apply_gen";
+// ----------------------------------------------
+var g_func_map = func ~(list, arg) ->
+    g_func_fold("g_array_add", list, [], "g_func_xsl", arg, "g_func_1", "g_func_always_true");
+export "g_func_map";
+var g_func_mapr = func ~(list, arg) ->
+    g_func_fold("g_array_add", list, [], "g_func_xsr", arg, "g_func_1", "g_func_always_true");
+export "g_func_mapr";
+var g_func_reverse = func ~(list) ->
+    g_func_fold("g_array_add", list, [], "g_func_xsr", "g_func_1", "g_func_1", "g_func_always_true");
+export "g_func_reverse";
+var g_func_length = func ~(list) ->
+    g_func_fold("g_func_add", list, 0, "g_func_xsl", "g_func_always_1", "g_func_1", "g_func_always_true");
+export "g_func_length";
+var g_func_filter = func ~(list, filter) ->
+    g_func_fold("g_array_add", list, [], "g_func_xsl", "g_func_1", "g_func_1", filter);
+export "g_func_filter";
+// ----------------------------------------------
+var take_filter = func ~(n) {//取数组前N个元素
+    var idx = 0;
+    var end = n;
+    return lambda(a) -> idx++ <= end;
+};
+var drop_filter = func ~(n) {//取数组后len-N个元素
+    var idx = 0;
+    var end = n;
+    return lambda(a) -> idx++ > end;
+};
+var g_func_take = func ~(list, n) ->
+    g_func_fold("g_array_add", list, [], "g_func_xsl", "g_func_1", "g_func_1", take_filter(n));
+export "g_func_take";
+var g_func_taker = func ~(list, n) ->
+    g_func_fold("g_array_add", list, [], "g_func_xsr", "g_func_1", "g_func_1", take_filter(n));
+export "g_func_taker";
+var g_func_drop = func ~(list, n) ->
+    g_func_fold("g_array_add", list, [], "g_func_xsl", "g_func_1", "g_func_1", drop_filter(n));
+export "g_func_drop";
+var g_func_dropr = func ~(list, n) ->
+    g_func_fold("g_array_add", list, [], "g_func_xsr", "g_func_1", "g_func_1", drop_filter(n));
+export "g_func_dropr";
+// ----------------------------------------------
+var func_zip = func ~(name, a, b, xs) {//将两数组进行合并
+    var val = [];
+    var xa = xs(a);
+    var xb = xs(b);
+    for (;;) {
+        var _a = xa();
+        var _b = xb();
+        if (g_is_null(_a) || g_is_null(_b)) {
+            break;
+        }
+        var c = name(_a(), _b());
+        g_array_add(val, c);
+    }
+    return val;
+};
+var g_func_zip = func ~(name, a, b) ->
+    func_zip(name, a, b, "g_func_xsl");
+export "g_func_zip";
+var g_func_zipr = func ~(name, a, b) ->
+    func_zip(name, a, b, "g_func_xsr");
+export "g_func_zipr";
+// ----------------------------------------------
+var g_func_applicative = func ~(f, a, b) -> f(a, b(a));
+export "g_func_applicative";
+// ----------------------------------------------
+var g_func_apply_array = func ~(list) ->
+    g_func_fold("g_array_append", list, [], "g_func_xsl", "g_func_1", "g_func_1", "g_func_always_true");
+export "g_func_apply_array";

@@ -189,7 +189,6 @@ public class RuntimePipeService implements IRuntimePipeService {
 		RuntimeArray array = new RuntimeArray();
 		if (api) {
 			mapPipeNames.values().stream().sorted(Comparator.naturalOrder())
-					.collect(Collectors.toList())
 					.forEach((value) -> {
 						RuntimeArray item = new RuntimeArray();
 						item.add(new RuntimeObject(String.valueOf(value)));
@@ -200,11 +199,10 @@ public class RuntimePipeService implements IRuntimePipeService {
 						array.add(new RuntimeObject(item));
 					});
 		} else {
-			array.add(new RuntimeObject(String.format("   %-5s   %-15s   %-15s   %-15s",
+			array.add(new RuntimeObject(String.format("   %-5s   %-20s   %-15s   %-15s",
 					"Id", "Name", "Queue", "Waiting")));
 			mapPipeNames.values().stream().sorted(Comparator.naturalOrder())
-					.collect(Collectors.toList())
-					.forEach((value) -> array.add(new RuntimeObject(String.format("   %-5s   %-15s   %-15d   %-15d",
+					.forEach((value) -> array.add(new RuntimeObject(String.format("   %-5s   %-20s   %-15d   %-15d",
 							String.valueOf(value), arrPipes[value].name, arrPipes[value].queue.size(), arrPipes[value].waiting_pids.size()))));
 		}
 		return array;

@@ -1,5 +1,8 @@
 package com.bajdcc.LALR1.grammar.runtime.service;
 
+import com.bajdcc.LALR1.grammar.runtime.RuntimeObject;
+import com.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
+
 /**
  * 【运行时】运行时文件服务接口
  *
@@ -29,9 +32,10 @@ public interface IRuntimeFileService {
 	 * @param name     管道名称
 	 * @param mode     模式，1读，2写，3追加写
 	 * @param encoding 编码
+	 * @param page     创建时的页面
 	 * @return 管道句柄
 	 */
-	int create(String name, int mode, String encoding);
+	int create(String name, int mode, String encoding, String page);
 
 	/**
 	 * 销毁管道
@@ -90,4 +94,34 @@ public interface IRuntimeFileService {
 	 * @return 文件内容
 	 */
 	String readAll(String filename);
+
+	/**
+	 * 获取文件数量
+	 *
+	 * @return 文件数量
+	 */
+	long size();
+
+	/**
+	 * 获取列表
+	 *
+	 * @param api 是否API调用
+	 * @return 列表
+	 */
+	RuntimeArray stat(boolean api);
+
+	/**
+	 * 获取虚拟文件数量
+	 *
+	 * @return 文件数量
+	 */
+	long getVfsListSize();
+
+	/**
+	 * 虚拟文件列表
+	 *
+	 * @param api 是否API调用
+	 * @return 虚拟文件列表
+	 */
+	RuntimeArray getVfsList(boolean api);
 }

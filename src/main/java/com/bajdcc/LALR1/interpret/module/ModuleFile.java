@@ -64,7 +64,7 @@ public class ModuleFile implements IInterpreterModule {
 				String name = args.get(0).getObj().toString();
 				int mode = ((BigInteger) args.get(1).getObj()).intValue();
 				String encoding = args.get(2).getObj().toString();
-				return new RuntimeObject(status.getService().getFileService().create(name, mode, encoding));
+				return new RuntimeObject(status.getService().getFileService().create(name, mode, encoding, String.valueOf(status.getProcInfo()[3])));
 			}
 		});
 		info.addExternalFunc("g_destroy_file_internal", new IRuntimeDebugExec() {

@@ -31,7 +31,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr v-for="item in pipe">
+                <tr v-for="item in items">
                     <td v-text="item[0]"></td>
                     <td v-text="item[1]"></td>
                     <td v-text="item[2]"></td>
@@ -49,7 +49,7 @@
     var App = new Vue({
         el: '#app',
         data: {
-            pipe: []
+            items: []
         },
         mounted: function () {
                 this.getInfo("pipe");
@@ -60,9 +60,9 @@
                 vm.$http.get('/api/query/' + name).then(function (response) {
                     var data = response.data;
                     if (data.code == 200)
-                        vm[name] = data.data;
+                        vm.items = data.data;
                     else
-                        vm[name] = [ [ "发生错误", "错误代码：" + data.code, "", "", "" ] ];
+                        vm.items = [ [ "发生错误", "错误代码：" + data.code, "", "", "" ] ];
                 }, function (response) {
                     console.error('cannot get ' + name);
                 });

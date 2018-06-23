@@ -118,7 +118,6 @@ public class RuntimeShareService implements IRuntimeShareService {
 		RuntimeArray array = new RuntimeArray();
 		if (api) {
 			mapShares.values().stream().sorted(Comparator.comparing(ShareStruct::getObjType).thenComparing(ShareStruct::getName))
-					.collect(Collectors.toList())
 					.forEach((value) -> {
 						RuntimeArray item = new RuntimeArray();
 						item.add(new RuntimeObject(value.name));
@@ -129,11 +128,10 @@ public class RuntimeShareService implements IRuntimeShareService {
 						array.add(new RuntimeObject(item));
 					});
 		} else {
-			array.add(new RuntimeObject(String.format("   %-15s   %-15s   %-5s   %-5s",
+			array.add(new RuntimeObject(String.format("   %-20s   %-15s   %-5s   %-5s",
 					"Name", "Type", "Ref", "Locked")));
 			mapShares.values().stream().sorted(Comparator.comparing(ShareStruct::getObjType).thenComparing(ShareStruct::getName))
-					.collect(Collectors.toList())
-					.forEach((value) -> array.add(new RuntimeObject(String.format("   %-15s   %-15s   %-5s   %-5s",
+					.forEach((value) -> array.add(new RuntimeObject(String.format("   %-20s   %-15s   %-5s   %-5s",
 							value.name, value.obj.getType().name(), String.valueOf(value.reference), String.valueOf(value.locked)))));
 		}
 		return array;
