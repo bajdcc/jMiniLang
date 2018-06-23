@@ -4,6 +4,34 @@
 
 视频演示：https://www.bilibili.com/video/av13294962/
 
+*一言以蔽之，本项目涉及的思想包括：*
+
+- 编译原理（涵盖正则文法(com.bajdcc.util.lexer)、LR1文法(com.bajdcc.util.LALR1)、LL1文法(com.bajdcc.util.LL1)），包含自动机的生成(NFA,NPA,NPA,PDA)、LR或LL表的生成(com.bajdcc.LALR1/LL1.syntax)、语法分析(com.bajdcc.LALR1.grammar)、语义分析(com.bajdcc.LALR1.semantic)、语法树的生成(com.bajdcc.LALR1.grammar.tree)、中间代码的生成(com.bajdcc.LALR1.grammar.codegen)，其中LR分析部分要感谢vczh大牛提供的C++源码
+- 虚拟机(com.bajdcc.LALR1.interpret)，包含基于栈的虚拟机指令的设计(com.bajdcc.LALR1.grammar.runtime)（没有指令，只有引用）、外部方法导入、二进制码生成、隐性类型转换、实现N元运算
+- 语法特性(com.bajdcc.LALR1.grammar.Grammar)，包含foreach/yield的实现、Lambda的实现、管道的实现、import导入代码页的实现、实现try/catch
+- 操作系统，包含多进程的实现(RuntimeProcess)、微服务架构（`ModuleTask`）、基于管道的进程同步机制的实现（`ModuleProc`）、用户进程的实现（`ModuleUserBase`意思是可以挂掉而不影响系统）
+- Web网页服务器的实现(com.bajdcc.web)，包含REST接口的实现、REST服务与jMiniLang用户进程的消息传递机制、Spring-boot的使用
+- UI(com.bajdcc.LALR1.ui)，包含部分SVG指令的绘制、操作系统层面的UI服务设计、控制台的实现、Ctrl-C指令的实现、对话框Dialog的实现、支持中文宽字符的显示、支持RGB24位彩色字符的显示、支持背景颜色的设置
+- 基于jMiniLang语言实现的面向对象特性（`ModuleClass`参照JS的原型链）
+- 函数式编程接口的实现（`ModuleFunction`）
+- LISP的jMiniLang实现（`ModuleLisp`）
+- LINQ的jMIniLang实现（`ModuleStdBase`，参考Vlpp）
+
+*一言以蔽之，本项目涉及的玩法包括：*
+
+- Shell层面的管道机制，类似`echo a | > b.txt`等，语法层面有Bash接口的实现
+- 基于Map数据的原型链实现面向对象特性（`ModuleClass`），应用有：状态机实例--百度新闻（URNews）、行为树实例-AI（URAI）、状态机实例-歌词动画（URMusic）、图论-路由距离算法-PC（URPC）
+- BadApple黑白动画播放（`test badapple`），测试IO性能
+- SSH机制（`ModuleNet`），采用netty实现远程命令
+- Spring-boot制作而成的网页服务器(localhost:8080)，与我们的jMiniLang语言进行交互，可以查看jMiniLang虚拟机的各项指标
+- 哲学家进餐问题（`test philo`、`test philo2`）
+- LISP的实现（`test lisp`）
+- LINQ的实现（`test linq`）
+- 一个自制的基于NIO的简易HTTP服务器（`test web`）
+- *还有一些其他的好玩的但不想费力介绍的冷门内容，上面的部分内容我懒得截图了*
+
+----
+
 ***jMiniLang*** is a simplified compiler framework. Developed by ***bajdcc***.
 *PS.* ***LR Analysis*** refers to ***VFS*** developed by [*vczh*](https://github.com/vczh "Github page of vczh").
 
@@ -164,24 +192,109 @@ TASK PROC:
 **1. Spring Boot API**
 
 > Front-end: LayUI + Vue.js
+>
 > API: Json + RestController
+>
 > Back-end: jMiniLang API Handler (RING 3 Process)
 
-![Screenshot 102](https://raw.githubusercontent.com/bajdcc/jMiniLang/master/screenshots/web-2.png)
+![Screenshot 102](https://raw.githubusercontent.com/bajdcc/jMiniLang/master/screenshots/web-4.png)
+
+![Screenshot 103](https://raw.githubusercontent.com/bajdcc/jMiniLang/master/screenshots/web-3.gif)
 
 **Back-end**
 
 ```javascript
 import "user.base";
 import "user.web";
+g_disable_result();
 var ctx = g_web_get_api();
 if (g_is_null(ctx)) { return; }
-ctx["resp"] := [
-    [ "唯一标识", g_env_get_guid() ],
-    [ "作者", g_author() ],
-    [ "当前版本", g_version() ],
-    [ "仓库地址", g_github_repo() ]
-];
+var route = g_string_split(ctx["route"], "/");
+
+g_printn("API Request: " + ctx["route"]);
+
+// QUERY
+if (route[0] == "query") {
+if (route[1] == "info") {
+    ctx["resp"] := [
+        [ "主机名", g_info_get_hostname() ],
+        [ "IP地址", g_info_get_ip() ],
+        [ "Java 运行时环境版本", g_env_get("java.version") ],
+        [ "Java 运行时环境供应商", g_env_get("java.vendor") ],
+        [ "Java 供应商的 URL", g_env_get("java.vendor.url") ],
+        [ "Java 安装目录", g_env_get("java.home") ],
+        [ "Java 虚拟机规范版本", g_env_get("java.vm.specification.version") ],
+        [ "Java 虚拟机规范供应商", g_env_get("java.vm.specification.vendor") ],
+        [ "Java 虚拟机规范名称", g_env_get("java.vm.specification.name") ],
+        [ "Java 虚拟机实现版本", g_env_get("java.vm.version") ],
+        [ "Java 虚拟机实现供应商", g_env_get("java.vm.vendor") ],
+        [ "Java 虚拟机实现名称", g_env_get("java.vm.name") ],
+        [ "Java 运行时环境规范版本", g_env_get("java.specification.version") ],
+        [ "Java 运行时环境规范供应商", g_env_get("java.specification.vendor") ],
+        [ "Java 运行时环境规范名称", g_env_get("java.specification.name") ],
+        [ "Java 类格式版本号", g_env_get("java.class.version") ],
+        //[ "Java 类路径", g_env_get("java.class.path") ],
+        //[ "加载库时搜索的路径列表", g_env_get("java.library.path") ],
+        //[ "默认的临时文件路径", g_env_get("java.io.tmpdir") ],
+        //[ "要使用的 JIT 编译器的名称", g_env_get("java.compiler") ],
+        //[ "一个或多个扩展目录的路径", g_env_get("java.ext.dirs") ],
+        [ "操作系统的名称", g_env_get("os.name") ],
+        [ "操作系统的架构", g_env_get("os.arch") ],
+        [ "操作系统的版本", g_env_get("os.version") ],
+        //[ "文件分隔符(在 UNIX 系统中是\"/\")", g_env_get("file.separator") ],
+        //[ "路径分隔符(在 UNIX 系统中是\":\")", g_env_get("path.separator") ],
+        //[ "行分隔符(在 UNIX 系统中是\"/n\")", g_env_get("line.separator") ],
+        [ "用户的账户名称", g_env_get("user.name") ],
+        [ "用户的主目录", g_env_get("user.home") ],
+        [ "用户的当前工作目录", g_env_get("user.dir") ]
+    ];
+} else if (route[1] == "env") {
+    ctx["resp"] := [
+        [ "唯一标识", g_env_get_guid() ],
+        [ "作者", g_author() ],
+        [ "当前版本", g_version() ],
+        [ "仓库地址", g_github_repo() ]
+    ];
+} else if (route[1] == "resource") {
+    ctx["resp"] := [
+        [ "速度", g_res_get_speed() ],
+        [ "进程数", g_res_get_proc_size() ],
+        [ "管道数", g_res_get_pipe_size() ],
+        [ "共享数", g_res_get_share_size() ],
+        [ "文件数", g_res_get_file_size() ],
+        [ "虚拟文件数", g_res_get_vfs_size() ]
+    ];
+} else if (route[1] == "proc") {
+    ctx["resp"] := g_res_get_proc();
+} else if (route[1] == "pipe") {
+    ctx["resp"] := g_res_get_pipe();
+} else if (route[1] == "share") {
+    ctx["resp"] := g_res_get_share();
+} else if (route[1] == "file") {
+    ctx["resp"] := g_res_get_file();
+} else if (route[1] == "vfs") {
+    ctx["resp"] := g_res_get_vfs_list();
+}
+// MARKDOWN
+} else if (route[0] == "md") {
+    if (route[1] == "readme") {
+        ctx["resp"] := g_web_markdown(g_load_resource("/com/bajdcc/code/fs/md/readme.md"));
+    } else if (route[1] == "api") {
+        //....
+    }
+} else if (route[0] == "vfs") { // VFS
+    var url = route[1];
+    url := g_string_replace(url, "_", "/");
+    var file = g_res_get_vfs(url);
+    var txt = "";
+    if (g_not_null(file)) {
+        txt := "# File: " + url + g_endl + "```" + g_endl + file + g_endl + "```";
+        ctx["resp"] := g_web_markdown(txt);
+    } else {
+        txt := "# File not exists";
+        ctx["resp"] := g_web_markdown(txt);
+    }
+}
 g_web_set_api(ctx);
 ```
 
