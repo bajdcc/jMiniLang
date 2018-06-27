@@ -12,6 +12,9 @@ import java.util.*;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.stream.Collectors;
 
+import static com.bajdcc.LALR1.grammar.runtime.RuntimeMachine.Ring3Option.LOG_FILE;
+import static com.bajdcc.LALR1.grammar.runtime.RuntimeMachine.Ring3Option.LOG_PIPE;
+
 /**
  * 【虚拟机】运行时进程
  *
@@ -234,7 +237,7 @@ public class RuntimeProcess implements IRuntimeProcessService {
 			Thread.sleep(TIME_SLEEP_FULL);
 			if (!pipeDeque.isEmpty()) {
 				Pair<String, String> pair = pipeDeque.poll();
-				service.getPipeService().writeString(pair.getKey(), pair.getValue());
+				service.getPipeService().writeStringNew(pair.getKey(), pair.getValue());
 			}
 		}
 		return true;
@@ -428,10 +431,14 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		if (!setProcessId.contains(pid)) {
 			return -1;
 		}
+		if (!arrProcess[pid].machine.getRing3().isRing3()) {
+			return -2;
+		}
 		//TODO: 完成清理RING3进程创建的共享、管道、文件句柄
-		if (arrProcess[pid].machine.getRing3().isEnableResult())
+		if (arrProcess[pid].machine.getRing3().isOptionsBool(LOG_FILE))
 			service.getFileService().addVfs(USER_PROC_FILE_PREFIX + pid, error);
-		service.getPipeService().destroyByName(pid, USER_PROC_PIPE_PREFIX + pid);
+		if (!arrProcess[pid].machine.getRing3().isOptionsBool(LOG_PIPE))
+			service.getPipeService().destroyByName(pid, USER_PROC_PIPE_PREFIX + pid);
 		for (int id : arrProcess[pid].waiting_pids) {
 			wakeup(id);
 		}

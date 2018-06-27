@@ -250,11 +250,6 @@ public interface IRuntimeStatus {
 	IRuntimeRing3 getRing3();
 
 	/**
-	 * 禁用输出文件
-	 */
-	void disableResult();
-
-	/**
 	 * 获取所有文档
 	 * @return 文档数组
 	 */

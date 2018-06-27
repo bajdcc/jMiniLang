@@ -6,6 +6,7 @@ import com.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 【运行时】运行时管道服务
@@ -166,6 +167,39 @@ public class RuntimePipeService implements IRuntimePipeService {
 			arrPipes[handle].queue.add(data.charAt(i));
 		}
 		return true;
+	}
+
+	@Override
+	public void writeStringNew(String name, String data) {
+		if (!mapPipeNames.containsKey(name)) {
+			create(name, "/system/pipe");
+		}
+		int handle = mapPipeNames.get(name);
+		if (!arrPipes[handle].waiting_pids.isEmpty()) {
+			Integer pid = arrPipes[handle].waiting_pids.poll();
+			if (pid != null)
+				service.getProcessService().wakeup(pid);
+		}
+		for (int i = 0; i < data.length(); i++) {
+			arrPipes[handle].queue.add(data.charAt(i));
+		}
+	}
+
+	@Override
+	public String readAndDestroy(String name) {
+		if (!mapPipeNames.containsKey(name)) {
+			return null;
+		}
+		int handle = mapPipeNames.get(name);
+		PipeStruct ps = arrPipes[handle];
+		if (ps.queue.isEmpty()) {
+			return "";
+		}
+		StringBuilder sb = new StringBuilder();
+		while (!ps.queue.isEmpty()) {
+			sb.append(ps.queue.poll());
+		}
+		return sb.toString();
 	}
 
 	@Override

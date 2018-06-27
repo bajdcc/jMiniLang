@@ -2,7 +2,9 @@ package com.bajdcc.LALR1.interpret.module.user;
 
 import com.bajdcc.LALR1.grammar.Grammar;
 import com.bajdcc.LALR1.grammar.runtime.*;
+import com.bajdcc.LALR1.grammar.runtime.RuntimeException;
 import com.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
+import com.bajdcc.LALR1.grammar.runtime.data.RuntimeMap;
 import com.bajdcc.LALR1.interpret.module.*;
 import com.bajdcc.util.ResourceLoader;
 import org.apache.log4j.Logger;
@@ -15,6 +17,8 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.bajdcc.LALR1.grammar.runtime.RuntimeMachine.Ring3Option.LOG_FILE;
+import static com.bajdcc.LALR1.grammar.runtime.RuntimeMachine.Ring3Option.LOG_PIPE;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
@@ -27,6 +31,9 @@ public class ModuleUserBase implements IInterpreterModule {
 	private static ModuleUserBase instance = new ModuleUserBase();
 	private RuntimeCodePage runtimeCodePage;
 	private static Logger logger = Logger.getLogger("user");
+
+	public static final String EXEC_PREFIX = "#WEB#EXEC#";
+	public static final String EXEC_PATH_PREFIX = "/web/exec/";
 
 	public static ModuleUserBase getInstance() {
 		return instance;
@@ -266,7 +273,25 @@ public class ModuleUserBase implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				status.disableResult();
+				status.getRing3().setOptionsBool(LOG_FILE, false);
+				return null;
+			}
+		});
+		info.addExternalFunc("g_enable_output", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "保留输出结果";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return null;
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				status.getRing3().setOptionsBool(LOG_PIPE, true);
 				return null;
 			}
 		});
@@ -285,6 +310,49 @@ public class ModuleUserBase implements IInterpreterModule {
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
 				return new RuntimeObject(status.getAllDocs());
+			}
+		});
+		info.addExternalFunc("g_web_exec", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "执行用户程序";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kString};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				RuntimeMap map = new RuntimeMap();
+				if (args.get(0).getObj() == null) {
+					map.put("error", new RuntimeObject(true));
+					map.put("msg", new RuntimeObject("input null"));
+				} else {
+					String id = String.valueOf(args.get(0).getObj());
+					String code = status.getService().getPipeService().readAndDestroy(EXEC_PREFIX + id);
+					if (code == null) {
+						map.put("error", new RuntimeObject(true));
+						map.put("msg", new RuntimeObject("code null"));
+					} else {
+						try {
+							int pid = status.getRing3().exec_file(EXEC_PATH_PREFIX + id, code);
+							map.put("pid", new RuntimeObject(BigInteger.valueOf(pid)));
+						} catch (RuntimeException e) {
+							e.printStackTrace();
+							map.put("error", new RuntimeObject(true));
+							String error = e.getError().getMessage() + " " + e.getPosition() + ": " + e.getInfo();
+							map.put("msg", new RuntimeObject(error));
+						} catch (Exception e) {
+							e.printStackTrace();
+							map.put("error", new RuntimeObject(true));
+							map.put("msg", new RuntimeObject(e.getMessage()));
+						}
+					}
+				}
+				return new RuntimeObject(map);
 			}
 		});
 	}

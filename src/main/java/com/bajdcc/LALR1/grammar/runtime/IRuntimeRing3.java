@@ -13,6 +13,12 @@ import java.util.List;
 public interface IRuntimeRing3 {
 
 	/**
+	 * 是否是RING3程序
+	 * @return 是否是RING3程序
+	 */
+	boolean isRing3();
+
+	/**
 	 * 运行用户态代码
 	 * @param code 代码
 	 * @return PID
@@ -36,8 +42,16 @@ public interface IRuntimeRing3 {
 	void put(String text);
 
 	/**
-	 * 是否启用输出文件
-	 * @return 是否启用
+	 * 设置布尔值
+	 * @param option 选项类型
+	 * @param flag 值
 	 */
-	boolean isEnableResult();
+	void setOptionsBool(RuntimeMachine.Ring3Option option, boolean flag);
+
+	/**
+	 * 查看设置
+	 * @param option 选项类型
+	 * @return 返回设置的值
+	 */
+	boolean isOptionsBool(RuntimeMachine.Ring3Option option);
 }

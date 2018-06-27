@@ -19,6 +19,7 @@ import com.bajdcc.util.lexer.token.OperatorType;
 import com.bajdcc.util.lexer.token.Token;
 import com.bajdcc.util.lexer.token.TokenType;
 import org.apache.log4j.Logger;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -26,6 +27,8 @@ import java.io.InputStream;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.bajdcc.LALR1.grammar.runtime.RuntimeProcess.USER_PROC_PIPE_PREFIX;
 
@@ -40,14 +43,52 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 	private static IInterpreterModule[] modulesSystem;
 	private static IInterpreterModule[] modulesUser;
 
+	public enum Ring3Option {
+		/**
+		 * 自动保存运行日志文件，默认true
+		 */
+		LOG_FILE,
+		/**
+		 * 运行结果自动保留输出管道，默认false
+		 */
+		LOG_PIPE
+	}
+
 	private class Ring3Struct {
 		public int putHandle;
-		public boolean saveRunResult;
+		public boolean bSaveLogFile;
+		public boolean bSavePipeFile;
+
 		private Ring3Struct() {
 			putHandle = -1;
-			saveRunResult = true;
+			bSaveLogFile = true;
+			bSavePipeFile = false;
+		}
+
+		public void setOptionsBool(Ring3Option option, boolean flag) {
+			switch (option) {
+				case LOG_FILE:
+					bSaveLogFile = flag;
+					break;
+				case LOG_PIPE:
+					bSavePipeFile = flag;
+					break;
+				default:
+					throw new NotImplementedException();
+			}
+		}
+
+		public boolean isOptionsBool(Ring3Option option) {
+			switch (option) {
+				case LOG_FILE:
+					return bSaveLogFile;
+				case LOG_PIPE:
+					return bSavePipeFile;
+			}
+			throw new NotImplementedException();
 		}
 	}
+
 	private Ring3Struct ring3Struct;
 
 	private HashListMapEx<String, RuntimeCodePage> pageMap = new HashListMapEx<>();
@@ -494,6 +535,11 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 	}
 
 	@Override
+	public boolean isRing3() {
+		return ring3Struct != null;
+	}
+
+	@Override
 	public int exec(String code) throws Exception {
 		try {
 			Grammar grammar = new Grammar(code);
@@ -504,7 +550,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 		} catch (SyntaxException e) {
 			e.printStackTrace();
 			errRT(RuntimeError.THROWS_EXCEPTION, String.format("%s %s %s",
-					e.getPosition(), e.getMessage(),e .getInfo()));
+					e.getPosition(), e.getMessage(), e.getInfo()));
 		}
 		return -1;
 	}
@@ -524,7 +570,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 		} catch (SyntaxException e) {
 			e.printStackTrace();
 			errRT(RuntimeError.THROWS_EXCEPTION, String.format("%s %s %s",
-					e.getPosition(), e.getMessage(),e .getInfo()));
+					e.getPosition(), e.getMessage(), e.getInfo()));
 		}
 		return -1;
 	}
@@ -538,8 +584,13 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 	}
 
 	@Override
-	public boolean isEnableResult() {
-		return ring3Struct.saveRunResult;
+	public void setOptionsBool(Ring3Option option, boolean flag) {
+		ring3Struct.setOptionsBool(option, flag);
+	}
+
+	@Override
+	public boolean isOptionsBool(Ring3Option option) {
+		return ring3Struct.isOptionsBool(option);
 	}
 
 	@Override
@@ -558,27 +609,11 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 	}
 
 	@Override
-	public void disableResult() {
-		if (ring == 3)
-			ring3Struct.saveRunResult = false;
-	}
-
-	@Override
 	public RuntimeArray getAllDocs() {
 		RuntimeArray array = new RuntimeArray();
 		int i = 1;
-		for (IInterpreterModule module : modulesSystem) {
-			try {
-				for (RuntimeArray arr : module.getCodePage().getInfo().getExternFuncList()) {
-					arr.insert(0, new RuntimeObject(BigInteger.valueOf(i++)));
-					arr.insert(1, new RuntimeObject(module.getModuleName()));
-					array.add(new RuntimeObject(arr));
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		for (IInterpreterModule module : modulesUser) {
+		for (IInterpreterModule module : Stream.of(modulesSystem, modulesUser)
+				.flatMap(Arrays::stream).collect(Collectors.toList())) {
 			try {
 				for (RuntimeArray arr : module.getCodePage().getInfo().getExternFuncList()) {
 					arr.insert(0, new RuntimeObject(BigInteger.valueOf(i++)));

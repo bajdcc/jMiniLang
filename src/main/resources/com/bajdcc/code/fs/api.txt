@@ -117,5 +117,8 @@ if (route[1] == "info") {
         txt := "# File not exists";
         ctx["resp"] := g_web_markdown(txt);
     }
+} else if (route[0] == "exec") { // EXEC
+    var id = route[1];
+    ctx["resp"] := g_web_exec(id);
 }
 g_web_set_api(ctx);

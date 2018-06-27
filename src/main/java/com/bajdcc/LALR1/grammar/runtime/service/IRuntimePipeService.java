@@ -101,4 +101,19 @@ public interface IRuntimePipeService {
 	 * @return 管道是否存在
 	 */
 	boolean writeString(String name, String data);
+
+	/**
+	 * 写入数据（不存在时创建）
+	 *
+	 * @param name 管道名
+	 * @param data 数据
+	 */
+	void writeStringNew(String name, String data);
+
+	/**
+	 * 一次性读取完管道所有内容
+	 * @param name 管道名
+	 * @return 内容，如管道不存在则返回空
+	 */
+	String readAndDestroy(String name);
 }

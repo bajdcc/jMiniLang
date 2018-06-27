@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>运行程序</title>
+</head>
+<body>
+<div layout:fragment="content" id="app">
+    <div class="site-text">
+        <h1 class="site-h1">系统</h1>
+        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+            <legend>运行程序</legend>
+        </fieldset>
+        <div class="layui-form">
+            <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label">代码框</label>
+                <div class="layui-input-block">
+                    <textarea name="code" required lay-verify="required" placeholder="请输入代码" class="layui-textarea"></textarea>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="*">运行代码</button>
+                    <button type="reset" class="layui-btn layui-btn-primary">重置代码</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<th:block layout:fragment="bottom_script_block">
+</th:block>
+<script layout:fragment="script">
+var App = new Vue({
+        el: '#app',
+        data: {
+            items: []
+        },
+        mounted: function () {
+            var vm = this;
+            layui.use('form', function(){
+                var form = layui.form;
+                form.on('submit', function(data){
+                    vm.submit(data.field);
+                });
+            });
+        },
+        methods: {
+            submit: function (field) {
+                var vm = this;
+                vm.$http.post('/api/exec/', field).then(function (response) {
+                    var data = response.data;
+                    if (data.code == 200) {
+                        if (data.data.error) {
+                            layer.msg(data.data.msg, {
+                                time: 5000,
+                                btn: ['关闭']
+                            });
+                        } else {
+                            layer.msg(data.data.pid, {
+                                time: 5000,
+                                btn: ['关闭']
+                            });
+                        }
+                    } else {
+                        layer.msg('API调用失败', {
+                            time: 5000,
+                            btn: ['关闭']
+                        });
+                    }
+                }, function (response) {
+                    console.error('cannot post code');
+                });
+            }
+        }
+    })
+</script>
+</body>
+</html>

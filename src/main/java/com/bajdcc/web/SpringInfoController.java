@@ -30,6 +30,7 @@ public class SpringInfoController extends Thread {
 			pages.add("file");
 			pages.add("vfs");
 			pages.add("doc");
+			pages.add("exec");
 		}
 	}
 
