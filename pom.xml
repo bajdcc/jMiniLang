@@ -95,6 +95,12 @@
             <artifactId>vue-resource</artifactId>
             <version>1.3.4</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.webjars.bower/datatables -->
+        <dependency>
+            <groupId>org.webjars.bower</groupId>
+            <artifactId>datatables</artifactId>
+            <version>1.10.19</version>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/com.vladsch.flexmark/flexmark-all -->
         <dependency>
             <groupId>com.vladsch.flexmark</groupId>

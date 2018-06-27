@@ -1,6 +1,9 @@
 package com.bajdcc.LALR1.grammar.runtime;
 
+import com.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
+
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * 【扩展】调试、本地化开发接口
@@ -65,4 +68,10 @@ public interface IRuntimeDebugInfo {
 	 * @return 是否冲突
 	 */
 	boolean addExternalFunc(String name, IRuntimeDebugExec func);
+
+	/**
+	 * 得到导出的函数列表
+	 * @return 导出函数
+	 */
+	List<RuntimeArray> getExternFuncList();
 }

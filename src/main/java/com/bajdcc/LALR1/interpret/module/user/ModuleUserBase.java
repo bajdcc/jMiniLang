@@ -270,6 +270,23 @@ public class ModuleUserBase implements IInterpreterModule {
 				return null;
 			}
 		});
+		info.addExternalFunc("g_info_get_doc", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "获取所有文档";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return null;
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				return new RuntimeObject(status.getAllDocs());
+			}
+		});
 	}
 
 	private static void importFromString(IRuntimeDebugInfo info, IRuntimeDebugInfo refer) {

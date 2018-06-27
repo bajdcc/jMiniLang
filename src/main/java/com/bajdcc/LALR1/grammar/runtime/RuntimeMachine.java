@@ -11,6 +11,7 @@ import com.bajdcc.LALR1.grammar.type.TokenTools;
 import com.bajdcc.LALR1.interpret.module.*;
 import com.bajdcc.LALR1.interpret.module.std.*;
 import com.bajdcc.LALR1.interpret.module.user.*;
+import com.bajdcc.LALR1.interpret.os.IOSCodePage;
 import com.bajdcc.LALR1.syntax.handler.SyntaxException;
 import com.bajdcc.util.HashListMapEx;
 import com.bajdcc.util.lexer.error.RegexException;
@@ -560,6 +561,35 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 	public void disableResult() {
 		if (ring == 3)
 			ring3Struct.saveRunResult = false;
+	}
+
+	@Override
+	public RuntimeArray getAllDocs() {
+		RuntimeArray array = new RuntimeArray();
+		int i = 1;
+		for (IInterpreterModule module : modulesSystem) {
+			try {
+				for (RuntimeArray arr : module.getCodePage().getInfo().getExternFuncList()) {
+					arr.insert(0, new RuntimeObject(BigInteger.valueOf(i++)));
+					arr.insert(1, new RuntimeObject(module.getModuleName()));
+					array.add(new RuntimeObject(arr));
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		for (IInterpreterModule module : modulesUser) {
+			try {
+				for (RuntimeArray arr : module.getCodePage().getInfo().getExternFuncList()) {
+					arr.insert(0, new RuntimeObject(BigInteger.valueOf(i++)));
+					arr.insert(1, new RuntimeObject(module.getModuleName()));
+					array.add(new RuntimeObject(arr));
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return array;
 	}
 
 	@Override

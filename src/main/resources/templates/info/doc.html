@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>使用文档</title>
+    <link rel="stylesheet" href="/webjars/datatables/media/css/jquery.dataTables.min.css" media="all">
+</head>
+<body>
+<div layout:fragment="content" id="app">
+    <div class="site-text">
+        <h1 class="site-h1">系统</h1>
+        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+            <legend>使用文档</legend>
+        </fieldset>
+        <table id="doc" class="display" cellspacing="0" width="100%"></table>
+    </div>
+</div>
+<th:block layout:fragment="bottom_script_block">
+    <script src="/webjars/datatables/media/js/jquery.js" charset="utf-8"></script>
+    <script src="/webjars/datatables/media/js/jquery.dataTables.min.js" charset="utf-8"></script>
+</th:block>
+<script layout:fragment="script">
+$(document).ready(function () {
+    $('#doc').dataTable({
+        ajax: {
+            url: '/api/query/doc'
+        },
+        deferRender: true,
+        paging: true,
+        autoWidth: true,
+        order: [ [ 0, "asc" ] ],
+        columns: [
+            { title: "编号", searchable: false, type: "numeric", width: "50px" },
+            { title: "页面", searchable: false },
+            { title: "名称", searchable: true },
+            { title: "地址", searchable: false, type: "numeric", width: "50px" },
+            { title: "参数", searchable: false, width: "150px" },
+            { title: "文档", searchable: true }
+        ],
+        language: {
+            "sProcessing":   "处理中...",
+            "sLengthMenu":   "显示 _MENU_ 项结果",
+            "sZeroRecords":  "没有匹配结果",
+            "sInfo":         "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+            "sInfoEmpty":    "显示第 0 至 0 项结果，共 0 项",
+            "sInfoFiltered": "(由 _MAX_ 项结果过滤)",
+            "sInfoPostFix":  "",
+            "sSearch":       "搜索:",
+            "sUrl":          "",
+            "sEmptyTable":     "表中数据为空",
+            "sLoadingRecords": "载入中...",
+            "sInfoThousands":  ",",
+            "oPaginate": {
+                "sFirst":    "首页",
+                "sPrevious": "上页",
+                "sNext":     "下页",
+                "sLast":     "末页"
+            },
+            "oAria": {
+                "sSortAscending":  ": 以升序排列此列",
+                "sSortDescending": ": 以降序排列此列"
+            }
+        },
+        aoColumnDefs: [{
+            sDefaultContent: '',
+            aTargets: ['_all'],
+        }],
+        pageLength: 10,
+        stripeClasses: ["odd", "even"]
+    });
+});
+</script>
+</body>
+</html>

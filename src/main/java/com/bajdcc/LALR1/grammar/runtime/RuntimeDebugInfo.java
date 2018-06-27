@@ -1,7 +1,11 @@
 package com.bajdcc.LALR1.grammar.runtime;
 
+import com.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
+
 import java.io.Serializable;
-import java.util.HashMap;
+import java.math.BigInteger;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 【扩展】调试与开发
@@ -53,6 +57,27 @@ public class RuntimeDebugInfo implements IRuntimeDebugInfo, Serializable {
 	@Override
 	public boolean addExternalFunc(String name, IRuntimeDebugExec func) {
 		return externalExec.put(name, func) != null;
+	}
+
+	private static String argsToString(RuntimeObjectType[] args) {
+		if (args == null) {
+			return "无";
+		}
+		return Arrays.stream(args).map(RuntimeObjectType::getName).collect(Collectors.joining("，"));
+	}
+
+	@Override
+	public List<RuntimeArray> getExternFuncList() {
+		List<RuntimeArray> array = new ArrayList<>();
+		externalExec.entrySet().stream().sorted(Comparator.comparing(Map.Entry::getKey)).forEach(a -> {
+			RuntimeArray arr = new RuntimeArray();
+			arr.add(new RuntimeObject(a.getKey()));
+			arr.add(new RuntimeObject(BigInteger.valueOf(exports.getOrDefault(a.getKey(), -1))));
+			arr.add(new RuntimeObject(argsToString(a.getValue().getArgsType())));
+			arr.add(new RuntimeObject(String.valueOf(a.getValue().getDoc())));
+			array.add(arr);
+		});
+		return array;
 	}
 
 	@Override

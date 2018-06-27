@@ -91,6 +91,8 @@
     <orderEntry type="library" name="Maven: org.webjars.npm:mimic-response:1.0.0" level="project" />
     <orderEntry type="library" name="Maven: org.webjars.npm:is-stream:1.1.0" level="project" />
     <orderEntry type="library" name="Maven: org.webjars.npm:is-retry-allowed:1.1.0" level="project" />
+    <orderEntry type="library" name="Maven: org.webjars.bower:datatables:1.10.19" level="project" />
+    <orderEntry type="library" name="Maven: org.webjars.bower:jquery:3.3.1" level="project" />
     <orderEntry type="library" name="Maven: com.vladsch.flexmark:flexmark-all:0.34.0" level="project" />
     <orderEntry type="library" name="Maven: com.vladsch.flexmark:flexmark:0.34.0" level="project" />
     <orderEntry type="library" name="Maven: com.vladsch.flexmark:flexmark-ext-abbreviation:0.34.0" level="project" />

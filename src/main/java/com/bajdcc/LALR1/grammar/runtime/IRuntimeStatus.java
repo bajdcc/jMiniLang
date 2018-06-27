@@ -1,5 +1,6 @@
 package com.bajdcc.LALR1.grammar.runtime;
 
+import com.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
 import com.bajdcc.LALR1.grammar.runtime.data.RuntimeFuncObject;
 import com.bajdcc.LALR1.grammar.runtime.service.IRuntimeService;
 
@@ -252,4 +253,10 @@ public interface IRuntimeStatus {
 	 * 禁用输出文件
 	 */
 	void disableResult();
+
+	/**
+	 * 获取所有文档
+	 * @return 文档数组
+	 */
+	RuntimeArray getAllDocs();
 }
