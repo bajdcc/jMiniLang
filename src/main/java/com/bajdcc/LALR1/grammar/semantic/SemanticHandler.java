@@ -116,7 +116,6 @@ public class SemanticHandler {
 		mapSemanticAction.put("do_enter_cycle", (indexed, manage, access, recorder) -> manage.getQueryBlockService().enterBlock(BlockType.kCycle));
 		/* 匿名函数处理 */
 		mapSemanticAction.put("lambda", (indexed, manage, access, recorder) -> {
-			manage.getManageScopeService().clearFutureArgs();
 			Token token = access.relativeGet(0);
 			Function func = new Function();
 			func.setName(token);
@@ -465,6 +464,7 @@ public class SemanticHandler {
 					stmts.add(ret);
 				func.setBlock(block);
 			}
+			query.getManageService().getManageScopeService().clearFutureArgs();
 			ExpFunc exp = new ExpFunc();
 			exp.setFunc(func);
 			exp.genClosure();

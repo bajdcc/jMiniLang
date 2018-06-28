@@ -14,6 +14,7 @@ import com.bajdcc.util.lexer.token.TokenType;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 
 /**
@@ -28,9 +29,9 @@ public class TokenTools {
 	 */
 	public static final int SCALE_NUM = 10;
 
-	private static HashMap<TokenType, ITokenConventer> mapConverter = new HashMap<>();
-	private static HashMap<OperatorType, RuntimeInst> mapOp2Ins = new HashMap<>();
-	private static HashMap<RuntimeInst, OperatorType> mapIns2Op = new HashMap<>();
+	private static Map<TokenType, ITokenConventer> mapConverter = new HashMap<>();
+	private static Map<OperatorType, RuntimeInst> mapOp2Ins = new HashMap<>();
+	private static Map<RuntimeInst, OperatorType> mapIns2Op = new HashMap<>();
 
 	static {
 		mapConverter.put(TokenType.BOOL, new ConvertToBoolean());

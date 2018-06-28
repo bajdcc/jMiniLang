@@ -540,9 +540,10 @@ public class Semantic extends Syntax implements IErrorHandler {
 	 */
 	private void run() throws SyntaxException {
 		if (!arrErrors.isEmpty()) {
-			System.err.println(getTrackerError());
+			String error = getTrackerError();
+			System.err.println(error);
 			throw new SyntaxException(SyntaxError.COMPILE_ERROR,
-					arrErrors.get(0).position, "出现语法错误");
+					arrErrors.get(0).position, error);
 		}
 		/* 规则集合 */
 		ArrayList<RuleItem> items = npa.getRuleItems();

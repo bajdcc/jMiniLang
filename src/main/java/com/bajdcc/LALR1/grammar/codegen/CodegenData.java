@@ -3,9 +3,7 @@ package com.bajdcc.LALR1.grammar.codegen;
 import com.bajdcc.LALR1.grammar.runtime.RuntimeInstBase;
 import com.bajdcc.LALR1.grammar.runtime.RuntimeInstUnary;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Stack;
+import java.util.*;
 
 /**
  * 【中间代码】数据结构
@@ -14,9 +12,9 @@ import java.util.Stack;
  */
 public class CodegenData {
 
-	public ArrayList<RuntimeInstBase> insts = new ArrayList<>();
-	public HashMap<String, Integer> funcEntriesMap = new HashMap<>();
-	public ArrayList<RuntimeInstUnary> callsToWriteBack = new ArrayList<>();
+	public List<RuntimeInstBase> insts = new ArrayList<>();
+	public Map<String, Integer> funcEntriesMap = new HashMap<>();
+	public List<RuntimeInstUnary> callsToWriteBack = new ArrayList<>();
 	private Stack<CodegenBlock> stkBlock = new Stack<>();
 	private int idxCode = 0;
 

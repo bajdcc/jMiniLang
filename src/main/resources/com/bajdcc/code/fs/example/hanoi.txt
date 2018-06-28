@@ -1,28 +1,24 @@
 import "user.base";
 var move = func ~(i, x, y) {
-    call g_puts(call g_to_string(i) + ": " +
-        call g_to_string(x) + " -> " + call g_to_string(y));
+    g_puts(g_to_string(i) + ": " + g_to_string(x) + " -> " + g_to_string(y));
 };
 var hanoi = func ~(f) {
     var fk = func ~(i, a, b, c) {
         if (i == 1) {
-            call move(i, a, c);
+            move(i, a, c);
         } else {
-            call f(i - 1, a, c, b);
-            call move(i, a, c);
-            call f(i - 1, b, a, c);
+            f(i - 1, a, c, b);
+            move(i, a, c);
+            f(i - 1, b, a, c);
         }
     };
     return fk;
 };
-var h = call (func ~(f) {
-    var fx = func ~(x) {
-        var fn = func ~(i, a, b, c) {
-            var vf = call f(call x(x));
-            return call vf(i, a, b, c);
-        };
-        return fn;
-    };
-    return call (func ~(h) -> call h(h))(fx);
-})(hanoi);
-call h(3, 'A', 'B', 'C');
+var h = call (func ~(f) ->
+    call (func ~(h) -> h(h))(
+        lambda(x) -> lambda(i, a, b, c) {
+            var vf = f(x(x));
+            return vf(i, a, b, c);
+        })
+)(hanoi);
+h(3, 'A', 'B', 'C');

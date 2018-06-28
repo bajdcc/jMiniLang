@@ -15,11 +15,11 @@ import java.util.stream.Collectors;
 public class RuntimeDebugInfo implements IRuntimeDebugInfo, Serializable {
 
 	private static final long serialVersionUID = 1L;
-	private HashMap<String, Object> dataMap = new HashMap<>();
-	private HashMap<String, Integer> exports = new HashMap<>();
-	private HashMap<Integer, String> func = new HashMap<>();
-	private HashMap<String, IRuntimeDebugValue> externalValue = new HashMap<>();
-	private HashMap<String, IRuntimeDebugExec> externalExec = new HashMap<>();
+	private Map<String, Object> dataMap = new HashMap<>();
+	private Map<String, Integer> exports = new HashMap<>();
+	private Map<Integer, String> func = new HashMap<>();
+	private Map<String, IRuntimeDebugValue> externalValue = new HashMap<>();
+	private Map<String, IRuntimeDebugExec> externalExec = new HashMap<>();
 
 	public void addExports(String name, Integer addr) {
 		exports.put(name, addr);
@@ -81,7 +81,7 @@ public class RuntimeDebugInfo implements IRuntimeDebugInfo, Serializable {
 	}
 
 	@Override
-	public HashMap<String, Object> getDataMap() {
+	public Map<String, Object> getDataMap() {
 		return dataMap;
 	}
 }

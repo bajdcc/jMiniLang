@@ -1,6 +1,7 @@
 package com.bajdcc.LALR1.grammar.tree.closure;
 
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * 闭包
@@ -9,8 +10,8 @@ import java.util.HashSet;
  */
 public class ClosureScope implements IClosureScope {
 
-	private HashSet<Object> ref = new HashSet<>();
-	private HashSet<Object> decl = new HashSet<>();
+	private Set<Object> ref = new HashSet<>();
+	private Set<Object> decl = new HashSet<>();
 
 	@Override
 	public void addRef(Object obj) {
@@ -22,8 +23,8 @@ public class ClosureScope implements IClosureScope {
 		decl.add(obj);
 	}
 
-	protected HashSet<Object> getClosure() {
-		HashSet<Object> closure = new HashSet<>(ref);
+	protected Set<Object> getClosure() {
+		Set<Object> closure = new HashSet<>(ref);
 		closure.removeAll(decl);
 		return closure.isEmpty() ? null : closure;
 	}

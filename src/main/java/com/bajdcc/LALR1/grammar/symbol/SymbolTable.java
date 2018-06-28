@@ -42,4 +42,9 @@ public class SymbolTable implements IQuerySymbol, IManageSymbol {
 	public IQueryBlockSymbol getQueryBlockService() {
 		return manageScopeSymbol;
 	}
+
+	@Override
+	public IManageSymbol getManageService() {
+		return this;
+	}
 }

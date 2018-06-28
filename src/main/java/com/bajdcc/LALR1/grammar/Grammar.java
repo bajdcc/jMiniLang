@@ -182,7 +182,7 @@ public class Grammar extends Semantic {
 		infer(handler.getSemanticHandler("copy"),
 				"stmt -> stmt_stmt[0] | stmt_ctrl[0] | block_stmt[0]");
 		infer(handler.getSemanticHandler("stmt_exp"),
-				"stmt_stmt -> [stmt_exp[0]] @SEMI{lost_semi}");
+				"stmt_stmt -> [stmt_exp[0]] @SEMI#clear_catch#{lost_semi}");
 		infer(handler.getSemanticHandler("copy"),
 				"stmt_ctrl -> ret[0] | port[0] | if[0] | for[0] | foreach[0] | while[0] | try[0] | throw[0]");
 		/* 返回语句 */
@@ -260,7 +260,7 @@ public class Grammar extends Semantic {
 				"array -> @LSQ [exp_list[0]] @RSQ{lost_rsq}");
 		/* 字典初始化 */
 		infer(handler.getSemanticHandler("map_list"),
-				"map_list -> @LITERAL[1] @COLON[3]{lost_colon} exp[2]{lost_exp} [@COMMA map_list[0]]");
+				"map_list -> @LITERAL[1] @COLON[3]{lost_colon} exp[2]{lost_exp} [@COMMA#clear_catch# map_list[0]]");
 		infer(handler.getSemanticHandler("map"),
 				"map -> @LBR [map_list[0]] @RBR{lost_rbr}");
 		/* 异常处理 */

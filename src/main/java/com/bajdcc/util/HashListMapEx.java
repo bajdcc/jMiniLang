@@ -2,6 +2,8 @@ package com.bajdcc.util;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 哈希表
@@ -13,9 +15,9 @@ import java.util.HashMap;
  */
 public class HashListMapEx<K, V> {
 
-	public HashMap<K, V> map = new HashMap<>();
+	public Map<K, V> map = new HashMap<>();
 
-	public ArrayList<V> list = new ArrayList<>();
+	public List<V> list = new ArrayList<>();
 
 	public boolean contains(K k) {
 		return map.containsKey(k);

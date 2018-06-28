@@ -3,6 +3,7 @@ package com.bajdcc.util;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 哈希表
@@ -14,7 +15,7 @@ import java.util.List;
  */
 public class HashListMap<T> {
 
-	public HashMap<T, Integer> map = new HashMap<>();
+	public Map<T, Integer> map = new HashMap<>();
 
 	public List<T> list = new ArrayList<>();
 

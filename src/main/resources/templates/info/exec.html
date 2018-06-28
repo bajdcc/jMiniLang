@@ -13,6 +13,20 @@
             <legend>运行程序</legend>
         </fieldset>
         <div class="layui-row layui-col-space15">
+            <div class="layui-col-md12">
+                <div class="layui-card">
+                    <div class="layui-card-header">示例</div>
+                    <div class="layui-card-body">
+                        <div class="layui-form">
+                            <div class="layui-form layui-form-pane">
+                                <div class="layui-form-item">
+                                    <button class="layui-btn" @click="example('hanoi')">汉诺塔</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="layui-col-md6">
                 <div class="layui-card">
                     <div class="layui-card-header">编辑代码</div>
@@ -23,7 +37,8 @@
                                     <label class="layui-form-label">输入</label>
                                     <div class="layui-input-block">
                                         <textarea v-model="code" name="code" required lay-verify="required"
-                                                  placeholder="请输入代码" class="layui-textarea"></textarea>
+                                                  placeholder="请输入代码" class="layui-textarea"
+                                                  style="height: 200px"></textarea>
                                     </div>
                                 </div>
                                 <div class="layui-form-item" style="text-align: center">
@@ -44,8 +59,8 @@
                                 <div class="layui-form-item layui-form-text">
                                     <label class="layui-form-label">输出</label>
                                     <div class="layui-input-block">
-                                        <textarea v-model="content" readonly
-                                                  class="layui-textarea"></textarea>
+                                        <textarea v-model="content" readonly class="layui-textarea"
+                                                  style="height: 200px"></textarea>
                                     </div>
                                 </div>
                                 <div class="layui-form-item" style="text-align: center">
@@ -54,13 +69,6 @@
                             </div>
                         </form>
                     </div>
-                </div>
-            </div>
-        </div>
-        <div class="layui-form">
-            <div class="layui-form layui-form-pane">
-                <div class="layui-form-item">
-                    <button class="layui-btn" @click="example('hanoi')">汉诺塔</button>
                 </div>
             </div>
         </div>
@@ -148,7 +156,7 @@ var App = new Vue({
                         if (d.error) {
                             vm.content += "\n出现错误！原因：" + d.msg + '\n';
                         } else if (d.halt) {
-                            vm.content += d.data + "\n" + d.result + '\n';
+                            vm.content += d.data + "\n" + d.result;
                         } else {
                             vm.content += d.data;
                             setTimeout(function() {
@@ -164,6 +172,9 @@ var App = new Vue({
             }
         }
     })
+
+
+
 </script>
 </body>
 </html>

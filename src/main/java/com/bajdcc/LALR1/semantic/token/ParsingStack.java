@@ -3,6 +3,7 @@ package com.bajdcc.LALR1.semantic.token;
 import com.bajdcc.util.lexer.token.Token;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Stack;
 
@@ -16,12 +17,12 @@ public class ParsingStack implements IIndexedData {
 	/**
 	 * 当前索引表
 	 */
-	private HashMap<Integer, TokenBag> mapTokenBag = null;
+	private Map<Integer, TokenBag> mapTokenBag = null;
 
 	/**
 	 * 单词包栈
 	 */
-	private Stack<HashMap<Integer, TokenBag>> stkMapTokenBags = new Stack<>();
+	private Stack<Map<Integer, TokenBag>> stkMapTokenBags = new Stack<>();
 
 	public ParsingStack() {
 		push();
@@ -87,8 +88,7 @@ public class ParsingStack implements IIndexedData {
 		return mapTokenBag.containsKey(index);
 	}
 
-	private static void printTokenBag(StringBuilder sb,
-	                                  HashMap<Integer, TokenBag> bags) {
+	private static void printTokenBag(StringBuilder sb, Map<Integer, TokenBag> bags) {
 		if (bags != null) {
 			if (bags.isEmpty()) {
 				sb.append("(empty)");
@@ -115,7 +115,7 @@ public class ParsingStack implements IIndexedData {
 		printTokenBag(sb, mapTokenBag);
 		sb.append(System.lineSeparator());
 		int i = 1;
-		for (HashMap<Integer, TokenBag> hashMap : stkMapTokenBags) {
+		for (Map<Integer, TokenBag> hashMap : stkMapTokenBags) {
 			sb.append(i).append(": ");
 			printTokenBag(sb, hashMap);
 			sb.append(System.lineSeparator());

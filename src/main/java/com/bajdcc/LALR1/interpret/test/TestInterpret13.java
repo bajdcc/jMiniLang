@@ -115,9 +115,35 @@ public class TestInterpret13 {
 							"a.\"get\"(0).\"c\" := 2;\n" +
 							"a.\"get\"(0).\"c\" *= 2;\n" +
 							"a.\"get\"(0).\"c\" ++;\n" +
-							"g_printn(a.\"get\"(0).\"c\"++);\n"
+							"g_printn(a.\"get\"(0).\"c\"++);\n",
+
+					"import \"sys.base\";\n" +
+							"var move = func ~(i, x, y) {\n" +
+							"    g_printn(g_to_string(i) + \": \" + g_to_string(x) + \" -> \" + g_to_string(y));\n" +
+							"};\n" +
+							"var hanoi = func ~(f) {\n" +
+							"    var fk = func ~(i, a, b, c) {\n" +
+							"        if (i == 1) {\n" +
+							"            move(i, a, c);\n" +
+							"        } else {\n" +
+							"            f(i - 1, a, c, b);\n" +
+							"            move(i, a, c);\n" +
+							"            f(i - 1, b, a, c);\n" +
+							"        }\n" +
+							"    };\n" +
+							"    return fk;\n" +
+							"};\n" +
+							"var h = call (func ~(f) ->\n" +
+							"    call (func ~(h) -> h(h))(\n" +
+							"        lambda(x) -> lambda(i, a, b, c) {\n" +
+							"            var vf = f(x(x));\n" +
+							"            return vf(i, a, b, c);\n" +
+							"        })\n" +
+							")(hanoi);\n" +
+							"h(3, 'A', 'B', 'C');\n"
 			};
 
+			System.out.println(codes[codes.length - 1]);
 			Interpreter interpreter = new Interpreter();
 			Grammar grammar = new Grammar(codes[codes.length - 1]);
 			System.out.println(grammar.toString());

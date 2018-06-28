@@ -20,4 +20,10 @@ public interface IQuerySymbol {
 	 * @return 块查询接口
 	 */
 	IQueryBlockSymbol getQueryBlockService();
+
+	/**
+	 * 获取管理接口（尽量少用）
+	 * @return 管理接口
+	 */
+	IManageSymbol getManageService();
 }

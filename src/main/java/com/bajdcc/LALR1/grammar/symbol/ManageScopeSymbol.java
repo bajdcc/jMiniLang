@@ -10,10 +10,7 @@ import com.bajdcc.util.Position;
 import com.bajdcc.util.lexer.token.Token;
 import com.bajdcc.util.lexer.token.TokenType;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Stack;
+import java.util.*;
 
 /**
  * 命名空间管理
@@ -28,12 +25,12 @@ public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
 	private int lambdaId = 0;
 	private HashListMap<Object> symbolList = new HashListMap<>();
 	private HashListMapEx<String, ArrayList<Function>> funcMap = new HashListMapEx<>();
-	private ArrayList<HashMap<String, Function>> funcScope = new ArrayList<>();
-	private ArrayList<HashSet<String>> stkScope = new ArrayList<>();
+	private List<Map<String, Function>> funcScope = new ArrayList<>();
+	private List<Set<String>> stkScope = new ArrayList<>();
 	private Stack<Integer> stkLambdaId = new Stack<>();
 	private Stack<Integer> stkLambdaLine = new Stack<>();
-	private HashSet<String> symbolsInFutureBlock = new HashSet<>();
-	private HashMap<BlockType, Integer> blockLevel = new HashMap<>();
+	private Set<String> symbolsInFutureBlock = new HashSet<>();
+	private Map<BlockType, Integer> blockLevel = new HashMap<>();
 	private Stack<BlockType> blockStack = new Stack<>();
 
 	public ManageScopeSymbol() {
@@ -71,7 +68,7 @@ public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
 		if (symbolsInFutureBlock.contains(name)) {
 			return true;
 		}
-		for (HashSet<String> hashSet : stkScope) {
+		for (Set<String> hashSet : stkScope) {
 			if (hashSet.contains(name)) {
 				return true;
 			}
@@ -110,7 +107,7 @@ public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
 	@Override
 	public Function getFuncByName(String name) {
 		for (int i = funcScope.size() - 1; i >= 0; i--) {
-			HashMap<String, Function> f = funcScope.get(i);
+			Map<String, Function> f = funcScope.get(i);
 			Function f1 = f.get(name);
 			if (f1 != null)
 				return f1;

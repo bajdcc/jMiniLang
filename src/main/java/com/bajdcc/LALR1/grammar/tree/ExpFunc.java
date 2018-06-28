@@ -7,7 +7,7 @@ import com.bajdcc.LALR1.grammar.tree.closure.ClosureScope;
 import com.bajdcc.LALR1.grammar.tree.closure.IClosureScope;
 import com.bajdcc.LALR1.grammar.type.TokenTools;
 
-import java.util.HashSet;
+import java.util.Set;
 
 /**
  * 【语义分析】函数定义表达式
@@ -24,7 +24,7 @@ public class ExpFunc extends ClosureScope implements IExp {
 	/**
 	 * 闭包
 	 */
-	private HashSet<Object> closure = null;
+	private Set<Object> closure = null;
 
 	public Function getFunc() {
 		return func;

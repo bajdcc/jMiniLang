@@ -2,8 +2,8 @@ package com.bajdcc.LALR1.grammar.runtime;
 
 import com.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 【扩展】调试、本地化开发接口
@@ -17,7 +17,7 @@ public interface IRuntimeDebugInfo {
 	 *
 	 * @return 数据存储
 	 */
-	HashMap<String, Object> getDataMap();
+	Map<String, Object> getDataMap();
 
 	/**
 	 * 根据当前指令页地址找到函数名
