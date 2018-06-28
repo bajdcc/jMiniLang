@@ -7,7 +7,7 @@
     <groupId>com.bajdcc</groupId>
     <artifactId>jMiniLang</artifactId>
     <packaging>jar</packaging>
-    <version>2.3.3</version>
+    <version>2.3.4</version>
 	<properties>
 		<file_encoding>UTF-8</file_encoding>
 		<start_class>com.bajdcc.LALR1.ui.UIMainFrame</start_class>

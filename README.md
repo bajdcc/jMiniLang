@@ -6,19 +6,20 @@
 
 *一言以蔽之，本项目涉及的思想包括：*
 
-- 编译原理（涵盖正则文法(com.bajdcc.util.lexer)、LR1文法(com.bajdcc.util.LALR1)、LL1文法(com.bajdcc.util.LL1)），包含自动机的生成(NFA,DFA,NPDA,PDA)、LR或LL表的生成(com.bajdcc.LALR1/LL1.syntax)、语法分析(com.bajdcc.LALR1.grammar)、语义分析(com.bajdcc.LALR1.semantic)、语法树的生成(com.bajdcc.LALR1.grammar.tree)、中间代码的生成(com.bajdcc.LALR1.grammar.codegen)，其中LR分析部分要感谢vczh大牛提供的C++源码
-- 虚拟机(com.bajdcc.LALR1.interpret)，包含基于栈的虚拟机指令的设计(com.bajdcc.LALR1.grammar.runtime)（没有指针，只有引用）、外部方法导入、二进制码生成、隐性类型转换、实现N元运算
-- 语法特性(com.bajdcc.LALR1.grammar.Grammar)，包含foreach/yield的实现、Lambda的实现、管道的实现、import导入代码页的实现、实现try/catch
+- 编译原理（涵盖正则文法(com.bajdcc.util.lexer)、LR1文法(com.bajdcc.LALR1)、LL1文法(com.bajdcc.LL1)），重点：**语法制导翻译、自定义语义动作**，包含自动机的生成(非确定性有限自动机-NFA、确定性有限自动机-DFA、非确定性下推自动机-NPDA、确定性下推自动机-PDA)、LR或LL表的生成(com.bajdcc.LALR1/LL1.syntax)、语法分析(com.bajdcc.LALR1.grammar)、语义分析(com.bajdcc.LALR1.semantic)、语法树的生成(com.bajdcc.LALR1.grammar.tree)、中间代码的生成(com.bajdcc.LALR1.grammar.codegen)，其中LR分析部分要感谢vczh大牛提供的C++源码
+- 虚拟机(com.bajdcc.LALR1.interpret)，包含基于栈的虚拟机指令的设计(com.bajdcc.LALR1.grammar.runtime)（**没有指针，只有引用**）、外部方法导入、二进制码生成、隐性类型转换、实现N元运算
+- 语法特性(com.bajdcc.LALR1.grammar.Grammar)，包含foreach/yield的实现、Lambda的实现、管道的实现、import导入代码页的实现、实现try/catch，及一些语法糖
 - 操作系统，包含多进程的实现(RuntimeProcess)、微服务架构（`ModuleTask`）、基于管道的进程同步机制的实现（`ModuleProc`）、用户进程的实现（`ModuleUserBase`意思是可以挂掉而不影响系统）
 - Web网页服务器的实现(com.bajdcc.web)，包含REST接口的实现、REST服务与jMiniLang用户进程的消息传递机制、Spring-boot的使用
 - UI(com.bajdcc.LALR1.ui)，包含部分SVG指令的绘制、操作系统层面的UI服务设计、控制台的实现、Ctrl-C指令的实现、对话框Dialog的实现、支持中文宽字符的显示、支持RGB24位彩色字符的显示、支持背景颜色的设置
 - 基于jMiniLang语言实现的面向对象特性（`ModuleClass`参照JS的原型链）
 - 函数式编程接口的实现（`ModuleFunction`）
-- LISP的jMiniLang实现（`ModuleLisp`）
-- LINQ的jMiniLang实现（`ModuleStdBase`，参考Vlpp）
+- LISP的jMiniLang实现（`ModuleLisp`），[B站视频链接](https://www.bilibili.com/video/av13294962/?p=2)
+- 语言集成查询（LINQ）的jMiniLang实现（`ModuleStdBase`，参考Vlpp），类似Java 8 Stream链式/流式操作
 
 *一言以蔽之，本项目涉及的玩法包括：*
 
+- **开发完善中** Spring-boot与layui制作的管理后台，包括资源查看、文档查看、**在线编译**！
 - Shell层面的管道机制，类似`echo a | > b.txt`等，语法层面有Bash接口的实现
 - 基于Map数据的原型链实现面向对象特性（`ModuleClass`），应用有：状态机实例--百度新闻（URNews）、行为树实例-AI（URAI）、状态机实例-歌词动画（URMusic）、图论-路由距离算法-PC（URPC）
 - BadApple黑白动画播放（`test badapple`），测试IO性能
@@ -62,7 +63,7 @@
 23. **Try/Catch/Throw**.
 24. **Behavior Tree**, including PC network simulator.
 25. **RING 3 Process**.
-26. **Web Server**.
+26. **Web Server**, including Online Compiler and Runner.
 
 #### What it generates
 
@@ -753,50 +754,7 @@ g_hook_remove_before(square, "get_index", before_1);
 
 **1. Lambda: Y Combinator of Hanoi**
 
-*Code:*
-
-```javascript
-import "sys.base";
-var move = func ~(i, x, y) {
-    call g_printn(call g_to_string(i) + ": " + 
-        call g_to_string(x) + " -> " + call g_to_string(y));
-};
-var hanoi = func ~(f) {
-    var fk = func ~(i, a, b, c) {
-        if (i == 1) {
-            call move(i, a, c);
-        } else {
-            call f(i - 1, a, c, b);
-            call move(i, a, c);
-            call f(i - 1, b, a, c);
-        }
-    };
-    return fk;
-};
-var h = call (func ~(f) {
-    var fx = func ~(x) {
-        var fn = func ~(i, a, b, c) {
-            var vf = call f(call x(x));
-            return call vf(i, a, b, c);
-        };
-        return fn;
-    };
-    return call (func ~(h) -> call h(h))(fx);
-})(hanoi);
-call h(3, 'A', 'B', 'C');
-```
-
-*Result:*
-
-```c
-1: A -> C
-2: A -> B
-1: C -> B
-3: A -> C
-1: B -> A
-2: B -> C
-1: A -> C
-```
+Hidden, see *Online Compiler Example I: Hanoi* above. 
 
 **2. Lambda: Trampoline**
 
