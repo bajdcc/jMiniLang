@@ -117,8 +117,18 @@ if (route[1] == "info") {
         txt := "# File not exists";
         ctx["resp"] := g_web_markdown(txt);
     }
+} else if (route[0] == "fs") { // VFS TEXT
+    var url = route[1];
+    url := g_string_replace(url, "_", "/");
+    var file = g_res_get_vfs(url);
+    if (g_not_null(file)) {
+        ctx["resp"] := file;
+    }
 } else if (route[0] == "exec") { // EXEC
     var id = route[1];
     ctx["resp"] := g_web_exec(id);
+} else if (route[0] == "exec_query") { // EXEC QUERY STATUS
+    var id = route[1];
+    ctx["resp"] := g_web_exec_query(id);
 }
 g_web_set_api(ctx);

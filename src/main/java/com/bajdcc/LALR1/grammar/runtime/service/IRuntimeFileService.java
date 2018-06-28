@@ -124,4 +124,11 @@ public interface IRuntimeFileService {
 	 * @return 虚拟文件列表
 	 */
 	RuntimeArray getVfsList(boolean api);
+
+	/**
+	 * 读取虚拟文件并自动销毁
+	 * @param name 文件名
+	 * @return 文件内容，不存在则返回空
+	 */
+	String readAndDestroy(String name);
 }

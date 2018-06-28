@@ -193,6 +193,25 @@ public class RuntimePipeService implements IRuntimePipeService {
 		int handle = mapPipeNames.get(name);
 		PipeStruct ps = arrPipes[handle];
 		if (ps.queue.isEmpty()) {
+			destroy(encodeHandle(handle));
+			return "";
+		}
+		StringBuilder sb = new StringBuilder();
+		while (!ps.queue.isEmpty()) {
+			sb.append(ps.queue.poll());
+		}
+		destroy(encodeHandle(handle));
+		return sb.toString();
+	}
+
+	@Override
+	public String readAll(String name) {
+		if (!mapPipeNames.containsKey(name)) {
+			return null;
+		}
+		int handle = mapPipeNames.get(name);
+		PipeStruct ps = arrPipes[handle];
+		if (ps.queue.isEmpty()) {
 			return "";
 		}
 		StringBuilder sb = new StringBuilder();

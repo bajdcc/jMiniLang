@@ -45,6 +45,11 @@ var destroy_int = func ~() {
 
 if (!g_query_file("$/web/api")) {
     g_write_file_s_utf8("$/web/api", g_read_file_utf8_all("!/com/bajdcc/code/fs/api.txt"));
+    var examples = ["hanoi"];
+    foreach (var example : g_range_array(examples)) {
+        g_write_file_s_utf8("$/example/" + example,
+            g_read_file_utf8_all("!/com/bajdcc/code/fs/example/" + example + ".txt"));
+    }
 }
 
 var handler = func ~(ch) {

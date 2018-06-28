@@ -111,9 +111,16 @@ public interface IRuntimePipeService {
 	void writeStringNew(String name, String data);
 
 	/**
-	 * 一次性读取完管道所有内容
+	 * 一次性读取完管道所有内容并销毁
 	 * @param name 管道名
 	 * @return 内容，如管道不存在则返回空
 	 */
 	String readAndDestroy(String name);
+
+	/**
+	 * 一次性读取完管道所有内容
+	 * @param name 管道名
+	 * @return 内容，如管道不存在则返回空
+	 */
+	String readAll(String name);
 }

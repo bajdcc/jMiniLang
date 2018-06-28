@@ -19,6 +19,8 @@ import java.util.stream.Collectors;
 
 import static com.bajdcc.LALR1.grammar.runtime.RuntimeMachine.Ring3Option.LOG_FILE;
 import static com.bajdcc.LALR1.grammar.runtime.RuntimeMachine.Ring3Option.LOG_PIPE;
+import static com.bajdcc.LALR1.grammar.runtime.RuntimeProcess.USER_PROC_FILE_PREFIX;
+import static com.bajdcc.LALR1.grammar.runtime.RuntimeProcess.USER_PROC_PIPE_PREFIX;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
@@ -32,7 +34,7 @@ public class ModuleUserBase implements IInterpreterModule {
 	private RuntimeCodePage runtimeCodePage;
 	private static Logger logger = Logger.getLogger("user");
 
-	public static final String EXEC_PREFIX = "#WEB#EXEC#";
+	public static final String EXEC_PREFIX = "WEB_EXEC#";
 	public static final String EXEC_PATH_PREFIX = "/web/exec/";
 
 	public static ModuleUserBase getInstance() {
@@ -339,17 +341,55 @@ public class ModuleUserBase implements IInterpreterModule {
 					} else {
 						try {
 							int pid = status.getRing3().exec_file(EXEC_PATH_PREFIX + id, code);
+							status.getRing3(pid).setOptionsBool(LOG_PIPE, true);
 							map.put("pid", new RuntimeObject(BigInteger.valueOf(pid)));
 						} catch (RuntimeException e) {
 							e.printStackTrace();
 							map.put("error", new RuntimeObject(true));
-							String error = e.getError().getMessage() + " " + e.getPosition() + ": " + e.getInfo();
-							map.put("msg", new RuntimeObject(error));
+							map.put("msg", new RuntimeObject(e.getInfo()));
 						} catch (Exception e) {
 							e.printStackTrace();
 							map.put("error", new RuntimeObject(true));
 							map.put("msg", new RuntimeObject(e.getMessage()));
 						}
+					}
+				}
+				return new RuntimeObject(map);
+			}
+		});
+		info.addExternalFunc("g_web_exec_query", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "查询用户程序状态";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kString};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				RuntimeMap map = new RuntimeMap();
+				if (args.get(0).getObj() == null) {
+					map.put("error", new RuntimeObject(true));
+					map.put("msg", new RuntimeObject("id null"));
+				} else {
+					String id = String.valueOf(args.get(0).getObj());
+					String result = status.getService().getFileService().readAndDestroy("$" + USER_PROC_FILE_PREFIX + id);
+					if (result == null) { // 未结束
+						String data = status.getService().getPipeService().readAll(USER_PROC_PIPE_PREFIX + id);
+						if (data != null) {
+							map.put("data", new RuntimeObject(data));
+						} else {
+							map.put("error", new RuntimeObject(true));
+							map.put("msg", new RuntimeObject("invalid id"));
+						}
+					} else { // 结束
+						map.put("halt", new RuntimeObject(true));
+						map.put("data", new RuntimeObject(status.getService().getPipeService().readAndDestroy(USER_PROC_PIPE_PREFIX + id)));
+						map.put("result", new RuntimeObject(result));
 					}
 				}
 				return new RuntimeObject(map);

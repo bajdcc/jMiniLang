@@ -250,6 +250,13 @@ public interface IRuntimeStatus {
 	IRuntimeRing3 getRing3();
 
 	/**
+	 * 获取RING3接口（指定PID）
+	 * @param pid PID
+	 * @return RING3接口，不是则返回空
+	 */
+	IRuntimeRing3 getRing3(int pid);
+
+	/**
 	 * 获取所有文档
 	 * @return 文档数组
 	 */

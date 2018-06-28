@@ -239,6 +239,18 @@ public class RuntimeFileService implements IRuntimeFileService {
 		return array;
 	}
 
+	@Override
+	public String readAndDestroy(String name) {
+		if (name.startsWith(VFS_PREFIX)) {
+			if (mapVfs.containsKey(name)) {
+				String content = new String(mapVfs.get(name).data, UTF_8);
+				mapVfs.remove(name);
+				return content;
+			}
+		}
+		return null;
+	}
+
 	enum FileStatus {
 		ERROR,
 		READING,

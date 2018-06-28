@@ -1,6 +1,7 @@
 package com.bajdcc.LALR1.interpret.module.api;
 
 import com.bajdcc.LALR1.grammar.runtime.RuntimeObject;
+import com.bajdcc.LALR1.grammar.runtime.RuntimeObjectType;
 import com.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
 import com.bajdcc.LALR1.grammar.runtime.data.RuntimeMap;
 
@@ -36,10 +37,11 @@ public class ModuleNetWebApiHelper {
 			case kReal:
 				return ((BigDecimal) obj.getObj()).doubleValue();
 			case kArray:
-				return ((RuntimeArray) obj.getObj()).getArray()	.stream()
+				return ((RuntimeArray) obj.getObj()).getArray().stream()
 						.map(ModuleNetWebApiHelper::toJsonObject).collect(Collectors.toList());
 			case kMap:
 				return ((RuntimeMap) obj.getObj()).getMap().entrySet().stream()
+						.filter(entry -> entry.getValue().getType() != RuntimeObjectType.kNull)
 						.collect(Collectors.toMap(Map.Entry::getKey, entry -> toJsonObject(entry.getValue())));
 		}
 		return null;

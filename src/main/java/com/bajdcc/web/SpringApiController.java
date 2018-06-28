@@ -6,10 +6,8 @@ import com.bajdcc.LALR1.interpret.module.user.ModuleUserBase;
 import com.bajdcc.web.bean.SpringBeanExec;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.springframework.http.MediaType;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -62,6 +60,20 @@ public class SpringApiController {
 		return map;
 	}
 
+	@RequestMapping(value = "/fs", params = "path", method = RequestMethod.GET, produces = { MediaType.APPLICATION_JSON_UTF8_VALUE })
+	public Object getVfsText(@RequestParam("path") String path) {
+		Map<String, Object> map = new HashMap<>();
+		path = StringEscapeUtils.unescapeHtml4(path);
+		Object obj = ModuleNet.getInstance().getWebApi().sendRequest("fs/" + path.replace('/', '_'));
+		if (obj != null) {
+			map.put("code", 200);
+			map.put("data", obj);
+		} else {
+			map.put("code", 404);
+		}
+		return map;
+	}
+
 	private static int execId = 1;
 
 	@RequestMapping(value = "/exec", method = RequestMethod.POST, produces = { MediaType.APPLICATION_JSON_UTF8_VALUE })
@@ -72,6 +84,19 @@ public class SpringApiController {
 			map.put("code", 200);
 			map.put("data", ModuleNet.getInstance().getWebApi().sendRequest("exec/" + execId));
 			execId++;
+		} else {
+			map.put("code", 404);
+		}
+		return map;
+	}
+
+	@RequestMapping(value = "/exec_query", params = "id", method = RequestMethod.GET, produces = { MediaType.APPLICATION_JSON_UTF8_VALUE })
+	public Object execQuery(@RequestParam("id") String id) {
+		Map<String, Object> map = new HashMap<>();
+		Object obj = ModuleNet.getInstance().getWebApi().sendRequest("exec_query/" + id);
+		if (obj != null) {
+			map.put("code", 200);
+			map.put("data", obj);
 		} else {
 			map.put("code", 404);
 		}

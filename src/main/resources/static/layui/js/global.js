@@ -60,7 +60,8 @@ layui.define(['code', 'element', 'table', 'util'], function(exports){
   
   //代码修饰
   layui.code({
-    elem: 'pre'
+    elem: 'pre',
+    about: false
   });
   
   //目录

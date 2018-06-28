@@ -329,9 +329,10 @@ public class Grammar extends Semantic {
 		if (recorder.isCorrect()) {
 			symbol.check(recorder);
 		} else {
-			System.err.println(getSemanticError());
+			String error = getSemanticError();
+			System.err.println(error);
 			throw new SyntaxException(SyntaxError.COMPILE_ERROR,
-					recorder.getErrorList().get(0).getPosition().position, "请检查代码");
+					recorder.getErrorList().get(0).getPosition().position, error);
 		}
 	}
 
@@ -388,7 +389,7 @@ public class Grammar extends Semantic {
 		if (!recorder.isCorrect()) {
 			System.err.println(getSemanticError());
 			throw new SyntaxException(SyntaxError.COMPILE_ERROR,
-					recorder.getErrorList().get(0).getPosition().position, "请检查代码");
+					recorder.getErrorList().get(0).getPosition().position, getSemanticError());
 		}
 		return code.genCodePage();
 	}

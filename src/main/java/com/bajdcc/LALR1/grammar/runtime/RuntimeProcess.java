@@ -28,6 +28,7 @@ public class RuntimeProcess implements IRuntimeProcessService {
 	}
 
 	private class SchdProcess {
+
 		public RuntimeMachine machine;
 		public int priority;
 		public int sleep;
@@ -446,5 +447,11 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		arrProcess[pid] = null;
 		logger.debug("RING3 proc #" + pid + " exit, " + setProcessId.size() + " left.");
 		return 0;
+	}
+
+	public IRuntimeRing3 getRing3(int pid) {
+		if (!setProcessId.contains(pid))
+			return null;
+		return arrProcess[pid].machine.getRing3();
 	}
 }

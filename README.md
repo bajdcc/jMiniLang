@@ -15,7 +15,7 @@
 - 基于jMiniLang语言实现的面向对象特性（`ModuleClass`参照JS的原型链）
 - 函数式编程接口的实现（`ModuleFunction`）
 - LISP的jMiniLang实现（`ModuleLisp`）
-- LINQ的jMIniLang实现（`ModuleStdBase`，参考Vlpp）
+- LINQ的jMiniLang实现（`ModuleStdBase`，参考Vlpp）
 
 *一言以蔽之，本项目涉及的玩法包括：*
 
@@ -196,6 +196,10 @@ TASK PROC:
 > API: Json + RestController
 >
 > Back-end: jMiniLang API Handler (RING 3 Process)
+
+**Run on Server**
+
+![Screenshot 106](https://raw.githubusercontent.com/bajdcc/jMiniLang/master/screenshots/web-6.png)
 
 **Online Documentation**
 

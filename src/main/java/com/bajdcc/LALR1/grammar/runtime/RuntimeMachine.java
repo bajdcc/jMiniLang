@@ -569,7 +569,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 			errRT(RuntimeError.THROWS_EXCEPTION, e.getPosition() + ", " + e.getMessage());
 		} catch (SyntaxException e) {
 			e.printStackTrace();
-			errRT(RuntimeError.THROWS_EXCEPTION, String.format("%s %s %s",
+			errRT(RuntimeError.THROWS_EXCEPTION, String.format("%s %s\n%s",
 					e.getPosition(), e.getMessage(), e.getInfo()));
 		}
 		return -1;
@@ -606,6 +606,11 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 	@Override
 	public IRuntimeRing3 getRing3() {
 		return this;
+	}
+
+	@Override
+	public IRuntimeRing3 getRing3(int pid) {
+		return process.getRing3(pid);
 	}
 
 	@Override
