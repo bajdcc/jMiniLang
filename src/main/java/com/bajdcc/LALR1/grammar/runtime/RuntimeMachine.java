@@ -9,9 +9,10 @@ import com.bajdcc.LALR1.grammar.runtime.service.IRuntimePipeService;
 import com.bajdcc.LALR1.grammar.runtime.service.IRuntimeService;
 import com.bajdcc.LALR1.grammar.type.TokenTools;
 import com.bajdcc.LALR1.interpret.module.*;
-import com.bajdcc.LALR1.interpret.module.std.*;
-import com.bajdcc.LALR1.interpret.module.user.*;
-import com.bajdcc.LALR1.interpret.os.IOSCodePage;
+import com.bajdcc.LALR1.interpret.module.std.ModuleStdBase;
+import com.bajdcc.LALR1.interpret.module.std.ModuleStdShell;
+import com.bajdcc.LALR1.interpret.module.user.ModuleUserBase;
+import com.bajdcc.LALR1.interpret.module.user.ModuleUserWeb;
 import com.bajdcc.LALR1.syntax.handler.SyntaxException;
 import com.bajdcc.util.HashListMapEx;
 import com.bajdcc.util.lexer.error.RegexException;
@@ -954,11 +955,15 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 		int idx = loadInt();
 		String name = "";
 		if (invoke) {
-			RuntimeStack itStack = stack;
 			RuntimeObject obj = null;
-			while (obj == null && itStack != null) {
-				obj = itStack.findVariable(pageName, idx);
-				itStack = itStack.prev;
+			if (idx == -1) { // call (call exp) (args...)
+				obj = load();
+			} else {
+				RuntimeStack itStack = stack;
+				while (obj == null && itStack != null) {
+					obj = itStack.findVariable(pageName, idx);
+					itStack = itStack.prev;
+				}
 			}
 			if (obj == null || obj.getType() == null) {
 				err(RuntimeError.WRONG_LOAD_EXTERN, String.valueOf(idx));

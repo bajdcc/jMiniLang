@@ -279,24 +279,6 @@ public class ModuleUserBase implements IInterpreterModule {
 				return null;
 			}
 		});
-		info.addExternalFunc("g_enable_output", new IRuntimeDebugExec() {
-			@Override
-			public String getDoc() {
-				return "保留输出结果";
-			}
-
-			@Override
-			public RuntimeObjectType[] getArgsType() {
-				return null;
-			}
-
-			@Override
-			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
-			                                      IRuntimeStatus status) {
-				status.getRing3().setOptionsBool(LOG_PIPE, true);
-				return null;
-			}
-		});
 		info.addExternalFunc("g_info_get_doc", new IRuntimeDebugExec() {
 			@Override
 			public String getDoc() {
@@ -390,6 +372,38 @@ public class ModuleUserBase implements IInterpreterModule {
 						map.put("halt", new RuntimeObject(true));
 						map.put("data", new RuntimeObject(status.getService().getPipeService().readAndDestroy(USER_PROC_PIPE_PREFIX + id)));
 						map.put("result", new RuntimeObject(result));
+					}
+				}
+				return new RuntimeObject(map);
+			}
+		});
+		info.addExternalFunc("g_web_exec_kill", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "中止用户程序";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kString};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				RuntimeMap map = new RuntimeMap();
+				if (args.get(0).getObj() == null) {
+					map.put("error", new RuntimeObject(true));
+					map.put("msg", new RuntimeObject("id null"));
+				} else {
+					String id = String.valueOf(args.get(0).getObj());
+					try {
+						int pid = Integer.parseInt(id);
+						map.put("data", new RuntimeObject(status.getService().getProcessService().ring3Kill(pid, "远程中止")));
+					} catch (NumberFormatException e) {
+						e.printStackTrace();
+						map.put("error", new RuntimeObject(true));
+						map.put("msg", new RuntimeObject("invalid id"));
 					}
 				}
 				return new RuntimeObject(map);

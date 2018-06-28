@@ -61,6 +61,7 @@ public class SemanticException extends Exception {
 		UNKNOWN("未知"),
 		INVALID_OPERATOR("操作非法"),
 		MISSING_FUNCNAME("过程名不存在"),
+		INVALID_FUNCNAME("过程名非法"),
 		DUP_ENTRY("不能设置为入口函数名"),
 		DUP_FUNCNAME("重复的函数名"),
 		VARIABLE_NOT_DECLARAED("变量未定义"),

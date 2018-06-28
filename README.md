@@ -203,6 +203,32 @@ TASK PROC:
 
 ![Screenshot 107](https://raw.githubusercontent.com/bajdcc/jMiniLang/master/screenshots/web-7.gif)
 
+** Online Compiler Example I: Hanoi **
+
+```javascript
+import "user.base";
+var move = func ~(i, x, y) ->
+    g_puts(g_to_string(i) + ": " + g_to_string(x) + " -> " + g_to_string(y));
+var h = call (func ~(f) ->
+    call (func [
+    "实现Y Combinator",
+    "Y = f -> (x -> f x x) (x -> f x x)",
+    "相关网页——https://www.cnblogs.com/bajdcc/p/5757410.html"
+    ] ~(h) -> h(h))(
+        lambda(x) -> lambda(i, a, b, c) ->
+            call (f(x(x)))(i, a, b, c)))
+(lambda(f) -> lambda(i, a, b, c) {
+    if (i == 1) {
+        move(i, a, c);
+    } else {
+        f(i - 1, a, c, b);
+        move(i, a, c);
+        f(i - 1, b, a, c);
+    }
+});
+h(3, 'A', 'B', 'C');
+```
+
 **Online Documentation**
 
 ![Screenshot 105](https://raw.githubusercontent.com/bajdcc/jMiniLang/master/screenshots/web-5.png)

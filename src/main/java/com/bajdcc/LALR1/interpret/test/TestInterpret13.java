@@ -135,11 +135,8 @@ public class TestInterpret13 {
 							"};\n" +
 							"var h = call (func ~(f) ->\n" +
 							"    call (func ~(h) -> h(h))(\n" +
-							"        lambda(x) -> lambda(i, a, b, c) {\n" +
-							"            var vf = f(x(x));\n" +
-							"            return vf(i, a, b, c);\n" +
-							"        })\n" +
-							")(hanoi);\n" +
+							"        lambda(x) -> lambda(i, a, b, c) ->\n" +
+							"            call (f(x(x)))(i, a, b, c)))(hanoi);\n" +
 							"h(3, 'A', 'B', 'C');\n"
 			};
 

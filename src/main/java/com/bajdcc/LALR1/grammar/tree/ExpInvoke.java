@@ -48,6 +48,11 @@ public class ExpInvoke implements IExp {
 	 */
 	private boolean yield = false;
 
+	/**
+	 * 函数名是否为函数表达式
+	 */
+	private ExpInvoke invokeExp = null;
+
 	public Token getName() {
 		return name;
 	}
@@ -94,6 +99,14 @@ public class ExpInvoke implements IExp {
 
 	public void setYield(boolean yield) {
 		this.yield = yield;
+	}
+
+	public ExpInvoke getInvokeExp() {
+		return invokeExp;
+	}
+
+	public void setInvokeExp(ExpInvoke invokeExp) {
+		this.invokeExp = invokeExp;
 	}
 
 	@Override
@@ -181,6 +194,15 @@ public class ExpInvoke implements IExp {
 			codegen.genCode(RuntimeInst.iyldr, yldLine);
 			codegen.genCode(RuntimeInst.iyldo);
 			jmp.op1 = codegen.getCodeIndex();
+		} else if (invokeExp != null) {
+			invokeExp.genCode(codegen);
+			codegen.genCode(RuntimeInst.iopena);
+			for (IExp exp : params) {
+				exp.genCode(codegen);
+				codegen.genCode(RuntimeInst.ipusha);
+			}
+			codegen.genCode(RuntimeInst.ipush, -1);
+			codegen.genCode(RuntimeInst.ically);
 		} else {
 			codegen.genCode(RuntimeInst.iopena);
 			for (IExp exp : params) {
@@ -222,7 +244,11 @@ public class ExpInvoke implements IExp {
 			} else {
 				sb.append(func.print(prefix));
 			}
-		} else {
+		} else if (invokeExp != null) {
+			sb.append("( ");
+			sb.append(invokeExp.print(prefix));
+			sb.append(" )");
+		} else{
 			sb.append(KeywordType.EXTERN.getName());
 			sb.append(" ");
 			sb.append(extern.toRealString());
@@ -248,6 +274,9 @@ public class ExpInvoke implements IExp {
 	public void addClosure(IClosureScope scope) {
 		if (invoke) {
 			scope.addRef(extern.object);
+		}
+		if (invokeExp != null) {
+			invokeExp.addClosure(scope);
 		}
 		for (IExp exp : params) {
 			exp.addClosure(scope);

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      xmlns:v-bind="http://www.w3.org/1999/xhtml"
       layout:decorate="~{layout}">
 <head>
     <title>运行程序</title>
@@ -64,6 +65,9 @@
                                     </div>
                                 </div>
                                 <div class="layui-form-item" style="text-align: center">
+                                    <button class="layui-btn" lay-submit lay-filter="kill"
+                                            v-bind:class="{ 'layui-btn-disabled': !running }">结束
+                                    </button>
                                     <button type="reset" class="layui-btn layui-btn-primary">清空</button>
                                 </div>
                             </div>
@@ -79,102 +83,147 @@
     <script src="/webjars/datatables/media/js/jquery.js" charset="utf-8"></script>
 </th:block>
 <script layout:fragment="script">
-var Code = {
-    'hanoi': ''
-};
 var App = new Vue({
-        el: '#app',
-        data: {
-            items: [],
-            code: '',
-            content: ''
-        },
-        mounted: function () {
+    el: '#app',
+    data: {
+        items: [],
+        code: '',
+        content: '',
+        running: false,
+        id: -1
+    },
+    mounted: function () {
+        var vm = this;
+        layui.use('form', function(){
+            var form = layui.form;
+            form.on('submit(run)', function(data) {
+                vm.id = -1;
+                vm.submit(data.field);
+                return false;
+            });
+            form.on('submit(kill)', function(data) {
+                if (!vm.running) return false;
+                vm.kill(vm.id);
+                return false;
+            });
+        });
+    },
+    methods: {
+        submit: function (field) {
             var vm = this;
-            layui.use('form', function(){
-                var form = layui.form;
-                form.on('submit(run)', function(data){
-                    vm.submit(data.field);
-                    return false;
-                });
+            vm.$http.post('/api/exec/', field).then(function (response) {
+                var data = response.data;
+                vm.content = '';
+                if (data.code == 200) {
+                    if (data.data.error) {
+                        vm.content = data.data.msg;
+                        /*layer.msg(data.data.msg, {
+                            time: 5000,
+                            btn: ['关闭']
+                        });*/
+                    } else {
+                        vm.running = true;
+                        vm.id = data.data.pid;
+                        vm.content = '运行成功！PID：' + vm.id + '\n';
+                        vm.update(vm.id);
+                        /*layer.msg(data.data.pid, {
+                            time: 5000,
+                            btn: ['关闭']
+                        });*/
+                    }
+                } else {
+                    layer.msg('API调用失败', {
+                        time: 5000,
+                        btn: ['关闭']
+                    });
+                }
+            }, function (response) {
+                layer.msg('运行失败');
+                console.error('cannot post code');
             });
         },
-        methods: {
-            submit: function (field) {
-                var vm = this;
-                vm.$http.post('/api/exec/', field).then(function (response) {
-                    var data = response.data;
-                    vm.content = '';
-                    if (data.code == 200) {
-                        if (data.data.error) {
-                            vm.content = data.data.msg;
-                            /*layer.msg(data.data.msg, {
-                                time: 5000,
-                                btn: ['关闭']
-                            });*/
-                        } else {
-                            vm.content = '运行成功！PID：' + data.data.pid + '\n';
-                            vm.update(data.data.pid);
-                            /*layer.msg(data.data.pid, {
-                                time: 5000,
-                                btn: ['关闭']
-                            });*/
-                        }
+        example: function (name) {
+            var vm = this;
+            vm.$http.get('/api/fs', {"params": {"path": '$/example/' + name}}).then(function (response) {
+                var data = response.data;
+                vm.content = '';
+                if (data.code == 200) {
+                    vm.code = data.data;
+                } else {
+                    layer.msg('下载失败！错误代码：' + data.code, {
+                        time: 5000,
+                        btn: ['关闭']
+                    });
+                }
+            }, function (response) {
+                layer.msg('下载失败');
+                console.error('cannot get example');
+            });
+        },
+        update: function(id) {
+            var vm = this;
+            vm.$http.get('/api/exec_query', {"params": {"id": id}}).then(function (response) {
+                var data = response.data;
+                if (data.code == 200) {
+                    var d = data.data;
+                    if (d.error) {
+                        vm.running = false;
+                        vm.id = -1;
+                        vm.content += "\n出现错误！原因：" + d.msg + '\n';
+                    } else if (d.halt) {
+                        vm.running = false;
+                        vm.id = -1;
+                        vm.content += d.data + "\n" + d.result;
                     } else {
-                        layer.msg('API调用失败', {
+                        vm.content += d.data;
+                        setTimeout(function() {
+                            vm.update(id);
+                        }, 200);
+                    }
+                } else {
+                    vm.running = false;
+                    vm.id = -1;
+                    vm.content += "\n状态查询失败！错误代码：" + data.code + '\n';
+                }
+            }, function (response) {
+                vm.running = false;
+                vm.id = -1;
+                layer.msg('查询失败');
+                console.error('cannot get process status');
+            });
+        },
+        kill: function (id) {
+            var vm = this;
+            vm.$http.get('/api/exec_kill', {"params": {"id": id}}).then(function (response) {
+                var data = response.data;
+                if (data.code == 200) {
+                    var d = data.data;
+                    if (d.error) {
+                        layer.msg('操作失败！原因：' + d.msg, {
+                            time: 5000,
+                            btn: ['关闭']
+                        });
+                    } else if (d.data == 0) {
+                        layer.msg('操作成功');
+                    } else {
+                        layer.msg('操作失败！错误代码：' + d.data, {
                             time: 5000,
                             btn: ['关闭']
                         });
                     }
-                }, function (response) {
-                    console.error('cannot post code');
-                });
-            },
-            example: function (name) {
-                var vm = this;
-                vm.$http.get('/api/fs', {"params": {"path": '$/example/' + name}}).then(function (response) {
-                    var data = response.data;
-                    vm.content = '';
-                    if (data.code == 200) {
-                        vm.code = data.data;
-                    } else {
-                        layer.msg('下载失败！错误代码：' + data.code, {
-                            time: 5000,
-                            btn: ['关闭']
-                        });
-                    }
-                }, function (response) {
-                    console.error('cannot get example');
-                });
-            },
-            update: function(id) {
-                var vm = this;
-                vm.$http.get('/api/exec_query', {"params": {"id": id}}).then(function (response) {
-                    var data = response.data;
-                    if (data.code == 200) {
-                        var d = data.data;
-                        if (d.error) {
-                            vm.content += "\n出现错误！原因：" + d.msg + '\n';
-                        } else if (d.halt) {
-                            vm.content += d.data + "\n" + d.result;
-                        } else {
-                            vm.content += d.data;
-                            setTimeout(function() {
-                                vm.update(id);
-                            }, 200);
-                        }
-                    } else {
-                        vm.content += "\n状态查询失败！错误代码：" + data.code + '\n';
-                    }
-                }, function (response) {
-                    console.error('cannot get process status');
-                });
-            }
+                } else {
+                    layer.msg('操作失败！错误代码：' + data.code, {
+                        time: 5000,
+                        btn: ['关闭']
+                    });
+                }
+            }, function (response) {
+                layer.msg('操作失败');
+                console.error('cannot kill process');
+            });
         }
-    })
-
-
-
+    }
+})
 </script>
 </body>
 </html>

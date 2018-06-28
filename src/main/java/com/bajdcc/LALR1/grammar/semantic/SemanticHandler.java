@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static com.bajdcc.util.lexer.token.TokenType.ID;
+
 /**
  * 【语义分析】语义处理器集合
  *
@@ -51,7 +53,7 @@ public class SemanticHandler {
 		mapSemanticAction.put("predeclear_funcname", (indexed, manage, access, recorder) -> {
 			Token token = access.relativeGet(0);
 			String funcName = token.toRealString();
-			if (token.kToken == TokenType.ID) {
+			if (token.kToken == ID) {
 				if (manage.getQueryScopeService().getEntryName()
 						.equals(funcName)) {
 					recorder.add(SemanticError.DUP_ENTRY, token);
@@ -63,9 +65,9 @@ public class SemanticHandler {
 			Function func = new Function();
 			func.setName(token);
 			manage.getManageScopeService().registerFunc(func);
-			if (token.kToken != TokenType.ID) {
+			if (token.kToken != ID) {
 				token.object = func.getRealName();
-				token.kToken = TokenType.ID;
+				token.kToken = ID;
 			}
 		});
 		/* 声明变量名 */
@@ -213,22 +215,34 @@ public class SemanticHandler {
 				}
 				return obj;
 			} else {
-				ExpBinop binop = new ExpBinop();
 				Token token = indexed.get(10).token;
+				Token num = new Token();
+				if (token.kToken == TokenType.INTEGER) {
+					BigInteger n = (BigInteger) token.object;
+					if (n.signum() != -1) {
+						recorder.add(SemanticError.INVALID_OPERATOR,
+								token);
+						return indexed.get(0).object;
+					}
+					num.object = n.negate();
+					num.kToken = TokenType.INTEGER;
+				} else {
+					BigDecimal n = (BigDecimal) token.object;
+					if (n.signum() != -1) {
+						recorder.add(SemanticError.INVALID_OPERATOR,
+								token);
+						return indexed.get(0).object;
+					}
+					num.object = n.negate();
+					num.kToken = TokenType.DECIMAL;
+				}
+				ExpBinop binop = new ExpBinop();
 				Token minus = new Token();
 				minus.object = OperatorType.MINUS;
 				minus.kToken = TokenType.OPERATOR;
 				minus.position = token.position;
 				binop.setToken(minus);
 				binop.setLeftOperand((IExp) indexed.get(0).object);
-				Token num = new Token();
-				if (token.kToken == TokenType.INTEGER) {
-					num.object = ((BigInteger) token.object).negate();
-					num.kToken = TokenType.INTEGER;
-				} else {
-					num.object = ((BigDecimal) token.object).negate();
-					num.kToken = TokenType.DECIMAL;
-				}
 				num.position = token.position;
 				num.position.iColumn++;
 				ExpValue value = new ExpValue();
@@ -245,7 +259,7 @@ public class SemanticHandler {
 				return indexed.get(2).object;
 			} else if (indexed.exists(3)) {
 				Token token = indexed.get(0).token;
-				if (token.kToken == TokenType.ID) {
+				if (token.kToken == ID) {
 					ExpInvoke invoke = new ExpInvoke();
 					invoke.setName(token);
 					Function func = query.getQueryScopeService().getFuncByName(
@@ -366,6 +380,14 @@ public class SemanticHandler {
 					}
 				} else {
 					invoke.setFunc(func);
+				}
+			} else if (indexed.exists(3)) {
+				IExp exp = (IExp) indexed.get(3).object;
+				if (exp instanceof ExpInvoke) {
+					ExpInvoke invokeExp = (ExpInvoke) exp;
+					invoke.setInvokeExp(invokeExp);
+				} else {
+					recorder.add(SemanticError.INVALID_FUNCNAME, new Token());
 				}
 			} else {
 				invoke.setFunc((Function) indexed.get(0).object);

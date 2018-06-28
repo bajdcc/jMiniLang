@@ -102,4 +102,17 @@ public class SpringApiController {
 		}
 		return map;
 	}
+
+	@RequestMapping(value = "/exec_kill", params = "id", method = RequestMethod.GET, produces = { MediaType.APPLICATION_JSON_UTF8_VALUE })
+	public Object execKill(@RequestParam("id") String id) {
+		Map<String, Object> map = new HashMap<>();
+		Object obj = ModuleNet.getInstance().getWebApi().sendRequest("exec_kill/" + id);
+		if (obj != null) {
+			map.put("code", 200);
+			map.put("data", obj);
+		} else {
+			map.put("code", 404);
+		}
+		return map;
+	}
 }
