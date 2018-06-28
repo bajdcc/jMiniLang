@@ -201,6 +201,8 @@ TASK PROC:
 
 ![Screenshot 106](https://raw.githubusercontent.com/bajdcc/jMiniLang/master/screenshots/web-6.png)
 
+![Screenshot 107](https://raw.githubusercontent.com/bajdcc/jMiniLang/master/screenshots/web-7.gif)
+
 **Online Documentation**
 
 ![Screenshot 105](https://raw.githubusercontent.com/bajdcc/jMiniLang/master/screenshots/web-5.png)
