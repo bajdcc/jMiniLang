@@ -1,0 +1,405 @@
+// 代码参考 http://norvig.com/lispy.html @LISPY
+import "user.base";
+
+var symbol = func ~(s) -> g_set_flag(s, 1);
+var str = func ~(s) -> g_set_flag(s, 2);
+var error = func ~(s) { g_set_flag(s, 3); return "Error: " + s; };
+
+var is_symbol = func ~(exp) -> g_get_type_ordinal(exp) == 6 && g_is_flag(exp, 1);
+var is_string = func ~(exp) -> g_get_type_ordinal(exp) == 6 && g_is_flag(exp, 2);
+var is_error = func ~(exp) -> g_get_type_ordinal(exp) == 6 && g_is_flag(exp, 3);
+
+var is_list = func ~(exp) {
+    var type = g_get_type_ordinal(exp);
+    return type == 9;
+};
+
+var string = func [
+    "序列化",
+    "Convert `RuntimeObject` back into a Lisp-readable string."
+    ] string(exp) {
+    if (is_list(exp)) {
+        return "(" + g_string_join_array(g_func_map(exp, string), " ") + ")";
+    } else {
+        return g_to_string(exp);
+    }
+};
+
+var init = func ~(env) {
+    var code = "
+    (begin
+        (define nil       ())
+        (define when      (lambda (t a) (if t a)))
+        (define list      (lambda args args))
+        (define caar      (lambda (x) (car (car x))))
+        (define cadr      (lambda (x) (car (cdr x))))
+        (define cdar      (lambda (x) (cdr (car x))))
+        (define cddr      (lambda (x) (cdr (cdr x))))
+        (define count     (lambda (item L) (if L (+ 0 (== item (car L)) (count item (cdr L))) 0)))
+        (define range     (lambda (a b) (if (== a b) (quote ()) (cons a (range (+ a 1) b)))))
+        (define null?     empty)
+        (define int?      (lambda (x) (== (type_ord x) 3)))
+        (define real?     (lambda (x) (== (type_ord x) 4)))
+        (define number?   (lambda (x) (|| (int? x) (real? x))))
+        (define symbol?   (lambda (x) (== (type_ord x) 6)))
+        (define bool?     (lambda (x) (== (type_ord x) 7)))
+        (define func?     (lambda (x) (== (type_ord x) 8)))
+        (define list?     (lambda (x) (== (type_ord x) 9)))
+        (define ++        (lambda (x) (+ x 1)))
+        (define --        (lambda (x) (- x 1)))
+        (define val       (lambda (x) (eval x)))
+        (define apply     (lambda (item L) (eval (cons item L))))
+        (define Y
+          (lambda (F)
+            ((lambda (self)
+               (F (lambda (x)((self self) x))))
+             (lambda (self)
+               (F (lambda (x)((self self) x)))))))
+        (define call/cc
+          (lambda (f cc)
+            (f
+              (lambda (x k) (cc x))
+              cc)))
+        )
+    )
+    ";
+    g_lisp_repl(env, code);
+};
+
+var standard_env = func [
+    "内置函数",
+    "An environment with some Scheme standard procedures."
+    ] ~() {
+    var env = {};
+    // ------------------------
+    var bind = func ~(op, name) -> g_map_put(env, op, g_func_apply_gen(name));
+    var bind_direct = func ~(op, name) -> g_map_put(env, op, name);
+    // ------------------------
+    // 基本运算
+    bind("+", "g_func_add");
+    bind("-", "g_func_sub");
+    bind("*", "g_func_mul");
+    bind("/", "g_func_div");
+    bind("%", "g_func_mod");
+    bind("==", "g_func_eq");
+    bind("!=", "g_func_neq");
+    bind("<", "g_func_lt");
+    bind(">", "g_func_gt");
+    bind("<=", "g_func_lte");
+    bind(">=", "g_func_gte");
+    bind("&&", "g_func_and");
+    bind("||", "g_func_or");
+    bind("max", "g_func_max");
+    bind("min", "g_func_min");
+    // 内置方法
+    var bind_1st = func ~(op, name) {
+        g_map_put(env, op, lambda(args) {
+            var val = name(args[0]);
+            if (g_is_null(val)) {
+                return "Function: " + op;
+            }
+            return val;
+        });
+    };
+    var bind_1st_map = func ~(op, name, f) {
+        g_map_put(env, op, lambda(args) {
+            var val = name(args[0]);
+            if (g_is_null(val)) {
+                return "Function: " + op;
+            }
+            return f(val);
+        });
+    };
+    var bind_1st_curry = func ~(op, name, f, arg) {
+        g_map_put(env, op, lambda(args) {
+            var val = name(args[0]);
+            if (g_is_null(val)) {
+                return "Function: " + op;
+            }
+            return f(val, arg);
+        });
+    };
+    bind_1st_map("print", "g_print", string);
+    bind_1st_map("printn", "g_printn", string);
+    bind_1st_map("ui/print", "g_ui_print", string);
+    bind_1st_map("ui/printn", "g_ui_printn", string);
+    bind_1st("type", "g_type");
+    bind_1st("type_ord", "g_get_type_ordinal");
+    bind_1st("empty", "g_array_empty");
+    bind_1st("length", "g_array_size");
+    bind_1st("string", "g_to_string");
+    bind_1st("not", "g_func_not");
+    bind_1st_curry("car", "g_func_1", "g_array_get", 0);
+    bind_1st_curry("cdr", "g_func_1", "g_func_drop", 1);
+    // map
+    var _map = func ~(args) ->
+        g_func_map(args[1], args[0]);
+    bind_direct("map", _map);
+    // append
+    bind_direct("append", "g_func_apply_array");
+    // str
+    var _str = func ~(args) -> string(args[0]);
+    bind_direct("str", _str);
+    // ------------------------
+    var _set = func ~(name, value) -> g_map_put(env, name, value);
+    // ------------------------
+    // 常量
+    _set("PI", g_PI);
+    _set("E", g_E);
+    _set("#s", " ");
+    _set("#t", g_true);
+    _set("#f", g_false);
+    init(env);
+    return env;
+};
+
+var g_lisp_env = func ~() -> standard_env();
+export "g_lisp_env";
+
+var atom = func [
+    "构造原子",
+    "Numbers become numbers; every other token is a symbol."
+    ] ~(token) {
+    if (g_string_start_with(token, "\"")) {
+        var s = g_string_substr(token, 1, g_string_length(token) - 1);
+        s := g_string_replace(s, "_", " ");
+        return str(s);
+    }
+    var number = g_string_to_number(token);
+    if (g_is_null(number)) {
+        return symbol(token);
+    } else {
+        return number;
+    }
+};
+
+var not_equal = func ~(a, b) -> !g_is_null(a) && g_string_not_equal(a, b);
+
+var read_from = func [
+    "语法分析",
+    "Read an expression from a sequence of tokens."
+    ] read_from(tokens) {
+        if (g_array_empty(tokens)) {
+            return error("unexpected EOF while reading");
+        }
+        var token = g_array_remove(tokens, 0); // first token
+        if (g_string_equal(token, "(")) {
+            if (g_array_empty(tokens)) {
+                return error("missing )");
+            }
+            var L = [];
+            while (not_equal(tokens[0], ")")) {
+                g_array_add(L, read_from(tokens));
+            }
+            if (g_array_empty(tokens)) {
+                return error("missing )");
+            } else {
+                g_array_remove(tokens, 0); // pop off ')'
+            }
+            return L;
+        } else if (g_string_equal(token, ")")) {
+            return error("unexpected )");
+        } else if (g_string_equal(token, "'")) {
+            var L = [];
+            g_array_add(L, symbol("quote"));
+            g_array_add(L, read_from(tokens));
+            return L;
+        } else  {
+            return atom(token);
+        }
+};
+
+var tokenize = func [
+    "词法分析",
+    "Convert a string into a list of tokens."
+    ] ~(s) {
+    s := g_string_replace(s, "\\(", " ( "); // 以空格为定界符
+    s := g_string_replace(s, "\\)", " ) ");
+    s := g_string_replace(s, "'", " ' ");
+    s := g_string_trim(s);
+    s := g_string_split(s, "\\s+");
+    s := g_func_map(s, lambda(str) {
+        if (g_string_start_with(str, "\"")) {
+            s := g_string_replace(s, "_", " ");
+        }
+        return str;
+    });
+    return s;
+};
+
+var read = func [
+    "读取原始代码",
+    "Read a Scheme expression from a string."
+    ] ~(s) -> read_from(tokenize(s));
+
+var find = func find(exp, env) {
+    var val = env[exp];
+    if (g_is_null(val)) {
+        var outer = env["#PARENT#"];
+        if (g_is_null(outer)) {
+            return;
+        }
+        return find(exp, outer);
+    }
+    return env;
+};
+
+var eval = func [
+    "运行表达式",
+    "Evaluate an expression in an environment."
+    ] eval(x, env) {
+    if (is_symbol(x)) {                               // variable reference
+        var _env = find(x, env);
+        if (g_is_null(_env)) {
+            return error("undefined symbol " + x);
+        }
+        return _env[x];
+    } else if (!is_list(x)) {                         // constant literal
+        return x;
+    } else if (!g_array_empty(x)) {
+        var head = x[0];
+        if (g_string_equal(head, "quote")) {          // quotation (quote exp)
+            // (_, exp) = x
+            return x[1];
+        } else if (g_string_equal(head, "cons")) {    // construct (cons a b)
+            // (_, a, b) = x
+            var a = eval(x[1], env);
+            var b = eval(x[2], env);
+            var val = g_new(b);
+            g_array_insert(val, 0, a);
+            return val;
+        } else if (g_string_equal(head, "while")) {   // while (while test action)
+            // (_, test, action) = x
+            var test = x[1];
+            var action = x[2];
+            for (;;) {
+                var cond = eval(test, env);
+                if (is_error(cond)) {
+                    return cond;
+                }
+                if (is_list(cond)) {
+                    return error("invalid while: test " + string(cond));
+                } else if (cond) {
+                    eval(action, env);
+                } else {
+                    break;
+                }
+            }
+        } else if (g_string_equal(head, "if")) {      // conditional (if test conseq alt)
+            // (_, test, conseq, alt) = x
+            var test = x[1];
+            var conseq = x[2];
+            var alt = x[3];
+            var cond = eval(test, env);
+            if (is_error(cond)) {
+                return cond;
+            }
+            if (is_list(cond)) {
+                return eval(g_array_empty(cond) ? alt : conseq, env);
+            } else {
+                return eval(cond ? conseq : alt, env);
+            }
+        } else if (g_string_equal(head, "cond")) {    // conditional (cond (test_i action_i)*)
+            // (_, (test_i action_i)*) = x
+            var size = g_array_size(x);
+            for (var j = 1; j < size; j++) {
+                var pair = x[j];
+                if (!is_list(pair) || g_array_size(pair) != 2) {
+                    return error("invalid cond: " + string(pair));
+                }
+                var _test = eval(pair[0], env); // eval test_i
+                if (_test) {
+                    return eval(pair[1], env); // return eval action_i
+                }
+            }
+        } else if (g_string_equal(head, "case")) {    // case (cond key (key_i action_i)*)
+            // (_, key, (key_i action_i)*) = x
+            var key = eval(x[1], env);
+            if (g_is_null(key)) {
+                return error("invalid case: null " + x[1]);
+            }
+            var size = g_array_size(x);
+            for (var j = 2; j < size; j++) {
+                var pair = x[j];
+                if (!is_list(pair) || g_array_size(pair) != 2) {
+                    return error("invalid case: " + string(pair));
+                }
+                var _key = eval(pair[0], env); // eval key_i
+                if (is_list(_key)) {
+                    if (g_array_contains(_key, key)) {
+                        return eval(pair[1], env); // return eval action_i
+                    }
+                } else {
+                    if (key == _key) {
+                        return eval(pair[1], env); // return eval action_i
+                    }
+                }
+            }
+        } else if (g_string_equal(head, "set!")) {    // definition (set! var exp)
+            // (_, var, exp) = x
+            var _var = x[1];
+            var exp = x[2];
+            g_map_put(find(_var, env), _var, eval(exp, env));
+        } else if (g_string_equal(head, "define")) {  // assignment (define var exp)
+            // (_, var, exp) = x
+            var _var = x[1];
+            var exp = x[2];
+            g_map_put(env, _var, eval(exp, env));
+        } else if (g_string_equal(head, "lambda")) {  // procedure (lambda (var*) exp)
+            // (_, vars, exp) = x
+            var vars = x[1];
+            var exp = x[2];
+            return lambda(args) {
+                var env_new = g_new(env); // deep copy
+                g_map_put(env_new, "#PARENT#", env);
+                if (is_list(vars)) {                  // (lambda (var*) exp)
+                    if (is_list(args)) {
+                        var size = g_array_size(vars);
+                        for (var i = 0; i < size; i++) {
+                            g_map_put(env_new, vars[i], args[i]);
+                        }
+                    } else {
+                        g_map_put(env_new, vars[0], args);
+                    }
+                } else if (is_symbol(vars)) {
+                    g_map_put(env_new, vars, args);   // (lambda var exp)
+                }
+                return eval(exp, env_new);
+            };
+        } else if (g_string_equal(head, "begin")) {   // begin (begin exp*)
+            var size = g_array_size(x);
+            var val = g_null;
+            for (var j = 1; j < size; j++) {
+                var _v = eval(x[j], env);
+                val := _v;
+            }
+            return val;
+        } else if (g_string_equal(head, "eval")) {    // eval (eval exp*)
+            var exp = x[1];
+            var exp1 = eval(exp, env); // 第一次返回一个函数指针
+            return eval(exp1, env); // 再次调用
+        } else {                                      // procedure (proc exp*)
+            var proc = eval(head, env);
+            if (g_is_null(proc)) {
+                return error("undefined function " + head);
+            }
+            var x_1 = g_func_drop(x, 1); // take x[-1]
+            var args = g_func_map(x_1, lambda(arg) -> eval(arg, env));
+            return proc(args);
+        }
+    } else {
+        return "Error";
+    }
+};
+
+var g_lisp_repl = func [
+    "解释器",
+    "A prompt-read-eval-print loop."
+    ] ~(env, s) {
+    var r = read(s);
+    if (is_error(r)) {
+        return r;
+    }
+    return string(eval(r, env));
+};
+export "g_lisp_repl";

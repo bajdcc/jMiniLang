@@ -25,7 +25,7 @@ public class Codegen implements ICodegen, ICodegenBlock, ICodegenByteWriter {
 
 	public Codegen(SymbolTable symbol) {
 		symbolList = symbol.getManageDataService().getSymbolList();
-		for (ArrayList<Function> funcs : symbol.getManageDataService().getFuncMap().list) {
+		for (List<Function> funcs : symbol.getManageDataService().getFuncMap().list) {
 			for (Function func : funcs) {
 				funcMap.add(func);
 			}
@@ -51,7 +51,7 @@ public class Codegen implements ICodegen, ICodegenBlock, ICodegenByteWriter {
 			if (func.isExtern()) {
 				info.addExports(func.getRealName(), data.getCodeIndex());
 				info.addExternalFunc(func.getRealName(), new CodegenFuncDoc(
-						func.getDoc()));
+						func.getDoc(), func.getParams()));
 			}
 			func.genCode(this);
 		}

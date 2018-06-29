@@ -25,6 +25,14 @@ var g_puts = func ~() {
     }
 };
 export "g_puts";
+var g_range_string = yield ~(a) {
+    a := "" + a;
+    var size = g_string_length(a);
+    for (var i = 0; i < size; i++) {
+        yield a[i];
+    }
+};
+export "g_range_string";
 var g_sleep_s = func ~(second) {
     if (second < 1) { return; }
     var begin = g_get_timestamp();

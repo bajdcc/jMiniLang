@@ -3,23 +3,25 @@ package com.bajdcc.LALR1.interpret.module;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.bajdcc.LALR1.grammar.Grammar;
+import com.bajdcc.LALR1.grammar.runtime.*;
+import com.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
+import com.bajdcc.LALR1.grammar.runtime.data.RuntimeMap;
 import com.bajdcc.LALR1.interpret.module.api.ModuleNetWebApi;
+import com.bajdcc.LALR1.interpret.module.net.ModuleNetClient;
+import com.bajdcc.LALR1.interpret.module.net.ModuleNetServer;
 import com.bajdcc.LALR1.interpret.module.web.ModuleNetWebServer;
-import com.bajdcc.LALR1.ui.UIMainFrame;
+import com.bajdcc.util.ResourceLoader;
 import com.bajdcc.web.SpringBootstrap;
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
-import com.bajdcc.LALR1.grammar.Grammar;
-import com.bajdcc.LALR1.grammar.runtime.*;
-import com.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
-import com.bajdcc.LALR1.grammar.runtime.data.RuntimeMap;
-import com.bajdcc.LALR1.interpret.module.net.ModuleNetClient;
-import com.bajdcc.LALR1.interpret.module.net.ModuleNetServer;
-import com.bajdcc.util.ResourceLoader;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.*;
@@ -800,8 +802,10 @@ public class ModuleNet implements IInterpreterModule {
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) throws InterruptedException {
 				webApi = null;
-				bootstrap.terminate();
-				bootstrap.join();
+				if (bootstrap != null) {
+					bootstrap.terminate();
+					bootstrap.join();
+				}
 				return null;
 			}
 		});
@@ -860,5 +864,9 @@ public class ModuleNet implements IInterpreterModule {
 
 	public synchronized void setWebApi(ModuleNetWebApi webApi) {
 		this.webApi = webApi;
+	}
+
+	public synchronized void resetBootstrap() {
+		this.bootstrap = null;
 	}
 }

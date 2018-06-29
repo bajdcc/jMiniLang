@@ -1,0 +1,160 @@
+import "user.base";
+import "user.lisp";
+
+/* 打字效果 */
+var word_typewrite = func ~(str, span) {
+    foreach (var c : g_range_string(str)) {
+        g_put(c);
+        //注释下面一行以快速执行
+        //g_sleep_ms(span);
+    }
+    g_put(g_endl);
+};
+
+/* LISP 测试示例 */
+var stage_lisp = func ~() {
+    word_typewrite(g_endl + "    TEST LISP!!!       @jMiniLisp " + g_endl, 100);
+    var env = g_lisp_env();
+    var eval = func~(exp) {
+        g_put(g_endl);
+        //puts("jMiniLisp> ");
+        word_typewrite(exp + g_endl, 30);
+        var val = g_lisp_repl(env, exp);
+        if (val != "null") {
+            g_put("= ");
+            word_typewrite(val + g_endl, 30);
+        }
+    };
+    var comment = func~(str) -> word_typewrite(g_endl + "    " + str + g_endl + g_endl, 40);
+    var out_call = func~(strs) -> word_typewrite(strs[0] + g_endl, 35);
+    g_map_put(env, "out", out_call);
+    var builtin = func~(str) {
+        g_put(g_endl);
+        //puts("jMiniLisp> ");
+        word_typewrite(str + g_endl, 25);
+    };
+    // eval code
+    // ##########################
+    comment("1. Lambda");
+    eval("(define circle-area
+    (lambda (r)
+        (* PI
+            (* r r))))");
+    eval("(circle-area 10)");
+    eval("(define fact
+    (lambda (n)
+        (if (<= n 1)
+            1
+            (* n (fact (- n 1))))))");
+    eval("(fact 10)");
+    // ##########################
+    comment("2. List");
+    eval("(list 1 2 3 4 5)");
+    eval("(range 1 10)");
+    eval("(define L (list 1 2 3 4 5))");
+    eval("(car L)");
+    eval("(cdr L)");
+    // ##########################
+    comment("3. Count");
+    builtin("(define count
+    (lambda (item L)
+        (if L
+            (+ 0
+                (== item (car L))
+                (count item (cdr L)))
+            0)))");
+    eval("(count 0 (list 0 1 2 3 0 0))");
+    eval("(count 'the
+    '(the more the merrier the bigger the better))");
+    // ##########################
+    comment("4. Type");
+    eval("(null? (list))");
+    eval("(number? 5.0)");
+    eval("(number? (list))");
+    eval("(type 'hello)");
+    eval("(list? (list))");
+    eval("(car '(a b c))");
+    eval("(type (car '(a b c)))");
+    eval("(cdr (cons 'a '(b c)))");
+    // ##########################
+    comment("5. Function");
+    eval("(define repeat
+    (lambda (f)
+        (lambda (x)
+            (f (f x)))))");
+    eval("(define twice
+    (lambda (x)
+        (* 2 x)))");
+    eval("((repeat twice) 10)");
+    eval("(define sum
+    (lambda (n)
+        (if (< n 2)
+            1
+            (+ n (sum (- n 1))))))");
+    eval("(sum 10)");
+    eval("(min 50 60)");
+    eval("(range 0 10)");
+    eval("(define fib
+    (lambda (n)
+        (if (<= n 2)
+            1
+            (+ (fib (- n 1)) (fib (- n 2))))))");
+    eval("(fib 10)");
+    eval("(map fib (list 3 2 3 4 5))");
+    eval("(map fib (range 1 10))");
+    eval("(map
+    (lambda (n)
+        ((repeat twice) n))
+    (range 1 10))");
+    builtin("(define apply
+    (lambda (item L)
+        (eval (cons item L))))");
+    eval("(apply +
+    (list \"hello\" #s \"world\" #s \"bajdcc!\"))");
+    eval("(apply + (range 1 10))");
+    eval("(append '(a b) '(c d))");
+    eval("(apply 'append '('(a b) '(c d)))");
+    eval("(apply max (range 1 10))");
+    builtin("(define Y
+    (lambda (F)
+        ((lambda (self)
+            (F (lambda (x)((self self) x))))
+        (lambda (self)
+            (F (lambda (x)((self self) x))))))))))");
+    eval("(define fib_Y
+    (lambda (f)
+        (lambda (n)
+            (if (<= n 2)
+                1
+                (+ (f (- n 1)) (f (- n 2)))))))");
+    eval("(apply + (map (Y fib_Y) (range 1 10)))");
+    // ##########################
+    comment("6. Condition");
+    eval("(cond
+    ((== 1 2) 3 7)
+    ((== 4 4) 6))");
+    eval("(cond
+    ((== 1 2) 3)
+    ((== 4 4) 6))");
+    eval("(define N 8)");
+    eval("(case N
+    (1 2)
+    (8 9))");
+    eval("(case N
+    (3 2)
+    (2 9)
+    ('(4 8) 5))");
+    eval("(when (> N 5) 6)");
+    eval("(when (> N 50) 6)");
+    eval("(while (> N 1)
+    (set! N (-- N)))");
+    eval("(val N)");
+    eval("(while (<= N 10)
+    (begin
+        (out (+ \"Hello_world!_\" (str N)))
+        (set! N (++ N))))");
+    // ##########################
+    comment("The end.                @bajdcc");
+};
+
+stage_lisp();

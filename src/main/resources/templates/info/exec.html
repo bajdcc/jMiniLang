@@ -22,6 +22,7 @@
                             <div class="layui-form layui-form-pane">
                                 <div class="layui-form-item">
                                     <button class="layui-btn" @click="example('hanoi')">汉诺塔</button>
+                                    <button class="layui-btn" @click="example('lisp')">Lisp</button>
                                 </div>
                             </div>
                         </div>
@@ -60,7 +61,7 @@
                                 <div class="layui-form-item layui-form-text">
                                     <label class="layui-form-label">输出</label>
                                     <div class="layui-input-block">
-                                        <textarea v-model="content" readonly class="layui-textarea"
+                                        <textarea id="output" v-model="content" readonly class="layui-textarea"
                                                   style="height: 200px"></textarea>
                                     </div>
                                 </div>
@@ -174,8 +175,10 @@ var App = new Vue({
                         vm.running = false;
                         vm.id = -1;
                         vm.content += d.data + "\n" + d.result;
+                        $("#output").scrollTop($("#output")[0].scrollHeight);
                     } else {
                         vm.content += d.data;
+                        $("#output").scrollTop($("#output")[0].scrollHeight);
                         setTimeout(function() {
                             vm.update(id);
                         }, 200);

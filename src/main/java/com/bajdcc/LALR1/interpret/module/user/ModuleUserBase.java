@@ -69,6 +69,7 @@ public class ModuleUserBase implements IInterpreterModule {
 		importFromProc(info, ModuleProc.getInstance().getCodePage().getInfo());
 		importFromNet(info, ModuleNet.getInstance().getCodePage().getInfo());
 		importFromFile(info, ModuleFile.getInstance().getCodePage().getInfo());
+		importFromMath(info, ModuleMath.getInstance().getCodePage().getInfo());
 
 		return runtimeCodePage = page;
 	}
@@ -84,7 +85,8 @@ public class ModuleUserBase implements IInterpreterModule {
 		String[] importFunc = new String[]{
 				"g_is_null", "g_set_debug", "g_not_null",
 				"g_to_string", "g_new", "g_doc", "g_get_type", "g_get_type_ordinal", "g_type",
-				"g_args_count", "g_args_index", "g_get_timestamp"
+				"g_args_count", "g_args_index", "g_get_timestamp",
+				"g_is_flag", "g_set_flag"
 		};
 		for (String key : importFunc) {
 			info.addExternalFunc(key, refer.getExecCallByName(key));
@@ -654,5 +656,22 @@ public class ModuleUserBase implements IInterpreterModule {
 				return new RuntimeObject(BigInteger.valueOf(status.getService().getFileService().getVfsListSize()));
 			}
 		});
+	}
+
+	private static void importFromMath(IRuntimeDebugInfo info, IRuntimeDebugInfo refer) {
+		String[] importValue = new String[]{
+				"g_PI", "g_PI_2", "g_E", "g_random"
+		};
+		for (String key : importValue) {
+			info.addExternalValue(key, refer.getValueCallByName(key));
+		}
+
+		String[] importFunc = new String[]{
+				"g_sqrt", "g_sqrt_double", "g_cos", "g_sin", "g_floor",
+				"g_atan2", "g_random_int"
+		};
+		for (String key : importFunc) {
+			info.addExternalFunc(key, refer.getExecCallByName(key));
+		}
 	}
 }

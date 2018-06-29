@@ -1,27 +1,28 @@
-package com.bajdcc.LALR1.interpret.module;
+package com.bajdcc.LALR1.interpret.module.user;
 
 import com.bajdcc.LALR1.grammar.Grammar;
 import com.bajdcc.LALR1.grammar.runtime.IRuntimeDebugInfo;
 import com.bajdcc.LALR1.grammar.runtime.RuntimeCodePage;
+import com.bajdcc.LALR1.interpret.module.IInterpreterModule;
 import com.bajdcc.util.ResourceLoader;
 
 /**
- * 【模块】LISP
+ * 【模块】用户态-Lisp
  *
  * @author bajdcc
  */
-public class ModuleLisp implements IInterpreterModule {
+public class ModuleUserLisp implements IInterpreterModule {
 
-	private static ModuleLisp instance = new ModuleLisp();
+	private static ModuleUserLisp instance = new ModuleUserLisp();
 	private RuntimeCodePage runtimeCodePage;
 
-	public static ModuleLisp getInstance() {
+	public static ModuleUserLisp getInstance() {
 		return instance;
 	}
 
 	@Override
 	public String getModuleName() {
-		return "module.lisp";
+		return "user.lisp";
 	}
 
 	@Override

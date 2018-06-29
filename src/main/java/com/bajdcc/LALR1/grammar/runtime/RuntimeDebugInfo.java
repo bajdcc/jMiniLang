@@ -1,5 +1,6 @@
 package com.bajdcc.LALR1.grammar.runtime;
 
+import com.bajdcc.LALR1.grammar.codegen.CodegenFuncDoc;
 import com.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
 
 import java.io.Serializable;
@@ -73,7 +74,10 @@ public class RuntimeDebugInfo implements IRuntimeDebugInfo, Serializable {
 			RuntimeArray arr = new RuntimeArray();
 			arr.add(new RuntimeObject(a.getKey()));
 			arr.add(new RuntimeObject(BigInteger.valueOf(exports.getOrDefault(a.getKey(), -1))));
-			arr.add(new RuntimeObject(argsToString(a.getValue().getArgsType())));
+			if (a.getValue() instanceof CodegenFuncDoc)
+				arr.add(new RuntimeObject(((CodegenFuncDoc) a.getValue()).getParamsDoc()));
+			else
+				arr.add(new RuntimeObject(argsToString(a.getValue().getArgsType())));
 			arr.add(new RuntimeObject(String.valueOf(a.getValue().getDoc())));
 			array.add(arr);
 		});

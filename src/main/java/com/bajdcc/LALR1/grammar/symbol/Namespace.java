@@ -16,6 +16,4 @@ public class Namespace {
 	 * 命名空间名称
 	 */
 	public String name = "(null)";
-
-
 }

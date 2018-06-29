@@ -1,11 +1,11 @@
 package com.bajdcc.LALR1.grammar.runtime;
 
-import javafx.util.Pair;
-import org.apache.log4j.Logger;
 import com.bajdcc.LALR1.grammar.Grammar;
 import com.bajdcc.LALR1.grammar.runtime.service.IRuntimeProcessService;
 import com.bajdcc.LALR1.grammar.runtime.service.RuntimeService;
 import com.bajdcc.LALR1.syntax.handler.SyntaxException;
+import javafx.util.Pair;
+import org.apache.log4j.Logger;
 
 import java.io.InputStream;
 import java.util.*;
@@ -196,11 +196,12 @@ public class RuntimeProcess implements IRuntimeProcessService {
 					}
 				} else {
 					int cycle = MAX_CYCLE - process.priority;
-					sleep++;
+					// sleep++;
 					try {
 						for (int i = 0; i < cycle; i++) {
 							if (process.sleep > 0) {
 								process.sleep--;
+								sleep++; // boost!
 								break;
 							}
 							if (process.runnable) {

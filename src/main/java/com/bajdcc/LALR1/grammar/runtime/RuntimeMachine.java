@@ -12,6 +12,7 @@ import com.bajdcc.LALR1.interpret.module.*;
 import com.bajdcc.LALR1.interpret.module.std.ModuleStdBase;
 import com.bajdcc.LALR1.interpret.module.std.ModuleStdShell;
 import com.bajdcc.LALR1.interpret.module.user.ModuleUserBase;
+import com.bajdcc.LALR1.interpret.module.user.ModuleUserLisp;
 import com.bajdcc.LALR1.interpret.module.user.ModuleUserWeb;
 import com.bajdcc.LALR1.syntax.handler.SyntaxException;
 import com.bajdcc.util.HashListMapEx;
@@ -134,7 +135,8 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 			logger.debug("Loading user modules...");
 			modulesUser = new IInterpreterModule[]{
 					ModuleUserBase.getInstance(),
-					ModuleUserWeb.getInstance()
+					ModuleUserWeb.getInstance(),
+					ModuleUserLisp.getInstance()
 			};
 		}
 		this.process = process;

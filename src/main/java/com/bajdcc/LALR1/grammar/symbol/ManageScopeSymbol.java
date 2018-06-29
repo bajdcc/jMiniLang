@@ -24,7 +24,7 @@ public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
 	private static String LAMBDA_PREFIX = "~lambda#";
 	private int lambdaId = 0;
 	private HashListMap<Object> symbolList = new HashListMap<>();
-	private HashListMapEx<String, ArrayList<Function>> funcMap = new HashListMapEx<>();
+	private HashListMapEx<String, List<Function>> funcMap = new HashListMapEx<>();
 	private List<Map<String, Function>> funcScope = new ArrayList<>();
 	private List<Set<String>> stkScope = new ArrayList<>();
 	private Stack<Integer> stkLambdaId = new Stack<>();
@@ -35,7 +35,7 @@ public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
 
 	public ManageScopeSymbol() {
 		enterScope();
-		ArrayList<Function> entry = new ArrayList<>();
+		List<Function> entry = new ArrayList<>();
 		entry.add(new Function());
 		funcMap.add(ENTRY_NAME, entry);
 		for (BlockType type : BlockType.values()) {
@@ -167,7 +167,7 @@ public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
 
 	@Override
 	public boolean isRegisteredFunc(String name) {
-		ArrayList<Function> funcs = funcMap.get(name);
+		List<Function> funcs = funcMap.get(name);
 		return funcs != null && !funcs.isEmpty();
 	}
 
@@ -177,7 +177,7 @@ public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
 	}
 
 	public void check(ISemanticRecorder recorder) {
-		for (ArrayList<Function> funcs : funcMap.list) {
+		for (List<Function> funcs : funcMap.list) {
 			for (Function func : funcs) {
 				func.analysis(recorder);
 			}
@@ -190,7 +190,7 @@ public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
 	}
 
 	@Override
-	public HashListMapEx<String, ArrayList<Function>> getFuncMap() {
+	public HashListMapEx<String, List<Function>> getFuncMap() {
 		return funcMap;
 	}
 
@@ -212,7 +212,7 @@ public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
 		sb.append("#### 过程表 ####");
 		sb.append(System.lineSeparator());
 		int i = 0;
-		for (ArrayList<Function> funcs : funcMap.list) {
+		for (List<Function> funcs : funcMap.list) {
 			for (Function func : funcs) {
 				sb.append("----==== #").append(i).append(" ====----");
 				sb.append(System.lineSeparator());

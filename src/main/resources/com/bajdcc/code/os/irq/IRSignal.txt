@@ -4,6 +4,7 @@ import "sys.proc";
 import "sys.remote";
 import "sys.task";
 import "sys.file";
+import "sys.string";
 
 // IRQ: 3
 var no = 3;
@@ -45,7 +46,7 @@ var destroy_int = func ~() {
 
 if (!g_query_file("$/web/api")) {
     g_write_file_s_utf8("$/web/api", g_read_file_utf8_all("!/com/bajdcc/code/fs/api.txt"));
-    var examples = ["hanoi"];
+    var examples = g_string_split(g_read_file_utf8_all("!/com/bajdcc/code/fs/examples.txt"), "\\s+");
     foreach (var example : g_range_array(examples)) {
         g_write_file_s_utf8("$/example/" + example,
             g_read_file_utf8_all("!/com/bajdcc/code/fs/example/" + example + ".txt"));

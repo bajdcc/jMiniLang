@@ -4,7 +4,7 @@ import com.bajdcc.LALR1.grammar.tree.Function;
 import com.bajdcc.util.HashListMap;
 import com.bajdcc.util.HashListMapEx;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 符号表数据接口
@@ -21,5 +21,5 @@ public interface IManageDataSymbol {
 	/**
 	 * @return 过程表
 	 */
-	HashListMapEx<String, ArrayList<Function>> getFuncMap();
+	HashListMapEx<String, List<Function>> getFuncMap();
 }
