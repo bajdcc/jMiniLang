@@ -9,6 +9,7 @@ import com.bajdcc.util.lexer.token.OperatorType;
 import com.bajdcc.util.lexer.token.Token;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 【语义分析】类方法调用表达式
@@ -32,7 +33,7 @@ public class ExpInvokeProperty implements IExp {
 	/**
 	 * 参数
 	 */
-	private ArrayList<IExp> params = new ArrayList<>();
+	private List<IExp> params = new ArrayList<>();
 
 	public void setToken(Token token) {
 		this.token = token;
@@ -54,11 +55,11 @@ public class ExpInvokeProperty implements IExp {
 		this.property = property;
 	}
 
-	public ArrayList<IExp> getParams() {
+	public List<IExp> getParams() {
 		return params;
 	}
 
-	public void setParams(ArrayList<IExp> params) {
+	public void setParams(List<IExp> params) {
 		this.params = params;
 	}
 

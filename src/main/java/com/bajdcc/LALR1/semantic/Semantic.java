@@ -23,6 +23,7 @@ import com.bajdcc.util.lexer.token.Token;
 import com.bajdcc.util.lexer.token.TokenType;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -45,17 +46,17 @@ public class Semantic extends Syntax implements IErrorHandler {
 	/**
 	 * 存放生成的指令
 	 */
-	private ArrayList<Instruction> arrInsts = new ArrayList<>();
+	private List<Instruction> arrInsts = new ArrayList<>();
 
 	/**
 	 * 存放生成过程中的错误
 	 */
-	private ArrayList<TrackerError> arrErrors = new ArrayList<>();
+	private List<TrackerError> arrErrors = new ArrayList<>();
 
 	/**
 	 * 单词流
 	 */
-	private ArrayList<Token> arrTokens = new ArrayList<>();
+	private List<Token> arrTokens = new ArrayList<>();
 
 	/**
 	 * 当前的语义接口
@@ -141,11 +142,11 @@ public class Semantic extends Syntax implements IErrorHandler {
 	 */
 	private void analysis() {
 		/* 可用NPA边表 */
-		ArrayList<NPAEdge> aliveEdgeList = new ArrayList<>();
+		List<NPAEdge> aliveEdgeList = new ArrayList<>();
 		/* 结束边 */
 		NPAEdge finalEdge;
 		/* 初始PDA状态集合 */
-		ArrayList<NPAStatus> initStatusList = npa.getInitStatusList();
+		List<NPAStatus> initStatusList = npa.getInitStatusList();
 		/* 清空结果 */
 		arrInsts.clear();
 		arrErrors.clear();
@@ -333,7 +334,7 @@ public class Semantic extends Syntax implements IErrorHandler {
 							/* 判断是否分析成功 */
 							if (!tracker.bRaiseError) {
 								/* 记录一个分析结果 */
-								ArrayList<Instruction> instList = new ArrayList<>();
+								List<Instruction> instList = new ArrayList<>();
 								InstructionRecord instRecord = tracker.rcdInst;
 								/* 记录语法树指令 */
 								while (instRecord != null) {
@@ -546,7 +547,7 @@ public class Semantic extends Syntax implements IErrorHandler {
 					arrErrors.get(0).position, error);
 		}
 		/* 规则集合 */
-		ArrayList<RuleItem> items = npa.getRuleItems();
+		List<RuleItem> items = npa.getRuleItems();
 		/* 符号表查询接口 */
 		IQuerySymbol query = getQuerySymbolService();
 		/* 符号表管理接口 */
@@ -554,7 +555,7 @@ public class Semantic extends Syntax implements IErrorHandler {
 		/* 语义错误处理接口 */
 		ISemanticRecorder recorder = getSemanticRecorderService();
 		/* 复制单词流 */
-		ArrayList<Token> tokens = arrTokens.stream().map(Token::copy).collect(Collectors.toCollection(ArrayList::new));
+		List<Token> tokens = arrTokens.stream().map(Token::copy).collect(Collectors.toCollection(ArrayList::new));
 		/* 运行时自动机 */
 		SemanticMachine machine = new SemanticMachine(items, arrActions,
 				tokens, query, manage, recorder, debug);
@@ -617,7 +618,7 @@ public class Semantic extends Syntax implements IErrorHandler {
 		System.err.println(tracker.iter.index());
 		System.err.println(tracker.iter.position());
 		System.err.println(tracker.npaStatus.data.label);
-		ArrayList<RuleItem> items = npa.getRuleItems();
+		List<RuleItem> items = npa.getRuleItems();
 		StringBuilder sb = new StringBuilder();
 		sb.append(System.lineSeparator());
 		InstructionRecord rcd = tracker.rcdInst;
@@ -675,7 +676,7 @@ public class Semantic extends Syntax implements IErrorHandler {
 	 * @return 指令集描述
 	 */
 	public String getInst() {
-		ArrayList<RuleItem> items = npa.getRuleItems();
+		List<RuleItem> items = npa.getRuleItems();
 		StringBuilder sb = new StringBuilder();
 		sb.append("#### 指令集 ####");
 		sb.append(System.lineSeparator());

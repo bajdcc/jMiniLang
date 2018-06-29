@@ -8,6 +8,7 @@ import com.bajdcc.util.lexer.token.KeywordType;
 import com.bajdcc.util.lexer.token.Token;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 【语义分析】函数
@@ -29,7 +30,7 @@ public class Function implements IExp {
 	/**
 	 * 参数
 	 */
-	private ArrayList<Token> params = new ArrayList<>();
+	private List<Token> params = new ArrayList<>();
 
 	/**
 	 * 函数主体Block
@@ -39,7 +40,7 @@ public class Function implements IExp {
 	/**
 	 * 文档
 	 */
-	private ArrayList<Token> doc = null;
+	private List<Token> doc = null;
 
 	/**
 	 * 外部化
@@ -71,11 +72,11 @@ public class Function implements IExp {
 		this.realName = realName;
 	}
 
-	public ArrayList<Token> getParams() {
+	public List<Token> getParams() {
 		return params;
 	}
 
-	public void setParams(ArrayList<Token> params) {
+	public void setParams(List<Token> params) {
 		this.params = params;
 	}
 
@@ -99,7 +100,7 @@ public class Function implements IExp {
 		return sb.toString();
 	}
 
-	public void setDoc(ArrayList<Token> doc) {
+	public void setDoc(List<Token> doc) {
 		this.doc = doc;
 	}
 

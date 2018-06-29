@@ -131,49 +131,49 @@ public class SemanticHandler {
 	 */
 	private void initializeHandler() {
 		/* 复制 */
-		mapSemanticAnalyzier.put("copy", (indexed, query, recorder) -> indexed.get(0).object);
+		mapSemanticAnalyzier.put("copy", (indexed, query, recorder) -> indexed.get(0).getObject());
 		/* 表达式 */
 		mapSemanticAnalyzier.put("exp", (indexed, query, recorder) -> {
 			if (indexed.exists(2)) {// 双目运算
-				Token token = indexed.get(2).token;
+				Token token = indexed.get(2).getToken();
 				if (token.kToken == TokenType.OPERATOR) {
-					if (token.object == OperatorType.DOT && indexed.get(0).object instanceof ExpInvokeProperty) {
-						ExpInvokeProperty invoke = (ExpInvokeProperty) indexed.get(0).object;
-						invoke.setObj((IExp) indexed.get(1).object);
+					if (token.object == OperatorType.DOT && indexed.get(0).getObject() instanceof ExpInvokeProperty) {
+						ExpInvokeProperty invoke = (ExpInvokeProperty) indexed.get(0).getObject();
+						invoke.setObj((IExp) indexed.get(1).getObject());
 						return invoke;
 					} else if (TokenTools.isAssignment((OperatorType) token.object)) {
-						if (indexed.get(1).object instanceof ExpBinop) {
-							ExpBinop bin = (ExpBinop) indexed.get(1).object;
+						if (indexed.get(1).getObject() instanceof ExpBinop) {
+							ExpBinop bin = (ExpBinop) indexed.get(1).getObject();
 							if (bin.getToken().object == OperatorType.DOT) {
 								ExpAssignProperty assign = new ExpAssignProperty();
 								assign.setToken(token);
 								assign.setObj(bin.getLeftOperand());
 								assign.setProperty(bin.getRightOperand());
-								assign.setExp((IExp) indexed.get(0).object);
+								assign.setExp((IExp) indexed.get(0).getObject());
 								return assign;
 							}
-						} else if (indexed.get(1).object instanceof ExpIndex) {
-							ExpIndex bin = (ExpIndex) indexed.get(1).object;
+						} else if (indexed.get(1).getObject() instanceof ExpIndex) {
+							ExpIndex bin = (ExpIndex) indexed.get(1).getObject();
 							ExpIndexAssign assign = new ExpIndexAssign();
 							assign.setToken(token);
 							assign.setExp(bin.getExp());
 							assign.setIndex(bin.getIndex());
-							assign.setObj((IExp) indexed.get(0).object);
+							assign.setObj((IExp) indexed.get(0).getObject());
 							return assign;
 						}
 					}
 				}
 				ExpBinop binop = new ExpBinop();
-				binop.setToken(indexed.get(2).token);
-				binop.setLeftOperand((IExp) indexed.get(1).object);
-				binop.setRightOperand((IExp) indexed.get(0).object);
+				binop.setToken(indexed.get(2).getToken());
+				binop.setLeftOperand((IExp) indexed.get(1).getObject());
+				binop.setRightOperand((IExp) indexed.get(0).getObject());
 				return binop.simplify(recorder);
 			} else if (indexed.exists(3)) {// 单目运算
-				Token token = indexed.get(3).token;
+				Token token = indexed.get(3).getToken();
 				if (token.kToken == TokenType.OPERATOR) {
 					if ((token.object == OperatorType.PLUS_PLUS || token.object == OperatorType.MINUS_MINUS)
-							&& indexed.get(1).object instanceof ExpBinop) {
-						ExpBinop bin = (ExpBinop) indexed.get(1).object;
+							&& indexed.get(1).getObject() instanceof ExpBinop) {
+						ExpBinop bin = (ExpBinop) indexed.get(1).getObject();
 						if (bin.getToken().object == OperatorType.DOT) {
 							ExpAssignProperty assign = new ExpAssignProperty();
 							assign.setToken(token);
@@ -184,24 +184,24 @@ public class SemanticHandler {
 					}
 				}
 				ExpSinop sinop = new ExpSinop();
-				sinop.setToken(indexed.get(3).token);
-				sinop.setOperand((IExp) indexed.get(1).object);
+				sinop.setToken(indexed.get(3).getToken());
+				sinop.setOperand((IExp) indexed.get(1).getObject());
 				return sinop.simplify(recorder);
 			} else if (indexed.exists(4)) {// 三目运算
 				ExpTriop triop = new ExpTriop();
-				triop.setFirstToken(indexed.get(4).token);
-				triop.setSecondToken(indexed.get(5).token);
-				triop.setFirstOperand((IExp) indexed.get(0).object);
-				triop.setSecondOperand((IExp) indexed.get(6).object);
-				triop.setThirdOperand((IExp) indexed.get(7).object);
+				triop.setFirstToken(indexed.get(4).getToken());
+				triop.setSecondToken(indexed.get(5).getToken());
+				triop.setFirstOperand((IExp) indexed.get(0).getObject());
+				triop.setSecondOperand((IExp) indexed.get(6).getObject());
+				triop.setThirdOperand((IExp) indexed.get(7).getObject());
 				return triop.simplify(recorder);
 			} else if (indexed.exists(5)) {
 				ExpIndex exp = new ExpIndex();
-				exp.setExp((IExp) indexed.get(1).object);
-				exp.setIndex((IExp) indexed.get(5).object);
+				exp.setExp((IExp) indexed.get(1).getObject());
+				exp.setIndex((IExp) indexed.get(5).getObject());
 				return exp;
 			} else if (!indexed.exists(10)) {
-				Object obj = indexed.get(0).object;
+				Object obj = indexed.get(0).getObject();
 				if (obj instanceof ExpValue) {
 					ExpValue value = (ExpValue) obj;
 					if (!value.isConstant()
@@ -215,14 +215,14 @@ public class SemanticHandler {
 				}
 				return obj;
 			} else {
-				Token token = indexed.get(10).token;
+				Token token = indexed.get(10).getToken();
 				Token num = new Token();
 				if (token.kToken == TokenType.INTEGER) {
 					BigInteger n = (BigInteger) token.object;
 					if (n.signum() != -1) {
 						recorder.add(SemanticError.INVALID_OPERATOR,
 								token);
-						return indexed.get(0).object;
+						return indexed.get(0).getObject();
 					}
 					num.object = n.negate();
 					num.kToken = TokenType.INTEGER;
@@ -231,7 +231,7 @@ public class SemanticHandler {
 					if (n.signum() != -1) {
 						recorder.add(SemanticError.INVALID_OPERATOR,
 								token);
-						return indexed.get(0).object;
+						return indexed.get(0).getObject();
 					}
 					num.object = n.negate();
 					num.kToken = TokenType.DECIMAL;
@@ -242,7 +242,7 @@ public class SemanticHandler {
 				minus.kToken = TokenType.OPERATOR;
 				minus.position = token.position;
 				binop.setToken(minus);
-				binop.setLeftOperand((IExp) indexed.get(0).object);
+				binop.setLeftOperand((IExp) indexed.get(0).getObject());
 				num.position = token.position;
 				num.position.iColumn++;
 				ExpValue value = new ExpValue();
@@ -254,11 +254,11 @@ public class SemanticHandler {
 		/* 基本数据结构 */
 		mapSemanticAnalyzier.put("type", (indexed, query, recorder) -> {
 			if (indexed.exists(1)) {
-				return indexed.get(1).object;
+				return indexed.get(1).getObject();
 			} else if (indexed.exists(2)) {
-				return indexed.get(2).object;
+				return indexed.get(2).getObject();
 			} else if (indexed.exists(3)) {
-				Token token = indexed.get(0).token;
+				Token token = indexed.get(0).getToken();
 				if (token.kToken == ID) {
 					ExpInvoke invoke = new ExpInvoke();
 					invoke.setName(token);
@@ -278,7 +278,7 @@ public class SemanticHandler {
 						invoke.setFunc(func);
 					}
 					if (indexed.exists(4)) {
-						invoke.setParams((ArrayList<IExp>) indexed.get(4).object);
+						invoke.setParams((List<IExp>) indexed.get(4).getObject());
 					}
 					return invoke;
 				} else {
@@ -288,13 +288,13 @@ public class SemanticHandler {
 					value.setToken(token);
 					invoke.setProperty(value);
 					if (indexed.exists(4)) {
-						invoke.setParams((ArrayList<IExp>) indexed.get(4).object);
+						invoke.setParams((List<IExp>) indexed.get(4).getObject());
 					}
 					return invoke;
 				}
 			} else {
 				ExpValue value = new ExpValue();
-				Token token = indexed.get(0).token;
+				Token token = indexed.get(0).getToken();
 				value.setToken(token);
 				return value;
 			}
@@ -304,7 +304,7 @@ public class SemanticHandler {
 			Function func = new Function();
 			func.setName(query.getQueryScopeService().getEntryToken());
 			func.setRealName(func.getName().toRealString());
-			Block block = new Block((List<IStmt>) indexed.get(0).object);
+			Block block = new Block((List<IStmt>) indexed.get(0).getObject());
 			block.getStmts().add(new StmtReturn());
 			func.setBlock(block);
 			return func;
@@ -314,30 +314,30 @@ public class SemanticHandler {
 			if (!indexed.exists(0)) {
 				return new Block();
 			}
-			return new Block((List<IStmt>) indexed.get(0).object);
+			return new Block((List<IStmt>) indexed.get(0).getObject());
 		});
 		/* 语句集合 */
 		mapSemanticAnalyzier.put("stmt_list", (indexed, query, recorder) -> {
-			ArrayList<IStmt> stmts;
+			List<IStmt> stmts;
 			if (indexed.exists(1)) {
-				stmts = (ArrayList<IStmt>) indexed.get(1).object;
+				stmts = (List<IStmt>) indexed.get(1).getObject();
 			} else {
 				stmts = new ArrayList<>();
 			}
-			stmts.add(0, (IStmt) indexed.get(0).object);
+			stmts.add(0, (IStmt) indexed.get(0).getObject());
 			return stmts;
 		});
 		/* 变量定义 */
 		mapSemanticAnalyzier.put("var", (indexed, query, recorder) -> {
 			ExpAssign assign = new ExpAssign();
-			Token token = indexed.get(0).token;
+			Token token = indexed.get(0).getToken();
 			assign.setName(token);
 			if (indexed.exists(11)) {
 				assign.setDecleared(true);
 			}
 			if (indexed.exists(1)) {
 				ExpFunc func = new ExpFunc();
-				func.setFunc((Function) indexed.get(1).object);
+				func.setFunc((Function) indexed.get(1).getObject());
 				func.genClosure();
 				if (assign.isDecleared()) {
 					String funcName = func.getFunc().getRealName();
@@ -348,23 +348,23 @@ public class SemanticHandler {
 				}
 				assign.setExp(func);
 			} else {
-				assign.setExp((IExp) indexed.get(2).object);
+				assign.setExp((IExp) indexed.get(2).getObject());
 			}
 			return assign;
 		});
 		/* 属性设置 */
 		mapSemanticAnalyzier.put("set", (indexed, query, recorder) -> {
 			ExpAssignProperty assign = new ExpAssignProperty();
-			assign.setObj((IExp) indexed.get(3).object);
-			assign.setProperty((IExp) indexed.get(4).object);
-			assign.setExp((IExp) indexed.get(2).object);
+			assign.setObj((IExp) indexed.get(3).getObject());
+			assign.setProperty((IExp) indexed.get(4).getObject());
+			assign.setExp((IExp) indexed.get(2).getObject());
 			return assign;
 		});
 		/* 调用表达式 */
 		mapSemanticAnalyzier.put("call_exp", (indexed, query, recorder) -> {
 			ExpInvoke invoke = new ExpInvoke();
 			if (indexed.exists(1)) {
-				Token token = indexed.get(1).token;
+				Token token = indexed.get(1).getToken();
 				invoke.setName(token);
 				Function func = query.getQueryScopeService().getFuncByName(
 						token.toRealString());
@@ -382,58 +382,58 @@ public class SemanticHandler {
 					invoke.setFunc(func);
 				}
 			} else if (indexed.exists(3)) {
-				IExp exp = (IExp) indexed.get(3).object;
+				IExp exp = (IExp) indexed.get(3).getObject();
 				if (exp instanceof ExpInvoke) {
 					ExpInvoke invokeExp = (ExpInvoke) exp;
 					invoke.setInvokeExp(invokeExp);
 				} else {
-					recorder.add(SemanticError.INVALID_FUNCNAME, new Token());
+					recorder.add(SemanticError.INVALID_FUNCNAME, indexed.get(4).getToken());
 				}
 			} else {
-				invoke.setFunc((Function) indexed.get(0).object);
+				invoke.setFunc((Function) indexed.get(0).getObject());
 				invoke.setName(invoke.getFunc().getName());
 			}
 			if (indexed.exists(2)) {
-				invoke.setParams((ArrayList<IExp>) indexed.get(2).object);
+				invoke.setParams((List<IExp>) indexed.get(2).getObject());
 			}
 			return invoke;
 		});
 		/* 类方法调用表达式 */
 		mapSemanticAnalyzier.put("invoke", (indexed, query, recorder) -> {
 			ExpInvokeProperty invoke = new ExpInvokeProperty();
-			invoke.setToken(indexed.get(0).token);
-			invoke.setObj((IExp) indexed.get(1).object);
-			invoke.setProperty((IExp) indexed.get(2).object);
+			invoke.setToken(indexed.get(0).getToken());
+			invoke.setObj((IExp) indexed.get(1).getObject());
+			invoke.setProperty((IExp) indexed.get(2).getObject());
 			if (indexed.exists(3)) {
-				invoke.setParams((ArrayList<IExp>) indexed.get(3).object);
+				invoke.setParams((List<IExp>) indexed.get(3).getObject());
 			}
 			return invoke;
 		});
 		/* 单词集合 */
 		mapSemanticAnalyzier.put("token_list", (indexed, query, recorder) -> {
-			ArrayList<Token> tokens;
+			List<Token> tokens;
 			if (indexed.exists(1)) {
-				tokens = (ArrayList<Token>) indexed.get(1).object;
+				tokens = (List<Token>) indexed.get(1).getObject();
 			} else {
 				tokens = new ArrayList<>();
 			}
-			tokens.add(0, indexed.get(0).token);
+			tokens.add(0, indexed.get(0).getToken());
 			return tokens;
 		});
 		/* 表达式集合 */
 		mapSemanticAnalyzier.put("exp_list", (indexed, query, recorder) -> {
-			ArrayList<IExp> exps;
+			List<IExp> exps;
 			if (indexed.exists(1)) {
-				exps = (ArrayList<IExp>) indexed.get(1).object;
+				exps = (List<IExp>) indexed.get(1).getObject();
 			} else {
 				exps = new ArrayList<>();
 			}
-			exps.add(0, (IExp) indexed.get(0).object);
+			exps.add(0, (IExp) indexed.get(0).getObject());
 			return exps;
 		});
 		/* 过程 */
 		mapSemanticAnalyzier.put("func", (indexed, query, recorder) -> {
-			Token token = indexed.get(1).token;
+			Token token = indexed.get(1).getToken();
 			Function func = query.getQueryScopeService().getFuncByName(
 					token.toRealString());
 			if (!indexed.exists(10)) {
@@ -441,10 +441,10 @@ public class SemanticHandler {
 				query.getQueryBlockService().leaveBlock(BlockType.kYield);
 			}
 			if (indexed.exists(2)) {
-				func.setParams((ArrayList<Token>) indexed.get(2).object);
+				func.setParams((List<Token>) indexed.get(2).getObject());
 			}
 			if (indexed.exists(0)) {
-				func.setDoc((ArrayList<Token>) indexed.get(0).object);
+				func.setDoc((List<Token>) indexed.get(0).getObject());
 			}
 			StmtReturn ret = new StmtReturn();
 			if (func.isYield()) {
@@ -452,12 +452,12 @@ public class SemanticHandler {
 			}
 			if (indexed.exists(3)) {
 				List<IStmt> stmts = new ArrayList<>();
-				ret.setExp((IExp) indexed.get(3).object);
+				ret.setExp((IExp) indexed.get(3).getObject());
 				stmts.add(ret);
 				Block block = new Block(stmts);
 				func.setBlock(block);
 			} else {
-				Block block = (Block) indexed.get(4).object;
+				Block block = (Block) indexed.get(4).getObject();
 				List<IStmt> stmts = block.getStmts();
 				if (stmts.isEmpty() || !(stmts.get(stmts.size() - 1) instanceof StmtReturn))
 					stmts.add(ret);
@@ -467,20 +467,20 @@ public class SemanticHandler {
 		});
 		/* 匿名函数 */
 		mapSemanticAnalyzier.put("lambda", (indexed, query, recorder) -> {
-			Token token = indexed.get(1).token;
+			Token token = indexed.get(1).getToken();
 			Function func = query.getQueryScopeService().getLambda();
 			if (indexed.exists(2)) {
-				func.setParams((ArrayList<Token>) indexed.get(2).object);
+				func.setParams((List<Token>) indexed.get(2).getObject());
 			}
 			StmtReturn ret = new StmtReturn();
 			if (indexed.exists(3)) {
 				List<IStmt> stmts = new ArrayList<>();
-				ret.setExp((IExp) indexed.get(3).object);
+				ret.setExp((IExp) indexed.get(3).getObject());
 				stmts.add(ret);
 				Block block = new Block(stmts);
 				func.setBlock(block);
 			} else {
-				Block block = (Block) indexed.get(4).object;
+				Block block = (Block) indexed.get(4).getObject();
 				List<IStmt> stmts = block.getStmts();
 				if (stmts.isEmpty() || !(stmts.get(stmts.size() - 1) instanceof StmtReturn))
 					stmts.add(ret);
@@ -496,21 +496,21 @@ public class SemanticHandler {
 		mapSemanticAnalyzier.put("return", (indexed, query, recorder) -> {
 			StmtReturn ret = new StmtReturn();
 			if (indexed.exists(0)) {
-				ret.setExp((IExp) indexed.get(0).object);
+				ret.setExp((IExp) indexed.get(0).getObject());
 			}
 			if (indexed.exists(1)) {
 				if (!indexed.exists(0)
 						|| !query.getQueryBlockService().isInBlock(
 						BlockType.kYield)) {
 					recorder.add(SemanticError.WRONG_YIELD,
-							indexed.get(1).token);
+							indexed.get(1).getToken());
 				}
 				ret.setYield(true);
 			} else if (query.getQueryBlockService().isInBlock(
 					BlockType.kYield)) {
 				if (indexed.exists(0)) {
 					recorder.add(SemanticError.WRONG_YIELD,
-							indexed.get(1).token);
+							indexed.get(1).getToken());
 				}
 			}
 			return ret;
@@ -518,7 +518,7 @@ public class SemanticHandler {
 		/* 导入/导出 */
 		mapSemanticAnalyzier.put("port", (indexed, query, recorder) -> {
 			StmtPort port = new StmtPort();
-			Token token = indexed.get(0).token;
+			Token token = indexed.get(0).getToken();
 			port.setName(token);
 			if (!indexed.exists(1)) {
 				port.setImported(false);
@@ -536,20 +536,20 @@ public class SemanticHandler {
 		mapSemanticAnalyzier.put("stmt_exp", (indexed, query, recorder) -> {
 			StmtExp exp = new StmtExp();
 			if (indexed.exists(0)) {
-				exp.setExp((IExp) indexed.get(0).object);
+				exp.setExp((IExp) indexed.get(0).getObject());
 			}
 			return exp;
 		});
 		/* 条件语句 */
 		mapSemanticAnalyzier.put("if", (indexed, query, recorder) -> {
 			StmtIf stmt = new StmtIf();
-			stmt.setExp((IExp) indexed.get(0).object);
-			stmt.setTrueBlock((Block) indexed.get(1).object);
+			stmt.setExp((IExp) indexed.get(0).getObject());
+			stmt.setTrueBlock((Block) indexed.get(1).getObject());
 			if (indexed.exists(2)) {
-				stmt.setFalseBlock((Block) indexed.get(2).object);
+				stmt.setFalseBlock((Block) indexed.get(2).getObject());
 			} else if (indexed.exists(3)) {
 				Block block = new Block();
-				block.getStmts().add((IStmt) indexed.get(3).object);
+				block.getStmts().add((IStmt) indexed.get(3).getObject());
 				stmt.setFalseBlock(block);
 			}
 			return stmt;
@@ -559,30 +559,30 @@ public class SemanticHandler {
 			query.getQueryBlockService().leaveBlock(BlockType.kCycle);
 			StmtFor stmt = new StmtFor();
 			if (indexed.exists(0)) {
-				stmt.setVar((IExp) indexed.get(0).object);
+				stmt.setVar((IExp) indexed.get(0).getObject());
 			}
 			if (indexed.exists(1)) {
-				stmt.setCond((IExp) indexed.get(1).object);
+				stmt.setCond((IExp) indexed.get(1).getObject());
 			}
 			if (indexed.exists(2)) {
-				stmt.setCtrl((IExp) indexed.get(2).object);
+				stmt.setCtrl((IExp) indexed.get(2).getObject());
 			}
-			stmt.setBlock((Block) indexed.get(3).object);
+			stmt.setBlock((Block) indexed.get(3).getObject());
 			return stmt;
 		});
 		mapSemanticAnalyzier.put("while", (indexed, query, recorder) -> {
 			query.getQueryBlockService().leaveBlock(BlockType.kCycle);
 			StmtWhile stmt = new StmtWhile();
-			stmt.setCond((IExp) indexed.get(0).object);
-			stmt.setBlock((Block) indexed.get(1).object);
+			stmt.setCond((IExp) indexed.get(0).getObject());
+			stmt.setBlock((Block) indexed.get(1).getObject());
 			return stmt;
 		});
 		mapSemanticAnalyzier.put("foreach", (indexed, query, recorder) -> {
 			query.getQueryBlockService().leaveBlock(BlockType.kCycle);
 			StmtForeach stmt = new StmtForeach();
-			stmt.setVar(indexed.get(0).token);
-			stmt.setEnumerator((IExp) indexed.get(1).object);
-			stmt.setBlock((Block) indexed.get(2).object);
+			stmt.setVar(indexed.get(0).getToken());
+			stmt.setEnumerator((IExp) indexed.get(1).getObject());
+			stmt.setBlock((Block) indexed.get(2).getObject());
 			if (!stmt.getEnumerator().isEnumerable()) {
 				recorder.add(SemanticError.WRONG_ENUMERABLE, stmt.getVar());
 			}
@@ -593,7 +593,7 @@ public class SemanticHandler {
 		mapSemanticAnalyzier.put("cycle", (indexed, query, recorder) -> {
 			ExpCycleCtrl exp = new ExpCycleCtrl();
 			if (indexed.exists(0)) {
-				exp.setName(indexed.get(0).token);
+				exp.setName(indexed.get(0).getToken());
 			}
 			if (!query.getQueryBlockService().isInBlock(BlockType.kCycle)) {
 				recorder.add(SemanticError.WRONG_CYCLE, exp.getName());
@@ -603,54 +603,54 @@ public class SemanticHandler {
 		/* 块语句 */
 		mapSemanticAnalyzier.put("block_stmt", (indexed, query, recorder) -> {
 			StmtBlock block = new StmtBlock();
-			block.setBlock((Block) indexed.get(0).object);
+			block.setBlock((Block) indexed.get(0).getObject());
 			return block;
 		});
 		/* 数组 */
 		mapSemanticAnalyzier.put("array", (indexed, query, recorder) -> {
 			ExpArray exp = new ExpArray();
 			if (indexed.exists(0)) {
-				exp.setParams((ArrayList<IExp>) indexed.get(0).object);
+				exp.setParams((List<IExp>) indexed.get(0).getObject());
 			}
 			return exp;
 		});
 		/* 字典 */
 		mapSemanticAnalyzier.put("map_list", (indexed, query, recorder) -> {
-			ArrayList<IExp> exps;
+			List<IExp> exps;
 			if (indexed.exists(0)) {
-				exps = (ArrayList<IExp>) indexed.get(0).object;
+				exps = (List<IExp>) indexed.get(0).getObject();
 			} else {
 				exps = new ArrayList<>();
 			}
 			ExpBinop binop = new ExpBinop();
-			binop.setToken(indexed.get(3).token);
+			binop.setToken(indexed.get(3).getToken());
 			ExpValue value = new ExpValue();
-			value.setToken(indexed.get(1).token);
+			value.setToken(indexed.get(1).getToken());
 			binop.setLeftOperand(value);
-			binop.setRightOperand((IExp) indexed.get(2).object);
+			binop.setRightOperand((IExp) indexed.get(2).getObject());
 			exps.add(0, binop.simplify(recorder));
 			return exps;
 		});
 		mapSemanticAnalyzier.put("map", (indexed, query, recorder) -> {
 			ExpMap exp = new ExpMap();
 			if (indexed.exists(0)) {
-				exp.setParams((ArrayList<IExp>) indexed.get(0).object);
+				exp.setParams((List<IExp>) indexed.get(0).getObject());
 			}
 			return exp;
 		});
 		/* 异常处理 */
 		mapSemanticAnalyzier.put("try", (indexed, query, recorder) -> {
 			StmtTry stmt = new StmtTry();
-			stmt.setTryBlock((Block) indexed.get(1).object);
-			stmt.setCatchBlock((Block) indexed.get(2).object);
+			stmt.setTryBlock((Block) indexed.get(1).getObject());
+			stmt.setCatchBlock((Block) indexed.get(2).getObject());
 			if (indexed.exists(0)) {
-				stmt.setToken(indexed.get(0).token);
+				stmt.setToken(indexed.get(0).getToken());
 			}
 			return stmt;
 		});
 		mapSemanticAnalyzier.put("throw", (indexed, query, recorder) -> {
 			StmtThrow stmt = new StmtThrow();
-			stmt.setExp((IExp) indexed.get(0).object);
+			stmt.setExp((IExp) indexed.get(0).getObject());
 			return stmt;
 		});
 	}

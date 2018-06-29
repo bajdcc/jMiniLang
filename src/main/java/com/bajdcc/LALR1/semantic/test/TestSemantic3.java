@@ -21,10 +21,10 @@ public class TestSemantic3 {
 			semantic.addNonTerminal("Z");
 			semantic.addErrorHandler("sample", null);
 			ISemanticAnalyzer handleValue = (indexed, query, recorder) -> 1;
-			ISemanticAnalyzer handleCopy = (indexed, query, recorder) -> indexed.get(0).object;
+			ISemanticAnalyzer handleCopy = (indexed, query, recorder) -> indexed.get(0).getObject();
 			ISemanticAnalyzer handleRec = (indexed, query, recorder) -> {
 				int lop = Integer
-						.parseInt(indexed.get(0).object.toString());
+						.parseInt(indexed.get(0).getObject().toString());
 				return lop + 1;
 			};
 			// syntax.infer("E -> T `PLUS`<+> E | T `MINUS`<-> E | T");

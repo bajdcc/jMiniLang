@@ -18,9 +18,7 @@ import com.bajdcc.util.BitVector2;
 import com.bajdcc.util.Position;
 import com.bajdcc.util.lexer.error.RegexException;
 
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.HashMap;
+import java.util.*;
 
 /**
  * 【语法分析】文法构造器
@@ -39,40 +37,40 @@ public class Syntax {
 	/**
 	 * 终结符表
 	 */
-	static protected ArrayList<TokenExp> arrTerminals = new ArrayList<>();
+	static protected List<TokenExp> arrTerminals = new ArrayList<>();
 
 	/**
 	 * 终结符映射
 	 */
-	static protected HashMap<String, TokenExp> mapTerminals = new HashMap<>();
+	static protected Map<String, TokenExp> mapTerminals = new HashMap<>();
 
 	/**
 	 * 非终结符表
 	 */
-	static protected ArrayList<RuleExp> arrNonTerminals = new ArrayList<>();
+	static protected List<RuleExp> arrNonTerminals = new ArrayList<>();
 
 	/**
 	 * 非终结符映射
 	 */
-	static protected HashMap<String, RuleExp> mapNonTerminals = new HashMap<>();
+	static protected Map<String, RuleExp> mapNonTerminals = new HashMap<>();
 
 	/**
 	 * 错误处理表
 	 */
-	static protected ArrayList<IErrorHandler> arrHandlers = new ArrayList<>();
+	static protected List<IErrorHandler> arrHandlers = new ArrayList<>();
 	/**
 	 * 错误处理映射
 	 */
-	static protected HashMap<String, IErrorHandler> mapHandlers = new HashMap<>();
+	static protected Map<String, IErrorHandler> mapHandlers = new HashMap<>();
 
 	/**
 	 * 语义动作表
 	 */
-	static protected ArrayList<ISemanticAction> arrActions = new ArrayList<>();
+	static protected List<ISemanticAction> arrActions = new ArrayList<>();
 	/**
 	 * 语义动作映射
 	 */
-	static protected HashMap<String, ISemanticAction> mapActions = new HashMap<>();
+	static protected Map<String, ISemanticAction> mapActions = new HashMap<>();
 
 	/**
 	 * 文法起始符号

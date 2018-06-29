@@ -5,6 +5,7 @@ import com.bajdcc.util.lexer.automata.nfa.NFAStatusData;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * DFA状态数据
@@ -15,7 +16,7 @@ public class DFAStatusData extends NFAStatusData {
 	/**
 	 * NFA状态集合
 	 */
-	public ArrayList<NFAStatus> nfaStatus = new ArrayList<>();
+	public List<NFAStatus> nfaStatus = new ArrayList<>();
 
 	/**
 	 * 获得状态编号描述（逗号分隔）
@@ -23,7 +24,7 @@ public class DFAStatusData extends NFAStatusData {
 	 * @param dfaStatusList 状态表
 	 * @return 状态编号描述
 	 */
-	public String getStatusString(ArrayList<NFAStatus> dfaStatusList) {
+	public String getStatusString(List<NFAStatus> dfaStatusList) {
 		if (nfaStatus.isEmpty()) {
 			return "";
 		}

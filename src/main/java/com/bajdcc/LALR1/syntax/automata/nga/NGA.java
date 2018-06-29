@@ -9,10 +9,7 @@ import com.bajdcc.LALR1.syntax.stringify.NGAToString;
 import com.bajdcc.util.VisitBag;
 import com.bajdcc.util.lexer.automata.BreadthFirstSearch;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -28,24 +25,24 @@ public class NGA implements ISyntaxComponentVisitor {
 	/**
 	 * 非终结符集合
 	 */
-	protected ArrayList<RuleExp> arrNonTerminals = null;
+	protected List<RuleExp> arrNonTerminals = null;
 
 	/**
 	 * 终结符集合
 	 */
-	protected ArrayList<TokenExp> arrTerminals = null;
+	protected List<TokenExp> arrTerminals = null;
 
 	/**
 	 * 规则到文法自动机状态的映射
 	 */
-	protected HashMap<RuleItem, NGAStatus> mapNGA = new HashMap<>();
+	protected Map<RuleItem, NGAStatus> mapNGA = new HashMap<>();
 
 	/**
 	 * 保存结果的数据包
 	 */
 	private NGABag bag = null;
 
-	public NGA(ArrayList<RuleExp> nonterminals, ArrayList<TokenExp> terminals) {
+	public NGA(List<RuleExp> nonterminals, List<TokenExp> terminals) {
 		arrNonTerminals = nonterminals;
 		arrTerminals = terminals;
 		generateNGAMap();
@@ -130,14 +127,14 @@ public class NGA implements ISyntaxComponentVisitor {
 	 */
 	private NGAStatus deleteEpsilon(ENGA enga) {
 		/* 获取状态闭包 */
-		ArrayList<NGAStatus> NGAStatusList = getNGAStatusClosure(
+		List<NGAStatus> NGAStatusList = getNGAStatusClosure(
 				new BreadthFirstSearch<>(), enga.begin);
 		/* 可到达状态集合 */
-		ArrayList<NGAStatus> availableStatus = new ArrayList<>();
+		List<NGAStatus> availableStatus = new ArrayList<>();
 		/* 可到达标签集合 */
-		ArrayList<String> availableLabels = new ArrayList<>();
+		List<String> availableLabels = new ArrayList<>();
 		/* 可到达标签集哈希表（用于查找） */
-		HashSet<String> availableLabelsSet = new HashSet<>();
+		Set<String> availableLabelsSet = new HashSet<>();
 		/* 搜索所有有效状态 */
 		availableStatus.add(NGAStatusList.get(0));
 		availableLabels.add(NGAStatusList.get(0).data.label);
@@ -169,7 +166,7 @@ public class NGA implements ISyntaxComponentVisitor {
 		/* 遍历所有有效状态 */
 		for (NGAStatus status : availableStatus) {
 			/* 获取当前状态的Epsilon闭包 */
-			ArrayList<NGAStatus> epsilonClosure = getNGAStatusClosure(
+			List<NGAStatus> epsilonClosure = getNGAStatusClosure(
 					epsilonBFS, status);
 			/* 去除自身状态 */
 			epsilonClosure.remove(status);
@@ -202,7 +199,7 @@ public class NGA implements ISyntaxComponentVisitor {
 			}
 		}
 		/* 删除无效状态 */
-		ArrayList<NGAStatus> unaccessiableStatus = NGAStatusList.stream().filter(status -> !availableStatus.contains(status)).collect(Collectors.toCollection(ArrayList::new));
+		List<NGAStatus> unaccessiableStatus = NGAStatusList.stream().filter(status -> !availableStatus.contains(status)).collect(Collectors.toList());
 		for (NGAStatus status : unaccessiableStatus) {
 			NGAStatusList.remove(status);// 删除无效状态
 			disconnect(status);// 删除与状态有关的所有边
@@ -217,7 +214,7 @@ public class NGA implements ISyntaxComponentVisitor {
 	 * @param status 初态
 	 * @return 初态闭包
 	 */
-	protected static ArrayList<NGAStatus> getNGAStatusClosure(
+	protected static List<NGAStatus> getNGAStatusClosure(
 			BreadthFirstSearch<NGAEdge, NGAStatus> bfs, NGAStatus status) {
 		status.visit(bfs);
 		return bfs.arrStatus;

@@ -7,6 +7,7 @@ import com.bajdcc.LALR1.grammar.tree.closure.IClosureScope;
 import com.bajdcc.util.lexer.token.OperatorType;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 【语义分析】字典
@@ -18,13 +19,13 @@ public class ExpMap implements IExp {
 	/**
 	 * 参数
 	 */
-	private ArrayList<IExp> params = new ArrayList<>();
+	private List<IExp> params = new ArrayList<>();
 
-	public ArrayList<IExp> getParams() {
+	public List<IExp> getParams() {
 		return params;
 	}
 
-	public void setParams(ArrayList<IExp> params) {
+	public void setParams(List<IExp> params) {
 		this.params = params;
 	}
 

@@ -7,6 +7,7 @@ import com.bajdcc.util.lexer.token.Token;
 import com.bajdcc.util.lexer.token.TokenType;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 用于抽取单词的算法集合（包含数字、字符串等）
@@ -17,7 +18,7 @@ public class TokenAlgorithmCollection implements Cloneable {
 	/**
 	 * 算法集合
 	 */
-	private ArrayList<ITokenAlgorithm> arrAlgorithms = new ArrayList<>();
+	private List<ITokenAlgorithm> arrAlgorithms = new ArrayList<>();
 
 	/**
 	 * 字符串迭代器

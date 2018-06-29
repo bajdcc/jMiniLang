@@ -224,7 +224,7 @@ public class Grammar extends Semantic {
 		infer(exp_handler, "exp10 -> [exp10[1] @DOT[2]] type[0]");
 		/* 调用语句 */
 		infer(handler.getSemanticHandler("call_exp"),
-				"call -> @CALL (@LPA{lost_lpa} (func[0]{lost_call} | exp[3]{lost_exp}) @RPA{lost_rpa} | @ID[1]{lost_call}) @LPA{lost_lpa} [exp_list[2]] @RPA{lost_rpa}");
+				"call -> @CALL[4] (@LPA{lost_lpa} (func[0]{lost_call} | exp[3]{lost_exp}) @RPA{lost_rpa} | @ID[1]{lost_call}) @LPA{lost_lpa} [exp_list[2]] @RPA{lost_rpa}");
 		/* 函数定义 */
 		infer(handler.getSemanticHandler("token_list"),
 				"var_list -> @ID[0]#declear_param#{lost_token} [@COMMA var_list[1]{lost_token}]");

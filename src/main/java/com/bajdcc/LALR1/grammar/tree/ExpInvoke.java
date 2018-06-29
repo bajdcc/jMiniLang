@@ -10,6 +10,7 @@ import com.bajdcc.util.lexer.token.KeywordType;
 import com.bajdcc.util.lexer.token.Token;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 【语义分析】函数调用表达式
@@ -36,7 +37,7 @@ public class ExpInvoke implements IExp {
 	/**
 	 * 参数
 	 */
-	private ArrayList<IExp> params = new ArrayList<>();
+	private List<IExp> params = new ArrayList<>();
 
 	/**
 	 * 是否为函数指针调用
@@ -77,11 +78,11 @@ public class ExpInvoke implements IExp {
 		this.extern = extern;
 	}
 
-	public ArrayList<IExp> getParams() {
+	public List<IExp> getParams() {
 		return params;
 	}
 
-	public void setParams(ArrayList<IExp> params) {
+	public void setParams(List<IExp> params) {
 		this.params = params;
 	}
 

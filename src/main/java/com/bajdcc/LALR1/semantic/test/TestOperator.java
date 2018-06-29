@@ -46,13 +46,13 @@ public class TestOperator {
 				bag.bPass = true;
 				return "缺少右括号";
 			});
-			ISemanticAnalyzer handleCopy = (indexed, query, recorder) -> indexed.get(0).object;
+			ISemanticAnalyzer handleCopy = (indexed, query, recorder) -> indexed.get(0).getObject();
 			ISemanticAnalyzer handleBinop = (indexed, query, recorder) -> {
 				int lop = Integer
-						.parseInt(indexed.get(0).object.toString());
+						.parseInt(indexed.get(0).getObject().toString());
 				int rop = Integer
-						.parseInt(indexed.get(2).object.toString());
-				Token op = indexed.get(1).token;
+						.parseInt(indexed.get(2).getObject().toString());
+				Token op = indexed.get(1).getToken();
 				if (op.kToken == TokenType.OPERATOR) {
 					OperatorType kop = (OperatorType) op.object;
 					switch (kop) {
@@ -75,7 +75,7 @@ public class TestOperator {
 					return 0;
 				}
 			};
-			ISemanticAnalyzer handleValue = (indexed, query, recorder) -> indexed.get(0).token.object;
+			ISemanticAnalyzer handleValue = (indexed, query, recorder) -> indexed.get(0).getToken().object;
 			// syntax.infer("E -> T `PLUS`<+> E | T `MINUS`<-> E | T");
 			// syntax.infer("T -> F `TIMES`<*> T | F `DIVIDE`</> T | F");
 			// syntax.infer("F -> `LPA`<(> E `RPA`<)>  | `SYMBOL`<i>");

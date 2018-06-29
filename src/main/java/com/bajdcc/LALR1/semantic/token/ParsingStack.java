@@ -95,10 +95,10 @@ public class ParsingStack implements IIndexedData {
 			} else {
 				for (Entry<Integer, TokenBag> bag : bags.entrySet()) {
 					sb.append("[").append(bag.getKey()).append(": ");
-					if (bag.getValue().token != null) {
-						sb.append(bag.getValue().token.toString());
+					if (bag.getValue().getToken() != null) {
+						sb.append(bag.getValue().getToken().toString());
 					} else {
-						sb.append(bag.getValue().object.toString());
+						sb.append(bag.getValue().getObject().toString());
 					}
 					sb.append("]");
 				}

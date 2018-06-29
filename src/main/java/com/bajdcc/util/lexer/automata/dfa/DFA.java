@@ -106,7 +106,7 @@ public class DFA extends NFA {
 	 * @param status 初态
 	 * @return 初态闭包
 	 */
-	protected static ArrayList<DFAStatus> getDFAStatusClosure(
+	protected static List<DFAStatus> getDFAStatusClosure(
 			BreadthFirstSearch<DFAEdge, DFAStatus> bfs, DFAStatus status) {
 		status.visit(bfs);
 		return bfs.arrStatus;
@@ -117,7 +117,7 @@ public class DFA extends NFA {
 	 *
 	 * @return DFA状态转换矩阵
 	 */
-	public ArrayList<DFAStatus> getDFATable() {
+	public List<DFAStatus> getDFATable() {
 		return getDFAStatusClosure(
 				new BreadthFirstSearch<>(), dfa);
 	}
@@ -126,9 +126,9 @@ public class DFA extends NFA {
 	 * 去除Epsilon边
 	 */
 	private void deleteEpsilonEdges() {
-		ArrayList<NFAStatus> NFAStatusList = getNFAStatusClosure(
+		List<NFAStatus> NFAStatusList = getNFAStatusClosure(
 				new BreadthFirstSearch<>(), nfa.begin);// 获取状态闭包
-		ArrayList<NFAStatus> unaccessiableList = new ArrayList<>();// 不可到达状态集合
+		List<NFAStatus> unaccessiableList = new ArrayList<>();// 不可到达状态集合
 		for (NFAStatus status : NFAStatusList) {
 			boolean epsilon = true;
 			for (NFAEdge edge : status.inEdges) {
@@ -153,7 +153,7 @@ public class DFA extends NFA {
 		/* 获取当前状态的Epsilon闭包 *//* 去除自身状态 *//* 遍历Epsilon闭包的状态 *//* 如果闭包中有终态，则当前状态为终态 *//* 遍历闭包中所有边 *//* 如果当前边不是Epsilon边，就将闭包中的有效边添加到当前状态 *//* 如果当前边不是Epsilon边，就将闭包中的有效边添加到当前状态 */
 		NFAStatusList.stream().filter(status -> !unaccessiableList.contains(status)).forEach(status -> {// 若为有效状态
 			/* 获取当前状态的Epsilon闭包 */
-			ArrayList<NFAStatus> epsilonClosure = getNFAStatusClosure(
+			List<NFAStatus> epsilonClosure = getNFAStatusClosure(
 					epsilonBFS, status);
 			/* 去除自身状态 */
 			epsilonClosure.remove(status);
@@ -211,21 +211,20 @@ public class DFA extends NFA {
 	 */
 	private void determine() {
 		/* 取得NFA所有状态 */
-		ArrayList<NFAStatus> NFAStatusList = getNFAStatusClosure(
+		List<NFAStatus> NFAStatusList = getNFAStatusClosure(
 				new BreadthFirstSearch<>(), nfa.begin);
-		ArrayList<DFAStatus> DFAStatusList = new ArrayList<>();
+		List<DFAStatus> DFAStatusList = new ArrayList<>();
 		/* 哈希表用来进行DFA状态表的查找 */
-		HashMap<String, Integer> DFAStatusListMap = new HashMap<>();
+		Map<String, Integer> DFAStatusListMap = new HashMap<>();
 		DFAStatus initStatus = new DFAStatus();
 		initStatus.data.bFinal = nfa.begin.data.bFinal;// 是否终态
 		initStatus.data.nfaStatus.add(nfa.begin);// DFA[0]=NFA初态集合
 		DFAStatusList.add(initStatus);
-		DFAStatusListMap.put(initStatus.data.getStatusString(NFAStatusList),
-				0);
+		DFAStatusListMap.put(initStatus.data.getStatusString(NFAStatusList), 0);
 		/* 构造DFA表 */
 		for (int i = 0; i < DFAStatusList.size(); i++) {
 			DFAStatus dfaStatus = DFAStatusList.get(i);
-			ArrayList<DFAEdgeBag> bags = new ArrayList<>();
+			List<DFAEdgeBag> bags = new ArrayList<>();
 			/* 遍历当前NFA状态集合的所有边 */
 			for (NFAStatus nfaStatus : dfaStatus.data.nfaStatus) {
 				for (NFAEdge nfaEdge : nfaStatus.outEdges) {
@@ -292,9 +291,9 @@ public class DFA extends NFA {
 		boolean bExistequivalentClass = true;
 		while (bExistequivalentClass) {
 			/* 终态集合 */
-			ArrayList<Integer> finalStatus = new ArrayList<>();
+			List<Integer> finalStatus = new ArrayList<>();
 			/* 非终态集合 */
-			ArrayList<Integer> nonFinalStatus = new ArrayList<>();
+			List<Integer> nonFinalStatus = new ArrayList<>();
 			/* DFA状态转移表，填充终态集合 */
 			int[][] transition = buildTransition(finalStatus);
 			/* 填充非终态集合和状态集合的哈希表 */
@@ -304,7 +303,7 @@ public class DFA extends NFA {
 				}
 			}
 			/* DFA状态表 */
-			ArrayList<DFAStatus> statusList = getDFATable();
+			List<DFAStatus> statusList = getDFATable();
 			/* 处理终态 */
 			bExistequivalentClass = mergeStatus(
 					partition(finalStatus, transition), statusList);
@@ -321,16 +320,16 @@ public class DFA extends NFA {
 	 * @param transition 状态转移表
 	 * @return 划分
 	 */
-	private ArrayList<ArrayList<Integer>> partition(
-			ArrayList<Integer> statusList, int[][] transition) {
+	private List<List<Integer>> partition(
+			List<Integer> statusList, int[][] transition) {
 		if (statusList.size() == 1) {
 			/* 存放结果 */
-			ArrayList<ArrayList<Integer>> pat = new ArrayList<>();
+			List<List<Integer>> pat = new ArrayList<>();
 			pat.add(new ArrayList<>(statusList.get(0)));
 			return pat;
 		} else {
 			/* 用于查找相同状态 */
-			HashMap<String, ArrayList<Integer>> map = new HashMap<>();
+			Map<String, List<Integer>> map = new HashMap<>();
 			for (int status : statusList) {
 				/* 获得状态hash */
 				String hash = getStatusLineString(transition[status]);
@@ -340,7 +339,7 @@ public class DFA extends NFA {
 					map.get(hash).add(status);
 				} else {
 					/* 前次出现，创建数组保存它 */
-					ArrayList<Integer> set = new ArrayList<>();
+					List<Integer> set = new ArrayList<>();
 					set.add(status);
 					map.put(hash, set);
 				}
@@ -355,17 +354,17 @@ public class DFA extends NFA {
 	 * @param pat        状态划分
 	 * @param statusList 状态转移表
 	 */
-	private boolean mergeStatus(ArrayList<ArrayList<Integer>> pat,
-	                            ArrayList<DFAStatus> statusList) {
+	private boolean mergeStatus(List<List<Integer>> pat,
+	                            List<DFAStatus> statusList) {
 		/* 保存要处理的多状态合并的划分 */
-		ArrayList<ArrayList<Integer>> dealWith = pat.stream().filter(collection -> collection.size() > 1).collect(Collectors.toCollection(ArrayList::new));
+		List<List<Integer>> dealWith = pat.stream().filter(collection -> collection.size() > 1).collect(Collectors.toList());
 		// 有多个状态
 		/* 是否已经没有等价类，若没有，就返回false，这样算法就结束（收敛 ） */
 		if (dealWith.isEmpty()) {
 			return false;
 		}
 		/* 合并每一分组 */
-		for (ArrayList<Integer> collection : dealWith) {
+		for (List<Integer> collection : dealWith) {
 			/* 目标状态为集合中第一个状态，其余状态被合并 */
 			int dstStatus = collection.get(0);
 			/* 目标状态 */
@@ -412,7 +411,7 @@ public class DFA extends NFA {
 	public int[][] buildTransition(Collection<Integer> finalStatus) {
 		finalStatus.clear();
 		/* DFA状态表 */
-		ArrayList<DFAStatus> statusList = getDFATable();
+		List<DFAStatus> statusList = getDFATable();
 		/* 建立状态转移矩阵 */
 		int[][] transition = new int[statusList.size()][chMap.getRanges()
 				.size()];
@@ -442,10 +441,10 @@ public class DFA extends NFA {
 	 */
 	public String getDFAString() {
 		/* 取得NFA所有状态 */
-		ArrayList<NFAStatus> NFAStatusList = getNFAStatusClosure(
+		List<NFAStatus> NFAStatusList = getNFAStatusClosure(
 				new BreadthFirstSearch<>(), nfa.begin);
 		/* 取得DFA所有状态 */
-		ArrayList<DFAStatus> DFAStatusList = getDFAStatusClosure(
+		List<DFAStatus> DFAStatusList = getDFAStatusClosure(
 				new BreadthFirstSearch<>(), dfa);
 		StringBuilder sb = new StringBuilder();
 		/* 生成DFA描述 */

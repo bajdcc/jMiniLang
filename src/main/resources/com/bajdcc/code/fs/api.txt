@@ -1,6 +1,6 @@
 import "user.base";
 import "user.web";
-
+g_disable_result();
 var ctx = g_web_get_api();
 if (g_is_null(ctx)) { return; }
 var route = g_string_split(ctx["route"], "/");

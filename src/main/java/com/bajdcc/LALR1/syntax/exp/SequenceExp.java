@@ -5,6 +5,7 @@ import com.bajdcc.LALR1.syntax.ISyntaxComponentVisitor;
 import com.bajdcc.util.VisitBag;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 文法规则（序列）
@@ -16,7 +17,7 @@ public class SequenceExp implements ISyntaxComponent, IExpCollction {
 	/**
 	 * 子表达式表
 	 */
-	public ArrayList<ISyntaxComponent> arrExpressions = new ArrayList<>();
+	public List<ISyntaxComponent> arrExpressions = new ArrayList<>();
 
 	@Override
 	public void visit(ISyntaxComponentVisitor visitor) {

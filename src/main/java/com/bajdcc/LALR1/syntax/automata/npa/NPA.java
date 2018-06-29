@@ -11,10 +11,7 @@ import com.bajdcc.LALR1.syntax.rule.Rule;
 import com.bajdcc.LALR1.syntax.rule.RuleItem;
 import com.bajdcc.util.lexer.automata.BreadthFirstSearch;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
@@ -30,25 +27,25 @@ public class NPA extends NGA {
 	/**
 	 * 规则集合
 	 */
-	private ArrayList<RuleItem> arrRuleItems = new ArrayList<>();
+	private List<RuleItem> arrRuleItems = new ArrayList<>();
 
 	/**
 	 * 起始状态集合
 	 */
-	private ArrayList<NPAStatus> arrInitStatusList = new ArrayList<>();
+	private List<NPAStatus> arrInitStatusList = new ArrayList<>();
 
 	/**
 	 * 语义动作集合
 	 */
-	private ArrayList<ISemanticAction> arrActions = new ArrayList<>();
+	private List<ISemanticAction> arrActions = new ArrayList<>();
 
 	/**
 	 * 起始规则
 	 */
 	private Rule initRule = null;
 
-	public NPA(ArrayList<RuleExp> nonterminals, ArrayList<TokenExp> terminals,
-	           Rule initNonterminal, ArrayList<ISemanticAction> actions) {
+	public NPA(List<RuleExp> nonterminals, List<TokenExp> terminals,
+	           Rule initNonterminal, List<ISemanticAction> actions) {
 		super(nonterminals, terminals);
 		initRule = initNonterminal;
 		arrActions = actions;
@@ -106,11 +103,11 @@ public class NPA extends NGA {
 	 */
 	private void generateNPA() {
 		/* 下推自动机状态 */
-		ArrayList<NPAStatus> NPAStatusList = new ArrayList<>();
+		List<NPAStatus> NPAStatusList = new ArrayList<>();
 		/* 文法自动机状态 */
-		ArrayList<NGAStatus> NGAStatusList = new ArrayList<>();
+		List<NGAStatus> NGAStatusList = new ArrayList<>();
 		/* 下推自动机边（规则映射到NGA边） */
-		HashMap<Rule, ArrayList<NGAEdge>> ruleEdgeMap = new HashMap<>();
+		Map<Rule, ArrayList<NGAEdge>> ruleEdgeMap = new HashMap<>();
 		/* 遍历每条规则 */
 		for (Entry<RuleItem, NGAStatus> entry : mapNGA.entrySet()) {
 			RuleItem key = entry.getKey();
@@ -118,7 +115,7 @@ public class NPA extends NGA {
 			/* 保存规则 */
 			arrRuleItems.add(key);
 			/* 搜索当前规则中的所有状态 */
-			ArrayList<NGAStatus> CurrentNGAStatusList = getNGAStatusClosure(
+			List<NGAStatus> CurrentNGAStatusList = getNGAStatusClosure(
 					new BreadthFirstSearch<>(), value);
 			/* 搜索所有的边 */
 			for (NGAStatus status : CurrentNGAStatusList) {
@@ -229,7 +226,7 @@ public class NPA extends NGA {
 				if (ngaStatus.data.bFinal) {
 					if (ruleEdgeMap.containsKey(ruleItem.parent)) {
 						/* 遍历文法自动机中附带了当前推导规则所属规则的边 */
-						ArrayList<NGAEdge> ruleEdges = ruleEdgeMap
+						List<NGAEdge> ruleEdges = ruleEdgeMap
 								.get(ruleItem.parent);// 当前规约的文法的非终结符为A，获得包含A的所有边
 						for (NGAEdge ngaEdge : ruleEdges) {
 							/* 判断纯左递归，冗长的表达式是为了获得当前边的所在推导式的起始非终结符 */
@@ -333,7 +330,7 @@ public class NPA extends NGA {
 	 * @param status 初态
 	 * @return 初态闭包
 	 */
-	protected static ArrayList<NPAStatus> getNGAStatusClosure(
+	protected static List<NPAStatus> getNGAStatusClosure(
 			BreadthFirstSearch<NPAEdge, NPAStatus> bfs, NPAStatus status) {
 		status.visit(bfs);
 		return bfs.arrStatus;
@@ -344,7 +341,7 @@ public class NPA extends NGA {
 	 *
 	 * @return NPA初态表
 	 */
-	public ArrayList<NPAStatus> getInitStatusList() {
+	public List<NPAStatus> getInitStatusList() {
 		return arrInitStatusList;
 	}
 
@@ -353,8 +350,8 @@ public class NPA extends NGA {
 	 *
 	 * @return NPA状态表
 	 */
-	public ArrayList<NPAStatus> getNPAStatusList() {
-		ArrayList<NPAStatus> NPAStatusList = new ArrayList<>();
+	public List<NPAStatus> getNPAStatusList() {
+		List<NPAStatus> NPAStatusList = new ArrayList<>();
 		for (NPAStatus status : arrInitStatusList) {
 			NPAStatusList.addAll(getNGAStatusClosure(
 					new BreadthFirstSearch<>(), status));
@@ -367,7 +364,7 @@ public class NPA extends NGA {
 	 *
 	 * @return NPA状态表
 	 */
-	public ArrayList<RuleItem> getRuleItems() {
+	public List<RuleItem> getRuleItems() {
 		return arrRuleItems;
 	}
 
@@ -379,7 +376,7 @@ public class NPA extends NGA {
 	public String getNPAString() {
 		StringBuilder sb = new StringBuilder();
 		/* 构造状态路径 */
-		ArrayList<NPAStatus> statusList = getNPAStatusList();
+		List<NPAStatus> statusList = getNPAStatusList();
 		/* 输出初始状态 */
 		sb.append("#### 初始状态 ####");
 		sb.append(System.lineSeparator());
