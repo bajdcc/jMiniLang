@@ -1,22 +1,34 @@
 package com.bajdcc.LALR1.ui;
 
-import org.apache.log4j.Logger;
 import com.bajdcc.LALR1.grammar.Grammar;
 import com.bajdcc.LALR1.grammar.runtime.RuntimeCodePage;
 import com.bajdcc.LALR1.grammar.runtime.RuntimeException;
 import com.bajdcc.LALR1.interpret.Interpreter;
 import com.bajdcc.LALR1.interpret.module.ModuleRemote;
 import com.bajdcc.LALR1.interpret.os.IOSCodePage;
-import com.bajdcc.LALR1.interpret.os.irq.*;
-import com.bajdcc.LALR1.interpret.os.kern.*;
+import com.bajdcc.LALR1.interpret.os.irq.IRPrint;
+import com.bajdcc.LALR1.interpret.os.irq.IRRemote;
+import com.bajdcc.LALR1.interpret.os.irq.IRSignal;
+import com.bajdcc.LALR1.interpret.os.irq.IRTask;
+import com.bajdcc.LALR1.interpret.os.kern.OSEntry;
+import com.bajdcc.LALR1.interpret.os.kern.OSIrq;
+import com.bajdcc.LALR1.interpret.os.kern.OSTask;
 import com.bajdcc.LALR1.interpret.os.task.*;
-import com.bajdcc.LALR1.interpret.os.ui.*;
+import com.bajdcc.LALR1.interpret.os.ui.UIClock;
+import com.bajdcc.LALR1.interpret.os.ui.UIHitokoto;
+import com.bajdcc.LALR1.interpret.os.ui.UIMain;
+import com.bajdcc.LALR1.interpret.os.ui.UIMonitor;
 import com.bajdcc.LALR1.interpret.os.user.UserMain;
 import com.bajdcc.LALR1.interpret.os.user.routine.*;
-import com.bajdcc.LALR1.interpret.os.user.routine.file.*;
+import com.bajdcc.LALR1.interpret.os.user.routine.file.URFileAppend;
+import com.bajdcc.LALR1.interpret.os.user.routine.file.URFileLoad;
+import com.bajdcc.LALR1.interpret.os.user.routine.file.URFileSave;
 import com.bajdcc.LALR1.syntax.handler.SyntaxException;
 import com.bajdcc.LALR1.ui.drawing.UIGraphics;
 import com.bajdcc.util.lexer.error.RegexException;
+import com.sun.jna.platform.win32.User32;
+import com.sun.jna.platform.win32.WinDef.HWND;
+import org.apache.log4j.Logger;
 
 import javax.swing.*;
 import javax.swing.plaf.FontUIResource;
@@ -26,6 +38,8 @@ import java.awt.event.WindowEvent;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Enumeration;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * 【界面】窗口
@@ -35,6 +49,7 @@ import java.util.Enumeration;
 public class UIMainFrame extends JFrame {
 
 	private static Logger logger = Logger.getLogger("window");
+	private static final String mainWndTitle = "jMiniLang Command Window";
 
 	private UIPanel panel;
 	private boolean isExitNormally = false;
@@ -47,15 +62,15 @@ public class UIMainFrame extends JFrame {
 	public UIMainFrame() {
 		initGlobalFont();
 		panel = new UIPanel();
-		this.setTitle("jMiniLang Command Window");
+		this.setTitle(mainWndTitle);
 		this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		this.setPreferredSize(new Dimension(panel.getUIGraphics().getWidth(), panel.getUIGraphics().getHeight()));
 		this.setContentPane(panel);
 		this.pack();
 		this.setLocationRelativeTo(null);
-		this.setAlwaysOnTop(true);
+		//this.setAlwaysOnTop(true);
 		this.setResizable(false);
-		this.setVisible(false);
+		this.setVisible(true);
 		this.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
 				if (isExitNormally) {
@@ -99,7 +114,7 @@ public class UIMainFrame extends JFrame {
 	}
 
 	private void setTimer() {
-		new Timer(33, e -> panel.repaint()).start();
+		new javax.swing.Timer(33, e -> panel.repaint()).start();
 	}
 
 	private void startOS(UIGraphics g) {
@@ -195,9 +210,20 @@ public class UIMainFrame extends JFrame {
 		}
 	}
 
-	public void setFocus() {
-		panel.setVisible(false);
-		panel.setVisible(true);
-		panel.setFocusable(true);
+	public void showDelay() {
+		new Timer().schedule(new TimerTask() {
+			@Override
+			public void run() {
+				if (System.getProperty("os.name").startsWith("Windows")) {
+					HWND hwnd = User32.INSTANCE.FindWindow("SunAwtFrame", mainWndTitle);
+					if (hwnd != null) {
+						User32.INSTANCE.SetForegroundWindow(hwnd);
+						User32.INSTANCE.SetFocus(hwnd);
+						return;
+					}
+				}
+				setAlwaysOnTop(true);
+			}
+		}, 1000);
 	}
 }

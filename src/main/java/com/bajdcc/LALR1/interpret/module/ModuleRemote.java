@@ -32,8 +32,7 @@ public class ModuleRemote implements IInterpreterModule {
 	}
 
 	public static void showMainFrame() {
-		mainFrame.setVisible(true);
-		mainFrame.setFocus();
+		mainFrame.showDelay();
 	}
 
 	public void setGraphics() {

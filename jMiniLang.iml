@@ -141,5 +141,7 @@
     <orderEntry type="library" name="Maven: com.vladsch.flexmark:flexmark-profile-pegdown:0.34.0" level="project" />
     <orderEntry type="library" name="Maven: com.vladsch.flexmark:flexmark-util:0.34.0" level="project" />
     <orderEntry type="library" name="Maven: com.vladsch.flexmark:flexmark-youtrack-converter:0.34.0" level="project" />
+    <orderEntry type="library" name="Maven: net.java.dev.jna:jna:4.5.1" level="project" />
+    <orderEntry type="library" name="Maven: net.java.dev.jna:jna-platform:4.5.1" level="project" />
   </component>
 </module>

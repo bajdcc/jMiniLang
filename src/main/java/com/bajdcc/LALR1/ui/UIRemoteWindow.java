@@ -14,6 +14,7 @@ import java.awt.event.WindowEvent;
  */
 public class UIRemoteWindow extends JFrame {
 	private UIRemotePanel panel;
+	private static final String remoteWndTitle = "jMiniOS Remote Window";
 
 	public UIRemotePanel getPanel() {
 		return panel;
@@ -21,7 +22,7 @@ public class UIRemoteWindow extends JFrame {
 
 	public UIRemoteWindow() {
 		panel = new UIRemotePanel();
-		this.setTitle("jMiniOS Remote Window");
+		this.setTitle(remoteWndTitle);
 		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		this.setPreferredSize(new Dimension(UIRemotePanel.w, UIRemotePanel.h));
 		this.setContentPane(panel);
