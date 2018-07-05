@@ -1,6 +1,7 @@
 package com.bajdcc.LALR1.grammar.runtime.service;
 
 import com.bajdcc.LALR1.grammar.runtime.RuntimeObject;
+import com.bajdcc.LALR1.grammar.runtime.RuntimeObjectType;
 import org.apache.log4j.Logger;
 
 import java.util.*;
@@ -30,15 +31,52 @@ public class RuntimeUserService implements IRuntimeUserService {
 	}
 
 	interface IUserHandler {
-
 		void destroy();
+		boolean isEmpty();
+		void enqueue(int pid);
+		void dequeue();
+		RuntimeObject read();
+		void write(RuntimeObject obj);
 	}
 
-	class UserPipeHandler implements IUserHandler {
+	abstract class UserHandler implements IUserHandler {
+
+		private Queue<Integer> waiting_pids;
+
+		UserHandler() {
+			this.waiting_pids = new ArrayDeque<>();
+		}
+
+		@Override
+		public void destroy() {
+
+		}
+
+		@Override
+		public boolean isEmpty() {
+			return true;
+		}
+
+		@Override
+		public void enqueue(int pid) {
+			waiting_pids.add(pid);
+			service.getProcessService().block(pid);
+		}
+
+		@Override
+		public void dequeue() {
+			if (waiting_pids.isEmpty())
+				return;
+			int pid = waiting_pids.poll();
+			service.getProcessService().wakeup(pid);
+		}
+	}
+
+	class UserPipeHandler extends UserHandler {
 		private int id;
 		private Queue<RuntimeObject> queue;
 
-		public UserPipeHandler(int id) {
+		UserPipeHandler(int id) {
 			this.id = id;
 			this.queue = new ArrayDeque<>();
 			service.getProcessService().getRing3().addHandle(id);
@@ -48,20 +86,45 @@ public class RuntimeUserService implements IRuntimeUserService {
 		public void destroy() {
 			service.getProcessService().getRing3().removeHandle(id);
 		}
-	}
-
-	class UserShareHandler implements IUserHandler {
 
 		@Override
-		public void destroy() {
+		public boolean isEmpty() {
+			return queue.isEmpty();
+		}
+
+		@Override
+		public RuntimeObject read() {
+			return queue.poll();
+		}
+
+		@Override
+		public void write(RuntimeObject obj) {
+			queue.add(obj);
+		}
+	}
+
+	class UserShareHandler extends UserHandler {
+
+		@Override
+		public RuntimeObject read() {
+			return null;
+		}
+
+		@Override
+		public void write(RuntimeObject obj) {
 
 		}
 	}
 
-	class UserFileHandler implements IUserHandler {
+	class UserFileHandler extends UserHandler {
 
 		@Override
-		public void destroy() {
+		public RuntimeObject read() {
+			return null;
+		}
+
+		@Override
+		public void write(RuntimeObject obj) {
 
 		}
 	}
@@ -125,6 +188,31 @@ public class RuntimeUserService implements IRuntimeUserService {
 			return createFile(sp[1], page);
 		}
 		return -3;
+	}
+
+	@Override
+	public RuntimeObject read(int id) {
+		if (arrUsers[id] == null) {
+			return new RuntimeObject(true, RuntimeObjectType.kNoop);
+		}
+		UserStruct user = arrUsers[id];
+		if (user.handler.isEmpty()) {
+			int pid = service.getProcessService().getPid();
+			arrUsers[id].handler.enqueue(pid);
+			return new RuntimeObject(false, RuntimeObjectType.kNoop);
+		}
+		return user.handler.read();
+	}
+
+	@Override
+	public boolean write(int id, RuntimeObject obj) {
+		if (arrUsers[id] == null) {
+			return false;
+		}
+		UserStruct user = arrUsers[id];
+		user.handler.write(obj);
+		user.handler.dequeue();
+		return true;
 	}
 
 	@Override

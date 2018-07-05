@@ -1495,11 +1495,31 @@ var import_string_class = func ~() {
 };
 
 var import_handle_class = func ~() {
+    g_class("system::output", "object", lambda(this) {
+        this."write" := lambda(this, obj) {
+            g_put(obj);
+        };
+    });
+    var g_system_output = func ~() -> g_new_class("system::output");
+    export "g_system_output";
+
     g_class("system::handle", "object", lambda(this) {
         this."handle" := g_nullptr;
         this."name" := g_null;
         this."is_valid" := lambda(this) -> g_is_valid_handle(this."handle");
         this."destroy" := lambda(this) -> g_destroy_handle(this."handle");
+        this."write" := lambda(this, obj) -> g_write_handle(this."handle", obj);
+        this."pipe" := lambda(this, output) {
+            var r = g_null;
+            while (true) {
+                r := g_read_handle(this."handle");
+                if (!g_is_noop(r)) {
+                    output."write"(r);
+                } else if (g_from_noop(r)) {
+                    break;
+                }
+            }
+        };
     });
 
     var g_pipe = func ~(name) {

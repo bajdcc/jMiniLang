@@ -20,6 +20,7 @@
 *一言以蔽之，本项目涉及的玩法包括：*
 
 - **开发完善中** Spring-boot与layui制作的管理后台，包括资源查看、文档查看、**在线编译**！
+- **开发完善中** `UserService` RING3级用户服务
 - Shell层面的管道机制，类似`echo a | > b.txt`等，语法层面有Bash接口的实现
 - 基于Map数据的原型链实现面向对象特性（`ModuleClass`），应用有：状态机实例--百度新闻（URNews）、行为树实例-AI（URAI）、状态机实例-歌词动画（URMusic）、图论-路由距离算法-PC（URPC）
 - BadApple黑白动画播放（`test badapple`），测试IO性能
@@ -62,7 +63,7 @@
 22. Array/Map initialize list.
 23. **Try/Catch/Throw**.
 24. **Behavior Tree**, including PC network simulator.
-25. **RING 3 Process**.
+25. **RING 3 Process**, including User Service.
 26. **Web Server**, including Online Compiler and Runner.
 
 #### What it generates
@@ -199,6 +200,41 @@ TASK PROC:
 > Back-end: jMiniLang API Handler (RING 3 Process)
 
 **Run on Server**
+
+** Online Compiler Example II: Pipe **
+
+**Reader**
+
+```javascript
+import "user.base";
+
+var channel = g_pipe("TEST");
+g_puts(channel, "读取管道：");
+channel."pipe"(g_system_output());//将管道重定向至输出流
+```
+
+**Writer**
+
+```javascript
+import "user.base";
+
+var channel = g_pipe("TEST");
+g_puts(channel, "写入管道：");
+for (var i = 0; i < 10; i++) {
+    var txt = "这是一条测试消息！ 编号：" + i;
+    channel."write"(txt + g_endl);//写管道
+    g_puts(txt);
+    g_sleep_s(1);
+}
+g_puts();
+channel."write"(g_noop_true);//发送管道关闭信号
+```
+
+![Screenshot 108](https://raw.githubusercontent.com/bajdcc/jMiniLang/master/screenshots/web-8.gif)
+
+----
+
+![Screenshot 107](https://raw.githubusercontent.com/bajdcc/jMiniLang/master/screenshots/web-7.gif)
 
 ![Screenshot 106](https://raw.githubusercontent.com/bajdcc/jMiniLang/master/screenshots/web-6.png)
 

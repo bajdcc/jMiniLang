@@ -184,32 +184,14 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		for (int pid : pids) {
 			currentPid = pid;
 			SchdProcess process = arrProcess[pid];
-			if (process != null && process.runnable) {
-				if (process.ring < 3) {
-					int cycle = MAX_CYCLE - process.priority;
-					for (int i = 0; i < cycle; i++) {
-						if (process.sleep > 0) {
-							process.sleep--;
-							sleep++;
-							break;
-						}
-						if (process.runnable) {
-							stat.cycle++;
-							switch (process.machine.runStep()) {
-								case 1:
-									return false;
-								case 2:
-									break LABEL_PID;
-							}
-						}
-					}
-				} else {
-					int cycle = MAX_CYCLE - process.priority;
-					try {
+			if (process != null) {
+				if (process.runnable) {
+					if (process.ring < 3) {
+						int cycle = MAX_CYCLE - process.priority;
 						for (int i = 0; i < cycle; i++) {
 							if (process.sleep > 0) {
 								process.sleep--;
-								sleepUser++; // boost!
+								sleep++;
 								break;
 							}
 							if (process.runnable) {
@@ -218,20 +200,42 @@ public class RuntimeProcess implements IRuntimeProcessService {
 									case 1:
 										return false;
 									case 2:
-										ring3Kill(pid, "正常退出");
 										break LABEL_PID;
 								}
 							}
 						}
-					} catch (RuntimeException e) {
-						String error = e.getError().getMessage() + " " + e.getPosition() + ": " + e.getInfo();
-						System.err.println(error);
-						e.printStackTrace();
-						ring3Kill(pid, error);
+					} else {
+						int cycle = MAX_CYCLE - process.priority;
+						try {
+							for (int i = 0; i < cycle; i++) {
+								if (process.sleep > 0) {
+									process.sleep--;
+									sleepUser++; // boost!
+									break;
+								}
+								if (process.runnable) {
+									stat.cycle++;
+									switch (process.machine.runStep()) {
+										case 1:
+											return false;
+										case 2:
+											ring3Kill(pid, "正常退出");
+											break LABEL_PID;
+									}
+								}
+							}
+						} catch (RuntimeException e) {
+							String error = e.getError().getMessage() + " " + e.getPosition() + ": " + e.getInfo();
+							System.err.println(error);
+							e.printStackTrace();
+							ring3Kill(pid, error);
+						}
 					}
+				} else if (process.ring < 3) {
+					sleep++;
+				} else {
+					sleepUser++;
 				}
-			} else {
-				sleep++;
 			}
 		}
 		if (sleep == pidNum) { // 都在休眠，等待并减掉休眠时间
@@ -334,6 +338,11 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		arrProcess[processId] = null;
 		setProcessId.remove(processId);
 		logger.debug("Process #" + processId + " exit, " + setProcessId.size() + " left.");
+	}
+
+	@Override
+	public int getPid() {
+		return currentPid;
 	}
 
 	@Override
@@ -451,8 +460,10 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		if (!ring3.isRing3()) {
 			return -2;
 		}
-		//TODO: 完成清理RING3进程创建的共享、管道、文件句柄
+		int tmp = currentPid;
+		currentPid = pid;
 		service.getUserService().destroy();
+		currentPid = tmp;
 		if (ring3.isOptionsBool(LOG_FILE))
 			service.getFileService().addVfs(USER_PROC_FILE_PREFIX + pid, error);
 		if (!ring3.isOptionsBool(LOG_PIPE))
@@ -471,6 +482,7 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		return arrProcess[currentPid].machine;
 	}
 
+	@Override
 	public IRuntimeRing3 getRing3(int pid) {
 		if (!setProcessId.contains(pid))
 			return null;

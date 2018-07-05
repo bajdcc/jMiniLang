@@ -12,6 +12,12 @@ import java.util.List;
 public interface IRuntimeProcessService {
 
 	/**
+	 * 获取PID
+	 * @return PID
+	 */
+	int getPid();
+
+	/**
 	 * 进程阻塞
 	 *
 	 * @param pid 进程ID
@@ -108,4 +114,11 @@ public interface IRuntimeProcessService {
 	 * @return RING3接口
 	 */
 	IRuntimeRing3 getRing3();
+
+	/**
+	 * 得到RING3接口
+	 * @param pid PID
+	 * @return RING3接口
+	 */
+	IRuntimeRing3 getRing3(int pid);
 }

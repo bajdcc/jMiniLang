@@ -23,6 +23,8 @@
                                 <div class="layui-form-item">
                                     <button class="layui-btn" @click="example('hanoi')">汉诺塔</button>
                                     <button class="layui-btn" @click="example('lisp')">Lisp</button>
+                                    <button class="layui-btn" @click="example('piperecv')">管道（接收端）</button>
+                                    <button class="layui-btn" @click="example('pipesend')">管道（发送端）</button>
                                 </div>
                             </div>
                         </div>
@@ -175,7 +177,9 @@ var App = new Vue({
                         vm.running = false;
                         vm.id = -1;
                         vm.content += d.data + "\n" + d.result;
-                        $("#output").scrollTop($("#output")[0].scrollHeight);
+                        setTimeout(function() {
+                            $("#output").scrollTop($("#output")[0].scrollHeight);
+                        }, 500);
                     } else {
                         vm.content += d.data;
                         $("#output").scrollTop($("#output")[0].scrollHeight);

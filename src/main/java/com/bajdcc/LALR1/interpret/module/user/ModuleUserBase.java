@@ -83,6 +83,8 @@ public class ModuleUserBase implements IInterpreterModule {
 			info.addExternalValue(key, refer.getValueCallByName(key));
 		}
 		info.addExternalValue("g_class_context", () -> globalContext);
+		info.addExternalValue("g_noop_true", () -> new RuntimeObject(true, RuntimeObjectType.kNoop));
+		info.addExternalValue("g_noop_false", () -> new RuntimeObject(false, RuntimeObjectType.kNoop));
 
 		String[] importFunc = new String[]{
 				"g_is_null", "g_set_debug", "g_not_null",
@@ -447,6 +449,74 @@ public class ModuleUserBase implements IInterpreterModule {
 			                                      IRuntimeStatus status) {
 				int id = (int) args.get(0).getObj();
 				return new RuntimeObject(status.getService().getUserService().destroy(id));
+			}
+		});
+		info.addExternalFunc("g_is_noop", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "是否是空闲值（用于句柄返回值）";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kObject};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				return new RuntimeObject(args.get(0).getType() == RuntimeObjectType.kNoop);
+			}
+		});
+		info.addExternalFunc("g_from_noop", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "将空闲值转成正常值";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kNoop};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				return new RuntimeObject(args.get(0).getObj());
+			}
+		});
+		info.addExternalFunc("g_read_handle", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "读取用户服务";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kPtr};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				return status.getService().getUserService().read((int) args.get(0).getObj());
+			}
+		});
+		info.addExternalFunc("g_write_handle", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "写入用户服务";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kPtr, RuntimeObjectType.kObject};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				return new RuntimeObject(status.getService().getUserService().write((int) args.get(0).getObj(), args.get(1)));
 			}
 		});
 	}

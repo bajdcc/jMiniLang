@@ -1,0 +1,12 @@
+import "user.base";
+
+var channel = g_pipe("TEST");
+g_puts(channel, "写入管道：");
+for (var i = 0; i < 10; i++) {
+    var txt = "这是一条测试消息！ 编号：" + i;
+    channel."write"(txt + g_endl);//写管道
+    g_puts(txt);
+    g_sleep_s(1);
+}
+g_puts();
+channel."write"(g_noop_true);//发送管道关闭信号

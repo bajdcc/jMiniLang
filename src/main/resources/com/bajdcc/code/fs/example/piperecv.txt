@@ -1,0 +1,5 @@
+import "user.base";
+
+var channel = g_pipe("TEST");
+g_puts(channel, "读取管道：");
+channel."pipe"(g_system_output());//将管道重定向至输出流
