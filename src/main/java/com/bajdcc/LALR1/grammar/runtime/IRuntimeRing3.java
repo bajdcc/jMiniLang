@@ -1,9 +1,6 @@
 package com.bajdcc.LALR1.grammar.runtime;
 
-import com.bajdcc.LALR1.grammar.runtime.data.RuntimeFuncObject;
-import com.bajdcc.LALR1.grammar.runtime.service.IRuntimeService;
-
-import java.util.List;
+import java.util.Set;
 
 /**
  * 【运行时】用户态运行时状态查询
@@ -54,4 +51,22 @@ public interface IRuntimeRing3 {
 	 * @return 返回设置的值
 	 */
 	boolean isOptionsBool(RuntimeMachine.Ring3Option option);
+
+	/**
+	 * 添加用户句柄
+	 * @param id 用户句柄
+	 */
+	void addHandle(int id);
+
+	/**
+	 * 删除用户句柄
+	 * @param id 用户句柄
+	 */
+	void removeHandle(int id);
+
+	/**
+	 * 获取用户句柄列表
+	 * @return 用户句柄列表
+	 */
+	Set<Integer> getHandles();
 }

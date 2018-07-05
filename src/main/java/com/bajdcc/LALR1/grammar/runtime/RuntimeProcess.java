@@ -23,6 +23,8 @@ import static com.bajdcc.LALR1.grammar.runtime.RuntimeMachine.Ring3Option.LOG_PI
 public class RuntimeProcess implements IRuntimeProcessService {
 
 	private static Deque<Pair<String, String>> pipeDeque = new ConcurrentLinkedDeque<>();
+	private int currentPid;
+
 	public static void writePipe(String name, String msg) {
 		pipeDeque.add(new Pair<>(name, msg));
 	}
@@ -55,6 +57,7 @@ public class RuntimeProcess implements IRuntimeProcessService {
 	private static final int MAX_PROCESS = 1000;
 	private static final int MAX_CYCLE = 150;
 	private static final int TIME_SLEEP_FULL = 5;
+	private static final int TIME_SLEEP_HALF = 10;
 	private static final int CLOCK_ONCE_SLEEP = 50;
 	private static final int CLOCK_WAIT_UI = 500;
 	public static final String USER_PROC_FILE_PREFIX = "/proc/";
@@ -77,11 +80,13 @@ public class RuntimeProcess implements IRuntimeProcessService {
 	public void run() throws Exception {
 		long last_time = System.currentTimeMillis();
 		stat.cycle = 0;
+		stat.ticked = false;
 		while (schd()) {
 			long span = System.currentTimeMillis() - last_time;
 			if (span > 1000) {
 				stat.speed = 1000.0 * stat.cycle / span;
 				stat.cycle = 0;
+				stat.ticked = true;
 				last_time = System.currentTimeMillis();
 				stat.procCache.clear();
 				Set<Integer> sorts = new TreeSet<>(setProcessId);
@@ -171,9 +176,13 @@ public class RuntimeProcess implements IRuntimeProcessService {
 			return true;
 		}
 		List<Integer> pids = new ArrayList<>(setProcessId);
-		int sleep = 0;
+		long pidNum = pids.stream().filter(a -> arrProcess[a].ring < 3).count();
+		long pidUserNum = pids.size() - pidNum;
+		long sleep = 0;
+		long sleepUser = 0;
 		LABEL_PID:
 		for (int pid : pids) {
+			currentPid = pid;
 			SchdProcess process = arrProcess[pid];
 			if (process != null && process.runnable) {
 				if (process.ring < 3) {
@@ -196,12 +205,11 @@ public class RuntimeProcess implements IRuntimeProcessService {
 					}
 				} else {
 					int cycle = MAX_CYCLE - process.priority;
-					// sleep++;
 					try {
 						for (int i = 0; i < cycle; i++) {
 							if (process.sleep > 0) {
 								process.sleep--;
-								sleep++; // boost!
+								sleepUser++; // boost!
 								break;
 							}
 							if (process.runnable) {
@@ -226,7 +234,7 @@ public class RuntimeProcess implements IRuntimeProcessService {
 				sleep++;
 			}
 		}
-		if (sleep == pids.size()) { // 都在休眠，等待并减掉休眠时间
+		if (sleep == pidNum) { // 都在休眠，等待并减掉休眠时间
 			for (int pid : pids) {
 				SchdProcess process = arrProcess[pid];
 				if (process != null && process.runnable) {
@@ -236,7 +244,12 @@ public class RuntimeProcess implements IRuntimeProcessService {
 						process.sleep -= CLOCK_ONCE_SLEEP;
 				}
 			}
-			Thread.sleep(TIME_SLEEP_FULL);
+			if (sleepUser == pidUserNum)
+				Thread.sleep(TIME_SLEEP_FULL);
+			else if (stat.ticked) {
+				Thread.sleep(TIME_SLEEP_HALF);
+				stat.ticked = false;
+			}
 			if (!pipeDeque.isEmpty()) {
 				Pair<String, String> pair = pipeDeque.poll();
 				service.getPipeService().writeStringNew(pair.getKey(), pair.getValue());
@@ -417,6 +430,7 @@ public class RuntimeProcess implements IRuntimeProcessService {
 	private class SystemStat {
 		public double speed;
 		public int cycle;
+		public boolean ticked;
 		public List<Object[]> procCache;
 
 		public SystemStat() {
@@ -433,13 +447,15 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		if (!setProcessId.contains(pid)) {
 			return -1;
 		}
-		if (!arrProcess[pid].machine.getRing3().isRing3()) {
+		IRuntimeRing3 ring3 = arrProcess[pid].machine.getRing3();
+		if (!ring3.isRing3()) {
 			return -2;
 		}
 		//TODO: 完成清理RING3进程创建的共享、管道、文件句柄
-		if (arrProcess[pid].machine.getRing3().isOptionsBool(LOG_FILE))
+		service.getUserService().destroy();
+		if (ring3.isOptionsBool(LOG_FILE))
 			service.getFileService().addVfs(USER_PROC_FILE_PREFIX + pid, error);
-		if (!arrProcess[pid].machine.getRing3().isOptionsBool(LOG_PIPE))
+		if (!ring3.isOptionsBool(LOG_PIPE))
 			service.getPipeService().destroyByName(pid, USER_PROC_PIPE_PREFIX + pid);
 		for (int id : arrProcess[pid].waiting_pids) {
 			wakeup(id);
@@ -448,6 +464,11 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		arrProcess[pid] = null;
 		logger.debug("RING3 proc #" + pid + " exit, " + setProcessId.size() + " left.");
 		return 0;
+	}
+
+	@Override
+	public IRuntimeRing3 getRing3() {
+		return arrProcess[currentPid].machine;
 	}
 
 	public IRuntimeRing3 getRing3(int pid) {

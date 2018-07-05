@@ -33,6 +33,22 @@ var g_range_string = yield ~(a) {
     }
 };
 export "g_range_string";
+var g_range_array = yield ~(a) {
+    var size = g_array_size(a);
+    for (var i = 0; i < size; i++) {
+        yield a[i];
+    }
+};
+export "g_range_array";
+var g_array_find = func ~(a, b) {
+    var size = g_array_size(a);
+    for (var i = 0; i < size; i++) {
+        if (b == a[i]) {
+            return i;
+        }
+    }
+};
+export "g_array_find";
 var g_sleep_s = func ~(second) {
     if (second < 1) { return; }
     var begin = g_get_timestamp();
@@ -247,3 +263,1296 @@ export "g_func_applicative";
 var g_func_apply_array = func ~(list) ->
     g_func_fold("g_array_append", list, [], "g_func_xsl", "g_func_1", "g_func_1", "g_func_always_true");
 export "g_func_apply_array";
+
+// ----------------------------------------------
+// Module Class
+var g_create_property = func ~(class, name, property) {
+    g_map_put(class, name, property);
+};
+export "g_create_property";
+var g_get_property = func ~(class, name) {
+    if (g_is_null(class)) {
+        throw "g_get_property: name = " + name;
+    }
+    if (g_map_contains(class, name)) {
+        return class[name];
+    }
+    var base = class["__base__"];
+    if (g_is_null(base)) {
+        return;
+    }
+    return g_get_property(base, name);
+};
+export "g_get_property";
+var g_has_property = func ~(class, name) {
+    if (g_map_contains(class, name)) {
+        return true;
+    }
+    var base = class["__base__"];
+    if (g_is_null(base)) {
+        return false;
+    }
+    return g_has_property(base, name);
+};
+export "g_has_property";
+var g_set_property_rec = func ~(class, name, property) {
+    if (g_map_contains(class, name)) {
+        g_map_put(class, name, property);
+        return true;
+    }
+    var base = class["__base__"];
+    if (g_is_null(base)) {
+        return false;
+    }
+    if (!g_set_property_rec(base, name, property)) {
+        g_map_put(class, name, property);
+    }
+    return true;
+};
+export "g_set_property_rec";
+var g_set_property = func ~(class, name, property) {
+    if (g_get_type_ordinal(class) != 10) {
+        throw "Not class type: " + g_to_string(class) + "." + name;
+    }
+    if (g_map_contains(class, name)) {
+        g_map_put(class, name, property);
+        return true;
+    }
+    var base = class["__base__"];
+    if (g_is_null(base)) {
+        g_map_put(class, name, property);
+        return false;
+    }
+    if (!g_set_property_rec(base, name, property)) {
+        g_map_put(class, name, property);
+    }
+    return true;
+};
+export "g_set_property";
+var g_set_property_unary = func ~(class, name, property) {
+    if (g_get_type_ordinal(class) != 10) {
+        throw "Not class type: " + g_to_string(class) + "." + name;
+    }
+    if (g_map_contains(class, name)) {
+        g_map_put(class, name, property);
+        return property;
+    }
+    var base = class["__base__"];
+    if (g_is_null(base)) {
+        g_map_put(class, name, property);
+        return property;
+    }
+    if (!g_set_property_rec(base, name, property)) {
+        g_map_put(class, name, property);
+    }
+    return property;
+};
+export "g_set_property_unary";
+
+var g_create_method = func ~(class, name, method) {
+    g_map_put(class, name, method);
+};
+export "g_create_method";
+var g_invoke_method = func ~(class, name) {
+    var method = class.name;
+    if (g_is_null(method)) { return; }
+    var flag = g_get_flag(method);
+    if ((flag & 1) > 0) {
+        var _ret = [];
+        var _before = class.(name + "__before");
+        var _cnt = g_array_size(_before);
+        var _i = 0;
+        var _next01 = func ~(__ret, __before, __cnt, __i, __next) {
+            if (__i >= __cnt) {
+                g_array_add(__ret, true);
+                return;
+            }
+            var next = __before[__i];
+            __i++;
+            var _next =  func ~() -> __next(__ret, __before, __cnt, __i, __next);
+            return next(class."__type__", name, class, _next);
+        };
+        var ret = _next01(_ret, _before, _cnt, _i, _next01);
+        if (g_array_empty(_ret)) {
+            return ret;
+        }
+    }
+    var r = method(class);
+    if ((flag & 2) > 0) {
+        var _ret = [];
+        var _after = class.(name + "__after");
+        var _cnt = g_array_size(_after);
+        var _i = 0;
+        var _next02 = func ~(__ret, __after, __cnt, __i, _r, __next) {
+            if (__i >= __cnt) {
+                g_array_add(__ret, true);
+                return;
+            }
+            var next = __after[__i];
+            __i++;
+            var _next =  func ~() -> __next(__ret, __after, __cnt, __i, _r, __next);
+            return next(class."__type__", name, class, _r, _next);
+        };
+        var ret = _next02(_ret, _after, _cnt, _i, r, _next02);
+        if (g_array_empty(_ret)) {
+            return ret;
+        }
+    }
+    return r;
+};
+export "g_invoke_method";
+var g_invoke_method_1 = func ~(class, name, arg1) {
+var method = class.name;
+    if (g_is_null(method)) { return; }
+    var flag = g_get_flag(method);
+    if ((flag & 1) > 0) {
+        var _ret = [];
+        var _before = class.(name + "__before");
+        var _cnt = g_array_size(_before);
+        var _i = 0;
+        var _next11 = func ~(__ret, __before, __cnt, __i, __next, arg1) {
+            if (__i >= __cnt) {
+                g_array_add(__ret, true);
+                return;
+            }
+            var next = __before[__i];
+            __i++;
+            var _next =  func ~() -> __next(__ret, __before, __cnt, __i, __next, arg1);
+            return next(class."__type__", name, class, _next, arg1);
+        };
+        var ret = _next11(_ret, _before, _cnt, _i, _next11, arg1);
+        if (g_array_empty(_ret)) {
+            return ret;
+        }
+    }
+    var r = method(class, arg1);
+    if ((flag & 2) > 0) {
+        var _ret = [];
+        var _after = class.(name + "__after");
+        var _cnt = g_array_size(_after);
+        var _i = 0;
+        var _next12 = func ~(__ret, __after, __cnt, __i, _r, __next, arg1) {
+            if (__i >= __cnt) {
+                g_array_add(__ret, true);
+                return;
+            }
+            var next = __after[__i];
+            __i++;
+            var _next =  func ~() -> __next(__ret, __after, __cnt, __i, _r, __next, arg1);
+            return next(class."__type__", name, class, _r, _next, arg1);
+        };
+        var ret = _next12(_ret, _after, _cnt, _i, r, _next12, arg1);
+        if (g_array_empty(_ret)) {
+            return ret;
+        }
+    }
+    return r;
+};
+export "g_invoke_method_1";
+var g_invoke_method_2 = func ~(class, name, arg1, arg2) {
+var method = class.name;
+    if (g_is_null(method)) { return; }
+    var flag = g_get_flag(method);
+    if ((flag & 1) > 0) {
+        var _ret = [];
+        var _before = class.(name + "__before");
+        var _cnt = g_array_size(_before);
+        var _i = 0;
+        var _next21 = func ~(__ret, __before, __cnt, __i, __next, arg1, arg2) {
+            if (__i >= __cnt) {
+                g_array_add(__ret, true);
+                return;
+            }
+            var next = __before[__i];
+            __i++;
+            var _next =  func ~() -> __next(__ret, __before, __cnt, __i, __next, arg1, arg2);
+            return next(class."__type__", name, class, _next, arg1, arg2);
+        };
+        var ret = _next21(_ret, _before, _cnt, _i, _next21, arg1, arg2);
+        if (g_array_empty(_ret)) {
+            return ret;
+        }
+    }
+    var r = method(class, arg1, arg2);
+    if ((flag & 2) > 0) {
+        var _ret = [];
+        var _after = class.(name + "__after");
+        var _cnt = g_array_size(_after);
+        var _i = 0;
+        var _next22 = func ~(__ret, __after, __cnt, __i, _r, __next, arg1, arg2) {
+            if (__i >= __cnt) {
+                g_array_add(__ret, true);
+                return;
+            }
+            var next = __after[__i];
+            __i++;
+            var _next =  func ~() -> __next(__ret, __after, __cnt, __i, _r, __next, arg1, arg2);
+            return next(class."__type__", name, class, _r, _next, arg1, arg2);
+        };
+        var ret = _next22(_ret, _after, _cnt, _i, r, _next22, arg1, arg2);
+        if (g_array_empty(_ret)) {
+            return ret;
+        }
+    }
+    return r;
+};
+export "g_invoke_method_2";
+var g_invoke_method_3 = func ~(class, name, arg1, arg2, arg3) {
+var method = class.name;
+    if (g_is_null(method)) { return; }
+    var flag = g_get_flag(method);
+    if ((flag & 1) > 0) {
+        var _ret = [];
+        var _before = class.(name + "__before");
+        var _cnt = g_array_size(_before);
+        var _i = 0;
+        var _next31 = func ~(__ret, __before, __cnt, __i, __next, arg1, arg2, arg3) {
+            if (__i >= __cnt) {
+                g_array_add(__ret, true);
+                return;
+            }
+            var next = __before[__i];
+            __i++;
+            var _next =  func ~() -> __next(__ret, __before, __cnt, __i, __next, arg1, arg2, arg3);
+            return next(class."__type__", name, class, _next, arg1, arg2, arg3);
+        };
+        var ret = _next31(_ret, _before, _cnt, _i, _next31, arg1, arg2, arg3);
+        if (g_array_empty(_ret)) {
+            return ret;
+        }
+    }
+    var r = method(class, arg1, arg2, arg3);
+    if ((flag & 2) > 0) {
+        var _ret = [];
+        var _after = class.(name + "__after");
+        var _cnt = g_array_size(_after);
+        var _i = 0;
+        var _next32 = func ~(__ret, __after, __cnt, __i, _r, __next, arg1, arg2, arg3) {
+            if (__i >= __cnt) {
+                g_array_add(__ret, true);
+                return;
+            }
+            var next = __after[__i];
+            __i++;
+            var _next =  func ~() -> __next(__ret, __after, __cnt, __i, _r, __next, arg1, arg2, arg3);
+            return next(class."__type__", name, class, _r, _next, arg1, arg2, arg3);
+        };
+        var ret = _next32(_ret, _after, _cnt, _i, r, _next32, arg1, arg2, arg3);
+        if (g_array_empty(_ret)) {
+            return ret;
+        }
+    }
+    return r;
+};
+export "g_invoke_method_3";
+var g_invoke_method_4 = func ~(class, name, arg1, arg2, arg3, arg4) {
+var method = class.name;
+    if (g_is_null(method)) { return; }
+    var flag = g_get_flag(method);
+    if ((flag & 1) > 0) {
+        var _ret = [];
+        var _before = class.(name + "__before");
+        var _cnt = g_array_size(_before);
+        var _i = 0;
+        var _next41 = func ~(__ret, __before, __cnt, __i, __next, arg1, arg2, arg3, arg4) {
+            if (__i >= __cnt) {
+                g_array_add(__ret, true);
+                return;
+            }
+            var next = __before[__i];
+            __i++;
+            var _next =  func ~() -> __next(__ret, __before, __cnt, __i, __next, arg1, arg2, arg3, arg4);
+            return next(class."__type__", name, class, _next, arg1, arg2, arg3, arg4);
+        };
+        var ret = _next41(_ret, _before, _cnt, _i, _next41, arg1, arg2, arg3, arg4);
+        if (g_array_empty(_ret)) {
+            return ret;
+        }
+    }
+    var r = method(class, arg1, arg2, arg3, arg4);
+    if ((flag & 2) > 0) {
+        var _ret = [];
+        var _after = class.(name + "__after");
+        var _cnt = g_array_size(_after);
+        var _i = 0;
+        var _next42 = func ~(__ret, __after, __cnt, __i, _r, __next, arg1, arg2, arg3, arg4) {
+            if (__i >= __cnt) {
+                g_array_add(__ret, true);
+                return;
+            }
+            var next = __after[__i];
+            __i++;
+            var _next =  func ~() -> __next(__ret, __after, __cnt, __i, _r, __next, arg1, arg2, arg3, arg4);
+            return next(class."__type__", name, class, _r, _next, arg1, arg2, arg3, arg4);
+        };
+        var ret = _next42(_ret, _after, _cnt, _i, r, _next42, arg1, arg2, arg3, arg4);
+        if (g_array_empty(_ret)) {
+            return ret;
+        }
+    }
+    return r;
+};
+export "g_invoke_method_4";
+var g_invoke_method_5 = func ~(class, name, arg1, arg2, arg3, arg4, arg5) {
+var method = class.name;
+    if (g_is_null(method)) { return; }
+    var flag = g_get_flag(method);
+    if ((flag & 1) > 0) {
+        var _ret = [];
+        var _before = class.(name + "__before");
+        var _cnt = g_array_size(_before);
+        var _i = 0;
+        var _next51 = func ~(__ret, __before, __cnt, __i, __next, arg1, arg2, arg3, arg4, arg5) {
+            if (__i >= __cnt) {
+                g_array_add(__ret, true);
+                return;
+            }
+            var next = __before[__i];
+            __i++;
+            var _next =  func ~() -> __next(__ret, __before, __cnt, __i, __next, arg1, arg2, arg3, arg4, arg5);
+            return next(class."__type__", name, class, _next, arg1, arg2, arg3, arg4, arg5);
+        };
+        var ret = _next51(_ret, _before, _cnt, _i, _next51, arg1, arg2, arg3, arg4, arg5);
+        if (g_array_empty(_ret)) {
+            return ret;
+        }
+    }
+    var r = method(class, arg1, arg2, arg3, arg4, arg5);
+    if ((flag & 2) > 0) {
+        var _ret = [];
+        var _after = class.(name + "__after");
+        var _cnt = g_array_size(_after);
+        var _i = 0;
+        var _next52 = func ~(__ret, __after, __cnt, __i, _r, __next, arg1, arg2, arg3, arg4, arg5) {
+            if (__i >= __cnt) {
+                g_array_add(__ret, true);
+                return;
+            }
+            var next = __after[__i];
+            __i++;
+            var _next =  func ~() -> __next(__ret, __after, __cnt, __i, _r, __next, arg1, arg2, arg3, arg4, arg5);
+            return next(class."__type__", name, class, _r, _next, arg1, arg2, arg3, arg4, arg5);
+        };
+        var ret = _next52(_ret, _after, _cnt, _i, r, _next52, arg1, arg2, arg3, arg4, arg5);
+        if (g_array_empty(_ret)) {
+            return ret;
+        }
+    }
+    return r;
+};
+export "g_invoke_method_5";
+var g_invoke_method_6 = func ~(class, name, arg1, arg2, arg3, arg4, arg5, arg6) {
+var method = class.name;
+    if (g_is_null(method)) { return; }
+    var flag = g_get_flag(method);
+    if ((flag & 1) > 0) {
+        var _ret = [];
+        var _before = class.(name + "__before");
+        var _cnt = g_array_size(_before);
+        var _i = 0;
+        var _next61 = func ~(__ret, __before, __cnt, __i, __next, arg1, arg2, arg3, arg4, arg5, arg6) {
+            if (__i >= __cnt) {
+                g_array_add(__ret, true);
+                return;
+            }
+            var next = __before[__i];
+            __i++;
+            var _next =  func ~() -> __next(__ret, __before, __cnt, __i, __next, arg1, arg2, arg3, arg4, arg5, arg6);
+            return next(class."__type__", name, class, _next, arg1, arg2, arg3, arg4, arg5, arg6);
+        };
+        var ret = _next61(_ret, _before, _cnt, _i, _next61, arg1, arg2, arg3, arg4, arg5, arg6);
+        if (g_array_empty(_ret)) {
+            return ret;
+        }
+    }
+    var r = method(class, arg1, arg2, arg3, arg4, arg5, arg6);
+    if ((flag & 2) > 0) {
+        var _ret = [];
+        var _after = class.(name + "__after");
+        var _cnt = g_array_size(_after);
+        var _i = 0;
+        var _next62 = func ~(__ret, __after, __cnt, __i, _r, __next, arg1, arg2, arg3, arg4, arg5, arg6) {
+            if (__i >= __cnt) {
+                g_array_add(__ret, true);
+                return;
+            }
+            var next = __after[__i];
+            __i++;
+            var _next =  func ~() -> __next(__ret, __after, __cnt, __i, _r, __next, arg1, arg2, arg3, arg4, arg5, arg6);
+            return next(class."__type__", name, class, _r, _next, arg1, arg2, arg3, arg4, arg5, arg6);
+        };
+        var ret = _next62(_ret, _after, _cnt, _i, r, _next62, arg1, arg2, arg3, arg4, arg5, arg6);
+        if (g_array_empty(_ret)) {
+            return ret;
+        }
+    }
+    return r;
+};
+export "g_invoke_method_6";
+var g_invoke_method_7 = func ~(class, name, arg1, arg2, arg3, arg4, arg5, arg6, arg7) {
+var method = class.name;
+    if (g_is_null(method)) { return; }
+    var flag = g_get_flag(method);
+    if ((flag & 1) > 0) {
+        var _ret = [];
+        var _before = class.(name + "__before");
+        var _cnt = g_array_size(_before);
+        var _i = 0;
+        var _next71 = func ~(__ret, __before, __cnt, __i, __next, arg1, arg2, arg3, arg4, arg5, arg6, arg7) {
+            if (__i >= __cnt) {
+                g_array_add(__ret, true);
+                return;
+            }
+            var next = __before[__i];
+            __i++;
+            var _next =  func ~() -> __next(__ret, __before, __cnt, __i, __next, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+            return next(class."__type__", name, class, _next, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+        };
+        var ret = _next71(_ret, _before, _cnt, _i, _next71, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+        if (g_array_empty(_ret)) {
+            return ret;
+        }
+    }
+    var r = method(class, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+    if ((flag & 2) > 0) {
+        var _ret = [];
+        var _after = class.(name + "__after");
+        var _cnt = g_array_size(_after);
+        var _i = 0;
+        var _next72 = func ~(__ret, __after, __cnt, __i, _r, __next, arg1, arg2, arg3, arg4, arg5, arg6, arg7) {
+            if (__i >= __cnt) {
+                g_array_add(__ret, true);
+                return;
+            }
+            var next = __after[__i];
+            __i++;
+            var _next =  func ~() -> __next(__ret, __after, __cnt, __i, _r, __next, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+            return next(class."__type__", name, class, _r, _next, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+        };
+        var ret = _next72(_ret, _after, _cnt, _i, r, _next72, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+        if (g_array_empty(_ret)) {
+            return ret;
+        }
+    }
+    return r;
+};
+export "g_invoke_method_7";
+var g_invoke_method_8 = func ~(class, name, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) {
+var method = class.name;
+    if (g_is_null(method)) { return; }
+    var flag = g_get_flag(method);
+    if ((flag & 1) > 0) {
+        var _ret = [];
+        var _before = class.(name + "__before");
+        var _cnt = g_array_size(_before);
+        var _i = 0;
+        var _next81 = func ~(__ret, __before, __cnt, __i, __next, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) {
+            if (__i >= __cnt) {
+                g_array_add(__ret, true);
+                return;
+            }
+            var next = __before[__i];
+            __i++;
+            var _next =  func ~() -> __next(__ret, __before, __cnt, __i, __next, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+            return next(class."__type__", name, class, _next, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+        };
+        var ret = _next81(_ret, _before, _cnt, _i, _next81, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+        if (g_array_empty(_ret)) {
+            return ret;
+        }
+    }
+    var r = method(class, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+    if ((flag & 2) > 0) {
+        var _ret = [];
+        var _after = class.(name + "__after");
+        var _cnt = g_array_size(_after);
+        var _i = 0;
+        var _next82 = func ~(__ret, __after, __cnt, __i, _r, __next, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) {
+            if (__i >= __cnt) {
+                g_array_add(__ret, true);
+                return;
+            }
+            var next = __after[__i];
+            __i++;
+            var _next =  func ~() -> __next(__ret, __after, __cnt, __i, _r, __next, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+            return next(class."__type__", name, class, _r, _next, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+        };
+        var ret = _next82(_ret, _after, _cnt, _i, r, _next82, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+        if (g_array_empty(_ret)) {
+            return ret;
+        }
+    }
+    return r;
+};
+export "g_invoke_method_8";
+var g_invoke_method_9 = func ~(class, name, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) {
+var method = class.name;
+    if (g_is_null(method)) { return; }
+    var flag = g_get_flag(method);
+    if ((flag & 1) > 0) {
+        var _ret = [];
+        var _before = class.(name + "__before");
+        var _cnt = g_array_size(_before);
+        var _i = 0;
+        var _next91 = func ~(__ret, __before, __cnt, __i, __next, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) {
+            if (__i >= __cnt) {
+                g_array_add(__ret, true);
+                return;
+            }
+            var next = __before[__i];
+            __i++;
+            var _next =  func ~() -> __next(__ret, __before, __cnt, __i, __next, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
+            return next(class."__type__", name, class, _next, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
+        };
+        var ret = _next91(_ret, _before, _cnt, _i, _next91, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
+        if (g_array_empty(_ret)) {
+            return ret;
+        }
+    }
+    var r = method(class, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
+    if ((flag & 2) > 0) {
+        var _ret = [];
+        var _after = class.(name + "__after");
+        var _cnt = g_array_size(_after);
+        var _i = 0;
+        var _next92 = func ~(__ret, __after, __cnt, __i, _r, __next, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) {
+            if (__i >= __cnt) {
+                g_array_add(__ret, true);
+                return;
+            }
+            var next = __after[__i];
+            __i++;
+            var _next =  func ~() -> __next(__ret, __after, __cnt, __i, _r, __next, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
+            return next(class."__type__", name, class, _r, _next, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
+        };
+        var ret = _next92(_ret, _after, _cnt, _i, r, _next92, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
+        if (g_array_empty(_ret)) {
+            return ret;
+        }
+    }
+    return r;
+};
+export "g_invoke_method_9";
+
+var g_class = func ~(name, base, init) {
+    var class = {};
+    g_create_property(class, "name", name);
+    if (!g_is_null(base) && g_map_contains(g_class_context, base)) {
+        g_create_property(class, "base", base);
+    }
+    g_create_method(class, "init", init);
+    g_map_put(g_class_context, name, class);
+};
+export "g_class";
+
+var g_new_class = func ~() {
+    var name = g_args_index(0);
+    var prototype = g_class_context[name];
+    if (g_is_null(prototype)) {
+        throw "Undefined class: " + name;
+    }
+    var class = {};
+    g_create_property(class, "__type__", name);
+    if (g_map_contains(prototype, "base")) {
+        g_map_put(class, "__base__", g_new_class(prototype["base"]));
+    }
+    var init = prototype["init"];
+    if (!g_is_null(init)) {
+        init(class);
+    }
+    var c = g_args_count();
+    if (c >= 2) {
+        foreach (var d : g_range_array(g_args_index(1))) {
+            set class::d[0] = d[1];
+        }
+    }
+    if (c == 3) {
+        var m_ = g_null;
+        foreach (var m : g_range_array(g_args_index(2))) {
+            m_ := m[0];
+            g_array_remove(m, 0);
+            g_invoke_apply(class, m_, m);
+        }
+    }
+    return class;
+};
+export "g_new_class";
+
+// ---- HOOK ----
+
+var g_hook_add_before = func ~(class, name, f) {
+    var old = class.name;
+    if (g_is_null(old)) {
+        return false;
+    }
+    var flag = g_get_flag(old);
+    if ((flag & 1) > 0) {
+        var _before = class.(name + "__before");
+        g_array_add(_before, f);
+    } else {
+        var _before = [];
+        g_array_add(_before, f);
+        set class::(name + "__before") = _before;
+        g_set_flag(old, flag | 1);
+    }
+    return true;
+};
+export "g_hook_add_before";
+var g_hook_insert_before = func ~(class, name, f) {
+    var old = class.name;
+    if (g_is_null(old)) {
+        return false;
+    }
+    var flag = g_get_flag(old);
+    if ((flag & 1) > 0) {
+        var _before = class.(name + "__before");
+        g_array_insert(_before, 0, f);
+    } else {
+        var _before = [];
+        g_array_add(_before, f);
+        set class::(name + "__before") = _before;
+        g_set_flag(old, flag | 1);
+    }
+    return true;
+};
+export "g_hook_insert_before";
+var g_hook_remove_before = func ~(class, name, f) {
+    var old = class.name;
+    if (g_is_null(old)) {
+        return false;
+    }
+    var flag = g_get_flag(old);
+    if ((flag & 1) > 0) {
+        var _before = class.(name + "__before");
+        var ret = g_array_delete(_before, f);
+        if (g_array_empty(_before)) {
+            set class::(name + "__before") = g_null;
+            g_set_flag(old, flag - 1);
+        }
+        return ret;
+    }
+    return false;
+};
+export "g_hook_remove_before";
+var g_hook_add_after = func ~(class, name, f) {
+    var old = class.name;
+    if (g_is_null(old)) {
+        return false;
+    }
+    var flag = g_get_flag(old);
+    if ((flag & 2) > 0) {
+        var _after = class.(name + "__after");
+        g_array_add(_after, f);
+    } else {
+        var _after = [];
+        g_array_add(_after, f);
+        set class::(name + "__after") = _after;
+        g_set_flag(old, flag | 2);
+    }
+    return true;
+};
+export "g_hook_add_after";
+var g_hook_insert_after = func ~(class, name, f) {
+    var old = class.name;
+    if (g_is_null(old)) {
+        return false;
+    }
+    var flag = g_get_flag(old);
+    if ((flag & 2) > 0) {
+        var _after = class.(name + "__after");
+        g_array_insert(_after, 0, f);
+    } else {
+        var _after = [];
+        g_array_add(_after, f);
+        set class::(name + "__after") = _after;
+        g_set_flag(old, flag | 2);
+    }
+    return true;
+};
+export "g_hook_insert_after";
+var g_hook_remove_after = func ~(class, name, f) {
+    var old = class.name;
+    if (g_is_null(old)) {
+        return false;
+    }
+    var flag = g_get_flag(old);
+    if ((flag & 2) > 0) {
+        var _after = class.(name + "__after");
+        var ret = g_array_delete(_after, f);
+        if (g_array_empty(_after)) {
+            set class::(name + "__after") = g_null;
+            g_set_flag(old, flag - 2);
+        }
+        return ret;
+    }
+    return false;
+};
+export "g_hook_remove_after";
+
+var g_invoke_apply = func ~(class, fun, args) {
+    var size = g_array_size(args);
+    if (size > 9) {
+        g_panic("g_call_apply: TOO MANY ARGUMENTS");
+    }
+    var apply_callbacks = [
+        lambda(c, f, a) -> invoke c::f::(),
+        lambda(c, f, a) -> invoke c::f::(a[0]),
+        lambda(c, f, a) -> invoke c::f::(a[0], a[1]),
+        lambda(c, f, a) -> invoke c::f::(a[0], a[1], a[2]),
+        lambda(c, f, a) -> invoke c::f::(a[0], a[1], a[2], a[3]),
+        lambda(c, f, a) -> invoke c::f::(a[0], a[1], a[2], a[3], a[4]),
+        lambda(c, f, a) -> invoke c::f::(a[0], a[1], a[2], a[3], a[4], a[5]),
+        lambda(c, f, a) -> invoke c::f::(a[0], a[1], a[2], a[3], a[4], a[5], a[6]),
+        lambda(c, f, a) -> invoke c::f::(a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7]),
+        lambda(c, f, a) -> invoke c::f::(a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8])
+    ];
+    var fn = apply_callbacks[size];
+    return fn(class, fun, args);
+};
+export "g_invoke_apply";
+
+// -----------------------------------------------------------------------------------------
+// LINQ Design
+// @ Refer: https://github.com/vczh-libraries/vlpp
+// ---- CODE BEGIN ----
+
+var _ = g_null;
+
+var g_from = func ~(arr) {
+    var t = g_get_type_ordinal(arr);
+    if (t == 9) {
+        return g_new_class("list::array", [["array", arr]], []);
+    } else if (t == 10) {
+        return g_new_class("list::map", [["map", arr]], []);
+    } else {
+        throw "ERROR: " + "<From> Invalid type";
+    }
+};
+
+var import_linq_class = func ~() {
+
+    // LINQ Operator Class
+
+    g_class("linq::class", "object", lambda(this) {
+        this."__doc__" := "LINQ接口";
+        this."__from_array" := lambda(this, arr) ->
+            g_new_class("linq::from.iterator::enumerable", [["__array__", arr]], []);
+        this."cast_array" := lambda(this, arr) -> g_new_class("list::array", [["array", arr]], []);
+        this."from" := lambda(this, arr) {
+            var t = g_get_type_ordinal(arr);
+            if (t == 9) {
+                return this."__from_array"(this."cast_array"(arr));
+            } else if (t == 10) {
+                if (g_is_null(arr["__type__"]) || arr."__type__" != "list::array") {
+                    throw "LINQ ERROR: " + "<From> Invalid class type";
+                }
+                return this."__from_array"(arr);
+            } else {
+                throw "LINQ ERROR: " + "<From> Invalid type";
+            }
+        };
+        this."range" := lambda(this, begin, end) ->
+            g_new_class("linq::lazy::enumerable", [["__enumerator__",
+                g_new_class("linq::range::enumerator", [], [["init", begin, end]])]], []);
+    });
+
+    // Enumerator Class
+
+    g_class("linq::enumerator", "object", lambda(this) {
+        this."__doc__" := "枚举器接口";
+        this."current" := lambda(this) -> _; // 当前指针所在元素
+        this."index" := lambda(this) -> _; // 当前位置
+        this."next" := lambda(this) -> _; // 指针指向下一个，返回是否还有元素
+        this."reset" := lambda(this) -> _; // 重置
+        this."clone" := lambda(this) -> _; // 拷贝
+    });
+
+    g_class("linq::array::enumerator", "linq::enumerator", lambda(this) {
+        this."__doc__" := "数组枚举器";
+        this."__array__" := _; // 包装的数组
+        this."__index__" := -1; // 访问的索引
+        this."current" := lambda(this) -> this."__array__"."get"(this."__index__");
+        this."index" := lambda(this) -> this."__index__";
+        this."next" := lambda(this) {
+            var idx = this."__index__" + 1;
+            var res = idx >= 0 && idx < this."__array__"."size"();
+            if (res) { this."__index__" := idx; return true; }
+            return false;
+        };
+        this."reset" := lambda(this) -> this."__index__" := -1;
+        this."clone" := lambda(this) ->
+            g_new_class("linq::array::enumerator", [["__array__", this."__array__"]], []);
+    });
+
+    g_class("linq::range::enumerator", "linq::enumerator", lambda(this) {
+        this."__doc__" := "范围枚举器";
+        this."__dir__" := _; // 是否正序
+        this."__begin__" := _; // 起点
+        this."__end__" := _; // 终点
+        this."__index__" := _; // 当前位置
+        this."init" := lambda(this, begin, end) {
+            if (this."__dir__" := begin <= end) {
+                this."__begin__" := begin;
+                this."__end__" := end;
+                this."__index__" := begin - 1;
+            } else {
+                this."__begin__" := end;
+                this."__end__" := begin;
+                this."__index__" := begin + 1;
+            }
+        };
+        this."current" := lambda(this) -> this."__index__";
+        this."index" := lambda(this) ->
+            this."__dir__" ? (this."__index__" - this."__begin__") : (this."__end__" - this."__index__");
+        this."next" := lambda(this) {
+            var idx = this."__dir__" ? (this."__index__" + 1) : (this."__index__" - 1);
+            var res = idx >= this."__begin__" && idx <= this."__end__";
+            if (res) { this."__index__" := idx; return true; }
+            return false;
+        };
+        this."reset" := lambda(this) {
+            if (this."__dir__") {
+                this."__index__" := this."__begin__" - 1;
+            } else {
+                this."__index__" := this."__end__" + 1;
+            }
+        };
+        this."clone" := lambda(this) ->
+            g_new_class("linq::range::enumerator", [], [
+                this."__dir__" ? ["init", this."__begin__", this."__end__"] : ["init", this."__end__", this."__begin__"]]);
+    });
+
+    g_class("linq::select::enumerator", "linq::enumerator", lambda(this) {
+        this."__doc__" := "选择器";
+        this."__enumerator__" := _; // 包装的枚举器
+        this."__current__" := _; // 当前元素
+        this."__select__" := g_func_1; // 选择函数
+        this."current" := lambda(this) -> this."__current__";
+        this."index" := lambda(this) -> this."__enumerator__"."index"();
+        this."next" := lambda(this) {
+            if (this."__enumerator__"."next"()) {
+                var f = this."__select__";
+                this."__current__" := f(this."__enumerator__"."current"());
+                return true;
+            }
+            return false;
+        };
+        this."reset" := lambda(this) -> this."__enumerator__"."reset"();
+        this."clone" := lambda(this) ->
+            g_new_class("linq::select::enumerator",
+                [["__enumerator__", this."__enumerator__"."clone"()], ["__select__", this."__select__"]], []);
+    });
+
+    g_class("linq::where::enumerator", "linq::enumerator", lambda(this) {
+        this."__doc__" := "过滤器";
+        this."__enumerator__" := _; // 包装的枚举器
+        this."__index__" := -1; // 当前索引
+        this."__where__" := g_func_always_true; // 过滤函数
+        this."current" := lambda(this) -> this."__enumerator__"."current"();
+        this."index" := lambda(this) -> this."__index__";
+        this."next" := lambda(this) {
+            while (this."__enumerator__"."next"()) {
+                var f = this."__where__";
+                if (f(this."__enumerator__"."current"())) {
+                    this."__index__"++;
+                    return true;
+                }
+            }
+            return false;
+        };
+        this."reset" := lambda(this) {
+            this."__enumerator__"."reset"();
+            this."__index__" := -1;
+        };
+        this."clone" := lambda(this) ->
+            g_new_class("linq::where::enumerator",
+                [["__enumerator__", this."__enumerator__"."clone"()], ["__where__", this."__where__"]], []);
+    });
+
+    g_class("linq::concat::enumerator", "linq::enumerator", lambda(this) {
+        this."__doc__" := "连接器";
+        this."__enumerator1__" := _; // 包装的枚举器1
+        this."__enumerator2__" := _; // 包装的枚举器2
+        this."__index__" := -1; // 当前索引
+        this."__use1__" := true; // 是否使用枚举器1
+        this."current" := lambda(this) -> this."__use1__" ? this."__enumerator1__"."current"() : this."__enumerator2__"."current"();
+        this."index" := lambda(this) -> this."__index__";
+        this."next" := lambda(this) {
+            if (this."__use1__") {
+                if (this."__enumerator1__"."next"()) {
+                    this."__index__"++;
+                    return true;
+                }
+                this."__use1__" := false;
+                return this."next"();
+            } else {
+                if (this."__enumerator2__"."next"()) {
+                    this."__index__"++;
+                    return true;
+                }
+                return false;
+            }
+        };
+        this."reset" := lambda(this) {
+            this."__enumerator1__"."reset"();
+            this."__enumerator2__"."reset"();
+            this."__index__" := -1;
+            this."__use1__" := true;
+        };
+        this."clone" := lambda(this) ->
+            g_new_class("linq::concat::enumerator",
+                [["__enumerator1__", this."__enumerator1__"."clone"()],
+                 ["__enumerator2__", this."__enumerator2__"."clone"()],
+                 ["__index__", this."__index__"], ["__use1__", this."__use1__"]], []);
+    });
+
+    g_class("linq::take::enumerator", "linq::enumerator", lambda(this) {
+        this."__doc__" := "挑选";
+        this."__enumerator__" := _; // 包装的枚举器
+        this."__count__" := -1; // 指定数量
+        this."current" := lambda(this) -> this."__enumerator__"."current"();
+        this."index" := lambda(this) -> this."__enumerator__"."index"();
+        this."next" := lambda(this) {
+            if (this."index"() < this."__count__" - 1) {
+                return this."__enumerator__"."next"();
+            }
+            return false;
+        };
+        this."reset" := lambda(this) {
+            this."__enumerator__"."reset"();
+        };
+        this."clone" := lambda(this) ->
+            g_new_class("linq::take::enumerator",
+                [["__enumerator__", this."__enumerator__"."clone"()], ["__count__", this."__count__"]], []);
+    });
+
+    g_class("linq::skip::enumerator", "linq::enumerator", lambda(this) {
+        this."__doc__" := "跳过";
+        this."__enumerator__" := _; // 包装的枚举器
+        this."__count__" := -1; // 指定数量
+        this."__skipped__" := false; // 是否跳过
+        this."current" := lambda(this) -> this."__enumerator__"."current"();
+        this."index" := lambda(this) -> this."__enumerator__"."index"() - this."__count__";
+        this."next" := lambda(this) {
+            if (!this."__skipped__") {
+                this."__skipped__" := true;
+                var count = this."__count__";
+                for (var i = 0; i < count; i++) {
+                    if (!this."__enumerator__"."next"()) {
+                        return false;
+                    }
+                }
+            }
+            return this."__enumerator__"."next"();
+        };
+        this."reset" := lambda(this) {
+            this."__enumerator__"."reset"();
+            this."__skipped__" := false;
+        };
+        this."clone" := lambda(this) ->
+            g_new_class("linq::skip::enumerator",
+                [["__enumerator__", this."__enumerator__"."clone"()],
+                ["__count__", this."__count__"], ["__skipped__", this."__skipped__"]], []);
+    });
+
+    g_class("linq::repeat::enumerator", "linq::enumerator", lambda(this) {
+        this."__doc__" := "重复";
+        this."__enumerator__" := _; // 包装的枚举器
+        this."__count__" := -1; // 指定数量
+        this."__index__" := -1; // 当前位置
+        this."__repeat_count__" := 0; // 已重复次数
+        this."current" := lambda(this) -> this."__enumerator__"."current"();
+        this."index" := lambda(this) -> this."__index__";
+        this."next" := lambda(this) {
+            while (this."__repeat_count__" <this."__count__") {
+                if (this."__enumerator__"."next"()) {
+                    this."__index__"++;
+                    return true;
+                }
+                this."__repeat_count__"++;
+                this."__enumerator__"."reset"();
+            }
+            return false;
+        };
+        this."reset" := lambda(this) {
+            this."__enumerator__"."reset"();
+            this."__index__" := -1;
+            this."__repeat_count__" := 0;
+        };
+        this."clone" := lambda(this) ->
+            g_new_class("linq::repeat::enumerator",
+                [["__enumerator__", this."__enumerator__"."clone"()],
+                ["__count__", this."__count__"], ["__index__", this."__index__"],
+                ["__repeat_count__", this."__repeat_count__"]], []);
+    });
+
+    // Enumerable Class
+
+    g_class("linq::enumerable", "linq::class", lambda(this) {
+        this."__doc__" := "可枚举接口";
+        this."enumerator" := lambda(this) -> _; // 创建枚举器
+        this."select" := lambda(this, f) ->
+            g_new_class("linq::lazy::enumerable", [["__enumerator__",
+                g_new_class("linq::select::enumerator",
+                    [["__enumerator__", this."enumerator"()], ["__select__", f]], [])]], []);
+        this."where" := lambda(this, f) ->
+            g_new_class("linq::lazy::enumerable", [["__enumerator__",
+                g_new_class("linq::where::enumerator",
+                    [["__enumerator__", this."enumerator"()], ["__where__", f]], [])]], []);
+        this."concat" := lambda(this, x) ->
+            g_new_class("linq::lazy::enumerable", [["__enumerator__",
+                g_new_class("linq::concat::enumerator",
+                    [["__enumerator1__", this."enumerator"()], ["__enumerator2__", x."enumerator"()]], [])]], []);
+        this."take" := lambda(this, n) ->
+            g_new_class("linq::lazy::enumerable", [["__enumerator__",
+                g_new_class("linq::take::enumerator",
+                    [["__enumerator__", this."enumerator"()], ["__count__", n]], [])]], []);
+        this."skip" := lambda(this, n) ->
+            g_new_class("linq::lazy::enumerable", [["__enumerator__",
+                g_new_class("linq::skip::enumerator",
+                    [["__enumerator__", this."enumerator"()], ["__count__", n]], [])]], []);
+        this."repeat" := lambda(this, n) ->
+            g_new_class("linq::lazy::enumerable", [["__enumerator__",
+                g_new_class("linq::repeat::enumerator",
+                    [["__enumerator__", this."enumerator"()], ["__count__", n]], [])]], []);
+
+        this."count" := lambda(this) {
+            var count = 0;
+            var enumerator = this."enumerator"();
+            while (enumerator."next"()) {
+                count++;
+            }
+            return count;
+        };
+        this."empty" := lambda(this) -> this."enumerator"()."next"();
+        this."first" := lambda(this) {
+            var enumerator = this."enumerator"();
+            if (enumerator."next"()) {
+                return enumerator."current"();
+            }
+            throw "LINQ::FIRST Error: empty list";
+        };
+        this."first_or_default" := lambda(this, def) {
+            var enumerator = this."enumerator"();
+            if (enumerator."next"()) {
+                return enumerator."current"();
+            }
+            return def;
+        };
+        this."last" := lambda(this) {
+            var enumerator = this."enumerator"();
+            if (enumerator."next"()) {
+                var current = enumerator."current"();
+                while (enumerator."next"()) {
+                    current := enumerator."current"();
+                }
+                return current;
+            }
+            throw "LINQ::LAST Error: empty list";
+        };
+        this."last_or_default" := lambda(this, def) {
+            var enumerator = this."enumerator"();
+            var current = def;
+            while (enumerator."next"()) {
+                current := enumerator."current"();
+            }
+            return current;
+        };
+
+        this."aggregate" := lambda(this, f) {
+            var enumerator = this."enumerator"();
+            if (enumerator."next"()) {
+                var current = enumerator."current"();
+                while (enumerator."next"()) {
+                    current := f(current, enumerator."current"());
+                }
+                return current;
+            }
+            throw "LINQ::AGGREGATE Error: empty list";
+        };
+        this."aggregate_seed" := lambda(this, init, f) {
+            var enumerator = this."enumerator"();
+            var current = init;
+            while (enumerator."next"()) {
+                current := f(current, enumerator."current"());
+            }
+            return current;
+        };
+        this."max" := lambda(this) -> this."aggregate"(g_func_max);
+        this."min" := lambda(this) -> this."aggregate"(g_func_min);
+        this."sum" := lambda(this) -> this."aggregate_seed"(0, g_func_add);
+        this."product" := lambda(this) -> this."aggregate_seed"(1, g_func_mul);
+        this."all" := lambda(this, f) -> this."select"(f)."aggregate_seed"(true, g_func_and);
+        this."any" := lambda(this, f) -> this."select"(f)."aggregate_seed"(false, g_func_or);
+        this."select_many" := lambda(this, f) -> this."select"(f)."aggregate_seed"(this."from"([]), lambda(a, b) -> a."concat"(b));
+        this."union" := lambda(this, x) -> this."concat"(x)."distinct"();
+        this."to_list" := lambda(this) -> this."aggregate_seed"([], lambda(a, b) -> g_array_add(a, b));
+        this."distinct" := lambda(this) -> this."from"(g_array_distinct(this."to_list"())); // 暂时用内置的去重算法
+        this."group_by" := lambda(this, f) {
+            var s = this."select"(f)."distinct"();
+            var se = s."enumerator"();
+            var a = g_new_class("list::array");
+            while (se."next"()) {
+                var sec = se."current"();
+                var v = this."where"(lambda(a) -> sec == f(a))."select"(f);
+                a."add"({"key": sec, "value": v});
+            }
+            return this."from"(a);
+        };
+
+        this."for_each" := lambda(this, f) {
+            var enumerator = this."enumerator"();
+            while (enumerator."next"()) {
+                f(enumerator."index"(), enumerator."current"());
+            }
+        };
+    });
+
+    g_class("linq::from.iterator::enumerable", "linq::enumerable", lambda(this) {
+        this."__doc__" := "<From>枚举接口";
+        this."__array__" := _; // 包装的数组
+        this."enumerator" := lambda(this) ->
+            g_new_class("linq::array::enumerator", [["__array__", this."__array__"]], []);
+    });
+
+    g_class("linq::lazy::enumerable", "linq::enumerable", lambda(this) {
+        this."__doc__" := "<Lazy>惰性计算枚举接口";
+        this."__enumerator__" := _; // 包装的枚举器
+        this."enumerator" := lambda(this) -> this."__enumerator__"."clone"();
+    });
+};
+
+// ---- CODE END ----
+// -----------------------------------------------------------------------------------------
+
+var import_list_class = func ~() {
+    var to_string = func to_string(exp) {
+        if (g_get_type_ordinal(exp) == 9) {
+            return "[" + g_string_join_array(g_func_map(exp, to_string), ", ") + "]";
+        } else {
+            return g_to_string(exp);
+        }
+    };
+    g_class("list::array", "linq::enumerable", lambda(this) {
+        this."__doc__" := "数组";
+        this."array" := [];
+        this."add" := lambda(this, obj) -> g_array_add(this."array", obj);
+        this."contains" := lambda(this, obj) -> g_array_contains(this."array", obj);
+        this."append" := lambda(this, obj) -> g_array_append(this."array", obj);
+        this."insert" := lambda(this, i, obj) -> g_array_insert(this."array", i, obj);
+        this."set" := lambda(this, i, obj) -> g_array_set(this."array", i, obj);
+        this."pop" := lambda(this) -> g_array_pop(this."array");
+        this."clear" := lambda(this) -> g_array_clear(this."array");
+        this."reverse" := lambda(this) -> g_array_reverse(this."array");
+        this."get" := lambda(this, obj) -> g_array_get(this."array", obj);
+        this."get_ex" := lambda(this, obj) -> g_array_get_ex(this."array", obj);
+        this."size" := lambda(this) -> g_array_size(this."array");
+        this."remove" := lambda(this, i) -> g_array_remove(this."array", i);
+        this."delete" := lambda(this, obj) -> g_array_delete(this."array", obj);
+        this."empty" := lambda(this) -> g_array_empty(this."array");
+        this."fill" := lambda(this, obj) -> g_array_fill(this."array", obj);
+        this."distinct" := lambda(this) -> g_array_distinct(this."array");
+        this."enumerator" := lambda(this) ->
+            g_new_class("linq::array::enumerator", [["__array__", this]], []);
+        this."to_string" := lambda(this) -> to_string(this."array");
+    });
+    g_class("list::map", "object", lambda(this) {
+        this."map" := {};
+        this."keys" := lambda(this) -> g_map_keys(this."map");
+        this."values" := lambda(this) -> g_map_values(this."map");
+        this."put" := lambda(this, k, v) -> g_map_put(this."map", k, v);
+        this."contains" := lambda(this, obj) -> g_map_contains(this."map", obj);
+        this."get" := lambda(this, obj) -> g_map_get(this."map", obj);
+        this."size" := lambda(this) -> g_map_size(this."map");
+        this."remove" := lambda(this, obj) -> g_map_remove(this."map", obj);
+        this."clear" := lambda(this) -> g_map_clear(this."map");
+        this."empty" := lambda(this) -> g_map_empty(this."map");
+    });
+};
+
+var import_string_class = func ~() {
+    g_class("string", "object", lambda(this) {
+        this."str" := "";
+        this."replace" := lambda(this, from, to) -> g_string_replace(this."str", from, to);
+        this."split" := lambda(this, delim) -> g_string_split(this."str", delim);
+        this."splitn" := lambda(this, delim, n) -> g_string_splitn(this."str", delim, n);
+        this."trim" := lambda(this) -> g_string_trim(this."str");
+        this."length" := lambda(this) -> g_string_length(this."str");
+        this."size" := lambda(this) -> g_string_length(this."str");
+        this."get" := lambda(this, i) -> g_string_get(this."str", i);
+        this."empty" := lambda(this) -> g_string_empty(this."str");
+        this."regex" := lambda(this, regex) -> g_string_regex(this."str", regex);
+        this."atoi" := lambda(this) -> g_string_atoi(this."str");
+        this."atoi_s" := lambda(this) -> g_string_atoi_s(this."str");
+        this."to_upper" := lambda(this) -> g_string_toupper(this."str");
+        this."to_lower" := lambda(this) -> g_string_tolower(this."str");
+        this."to_number" := lambda(this) -> g_string_to_number(this."str");
+        this."start_with" := lambda(this, obj) -> g_string_start_with(this."str", obj);
+        this."substr" := lambda(this, start, end) -> g_string_substr(this."str", start, end);
+        this."left" := lambda(this, n) -> g_string_left(this."str", n);
+        this."right" := lambda(this, n) -> g_string_right(this."str", n);
+    });
+};
+
+var import_handle_class = func ~() {
+    g_class("system::handle", "object", lambda(this) {
+        this."handle" := g_nullptr;
+        this."name" := g_null;
+        this."is_valid" := lambda(this) -> g_is_valid_handle(this."handle");
+        this."destroy" := lambda(this) -> g_destroy_handle(this."handle");
+    });
+
+    var g_pipe = func ~(name) {
+        return g_new_class("system::pipe", [], [["init", name]]);
+    };
+    export "g_pipe";
+    g_class("system::pipe", "system::handle", lambda(this) {
+        this."init" := lambda(this, name) {
+            this."name" := name;
+            this."handle" := g_handle("pipe|" + name);
+        };
+    });
+
+    var g_share = func ~(name) {
+        return g_new_class("system::share", [], [["init", name]]);
+    };
+    export "g_share";
+    g_class("system::share", "system::handle", lambda(this) {
+        this."init" := lambda(this, name) {
+            this."name" := name;
+            this."handle" := g_handle("share|" + name);
+        };
+    });
+
+    var g_file = func ~(name) {
+        return g_new_class("system::file", [], [["init", name]]);
+    };
+    export "g_file";
+    g_class("system::file", "system::handle", lambda(this) {
+        this."init" := lambda(this, name) {
+            this."name" := name;
+            this."handle" := g_handle("file|" + name);
+        };
+    });
+};
+
+var import_std_base = func ~() {
+    if (g_map_contains(g_class_context, "object")) {
+        return;
+    }
+    // Base class: object
+    g_class("object", g_null, lambda(this) {
+        this."type" := "object";
+        this."to_string" := lambda(this) -> this."__type__";
+    });
+    // List
+    import_list_class();
+    // LINQ
+    import_linq_class();
+    // String
+    import_string_class();
+    // Handle
+    import_handle_class();
+};
+
+import_std_base(); // import std library!

@@ -1,5 +1,7 @@
 package com.bajdcc.LALR1.grammar.runtime.service;
 
+import com.bajdcc.LALR1.grammar.runtime.IRuntimeRing3;
+
 import java.util.List;
 
 /**
@@ -100,4 +102,10 @@ public interface IRuntimeProcessService {
 	 * @return 状态码
 	 */
 	int ring3Kill(int pid, String error);
+
+	/**
+	 * 得到RING3接口
+	 * @return RING3接口
+	 */
+	IRuntimeRing3 getRing3();
 }

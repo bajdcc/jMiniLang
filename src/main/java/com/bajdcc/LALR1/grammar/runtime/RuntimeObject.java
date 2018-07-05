@@ -209,7 +209,7 @@ public class RuntimeObject implements Cloneable {
 	@Override
 	public String toString() {
 		return " " + String.valueOf(symbol) + " " + type.getName() +
-				(obj == null ? "(null)" : "(" + obj.getClass().getName() + ")") +
-				"#" + (flag == null ? "" : String.valueOf(flag[0]));
+				("(" + String.valueOf(obj) + ")") +
+				(flag == null ? "" : (flag[0] == 0L ? "" : ("#" + String.valueOf(flag[0]))));
 	}
 }

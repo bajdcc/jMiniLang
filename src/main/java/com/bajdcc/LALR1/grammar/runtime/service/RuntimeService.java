@@ -14,6 +14,7 @@ public class RuntimeService implements IRuntimeService {
 	private RuntimeShareService share;
 	private RuntimeFileService file;
 	private RuntimeDialogService dialog;
+	private RuntimeUserService user;
 
 	public RuntimeService(RuntimeProcess process) {
 		this.process = process;
@@ -21,6 +22,7 @@ public class RuntimeService implements IRuntimeService {
 		this.share = new RuntimeShareService(this);
 		this.file = new RuntimeFileService(this);
 		this.dialog = new RuntimeDialogService(this);
+		this.user = new RuntimeUserService(this);
 	}
 
 	@Override
@@ -46,5 +48,10 @@ public class RuntimeService implements IRuntimeService {
 	@Override
 	public IRuntimeDialogService getDialogService() {
 		return dialog;
+	}
+
+	@Override
+	public IRuntimeUserService getUserService() {
+		return user;
 	}
 }

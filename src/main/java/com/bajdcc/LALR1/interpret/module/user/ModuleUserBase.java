@@ -33,6 +33,7 @@ public class ModuleUserBase implements IInterpreterModule {
 	private static ModuleUserBase instance = new ModuleUserBase();
 	private RuntimeCodePage runtimeCodePage;
 	private static Logger logger = Logger.getLogger("user");
+	private static RuntimeObject globalContext = new RuntimeObject(new RuntimeMap());
 
 	public static final String EXEC_PREFIX = "WEB_EXEC#";
 	public static final String EXEC_PATH_PREFIX = "/web/exec/";
@@ -81,12 +82,13 @@ public class ModuleUserBase implements IInterpreterModule {
 		for (String key : importValue) {
 			info.addExternalValue(key, refer.getValueCallByName(key));
 		}
+		info.addExternalValue("g_class_context", () -> globalContext);
 
 		String[] importFunc = new String[]{
 				"g_is_null", "g_set_debug", "g_not_null",
 				"g_to_string", "g_new", "g_doc", "g_get_type", "g_get_type_ordinal", "g_type",
 				"g_args_count", "g_args_index", "g_get_timestamp",
-				"g_is_flag", "g_set_flag"
+				"g_is_flag", "g_set_flag", "g_get_flag", "g_is_valid_handle"
 		};
 		for (String key : importFunc) {
 			info.addExternalFunc(key, refer.getExecCallByName(key));
@@ -192,7 +194,7 @@ public class ModuleUserBase implements IInterpreterModule {
 
 			@Override
 			public RuntimeObjectType[] getArgsType() {
-				return new RuntimeObjectType[]{RuntimeObjectType.kString};
+				return new RuntimeObjectType[]{RuntimeObjectType.kObject};
 			}
 
 			@Override
@@ -409,6 +411,42 @@ public class ModuleUserBase implements IInterpreterModule {
 					}
 				}
 				return new RuntimeObject(map);
+			}
+		});
+		info.addExternalFunc("g_handle", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "创建用户服务句柄";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kString};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				String name = String.valueOf(args.get(0).getObj());
+				return new RuntimeObject(status.getService().getUserService().create(name, status.getPage()));
+			}
+		});
+		info.addExternalFunc("g_destroy_handle", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "销毁用户服务句柄";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kPtr};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				int id = (int) args.get(0).getObj();
+				return new RuntimeObject(status.getService().getUserService().destroy(id));
 			}
 		});
 	}

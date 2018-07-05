@@ -57,17 +57,19 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 	}
 
 	private class Ring3Struct {
-		public int putHandle;
-		public boolean bSaveLogFile;
-		public boolean bSavePipeFile;
+		int putHandle;
+		boolean bSaveLogFile;
+		boolean bSavePipeFile;
+		public Set<Integer> handles;
 
 		private Ring3Struct() {
 			putHandle = -1;
 			bSaveLogFile = true;
 			bSavePipeFile = false;
+			handles = new HashSet<>();
 		}
 
-		public void setOptionsBool(Ring3Option option, boolean flag) {
+		void setOptionsBool(Ring3Option option, boolean flag) {
 			switch (option) {
 				case LOG_FILE:
 					bSaveLogFile = flag;
@@ -80,7 +82,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 			}
 		}
 
-		public boolean isOptionsBool(Ring3Option option) {
+		boolean isOptionsBool(Ring3Option option) {
 			switch (option) {
 				case LOG_FILE:
 					return bSaveLogFile;
@@ -533,6 +535,11 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 	}
 
 	@Override
+	public String getPage() {
+		return name;
+	}
+
+	@Override
 	public void setProcDesc(String desc) {
 		description = desc;
 	}
@@ -594,6 +601,21 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 	@Override
 	public boolean isOptionsBool(Ring3Option option) {
 		return ring3Struct.isOptionsBool(option);
+	}
+
+	@Override
+	public void addHandle(int id) {
+		ring3Struct.handles.add(id);
+	}
+
+	@Override
+	public void removeHandle(int id) {
+		ring3Struct.handles.remove(id);
+	}
+
+	@Override
+	public Set<Integer> getHandles() {
+		return ring3Struct.handles;
 	}
 
 	@Override

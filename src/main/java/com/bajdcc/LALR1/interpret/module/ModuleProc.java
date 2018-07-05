@@ -364,7 +364,7 @@ public class ModuleProc implements IInterpreterModule {
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) throws Exception {
 				String name = args.get(0).getObj().toString();
-				int handle = status.getService().getPipeService().create(name, String.valueOf(status.getProcInfo()[3]));
+				int handle = status.getService().getPipeService().create(name, status.getPage());
 				if (handle == -1)
 					status.err(RuntimeException.RuntimeError.MAX_HANDLE);
 				return new RuntimeObject(handle);
@@ -518,7 +518,7 @@ public class ModuleProc implements IInterpreterModule {
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) throws Exception {
 				String name = args.get(0).getObj().toString();
-				int result = status.getService().getShareService().startSharing(name, args.get(1), String.valueOf(status.getProcInfo()[3]));
+				int result = status.getService().getShareService().startSharing(name, args.get(1), status.getPage());
 				if (result == -1)
 					status.err(RuntimeException.RuntimeError.MAX_HANDLE, name);
 				if (result == 0)
@@ -541,7 +541,7 @@ public class ModuleProc implements IInterpreterModule {
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) throws Exception {
 				String name = args.get(0).getObj().toString();
-				int result = status.getService().getShareService().createSharing(name, args.get(1), String.valueOf(status.getProcInfo()[3]));
+				int result = status.getService().getShareService().createSharing(name, args.get(1), status.getPage());
 				if (result == -1)
 					status.err(RuntimeException.RuntimeError.MAX_HANDLE, name);
 				return new RuntimeObject(BigInteger.valueOf(result));

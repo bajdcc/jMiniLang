@@ -130,7 +130,7 @@ public class ExpInvoke implements IExp {
 
 	@Override
 	public void analysis(ISemanticRecorder recorder) {
-		if (func != null) {
+		if (func != null && !func.isExtern()) {
 			checkArgsCount(recorder);
 			if (func.getRealName().startsWith("~")) {
 				func.analysis(recorder);

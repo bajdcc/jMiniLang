@@ -22,7 +22,7 @@ public class RuntimeFunc {
 	/**
 	 * 名称
 	 */
-	private String name = "extern";
+	private String name;
 
 	/**
 	 * 当前的代码页名
@@ -87,7 +87,7 @@ public class RuntimeFunc {
 
 	public String getSimpleName() {
 		if (name == null)
-			return "UNKNOWN";
+			return "extern";
 		String[] s = name.split("\\$");
 		return s[s.length - 1];
 	}
@@ -195,6 +195,6 @@ public class RuntimeFunc {
 	public String toString() {
 		return System.lineSeparator() +
 				String.format("代码页：%s，地址：%d，名称：%s，参数：%s，变量：%s，闭包：%s",
-						currentPage, currentPc, name, params, tmp, closure);
+						currentPage, currentPc, name == null ? "extern" : name, params, tmp, closure);
 	}
 }

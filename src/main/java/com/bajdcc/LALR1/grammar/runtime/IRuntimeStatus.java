@@ -224,6 +224,12 @@ public interface IRuntimeStatus {
 	Object[] getProcInfo();
 
 	/**
+	 * 得到当前进程页面
+	 * @return 进程页面
+	 */
+	String getPage();
+
+	/**
 	 * 设置进程说明
 	 *
 	 * @param desc 说明信息

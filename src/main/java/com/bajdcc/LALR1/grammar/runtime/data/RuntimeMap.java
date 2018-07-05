@@ -3,8 +3,10 @@ package com.bajdcc.LALR1.grammar.runtime.data;
 import com.bajdcc.LALR1.grammar.runtime.RuntimeObject;
 
 import java.math.BigInteger;
-import java.util.*;
-import java.util.function.BiConsumer;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -93,6 +95,8 @@ public class RuntimeMap implements Cloneable {
 
 	@Override
 	public String toString() {
+		if (map.containsKey("__type__"))
+			return "class=" + String.valueOf(map.get("__type__"));
 		return String.valueOf(map.size());
 	}
 }

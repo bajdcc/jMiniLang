@@ -122,8 +122,11 @@ public class RuntimeStack {
 	}
 
 	public RuntimeObject getFuncArgs(int index) {
-		if (index >= 0 && index < stkCall.get(2).getParams().size())
-			return stkCall.get(2).getParams().get(index);
+		RuntimeFunc func = stkCall.stream().skip(1).filter(a -> a.getName() != null).findFirst().orElse(null);
+		if (func == null)
+			return null;
+		if (index >= 0 && index < func.getParams().size())
+			return func.getParams().get(index);
 		return null;
 	}
 
