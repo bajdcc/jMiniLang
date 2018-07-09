@@ -2,8 +2,11 @@ package com.bajdcc.LALR1.grammar.runtime.service;
 
 import com.bajdcc.LALR1.grammar.runtime.RuntimeObject;
 import com.bajdcc.LALR1.grammar.runtime.RuntimeObjectType;
+import com.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
+import com.vladsch.flexmark.util.collection.BitIntegerSet;
 import org.apache.log4j.Logger;
 
+import java.math.BigInteger;
 import java.util.*;
 
 /**
@@ -25,25 +28,40 @@ public class RuntimeUserService implements IRuntimeUserService {
 	}
 
 	enum UserType {
-		PIPE,
-		SHARE,
-		FILE
+		PIPE("管道"),
+		SHARE("共享"),
+		FILE("文件");
+
+		String name;
+
+		UserType(String name) {
+			this.name = name;
+		}
 	}
 
 	interface IUserHandler {
 		void destroy();
+
 		boolean isEmpty();
+
 		void enqueue(int pid);
+
 		void dequeue();
+
+		void dequeue(int pid);
+
 		RuntimeObject read();
+
 		void write(RuntimeObject obj);
 	}
 
 	abstract class UserHandler implements IUserHandler {
 
-		private Queue<Integer> waiting_pids;
+		protected int id;
+		private Deque<Integer> waiting_pids;
 
-		UserHandler() {
+		UserHandler(int id) {
+			this.id = id;
 			this.waiting_pids = new ArrayDeque<>();
 		}
 
@@ -61,6 +79,7 @@ public class RuntimeUserService implements IRuntimeUserService {
 		public void enqueue(int pid) {
 			waiting_pids.add(pid);
 			service.getProcessService().block(pid);
+			service.getProcessService().getRing3().setBlockHandle(id);
 		}
 
 		@Override
@@ -68,16 +87,26 @@ public class RuntimeUserService implements IRuntimeUserService {
 			if (waiting_pids.isEmpty())
 				return;
 			int pid = waiting_pids.poll();
+			service.getProcessService().getRing3().setBlockHandle(-1);
 			service.getProcessService().wakeup(pid);
+		}
+
+		@Override
+		public void dequeue(int pid) {
+			waiting_pids.remove(pid);
+		}
+
+		@Override
+		public String toString() {
+			return String.format("队列：%s", waiting_pids.toString());
 		}
 	}
 
 	class UserPipeHandler extends UserHandler {
-		private int id;
 		private Queue<RuntimeObject> queue;
 
 		UserPipeHandler(int id) {
-			this.id = id;
+			super(id);
 			this.queue = new ArrayDeque<>();
 			service.getProcessService().getRing3().addHandle(id);
 		}
@@ -101,9 +130,18 @@ public class RuntimeUserService implements IRuntimeUserService {
 		public void write(RuntimeObject obj) {
 			queue.add(obj);
 		}
+
+		@Override
+		public String toString() {
+			return String.format("%s 管道：%s", super.toString(), queue.toString());
+		}
 	}
 
 	class UserShareHandler extends UserHandler {
+
+		UserShareHandler(int id) {
+			super(id);
+		}
 
 		@Override
 		public RuntimeObject read() {
@@ -117,6 +155,10 @@ public class RuntimeUserService implements IRuntimeUserService {
 	}
 
 	class UserFileHandler extends UserHandler {
+
+		UserFileHandler(int id) {
+			super(id);
+		}
 
 		@Override
 		public RuntimeObject read() {
@@ -221,16 +263,51 @@ public class RuntimeUserService implements IRuntimeUserService {
 		for (int handle : handles) {
 			destroy(handle);
 		}
+		int blockHandle = service.getProcessService().getRing3().getBlockHandle();
+		if (blockHandle != -1) {
+			if (setUserId.contains(blockHandle)) {
+				UserStruct us = arrUsers[blockHandle];
+				assert (us.type == UserType.PIPE);
+				us.handler.dequeue(service.getProcessService().getPid());
+			}
+		}
 	}
 
 	@Override
 	public boolean destroy(int handle) {
 		if (!mapNames.containsKey(arrUsers[handle].name))
 			return false;
-		arrUsers[handle].handler.destroy();
+		setUserId.remove(handle);
 		mapNames.remove(arrUsers[handle].name);
+		arrUsers[handle].handler.destroy();
 		arrUsers[handle] = null;
 		return true;
+	}
+
+	@Override
+	public RuntimeArray stat(boolean api) {
+		RuntimeArray array = new RuntimeArray();
+		if (api) {
+			mapNames.values().stream().sorted(Comparator.naturalOrder())
+					.forEach((value) -> {
+						RuntimeArray item = new RuntimeArray();
+						item.add(new RuntimeObject(BigInteger.valueOf(value)));
+						item.add(new RuntimeObject(arrUsers[value].type.name));
+						item.add(new RuntimeObject(arrUsers[value].name));
+						item.add(new RuntimeObject(arrUsers[value].page));
+						item.add(new RuntimeObject(arrUsers[value].handler.toString()));
+						array.add(new RuntimeObject(item));
+					});
+		} else {
+			array.add(new RuntimeObject(String.format("   %-5s   %-15s   %-15s   %-20s",
+					"Id", "Name", "Type", "Description")));
+			mapNames.values().stream().sorted(Comparator.naturalOrder())
+					.forEach((value) -> array.add(
+							new RuntimeObject(String.format("   %-5s   %-15s   %-15s   %-20s",
+									BigInteger.valueOf(value), arrUsers[value].name,
+									arrUsers[value].type.toString(), arrUsers[value].handler.toString()))));
+		}
+		return array;
 	}
 
 	private int createPipe(String name, String page) {
@@ -249,7 +326,7 @@ public class RuntimeUserService implements IRuntimeUserService {
 		}
 		int id = newId();
 		mapNames.put(name, id);
-		arrUsers[id] = new UserStruct(name, page, UserType.SHARE, new UserShareHandler());
+		arrUsers[id] = new UserStruct(name, page, UserType.SHARE, new UserShareHandler(id));
 		service.getProcessService().getRing3().addHandle(id);
 		return id;
 	}
@@ -260,7 +337,7 @@ public class RuntimeUserService implements IRuntimeUserService {
 		}
 		int id = newId();
 		mapNames.put(name, id);
-		arrUsers[id] = new UserStruct(name, page, UserType.FILE, new UserFileHandler());
+		arrUsers[id] = new UserStruct(name, page, UserType.FILE, new UserFileHandler(id));
 		service.getProcessService().getRing3().addHandle(id);
 		return id;
 	}

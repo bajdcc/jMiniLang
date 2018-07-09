@@ -167,6 +167,23 @@ public class ModuleTask implements IInterpreterModule {
 				return new RuntimeObject(status.getService().getFileService().getVfsList(false));
 			}
 		});
+		info.addExternalFunc("g_task_get_user_stat", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "获取用户服务信息";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return null;
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				return new RuntimeObject(status.getService().getUserService().stat(false));
+			}
+		});
 		info.addExternalFunc("g_task_get_guid", new IRuntimeDebugExec() {
 			@Override
 			public String getDoc() {

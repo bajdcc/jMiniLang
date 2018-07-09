@@ -69,4 +69,16 @@ public interface IRuntimeRing3 {
 	 * @return 用户句柄列表
 	 */
 	Set<Integer> getHandles();
+
+	/**
+	 * 设置等待的用户句柄
+	 * @param id 用户句柄
+	 */
+	void setBlockHandle(int id);
+
+	/**
+	 * 获取等待的用户句柄
+	 * @return 等待的用户句柄
+	 */
+	int getBlockHandle();
 }

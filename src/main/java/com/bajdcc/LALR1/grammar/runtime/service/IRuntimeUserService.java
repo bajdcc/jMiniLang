@@ -1,6 +1,7 @@
 package com.bajdcc.LALR1.grammar.runtime.service;
 
 import com.bajdcc.LALR1.grammar.runtime.RuntimeObject;
+import com.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
 
 /**
  * 【运行时】运行时用户服务接口
@@ -44,4 +45,12 @@ public interface IRuntimeUserService {
 	 * @return 是否成功
 	 */
 	boolean destroy(int id);
+
+	/**
+	 * 获取列表
+	 *
+	 * @param api 是否API调用
+	 * @return 列表
+	 */
+	RuntimeArray stat(boolean api);
 }

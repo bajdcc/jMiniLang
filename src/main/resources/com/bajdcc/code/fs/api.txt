@@ -68,6 +68,8 @@ if (route[1] == "info") {
     ctx["resp"] := g_res_get_file();
 } else if (route[1] == "vfs") {
     ctx["resp"] := g_res_get_vfs_list();
+} else if (route[1] == "user") {
+    ctx["resp"] := g_res_get_user_list();
 } else if (route[1] == "doc") {
     ctx["resp"] := g_info_get_doc();
 }

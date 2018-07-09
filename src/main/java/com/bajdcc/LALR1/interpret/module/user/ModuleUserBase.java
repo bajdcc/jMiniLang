@@ -627,6 +627,23 @@ public class ModuleUserBase implements IInterpreterModule {
 				return new RuntimeObject(BigInteger.valueOf(status.getService().getShareService().size()));
 			}
 		});
+		info.addExternalFunc("g_res_get_user_list", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "用户服务列表";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return null;
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				return new RuntimeObject(status.getService().getUserService().stat(true));
+			}
+		});
 	}
 
 	private static void importFromList(IRuntimeDebugInfo info, IRuntimeDebugInfo refer) {

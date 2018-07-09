@@ -192,14 +192,15 @@ public class RuntimeFileService implements IRuntimeFileService {
 		RuntimeArray array = new RuntimeArray();
 		if (api) {
 			mapFileNames.values().stream().sorted(Comparator.naturalOrder())
+					.map(a -> arrFiles[a])
 					.forEach((value) -> {
 						RuntimeArray item = new RuntimeArray();
-						item.add(new RuntimeObject(arrFiles[value].name));
-						item.add(new RuntimeObject(modeString[arrFiles[value].mode]));
-						item.add(new RuntimeObject(arrFiles[value].page));
-						item.add(new RuntimeObject(statusString[arrFiles[value].status.ordinal()]));
-						item.add(new RuntimeObject(arrFiles[value].encoding));
-						item.add(new RuntimeObject(arrFiles[value].vfs ? "是" : "否"));
+						item.add(new RuntimeObject(value.name));
+						item.add(new RuntimeObject(modeString[value.mode]));
+						item.add(new RuntimeObject(value.page));
+						item.add(new RuntimeObject(statusString[value.status.ordinal()]));
+						item.add(new RuntimeObject(value.encoding));
+						item.add(new RuntimeObject(value.vfs ? "是" : "否"));
 						array.add(new RuntimeObject(item));
 					});
 		} else {

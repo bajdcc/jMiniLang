@@ -50,6 +50,10 @@ var time = func ~(msg, caller) {
         var val = g_task_get_vfs_stat();
         val := g_string_join_array(val, g_endl);
         g_map_put(msg, "val", val);
+    } else if (id == "user") {
+        var val = g_task_get_user_stat();
+        val := g_string_join_array(val, g_endl);
+        g_map_put(msg, "val", val);
     } else if (id == "guid") {
         var val = g_task_get_guid();
         g_map_put(msg, "val", val);

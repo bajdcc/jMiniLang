@@ -61,12 +61,14 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 		boolean bSaveLogFile;
 		boolean bSavePipeFile;
 		public Set<Integer> handles;
+		public int blockHandle;
 
 		private Ring3Struct() {
 			putHandle = -1;
 			bSaveLogFile = true;
 			bSavePipeFile = false;
 			handles = new HashSet<>();
+			blockHandle = -1;
 		}
 
 		void setOptionsBool(Ring3Option option, boolean flag) {
@@ -616,6 +618,16 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 	@Override
 	public Set<Integer> getHandles() {
 		return ring3Struct.handles;
+	}
+
+	@Override
+	public void setBlockHandle(int id) {
+		ring3Struct.blockHandle = id;
+	}
+
+	@Override
+	public int getBlockHandle() {
+		return ring3Struct.blockHandle;
 	}
 
 	@Override
