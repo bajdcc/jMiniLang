@@ -1509,6 +1509,7 @@ var import_handle_class = func ~() {
         this."is_valid" := lambda(this) -> g_is_valid_handle(this."handle");
         this."destroy" := lambda(this) -> g_destroy_handle(this."handle");
         this."write" := lambda(this, obj) -> g_write_handle(this."handle", obj);
+        this."writeln" := lambda(this, obj) -> g_write_handle(this."handle", obj + g_endl);
         this."pipe" := lambda(this, output) {
             var r = g_null;
             while (true) {

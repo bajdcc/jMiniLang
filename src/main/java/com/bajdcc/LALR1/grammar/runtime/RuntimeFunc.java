@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 【运行时】调用函数基本单位
@@ -52,12 +53,12 @@ public class RuntimeFunc {
 	/**
 	 * 参数
 	 */
-	private ArrayList<RuntimeObject> params = new ArrayList<>();
+	private List<RuntimeObject> params = new ArrayList<>();
 
 	/**
 	 * 临时变量
 	 */
-	private List<HashMap<Integer, RuntimeObject>> tmp = new ArrayList<>();
+	private List<Map<Integer, RuntimeObject>> tmp = new ArrayList<>();
 
 	/**
 	 * 函数闭包
@@ -136,7 +137,7 @@ public class RuntimeFunc {
 		return params.get(idx);
 	}
 
-	public ArrayList<RuntimeObject> getParams() {
+	public List<RuntimeObject> getParams() {
 		return params;
 	}
 
@@ -144,7 +145,7 @@ public class RuntimeFunc {
 		params.add(param);
 	}
 
-	public List<HashMap<Integer, RuntimeObject>> getTmp() {
+	public List<Map<Integer, RuntimeObject>> getTmp() {
 		return tmp;
 	}
 
@@ -196,5 +197,23 @@ public class RuntimeFunc {
 		return System.lineSeparator() +
 				String.format("代码页：%s，地址：%d，名称：%s，参数：%s，变量：%s，闭包：%s",
 						currentPage, currentPc, name == null ? "extern" : name, params, tmp, closure);
+	}
+
+	public RuntimeFunc copy() {
+		RuntimeFunc func = new RuntimeFunc();
+		func.address = address;
+		func.name = name;
+		func.currentPc = currentPc;
+		func.currentPage = currentPage;
+		func.retPc = retPc;
+		func.retPage = retPage;
+		func.tryJmp = tryJmp;
+		func.params = new ArrayList<>(params);
+		func.tmp = tmp.stream().map(a -> a.entrySet().stream()
+				.collect(Collectors.toMap(Map.Entry::getKey, c -> c.getValue().clone())))
+				.collect(Collectors.toList());
+		func.closure = closure.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, a -> a.getValue().clone()));
+		func.yields = yields == null ? null : yields.copy();
+		return func;
 	}
 }

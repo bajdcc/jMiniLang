@@ -16,4 +16,11 @@ public class RuntimeRegister {
 	 * 程序计数器
 	 */
 	public int execId = -1;
+
+	public RuntimeRegister copy() {
+		RuntimeRegister reg = new RuntimeRegister();
+		reg.pageId = pageId;
+		reg.execId = execId;
+		return reg;
+	}
 }

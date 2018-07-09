@@ -122,10 +122,7 @@ public class RuntimeArray implements Cloneable {
 	 * @param obj 原对象
 	 */
 	public void copyFrom(RuntimeArray obj) {
-		array = new ArrayList<>();
-		for (RuntimeObject o : obj.array) {
-			array.add(o.clone());
-		}
+		array = obj.array.stream().map(RuntimeObject::clone).collect(Collectors.toList());
 	}
 
 	public List<Object> toList() {

@@ -291,7 +291,7 @@ public class RuntimeProcess implements IRuntimeProcessService {
 	 * @param ring      RING层数
 	 * @param name      页名
 	 * @param page      页
-	 * @param pc        起始指令
+	 * @param pc        起始指令（fork时为负）
 	 * @param obj       参数
 	 * @return 进程ID
 	 * @throws Exception 运行时异常
@@ -313,7 +313,10 @@ public class RuntimeProcess implements IRuntimeProcessService {
 						name = USER_PROC_FILE_PREFIX + cyclePtr;
 				}
 				RuntimeMachine machine = new RuntimeMachine(name, ring, cyclePtr, creatorId, this);
-				machine.initStep(name, page, arrProcess[creatorId].machine.getPageRefers(name), pc, obj);
+				if (pc >= 0)
+					machine.initStep(name, page, arrProcess[creatorId].machine.getPageRefers(name), pc, obj);
+				else
+					machine.copyFrom(arrProcess[creatorId].machine);
 				setProcessId.add(cyclePtr);
 				pid = cyclePtr;
 				arrProcess[cyclePtr++] = new SchdProcess(machine, ring);

@@ -50,4 +50,11 @@ public class HashListMapEx2<K, V> {
 		map.remove(list.get(last));
 		list.remove(last);
 	}
+
+	public HashListMapEx2<K,V> copy() {
+		HashListMapEx2<K,V> o = new HashListMapEx2<>();
+		o.list = new ArrayList<>(list);
+		o.map = new HashMap<>(map);
+		return o;
+	}
 }

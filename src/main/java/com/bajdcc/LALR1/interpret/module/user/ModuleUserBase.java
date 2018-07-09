@@ -519,6 +519,23 @@ public class ModuleUserBase implements IInterpreterModule {
 				return new RuntimeObject(status.getService().getUserService().write((int) args.get(0).getObj(), args.get(1)));
 			}
 		});
+		info.addExternalFunc("g_fork", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "进程分叉";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return null;
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) throws Exception {
+				return new RuntimeObject(BigInteger.valueOf(status.getService().getProcessService().getRing3().fork()));
+			}
+		});
 	}
 
 	private static void importFromString(IRuntimeDebugInfo info, IRuntimeDebugInfo refer) {
@@ -661,6 +678,7 @@ public class ModuleUserBase implements IInterpreterModule {
 	}
 
 	private static void importFromProc(IRuntimeDebugInfo info, IRuntimeDebugInfo refer) {
+		info.addExternalFunc("g_pid", refer.getExecCallByName("g_get_pid"));
 		info.addExternalFunc("g_res_get_proc", new IRuntimeDebugExec() {
 			@Override
 			public String getDoc() {

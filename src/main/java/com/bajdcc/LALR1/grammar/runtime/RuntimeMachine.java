@@ -71,6 +71,11 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 			blockHandle = -1;
 		}
 
+		void copyFrom(Ring3Struct ring3) {
+			bSaveLogFile = ring3.bSaveLogFile;
+			bSavePipeFile = ring3.bSavePipeFile;
+		}
+
 		void setOptionsBool(Ring3Option option, boolean flag) {
 			switch (option) {
 				case LOG_FILE:
@@ -98,7 +103,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 	private Ring3Struct ring3Struct;
 
 	private HashListMapEx<String, RuntimeCodePage> pageMap = new HashListMapEx<>();
-	private Map<String, ArrayList<RuntimeCodePage>> pageRefer = new HashMap<>();
+	private Map<String, List<RuntimeCodePage>> pageRefer = new HashMap<>();
 	private Map<String, RuntimeCodePage> codeCache = new HashMap<>();
 	private Stack<RuntimeObject> stkYieldData = new Stack<>();
 	private RuntimeStack stack = new RuntimeStack();
@@ -184,6 +189,24 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 			ring3Struct = new Ring3Struct();
 			ring3Struct.putHandle = process.getService().getPipeService().create(USER_PROC_PIPE_PREFIX + pid, name);
 		}
+	}
+
+	/**
+	 * FORK进程
+	 * @param machine 被FORK的进程
+	 */
+	public void copyFrom(RuntimeMachine machine) throws RuntimeException {
+		assert (machine.ring == 3);
+		ring3Struct.copyFrom(machine.ring3Struct);
+		pageMap = machine.pageMap.copy();
+		pageRefer = machine.pageRefer.entrySet().stream().collect(Collectors.toMap(Entry::getKey, a -> new ArrayList<>(a.getValue())));
+		codeCache = new HashMap<>(machine.codeCache);
+		stkYieldData = (Stack<RuntimeObject>) machine.stkYieldData.clone();
+		stack = machine.stack.copy();
+		currentPage = machine.currentPage;
+		triesCount = machine.triesCount;
+		store(new RuntimeObject(BigInteger.valueOf(-1)));
+		opReturn();
 	}
 
 	public void run(String name, InputStream input) throws Exception {
@@ -628,6 +651,11 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 	@Override
 	public int getBlockHandle() {
 		return ring3Struct.blockHandle;
+	}
+
+	@Override
+	public int fork() throws Exception {
+		return process.createProcess(pid, ring, "fork", currentPage, -1, null);
 	}
 
 	@Override

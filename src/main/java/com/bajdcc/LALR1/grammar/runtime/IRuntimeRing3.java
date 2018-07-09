@@ -81,4 +81,10 @@ public interface IRuntimeRing3 {
 	 * @return 等待的用户句柄
 	 */
 	int getBlockHandle();
+
+	/**
+	 * 进程分叉
+	 * @return 父进程返回子进程PID，子进程返回0
+	 */
+	int fork() throws Exception;
 }

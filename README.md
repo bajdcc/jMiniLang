@@ -201,6 +201,28 @@ TASK PROC:
 
 **Run on Server**
 
+** Online Compiler Example III: Fork **
+
+```javascript
+import "user.base";
+var channel = g_pipe("测试FORK");
+var pid = g_null;
+if ((pid := g_fork()) != -1) { // 父进程读取管道
+    g_puts("父进程 PID：" + g_pid());
+    g_puts("父进程 FORK 返回：" + pid);
+    g_puts(channel, "读取管道：");
+    channel."pipe"(g_system_output());
+} else { // 子进程写入管道
+    channel."writeln"("子进程 FORK 返回：" + pid);
+    for (var i = 0; i < 10; i++) {
+        var txt = "这是一条测试消息！ 编号：" + i;
+        channel."writeln"(txt);//写管道
+        g_sleep_s(1);
+    }
+    channel."write"(g_noop_true);//发送管道关闭信号
+}
+```
+
 ** Online Compiler Example II: Pipe **
 
 **Reader**

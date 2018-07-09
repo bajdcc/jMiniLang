@@ -1,6 +1,7 @@
 package com.bajdcc.LALR1.grammar.runtime;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 【运行时】运行时堆栈
@@ -28,7 +29,7 @@ public class RuntimeStack {
 	/**
 	 * 调用堆栈，临时变量堆栈
 	 */
-	private ArrayList<RuntimeFunc> stkCall = new ArrayList<>();
+	private List<RuntimeFunc> stkCall = new ArrayList<>();
 
 	public RuntimeStack() {
 
@@ -64,7 +65,7 @@ public class RuntimeStack {
 	public RuntimeObject findVariable(String codePage, int idx) {
 		for (RuntimeFunc func : stkCall) {
 			if (func.getCurrentPage().equals(codePage)) {
-				List<HashMap<Integer, RuntimeObject>> tmp = func.getTmp();
+				List<Map<Integer, RuntimeObject>> tmp = func.getTmp();
 				RuntimeObject obj;
 				for (Map<Integer, RuntimeObject> scope : tmp) {
 					obj = scope.get(idx);
@@ -204,5 +205,18 @@ public class RuntimeStack {
 				System.lineSeparator() +
 				"调用栈: " + stkCall +
 				System.lineSeparator();
+	}
+
+	public RuntimeStack copy() {
+		RuntimeStack stack = new RuntimeStack();
+		stack.reg = reg.copy();
+		stack.level = level;
+		stack.catchState = catchState;
+		stack.stkData = new Stack<>();
+		Arrays.stream(stkData.toArray(new RuntimeObject[0])).map(RuntimeObject::clone).forEach(a -> stack.stkData.push(a));
+		stack.prev = prev == null ? null : prev.copy();
+		stack.dataTryCounts = (Stack<Integer>) dataTryCounts.clone();
+		stack.stkCall = stkCall.stream().map(RuntimeFunc::copy).collect(Collectors.toList());
+		return stack;
 	}
 }

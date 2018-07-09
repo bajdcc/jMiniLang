@@ -50,4 +50,11 @@ public class HashListMapEx<K, V> {
 	public int indexOf(V v) {
 		return list.indexOf(v);
 	}
+
+	public HashListMapEx<K,V> copy() {
+		HashListMapEx<K,V> o = new HashListMapEx<>();
+		o.list = new ArrayList<>(this.list);
+		o.map = new HashMap<>(this.map);
+		return o;
+	}
 }

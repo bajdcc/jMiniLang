@@ -157,7 +157,7 @@ public class RuntimeObject implements Cloneable {
 
 	public RuntimeObject clone() {
 		if (obj == null) {
-			return null;
+			return new RuntimeObject(null);
 		}
 		RuntimeObject o = null;
 		try {
