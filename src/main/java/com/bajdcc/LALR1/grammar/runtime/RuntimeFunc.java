@@ -1,7 +1,5 @@
 package com.bajdcc.LALR1.grammar.runtime;
 
-import com.bajdcc.util.HashListMapEx2;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -68,7 +66,23 @@ public class RuntimeFunc {
 	/**
 	 * YIELD
 	 */
-	private HashListMapEx2<String, RuntimeStack> yields = null;
+	private int yield = 0;
+
+	public int getYield() {
+		return yield;
+	}
+
+	public void addYield() {
+		this.yield++;
+	}
+
+	public void popYield() {
+		this.yield--;
+	}
+
+	public void resetYield() {
+		this.yield = 0;
+	}
 
 	public RuntimeFunc() {
 		enterScope();
@@ -169,21 +183,6 @@ public class RuntimeFunc {
 		closure.put(idx, val);
 	}
 
-	public RuntimeStack getYields(String hash) {
-		return yields == null ? null : yields.get(hash);
-	}
-
-	public void addYieldStack(String hash, RuntimeStack stack) {
-		if (yields == null) {
-			yields = new HashListMapEx2<>();
-		}
-		yields.add(hash, stack);
-	}
-
-	public void popYieldStack() {
-		yields.pop();
-	}
-
 	public int getTryJmp() {
 		return tryJmp;
 	}
@@ -199,7 +198,7 @@ public class RuntimeFunc {
 						currentPage, currentPc, name == null ? "extern" : name, params, tmp, closure);
 	}
 
-	public RuntimeFunc copy() {
+	public RuntimeFunc copy(RuntimeStack stack) {
 		RuntimeFunc func = new RuntimeFunc();
 		func.address = address;
 		func.name = name;
@@ -213,7 +212,7 @@ public class RuntimeFunc {
 				.collect(Collectors.toMap(Map.Entry::getKey, c -> c.getValue().clone())))
 				.collect(Collectors.toList());
 		func.closure = closure.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, a -> a.getValue().clone()));
-		func.yields = yields == null ? null : yields.copy();
+		func.yield = yield;
 		return func;
 	}
 }

@@ -459,8 +459,20 @@ public class SemanticHandler {
 			} else {
 				Block block = (Block) indexed.get(4).getObject();
 				List<IStmt> stmts = block.getStmts();
-				if (stmts.isEmpty() || !(stmts.get(stmts.size() - 1) instanceof StmtReturn))
+				if (func.isYield()) {
+					if (stmts.isEmpty()) {
+						stmts.add(ret);
+					} else if (stmts.get(stmts.size() - 1) instanceof StmtReturn) {
+						StmtReturn preRet = (StmtReturn) stmts.get(stmts.size() - 1);
+						if (preRet.getExp() != null) {
+							stmts.add(ret);
+						}
+					} else {
+						stmts.add(ret);
+					}
+ 				} else if (stmts.isEmpty() || !(stmts.get(stmts.size() - 1) instanceof StmtReturn)) {
 					stmts.add(ret);
+				}
 				func.setBlock(block);
 			}
 			return func;
@@ -498,20 +510,8 @@ public class SemanticHandler {
 			if (indexed.exists(0)) {
 				ret.setExp((IExp) indexed.get(0).getObject());
 			}
-			if (indexed.exists(1)) {
-				if (!indexed.exists(0)
-						|| !query.getQueryBlockService().isInBlock(
-						BlockType.kYield)) {
-					recorder.add(SemanticError.WRONG_YIELD,
-							indexed.get(1).getToken());
-				}
+			if (query.getQueryBlockService().isInBlock(BlockType.kYield)) {
 				ret.setYield(true);
-			} else if (query.getQueryBlockService().isInBlock(
-					BlockType.kYield)) {
-				if (indexed.exists(0)) {
-					recorder.add(SemanticError.WRONG_YIELD,
-							indexed.get(1).getToken());
-				}
 			}
 			return ret;
 		});

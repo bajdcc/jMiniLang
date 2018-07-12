@@ -117,7 +117,7 @@ var task_handler = func ~(ch) {
     }
     var task_table = g_query_share("TASK#TABLE");
     g_lock_share("TASK#LIST");                     // 锁定等待队列
-    var pid = waiting_list[0];        // 取最早等待的进程
+    var pid = waiting_list[0];                     // 取最早等待的进程
     g_array_remove(waiting_list, 0);               // 移除它
     g_unlock_share("TASK#LIST");                   // 解锁队列
     var m = g_query_share("MSG#" + pid);           // 读取客户端的数据
@@ -126,7 +126,7 @@ var task_handler = func ~(ch) {
     var msg = m["msg"];
     if (g_is_null(tid)) {
         g_map_put(msg, "error", 1);
-        g_map_put(msg, "val", "invalid task name");
+        g_map_put(msg, "val", "invalid task name: " + _tid);
     } else {
         g_map_put(msg, "error", 0);
         g_start_share("TASKDATA#" + tid, msg);

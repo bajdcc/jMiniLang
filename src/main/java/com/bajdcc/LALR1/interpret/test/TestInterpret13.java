@@ -93,14 +93,6 @@ public class TestInterpret13 {
 							"call g_printn(invoke square::\"get_index\"(2));\n" +
 							"",
 
-					"import \"sys.base\";\n" +
-							"var c = yield ~(){throw 3;};\n" +
-							"var b = yield ~(){\n" +
-							"try{foreach(var k : c()){}yield 1;}\n" +
-							"catch{\n" +
-							"  yield 4;throw 2;}};\n" +
-							"/*g_set_debug(true);*/\n" +
-							"try{foreach(var k : b()){g_printn(k);}}catch{g_printn(5);}\n",
 
 					"import \"sys.base\";\n" +
 					"import \"sys.class\";\n" +
@@ -137,7 +129,51 @@ public class TestInterpret13 {
 							"    call (func ~(h) -> h(h))(\n" +
 							"        lambda(x) -> lambda(i, a, b, c) ->\n" +
 							"            call (f(x(x)))(i, a, b, c)))(hanoi);\n" +
-							"h(3, 'A', 'B', 'C');\n"
+							"h(3, 'A', 'B', 'C');\n",
+
+					"import \"sys.base\";\n" +
+							"var c = yield ~(){throw 3;};\n" +
+							"var b = yield ~(){\n" +
+							"try{foreach(var k : c()){}yield 1;}\n" +
+							"catch{\n" +
+							"  yield 4;throw 2;}};\n" +
+							"/*g_set_debug(true);*/\n" +
+							"try{foreach(var k : b()){g_printn(k);}}catch{g_printn(5);}\n",
+					"import \"sys.base\";\n" +
+							"var a = func ~(){ foreach (var i : g_range(1, 4)+1) {\n" +
+							"    foreach (var j : g_range(1, 5)+1) {\n" +
+							"        g_printn(i*j);\n" +
+							"    }\n" +
+							"}};\n" +
+							"g_printn(a());\n" +
+							"g_printn(a());",
+					"import \"sys.base\";\n" +
+							"var b = func ~() { foreach (var j : g_range(1, 5)+1) {\n" +
+							"    g_printn(j);\n" +
+							"}};\n" +
+							"var a = func ~() { foreach (var i : g_range(1, 4)+1) {\n" +
+							"    b();\n" +
+							"}};\n" +
+							"g_printn(a());\n" +
+							"g_printn(a());",
+					"import \"sys.base\";\n" +
+							"import \"sys.string\";\n" +
+							"var a = func ~(){ foreach (var i : g_range_string(\"ertyrt\")) {\n" +
+							"    foreach (var j : g_range(1, 5)+1) {\n" +
+							"        g_printn(i);\n" +
+							"    }\n" +
+							"}};\n" +
+							"g_printn(a());\n" +
+							"g_printn(a());",
+					"import \"sys.base\";\n" +
+							"import \"sys.string\";\n" +
+							"var a = func ~(){ foreach (var i : g_range_string(\"ertyrt\")) {\n" +
+							"    foreach (var j : g_range(1, 5)+1) {\n" +
+							"        return i;\n" +
+							"    }\n" +
+							"}};\n" +
+							"g_printn(a());\n" +
+							"g_printn(a());",
 			};
 
 			System.out.println(codes[codes.length - 1]);

@@ -299,11 +299,11 @@ public class RuntimeProcess implements IRuntimeProcessService {
 	public int createProcess(int creatorId, int ring, String name, RuntimeCodePage page, int pc, RuntimeObject obj) throws Exception {
 		if (setProcessId.size() >= MAX_PROCESS) {
 			arrProcess[creatorId].machine.err(
-					RuntimeException.RuntimeError.PROCESS_OVERFLOW, String.valueOf(page));
+					RuntimeException.RuntimeError.PROCESS_OVERFLOW);
 		}
 		if (!(arrProcess[creatorId].ring == 0) && ring == 0) {
 			arrProcess[creatorId].machine.err(
-					RuntimeException.RuntimeError.ACCESS_FORBIDDEN, String.valueOf(page));
+					RuntimeException.RuntimeError.ACCESS_FORBIDDEN);
 		}
 		int pid;
 		for (; ; ) {

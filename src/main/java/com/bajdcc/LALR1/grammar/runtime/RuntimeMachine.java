@@ -16,6 +16,7 @@ import com.bajdcc.LALR1.interpret.module.user.ModuleUserLisp;
 import com.bajdcc.LALR1.interpret.module.user.ModuleUserWeb;
 import com.bajdcc.LALR1.syntax.handler.SyntaxException;
 import com.bajdcc.util.HashListMapEx;
+import com.bajdcc.util.HashListMapEx2;
 import com.bajdcc.util.lexer.error.RegexException;
 import com.bajdcc.util.lexer.token.OperatorType;
 import com.bajdcc.util.lexer.token.Token;
@@ -106,7 +107,9 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 	private Map<String, List<RuntimeCodePage>> pageRefer = new HashMap<>();
 	private Map<String, RuntimeCodePage> codeCache = new HashMap<>();
 	private Stack<RuntimeObject> stkYieldData = new Stack<>();
-	private RuntimeStack stack = new RuntimeStack();
+	private HashListMapEx2<String, Integer> stkYieldMap = new HashListMapEx2<>();
+	private RuntimeStack currentStack = null;
+	private List<RuntimeStack> stack = new ArrayList<>();
 	private RuntimeCodePage currentPage;
 	private String pageName;
 	private String name;
@@ -150,6 +153,8 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 		}
 		this.process = process;
 		this.ring = ring;
+		this.stack.add(new RuntimeStack());
+		this.refreshStack();
 		if (ring < 3) {
 			for (IInterpreterModule module : modulesSystem) {
 				process.getService().getFileService().addVfs(module.getModuleName(), module.getModuleCode());
@@ -191,6 +196,10 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 		}
 	}
 
+	private void refreshStack() {
+		currentStack = stack.get(stack.size() - 1);
+	}
+
 	/**
 	 * FORK进程
 	 * @param machine 被FORK的进程
@@ -202,7 +211,9 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 		pageRefer = machine.pageRefer.entrySet().stream().collect(Collectors.toMap(Entry::getKey, a -> new ArrayList<>(a.getValue())));
 		codeCache = new HashMap<>(machine.codeCache);
 		stkYieldData = (Stack<RuntimeObject>) machine.stkYieldData.clone();
-		stack = machine.stack.copy();
+		stkYieldMap = machine.stkYieldMap.copy();
+		stack = machine.stack.stream().map(RuntimeStack::copy).collect(Collectors.toList());
+		currentStack = stack.get(machine.stack.indexOf(machine.currentStack));
 		currentPage = machine.currentPage;
 		triesCount = machine.triesCount;
 		store(new RuntimeObject(BigInteger.valueOf(-1)));
@@ -290,8 +301,8 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 	public void run(String name, RuntimeCodePage page) throws Exception {
 		add(name, page);
 		currentPage = page;
-		stack.reg.pageId = name;
-		stack.reg.execId = 0;
+		currentStack.reg.pageId = name;
+		currentStack.reg.execId = 0;
 		switchPage();
 		runInsts();
 	}
@@ -303,8 +314,8 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 	public void initStep(String name, RuntimeCodePage page, List<RuntimeCodePage> refers, int pc, RuntimeObject obj) throws Exception {
 		add(name, page);
 		currentPage = page;
-		stack.reg.pageId = name;
-		stack.reg.execId = -1;
+		currentStack.reg.pageId = name;
+		currentStack.reg.execId = -1;
 		switchPage();
 		if (refers != null)
 			pageRefer.get(pageName).addAll(refers);
@@ -334,26 +345,26 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 		}
 		if (debug) {
 			System.err.println();
-			System.err.print(stack.reg.execId + ": " + inst.toString());
+			System.err.print(currentStack.reg.execId + ": " + inst.toString());
 		}
 		OperatorType op = TokenTools.ins2op(inst);
 		nextInst();
 		if (op != null) {
-			if (!RuntimeTools.calcOp(stack.reg, inst, this)) {
+			if (!RuntimeTools.calcOp(currentStack.reg, inst, this)) {
 				err(RuntimeError.UNDEFINED_CONVERT, op.getName());
 			}
 		} else {
-			if (!RuntimeTools.calcData(stack.reg, inst, this)) {
-				if (!RuntimeTools.calcJump(stack.reg, inst, this)) {
+			if (!RuntimeTools.calcData(currentStack.reg, inst, this)) {
+				if (!RuntimeTools.calcJump(currentStack.reg, inst, this)) {
 					err(RuntimeError.WRONG_INST, inst.toString());
 				}
 			}
 		}
 		if (debug) {
 			System.err.println();
-			System.err.print(stack.toString());
-//			System.err.print("协程栈：");
-//			System.err.print(stkYieldData.toString());
+			System.err.print(currentStack.toString());
+			System.err.print("协程栈：");
+			System.err.print(stkYieldData.toString());
 			System.err.println();
 		}
 		return true;
@@ -361,15 +372,15 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 
 	@Override
 	public RuntimeObject load() throws RuntimeException {
-		if (stack.isEmptyStack()) {
+		if (currentStack.isEmptyStack()) {
 			err(RuntimeError.NULL_STACK);
 		}
-		return stack.popData();
+		return currentStack.popData();
 	}
 
 	@Override
 	public void store(RuntimeObject obj) throws RuntimeException {
-		stack.pushData(obj);
+		currentStack.pushData(obj);
 	}
 
 	private RuntimeObject dequeue() throws RuntimeException {
@@ -384,10 +395,10 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 	}
 
 	public RuntimeObject top() throws RuntimeException {
-		if (stack.isEmptyStack()) {
+		if (currentStack.isEmptyStack()) {
 			err(RuntimeError.NULL_STACK);
 		}
-		return stack.top();
+		return currentStack.top();
 	}
 
 	private int loadInt() throws RuntimeException {
@@ -431,14 +442,14 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 
 	@Override
 	public void pop() throws RuntimeException {
-		if (stack.isEmptyStack()) {
+		if (currentStack.isEmptyStack()) {
 			err(RuntimeError.NULL_STACK);
 		}
-		stack.popData();
+		currentStack.popData();
 	}
 
 	private void nextInst() throws RuntimeException {
-		stack.reg.execId++;
+		currentStack.reg.execId++;
 		if (isEOF()) {
 			err(RuntimeError.WRONG_CODEPAGE);
 		}
@@ -448,7 +459,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 		if (isDebug()) {
 			System.err.print(" " + current());
 		}
-		stack.reg.execId += 4;
+		currentStack.reg.execId += 4;
 		if (isEOF()) {
 			err(RuntimeError.WRONG_CODEPAGE);
 		}
@@ -456,19 +467,19 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 
 	@Override
 	public void err(RuntimeError type) throws RuntimeException {
-		System.err.println(stack);
-		throw new RuntimeException(type, stack.reg.execId, type.getMessage() + "\n\n[ CODE ]\n" + currentPage.getDebugInfoByInc(stack.reg.execId));
+		System.err.println(currentStack);
+		throw new RuntimeException(type, currentStack.reg.execId, type.getMessage() + "\n\n[ CODE ]\n" + currentPage.getDebugInfoByInc(currentStack.reg.execId));
 	}
 
 	@Override
 	public void err(RuntimeError type, String message) throws RuntimeException {
-		System.err.println(stack);
-		throw new RuntimeException(type, stack.reg.execId, type.getMessage() + " " + message + "\n\n[ CODE ]\n" + currentPage.getDebugInfoByInc(stack.reg.execId));
+		System.err.println(currentStack);
+		throw new RuntimeException(type, currentStack.reg.execId, type.getMessage() + " " + message + "\n\n[ CODE ]\n" + currentPage.getDebugInfoByInc(currentStack.reg.execId));
 	}
 
 	public void errRT(RuntimeError type, String message) throws RuntimeException {
-		System.err.println(stack);
-		throw new RuntimeException(type, stack.reg.execId, message);
+		System.err.println(currentStack);
+		throw new RuntimeException(type, currentStack.reg.execId, message);
 	}
 
 	@Override
@@ -548,7 +559,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 
 	@Override
 	public Object[] getProcInfo() {
-		String funcName = stack.getFuncSimpleName();
+		String funcName = currentStack.getFuncSimpleName();
 		return new Object[]{
 				process.isBlock(pid) ? " " : "*",
 				String.valueOf(ring),
@@ -660,12 +671,12 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 
 	@Override
 	public RuntimeObject getFuncArgs(int index) {
-		return stack.getFuncArgs(index);
+		return currentStack.getFuncArgs(index);
 	}
 
 	@Override
 	public int getFuncArgsCount() {
-		return stack.getFuncArgsCount1();
+		return currentStack.getFuncArgsCount1();
 	}
 
 	@Override
@@ -703,8 +714,8 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 	}
 
 	private void switchPage() throws RuntimeException {
-		if (!stack.reg.pageId.isEmpty()) {
-			currentPage = pageMap.get(stack.reg.pageId);
+		if (!currentStack.reg.pageId.isEmpty()) {
+			currentPage = pageMap.get(currentStack.reg.pageId);
 			pageName = currentPage.getInfo().getDataMap().get("name").toString();
 		} else {
 			err(RuntimeError.WRONG_CODEPAGE);
@@ -720,8 +731,8 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 	}
 
 	private Byte currentInst() throws RuntimeException {
-		if (stack.reg.execId != -1) {
-			return getInst(stack.reg.execId);
+		if (currentStack.reg.execId != -1) {
+			return getInst(currentStack.reg.execId);
 		} else {
 			return (byte) RuntimeInst.ihalt.ordinal();
 		}
@@ -731,15 +742,15 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 		int op = 0;
 		byte b;
 		for (int i = 0; i < 4; i++) {
-			b = getInst(stack.reg.execId + i);
+			b = getInst(currentStack.reg.execId + i);
 			op += (b & 0xFF) << (8 * i);
 		}
 		return op;
 	}
 
 	private boolean isEOF() {
-		return stack.reg.execId < 0
-				|| stack.reg.execId >= currentPage.getInsts().size();
+		return currentStack.reg.execId < 0
+				|| currentStack.reg.execId >= currentPage.getInsts().size();
 	}
 
 	private RuntimeObject fetchFromGlobalData(int index)
@@ -756,7 +767,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 		RuntimeObject obj = fetchFromGlobalData(idx);
 		if (obj.getSymbol() == null)
 			obj.setSymbol(currentPage.getData().get(idx));
-		stack.pushData(obj);
+		currentStack.pushData(obj);
 	}
 
 	@Override
@@ -798,26 +809,26 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 				}
 				err(RuntimeError.WRONG_LOAD_EXTERN, name);
 			} else {
-				func.addEnv(id, stack.findVariable(func.getPage(), id));
+				func.addEnv(id, currentStack.findVariable(func.getPage(), id));
 			}
 		}
-		stack.pushData(obj);
+		currentStack.pushData(obj);
 	}
 
 	@Override
 	public void opReloadFunc() throws RuntimeException {
 		int idx = loadInt();
-		RuntimeFuncObject func = new RuntimeFuncObject(stack.reg.pageId, stack.reg.execId);
+		RuntimeFuncObject func = new RuntimeFuncObject(currentStack.reg.pageId, currentStack.reg.execId);
 		RuntimeObject obj = new RuntimeObject(func);
 		obj.setSymbol(currentPage.getData().get(idx));
-		stack.storeVariableDirect(idx, obj);
+		currentStack.storeVariableDirect(idx, obj);
 	}
 
 	@Override
 	public void opStore() throws RuntimeException {
 		int idx = loadInt();
 		RuntimeObject obj = load();
-		RuntimeObject target = stack.findVariable(pageName, idx);
+		RuntimeObject target = currentStack.findVariable(pageName, idx);
 		if (target == null) {
 			err(RuntimeError.WRONG_OPERATOR);
 		}
@@ -831,13 +842,13 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 		RuntimeObject obj = load();
 		if (obj.getSymbol() == null)
 			obj.setSymbol(currentPage.getData().get(idx));
-		stack.storeVariableDirect(idx, obj);
+		currentStack.storeVariableDirect(idx, obj);
 		store(obj);
 	}
 
 	@Override
 	public void opOpenFunc() throws RuntimeException {
-		if (!stack.pushFuncData()) {
+		if (!currentStack.pushFuncData()) {
 			err(RuntimeError.STACK_OVERFLOW);
 		}
 	}
@@ -846,37 +857,40 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 	public void opLoadArgs() throws RuntimeException {
 		int idx = current();
 		next();
-		if (idx < 0 || idx >= stack.getFuncArgsCount()) {
-			err(RuntimeError.WRONG_ARGINVALID, stack.getFuncSimpleName() + " has " +
-					(stack.getFuncArgsCount() - 1) + " args but got " + String.valueOf(idx));
+		if (idx < 0 || idx >= currentStack.getFuncArgsCount()) {
+			err(RuntimeError.WRONG_ARGINVALID, currentStack.getFuncSimpleName() + " has " +
+					(currentStack.getFuncArgsCount() - 1) + " args but got " + String.valueOf(idx));
 		}
-		store(stack.loadFuncArgs(idx));
+		store(currentStack.loadFuncArgs(idx));
 	}
 
 	@Override
 	public void opPushArgs() throws RuntimeException {
 		RuntimeObject obj = load();
-		if (!stack.pushFuncArgs(obj)) {
+		if (!currentStack.pushFuncArgs(obj)) {
 			err(RuntimeError.ARG_OVERFLOW, obj.toString());
 		}
 	}
 
 	@Override
 	public void opReturn() throws RuntimeException {
-		if (stack.isEmptyStack()) {
+		if (currentStack.isEmptyStack()) {
 			err(RuntimeError.NULL_STACK);
 		}
-		stack.opReturn(stack.reg);
+		if (currentStack.isYield()) {
+			clearYieldStack();
+		}
+		currentStack.opReturn(currentStack.reg);
 		switchPage();
 	}
 
 	@Override
 	public void opCall() throws RuntimeException {
 		int address = loadInt();
-		stack.opCall(address, pageName, stack.reg.execId, pageName, currentPage
+		currentStack.opCall(address, pageName, currentStack.reg.execId, pageName, currentPage
 				.getInfo().getFuncNameByAddress(address));
-		stack.reg.execId = address;
-		stack.reg.pageId = pageName;
+		currentStack.reg.execId = address;
+		currentStack.reg.pageId = pageName;
 	}
 
 	@Override
@@ -907,19 +921,19 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 	@Override
 	public void opLoadVar() throws RuntimeException {
 		int idx = loadInt();
-		store(RuntimeObject.createObject((stack.findVariable(pageName, idx))));
+		store(RuntimeObject.createObject((currentStack.findVariable(pageName, idx))));
 	}
 
 	@Override
 	public void opJump() throws RuntimeException {
-		stack.reg.execId = current();
+		currentStack.reg.execId = current();
 	}
 
 	@Override
 	public void opJumpBool(boolean bool) throws RuntimeException {
 		boolean tf = loadBool();
 		if (tf == bool) {
-			stack.reg.execId = current();
+			currentStack.reg.execId = current();
 		} else {
 			next();
 		}
@@ -929,7 +943,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 	public void opJumpBoolRetain(boolean bool) throws RuntimeException {
 		boolean tf = loadBoolRetain();
 		if (tf == bool) {
-			stack.reg.execId = current();
+			currentStack.reg.execId = current();
 		} else {
 			next();
 		}
@@ -939,7 +953,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 	public void opJumpZero(boolean bool) throws RuntimeException {
 		int val = loadInt();
 		if ((val == 0) == bool) {
-			stack.reg.execId = current();
+			currentStack.reg.execId = current();
 		} else {
 			next();
 		}
@@ -947,10 +961,10 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 
 	@Override
 	public void opJumpYield() throws RuntimeException {
-		String hash = RuntimeTools.getYieldHash(stack.level,
-				stack.getFuncLevel(), pageName, stack.reg.execId - 1);
-		if (stack.getYieldStack(hash) != null) {
-			stack.reg.execId = current();
+		String hash = RuntimeTools.getYieldHash(getLastStack(),
+				currentStack.getFuncLevel(), pageName, currentStack.reg.execId - 1);
+		if (stkYieldMap.contains(hash)) {
+			currentStack.reg.execId = current();
 		} else {
 			next();
 		}
@@ -960,7 +974,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 	public void opJumpNan() throws RuntimeException {
 		RuntimeObject obj = top();
 		if (obj.getType() == RuntimeObjectType.kNan) {
-			stack.reg.execId = current();
+			currentStack.reg.execId = current();
 		} else {
 			next();
 		}
@@ -988,12 +1002,12 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 		String name = obj.getObj().toString();
 		IRuntimeDebugValue value = currentPage.getInfo().getValueCallByName(name);
 		if (value != null) {
-			stack.pushData(value.getRuntimeObject());
+			currentStack.pushData(value.getRuntimeObject());
 			return;
 		}
 		int index = currentPage.getInfo().getAddressOfExportFunc(name);
 		if (index != -1) {
-			stack.pushData(new RuntimeObject(new RuntimeFuncObject(pageName, index)));
+			currentStack.pushData(new RuntimeObject(new RuntimeFuncObject(pageName, index)));
 			return;
 		}
 		List<RuntimeCodePage> refers = pageRefer.get(currentPage.getInfo()
@@ -1001,12 +1015,12 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 		for (RuntimeCodePage page : refers) {
 			value = page.getInfo().getValueCallByName(name);
 			if (value != null) {
-				stack.pushData(value.getRuntimeObject());
+				currentStack.pushData(value.getRuntimeObject());
 				return;
 			}
 			index = page.getInfo().getAddressOfExportFunc(name);
 			if (index != -1) {
-				stack.pushData(new RuntimeObject(new RuntimeFuncObject(page.getInfo()
+				currentStack.pushData(new RuntimeObject(new RuntimeFuncObject(page.getInfo()
 						.getDataMap().get("name").toString(), index)));
 				return;
 			}
@@ -1023,10 +1037,8 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 			if (idx == -1) { // call (call exp) (args...)
 				obj = load();
 			} else {
-				RuntimeStack itStack = stack;
-				while (obj == null && itStack != null) {
-					obj = itStack.findVariable(pageName, idx);
-					itStack = itStack.prev;
+				for (int i = currentStack.getLevel(); i >= 0 && obj == null; i = currentStack.getParent()) {
+					obj = stack.get(i).findVariable(pageName, idx);
 				}
 			}
 			if (obj == null || obj.getType() == null) {
@@ -1042,16 +1054,16 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 							if (o.getSymbol() == null)
 								o.setSymbol(currentPage.getData().get(id));
 						}*/
-						stack.storeClosure(id, o);
+						currentStack.storeClosure(id, o);
 					}
-					stack.pushData(obj);
+					currentStack.pushData(obj);
 				}
 				int address = func.getAddr();
-				stack.opCall(address, func.getPage(), stack.reg.execId,
+				currentStack.opCall(address, func.getPage(), currentStack.reg.execId,
 						pageName, pageMap.get(func.getPage()).getInfo()
 								.getFuncNameByAddress(address));
-				stack.reg.execId = address;
-				stack.reg.pageId = func.getPage();
+				currentStack.reg.execId = address;
+				currentStack.reg.pageId = func.getPage();
 				switchPage();
 				pop();
 				return;
@@ -1070,10 +1082,10 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 			if (address != -1) {
 				String jmpPage = page.getInfo().getDataMap().get("name")
 						.toString();
-				stack.opCall(address, jmpPage, stack.reg.execId,
-						stack.reg.pageId, name);
-				stack.reg.execId = address;
-				stack.reg.pageId = jmpPage;
+				currentStack.opCall(address, jmpPage, currentStack.reg.execId,
+						currentStack.reg.pageId, name);
+				currentStack.reg.execId = address;
+				currentStack.reg.pageId = jmpPage;
 				switchPage();
 				return;
 			}
@@ -1081,7 +1093,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 		for (RuntimeCodePage page : refers) {
 			IRuntimeDebugExec exec = page.getInfo().getExecCallByName(name);
 			if (exec != null) {
-				int argsCount = stack.getFuncArgsCount();
+				int argsCount = currentStack.getFuncArgsCount();
 				RuntimeObjectType[] types = exec.getArgsType();
 				if ((types == null && argsCount != 0)
 						|| (types != null && types.length != argsCount)) {
@@ -1089,8 +1101,8 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 				}
 				List<RuntimeObject> args = new ArrayList<>();
 				for (int i = 0; i < argsCount; i++) {
-					RuntimeObjectType type = types[i];
-					RuntimeObject objParam = stack.loadFuncArgs(i);
+					RuntimeObjectType type = types == null ? RuntimeObjectType.kObject : (types.length > i ? types[i] : RuntimeObjectType.kObject);
+					RuntimeObject objParam = currentStack.loadFuncArgs(i);
 					if (type != RuntimeObjectType.kObject) {
 						RuntimeObjectType objType = objParam.getType();
 						if (objType != type) {
@@ -1110,8 +1122,8 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 					}
 					args.add(objParam);
 				}
-				stack.opCall(stack.reg.execId, stack.reg.pageId,
-						stack.reg.execId, stack.reg.pageId, name);
+				currentStack.opCall(currentStack.reg.execId, currentStack.reg.pageId,
+						currentStack.reg.execId, currentStack.reg.pageId, name);
 				RuntimeObject retVal;
 				try {
 					retVal = exec.ExternalProcCall(args, this);
@@ -1175,19 +1187,25 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 		if (forward) {
 			int yldLine = current();
 			next();
-			String hash = RuntimeTools.getYieldHash(stack.level,
-					stack.getFuncLevel(), pageName, yldLine);
-			RuntimeStack newStack = stack.getYieldStack(hash);
+			String hash = RuntimeTools.getYieldHash(getLastStack(),
+					currentStack.getFuncLevel(), pageName, yldLine);
+			if (!stkYieldMap.contains(hash)) {
+				err(RuntimeError.WRONG_COROUTINE, hash);
+			}
+			RuntimeStack newStack = stack.get(stkYieldMap.get(hash));
 			if (newStack != null) {
-				stack = newStack;
+				currentStack = newStack;
 			} else {
 				err(RuntimeError.WRONG_COROUTINE, hash);
 			}
 		} else {
-			if (stack.prev == null) {
+			if (currentStack.getLevel() == 0) {
 				err(RuntimeError.WRONG_COROUTINE);
 			}
-			stack = stack.prev;
+			if (currentStack.getParent() == -1) {
+				err(RuntimeError.WRONG_COROUTINE);
+			}
+			currentStack = stack.get(currentStack.getParent());
 		}
 		switchPage();
 	}
@@ -1206,15 +1224,38 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 		}
 	}
 
+	/**
+	 * 向前寻找当前栈的父栈
+	 * @return 非yield栈
+	 */
+	private int getLastStack() {
+		int parent = currentStack.getParent();
+		if (parent != -1) {
+			return parent;
+		}
+		return currentStack.getLevel();
+	}
+
+	private void clearYieldStack() {
+		for (int i = 0; i < currentStack.getYield(); i++) {
+			stack.remove(stack.size() - 1);
+			stkYieldMap.pop();
+		}
+		currentStack.resetYield();
+	}
+
 	@Override
 	public void opYieldCreateContext() throws Exception {
-		RuntimeStack newStack = new RuntimeStack(stack);
+		RuntimeStack newStack = new RuntimeStack(stack.size());
+		newStack.setParent(currentStack.getLevel());
 		int yldLine = current();
 		next();
-		String hash = RuntimeTools.getYieldHash(stack.level,
-				stack.getFuncLevel(), pageName, yldLine);
-		stack.addYieldStack(hash, newStack);
-		stack = newStack;
+		String hash = RuntimeTools.getYieldHash(currentStack.getLevel(),
+				currentStack.getFuncLevel(), pageName, yldLine);
+		stkYieldMap.put(hash, newStack.getLevel());
+		currentStack.addYield(newStack.getLevel());
+		stack.add(newStack);
+		refreshStack();
 		int yieldSize = loadYieldData();
 		int type = loadInt();
 		opOpenFunc();
@@ -1236,17 +1277,21 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 
 	@Override
 	public void opYieldDestroyContext() {
-		stack.popYieldStack();
+		int stk = getLastStack();
+		stack.remove(stack.size() - 1);
+		stkYieldMap.pop();
+		currentStack = stack.get(stk);
+		currentStack.popYield();
 	}
 
 	@Override
 	public void opScope(boolean enter) throws RuntimeException {
-		if (stack.getFuncLevel() == 0)
+		if (currentStack.getFuncLevel() == 0)
 			err(RuntimeError.EMPTY_CALLSTACK);
 		if (enter) {
-			stack.enterScope();
+			currentStack.enterScope();
 		} else {
-			stack.leaveScope();
+			currentStack.leaveScope();
 		}
 	}
 
@@ -1258,7 +1303,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 		for (int i = 0; i < size; i++) {
 			arr.add(load());
 		}
-		stack.pushData(new RuntimeObject(arr));
+		currentStack.pushData(new RuntimeObject(arr));
 	}
 
 	@Override
@@ -1269,7 +1314,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 		for (int i = 0; i < size; i++) {
 			map.put(loadString(), load());
 		}
-		stack.pushData(new RuntimeObject(map));
+		currentStack.pushData(new RuntimeObject(map));
 	}
 
 	@Override
@@ -1280,15 +1325,15 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 		RuntimeObjectType typeObj = obj.getType();
 		if (typeIdx == RuntimeObjectType.kInt) {
 			if (typeObj == RuntimeObjectType.kArray) {
-				stack.pushData(new RuntimeObject(((RuntimeArray) obj.getObj()).get(((BigInteger) index.getObj()).intValue())));
+				currentStack.pushData(new RuntimeObject(((RuntimeArray) obj.getObj()).get(((BigInteger) index.getObj()).intValue())));
 				return;
 			} else if (typeObj == RuntimeObjectType.kString) {
-				stack.pushData(new RuntimeObject((String.valueOf(obj.getObj()).charAt(((BigInteger) index.getObj()).intValue()))));
+				currentStack.pushData(new RuntimeObject((String.valueOf(obj.getObj()).charAt(((BigInteger) index.getObj()).intValue()))));
 				return;
 			}
 		} else if (typeIdx == RuntimeObjectType.kString) {
 			if (typeObj == RuntimeObjectType.kMap) {
-				stack.pushData(new RuntimeObject(((RuntimeMap) obj.getObj()).get(String.valueOf(index.getObj()))));
+				currentStack.pushData(new RuntimeObject(((RuntimeMap) obj.getObj()).get(String.valueOf(index.getObj()))));
 				return;
 			}
 		}
@@ -1305,13 +1350,13 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 		if (typeIdx == RuntimeObjectType.kInt) {
 			if (typeObj == RuntimeObjectType.kArray) {
 				((RuntimeArray) obj.getObj()).set(((BigInteger) index.getObj()).intValue(), exp);
-				stack.pushData(obj);
+				currentStack.pushData(obj);
 				return;
 			}
 		} else if (typeIdx == RuntimeObjectType.kString) {
 			if (typeObj == RuntimeObjectType.kMap) {
 				((RuntimeMap) obj.getObj()).put(String.valueOf(index.getObj()), exp);
-				stack.pushData(obj);
+				currentStack.pushData(obj);
 				return;
 			}
 		}
@@ -1322,11 +1367,11 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 	public void opTry() throws RuntimeException {
 		triesCount++;
 		int jmp = current();
-		if (jmp != -1 && stack.getTry() != -1) {
+		if (jmp != -1 && currentStack.getTry() != -1) {
 			err(RuntimeError.DUP_EXCEPTION);
 		}
 		next();
-		stack.setTry(jmp);
+		currentStack.setTry(jmp);
 	}
 
 	@Override
@@ -1339,22 +1384,22 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 				err(RuntimeError.THROWS_EXCEPTION, "NULL");
 			}
 		}
-		if (stack.hasNoTry()) {
-			while (stack.hasNoTry()) {
+		if (currentStack.hasNoTry()) {
+			while (currentStack.hasNoTry()) {
 				opYieldSwitch(false);
+				clearYieldStack();
 			}
-			opYieldDestroyContext();
 		}
-		if (stack.hasCatch()) {
+		if (currentStack.hasCatch()) {
 			pop();
 			opScope(false);
 		}
-		while (stack.getTry() == -1) { // redirect to try stack
-			stack.opReturn(stack.reg); // clear stack
+		while (currentStack.getTry() == -1) { // redirect to try stack
+			currentStack.opReturn(currentStack.reg); // clear stack
 		}
-		stack.reg.execId = stack.getTry();
+		currentStack.reg.execId = currentStack.getTry();
 		store(obj);
-		stack.resetTry();
+		currentStack.resetTry();
 		triesCount--;
 	}
 

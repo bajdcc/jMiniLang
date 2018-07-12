@@ -1,6 +1,6 @@
 import "user.base";
 
-var channel = g_pipe("测试FORK");
+var channel = g_pipe("TEST-FORK");
 
 var pid = g_null;
 if ((pid := g_fork()) != -1) { // 父进程读取管道
@@ -10,8 +10,13 @@ if ((pid := g_fork()) != -1) { // 父进程读取管道
     channel."pipe"(g_system_output());
 } else { // 子进程写入管道
     channel."writeln"("子进程 FORK 返回：" + pid);
-    for (var i = 0; i < 10; i++) {
-        var txt = "这是一条测试消息！ 编号：" + i;
+    var range = yield ~() { // 枚举器
+        for (var i = 0; i < 3; i++) {
+            yield g_fork(); // 枚举返回值
+        }
+    };
+    foreach (var i : range()) {
+        var txt = "这是一条测试消息！ PID：" + g_pid() + " 编号：" + i;
         channel."writeln"(txt);//写管道
         g_sleep_s(1);
     }

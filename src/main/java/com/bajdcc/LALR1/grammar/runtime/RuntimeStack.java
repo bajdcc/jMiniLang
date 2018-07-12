@@ -14,8 +14,8 @@ public class RuntimeStack {
 	private static final int MAX_CALLSTACKSIZE = 100;
 	private static final int MAX_ARGSIZE = 16;
 
-	public RuntimeStack prev = null;
-	public int level = 0;
+	private int parent = -1;
+	private int level = 0;
 
 	public RuntimeRegister reg = new RuntimeRegister();
 	private Stack<Integer> dataTryCounts = new Stack<>();
@@ -35,9 +35,44 @@ public class RuntimeStack {
 
 	}
 
-	public RuntimeStack(RuntimeStack prev) {
-		this.prev = prev;
-		this.level = prev.level + 1;
+	public RuntimeStack(int level) {
+		this.level = level;
+	}
+
+	public int getParent() {
+		return parent;
+	}
+
+	public void setParent(int parent) {
+		this.parent = parent;
+	}
+
+	public int getLevel() {
+		return level;
+	}
+
+	public void setLevel(int level) {
+		this.level = level;
+	}
+
+	public boolean isYield() {
+		return stkCall.get(0).getYield() > 0;
+	}
+
+	public void addYield(int id) {
+		stkCall.get(0).addYield();
+	}
+
+	public void popYield() {
+		stkCall.get(0).popYield();
+	}
+
+	public int getYield() {
+		return stkCall.get(0).getYield();
+	}
+
+	public void resetYield() {
+		stkCall.get(0).resetYield();
 	}
 
 	public void pushData(RuntimeObject obj) throws RuntimeException {
@@ -143,19 +178,6 @@ public class RuntimeStack {
 		return stkCall.get(0).getSimpleName();
 	}
 
-	public RuntimeStack getYieldStack(String hash) {
-		return stkCall.get(0).getYields(hash);
-	}
-
-	public void addYieldStack(String hash,
-	                          RuntimeStack stack) {
-		stkCall.get(0).addYieldStack(hash, stack);
-	}
-
-	public void popYieldStack() {
-		stkCall.get(0).popYieldStack();
-	}
-
 	public RuntimeObject loadFuncArgs(int idx) {
 		return stkCall.get(0).getParam(idx);
 	}
@@ -210,13 +232,13 @@ public class RuntimeStack {
 	public RuntimeStack copy() {
 		RuntimeStack stack = new RuntimeStack();
 		stack.reg = reg.copy();
-		stack.level = level;
 		stack.catchState = catchState;
 		stack.stkData = new Stack<>();
 		Arrays.stream(stkData.toArray(new RuntimeObject[0])).map(RuntimeObject::clone).forEach(a -> stack.stkData.push(a));
-		stack.prev = prev == null ? null : prev.copy();
 		stack.dataTryCounts = (Stack<Integer>) dataTryCounts.clone();
-		stack.stkCall = stkCall.stream().map(RuntimeFunc::copy).collect(Collectors.toList());
+		stack.stkCall = stkCall.stream().map(a -> a.copy(stack)).collect(Collectors.toList());
+		stack.parent = parent;
+		stack.level = level;
 		return stack;
 	}
 }

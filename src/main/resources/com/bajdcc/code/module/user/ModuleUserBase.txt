@@ -25,6 +25,27 @@ var g_puts = func ~() {
     }
 };
 export "g_puts";
+var g_range = yield ~(a, b) {
+    for (var i = a; i <= b; i++) {
+        yield i;
+    }
+};
+export "g_range";
+var g_range_foreach = func ~(a, b, c) {
+    foreach (var i : g_range(a, b)) {
+        c(i);
+    }
+};
+export "g_range_foreach";
+var g_range_any = func ~(a, b, c) {
+    foreach (var i : g_range(a, b)) {
+        if (c(i)) {
+            return true;
+        }
+    }
+    return false;
+};
+export "g_range_any";
 var g_range_string = yield ~(a) {
     a := "" + a;
     var size = g_string_length(a);

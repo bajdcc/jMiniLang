@@ -20,7 +20,7 @@
 *一言以蔽之，本项目涉及的玩法包括：*
 
 - **开发完善中** Spring-boot与layui制作的管理后台，包括资源查看、文档查看、**在线编译**！
-- **开发完善中** `UserService` RING3级用户服务
+- **开发完善中** `UserService` RING3级用户服务，FORK机制
 - Shell层面的管道机制，类似`echo a | > b.txt`等，语法层面有Bash接口的实现
 - 基于Map数据的原型链实现面向对象特性（`ModuleClass`），应用有：状态机实例--百度新闻（URNews）、行为树实例-AI（URAI）、状态机实例-歌词动画（URMusic）、图论-路由距离算法-PC（URPC）
 - BadApple黑白动画播放（`test badapple`），测试IO性能
@@ -63,7 +63,7 @@
 22. Array/Map initialize list.
 23. **Try/Catch/Throw**.
 24. **Behavior Tree**, including PC network simulator.
-25. **RING 3 Process**, including User Service.
+25. **RING 3 Process**, including User Service, `fork`.
 26. **Web Server**, including Online Compiler and Runner.
 
 #### What it generates
@@ -203,9 +203,13 @@ TASK PROC:
 
 ** Online Compiler Example III: Fork **
 
+*`Fork` support `yield`*
+
 ```javascript
 import "user.base";
-var channel = g_pipe("测试FORK");
+
+var channel = g_pipe("TEST-FORK");
+
 var pid = g_null;
 if ((pid := g_fork()) != -1) { // 父进程读取管道
     g_puts("父进程 PID：" + g_pid());
@@ -214,14 +218,45 @@ if ((pid := g_fork()) != -1) { // 父进程读取管道
     channel."pipe"(g_system_output());
 } else { // 子进程写入管道
     channel."writeln"("子进程 FORK 返回：" + pid);
-    for (var i = 0; i < 10; i++) {
-        var txt = "这是一条测试消息！ 编号：" + i;
+    var range = yield ~() { // 枚举器
+        for (var i = 0; i < 3; i++) {
+            yield g_fork(); // 枚举返回值
+        }
+    };
+    foreach (var i : range()) {
+        var txt = "这是一条测试消息！ PID：" + g_pid() + " 编号：" + i;
         channel."writeln"(txt);//写管道
         g_sleep_s(1);
     }
     channel."write"(g_noop_true);//发送管道关闭信号
 }
+
 ```
+
+**Output:**
+
+> 运行成功！PID：24
+> 父进程 PID：24
+> 父进程 FORK 返回：25
+> class= system::pipe 字符串(system::pipe)
+> 读取管道：
+> 子进程 FORK 返回：-1
+> 这是一条测试消息！ PID：25 编号：26
+> 这是一条测试消息！ PID：26 编号：-1
+> 这是一条测试消息！ PID：32 编号：-1
+> 这是一条测试消息！ PID：33 编号：-1
+> 这是一条测试消息！ PID：25 编号：32
+> 这是一条测试消息！ PID：26 编号：33
+> 这是一条测试消息！ PID：32 编号：38
+> 这是一条测试消息！ PID：33 编号：39
+> 这是一条测试消息！ PID：38 编号：-1
+> 这是一条测试消息！ PID：39 编号：-1
+> 这是一条测试消息！ PID：40 编号：-1
+> 这是一条测试消息！ PID：41 编号：-1
+> 这是一条测试消息！ PID：25 编号：40
+> 这是一条测试消息！ PID：26 编号：41
+> 
+> 正常退出
 
 ** Online Compiler Example II: Pipe **
 
