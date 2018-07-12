@@ -27,7 +27,7 @@ var welcome = func ["WELCOME"] ~() {
     g_ui_printn("--== jMiniOS 脚本操作系统 Made by bajdcc ==--");
     g_ui_bgclear();
     g_ui_fgcolor(0, 0, 255);
-    g_read_file_s_utf8("!/com/bajdcc/code/fs/logo.txt", lambda(s) -> g_ui_printn(s));
+    g_read_file_s_utf8("!/banner.txt", lambda(s) -> g_ui_printn(s));
     g_ui_printn(g_endl + "      唯一标识： " + g_task_get_fast("system", "guid") + g_endl);
     g_ui_fgclear();
     g_printn("Running...");
