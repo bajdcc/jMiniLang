@@ -3,8 +3,8 @@ package com.bajdcc.LALR1.grammar.runtime.service;
 import com.bajdcc.LALR1.grammar.runtime.RuntimeObject;
 import com.bajdcc.LALR1.grammar.runtime.RuntimeObjectType;
 import com.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
-import com.vladsch.flexmark.util.collection.BitIntegerSet;
 import org.apache.log4j.Logger;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -14,7 +14,10 @@ import java.util.*;
  *
  * @author bajdcc
  */
-public class RuntimeUserService implements IRuntimeUserService {
+public class RuntimeUserService implements IRuntimeUserService,
+		IRuntimeUserService.IRuntimeUserPipeService,
+		IRuntimeUserService.IRuntimeUserShareService,
+		IRuntimeUserService.IRuntimeUserFileService {
 
 	private static final int MAX_USER = 1000;
 	private static Logger logger = Logger.getLogger("user");
@@ -39,10 +42,52 @@ public class RuntimeUserService implements IRuntimeUserService {
 		}
 	}
 
+	interface IUserPipeHandler {
+		/**
+		 * 读取管道
+		 * @param id 句柄
+		 * @return 读取的对象
+		 */
+		RuntimeObject read(int id);
+
+		/**
+		 * 写入管道
+		 * @param id 句柄
+		 * @param obj 写入的对象
+		 * @return 是否成功
+		 */
+		boolean write(int id, RuntimeObject obj);
+
+		/**
+		 * 管道是否为空
+		 * @return 空为真
+		 */
+		boolean isEmpty();
+	}
+
+	interface IUserShareHandler {
+		/**
+		 * 获取共享
+		 * @param id 句柄
+		 * @return 共享对象
+		 */
+		RuntimeObject get(int id);
+
+		/**
+		 * 设置共享
+		 * @param id 句柄
+		 * @param obj 共享对象
+		 * @return 上次保存的内容
+		 */
+		RuntimeObject set(int id, RuntimeObject obj);
+	}
+
+	interface IUserFileHandler {
+
+	}
+
 	interface IUserHandler {
 		void destroy();
-
-		boolean isEmpty();
 
 		void enqueue(int pid);
 
@@ -50,9 +95,11 @@ public class RuntimeUserService implements IRuntimeUserService {
 
 		void dequeue(int pid);
 
-		RuntimeObject read();
+		IUserPipeHandler getPipe();
 
-		void write(RuntimeObject obj);
+		IUserShareHandler getShare();
+
+		IUserFileHandler getFile();
 	}
 
 	abstract class UserHandler implements IUserHandler {
@@ -67,12 +114,7 @@ public class RuntimeUserService implements IRuntimeUserService {
 
 		@Override
 		public void destroy() {
-
-		}
-
-		@Override
-		public boolean isEmpty() {
-			return true;
+			service.getProcessService().getRing3().removeHandle(id);
 		}
 
 		@Override
@@ -97,23 +139,37 @@ public class RuntimeUserService implements IRuntimeUserService {
 		}
 
 		@Override
+		public IUserPipeHandler getPipe() {
+			throw new NotImplementedException();
+		}
+
+		@Override
+		public IUserShareHandler getShare() {
+			throw new NotImplementedException();
+		}
+
+		@Override
+		public IUserFileHandler getFile() {
+			throw new NotImplementedException();
+		}
+
+		@Override
 		public String toString() {
 			return String.format("队列：%s", waiting_pids.toString());
 		}
 	}
 
-	class UserPipeHandler extends UserHandler {
+	class UserPipeHandler extends UserHandler implements IUserPipeHandler {
 		private Queue<RuntimeObject> queue;
 
 		UserPipeHandler(int id) {
 			super(id);
 			this.queue = new ArrayDeque<>();
-			service.getProcessService().getRing3().addHandle(id);
 		}
 
 		@Override
-		public void destroy() {
-			service.getProcessService().getRing3().removeHandle(id);
+		public IUserPipeHandler getPipe() {
+			return this;
 		}
 
 		@Override
@@ -122,13 +178,14 @@ public class RuntimeUserService implements IRuntimeUserService {
 		}
 
 		@Override
-		public RuntimeObject read() {
+		public RuntimeObject read(int id) {
 			return queue.poll();
 		}
 
 		@Override
-		public void write(RuntimeObject obj) {
+		public boolean write(int id, RuntimeObject obj) {
 			queue.add(obj);
+			return true;
 		}
 
 		@Override
@@ -137,37 +194,46 @@ public class RuntimeUserService implements IRuntimeUserService {
 		}
 	}
 
-	class UserShareHandler extends UserHandler {
+	class UserShareHandler extends UserHandler implements IUserShareHandler {
+
+		private RuntimeObject obj = null;
 
 		UserShareHandler(int id) {
 			super(id);
 		}
 
 		@Override
-		public RuntimeObject read() {
-			return null;
+		public IUserShareHandler getShare() {
+			return this;
 		}
 
 		@Override
-		public void write(RuntimeObject obj) {
+		public RuntimeObject get(int id) {
+			return obj;
+		}
 
+		@Override
+		public RuntimeObject set(int id, RuntimeObject obj) {
+			RuntimeObject tmp = this.obj;
+			this.obj = obj;
+			return tmp;
+		}
+
+		@Override
+		public String toString() {
+			return String.format("%s 共享：%s", super.toString(), String.valueOf(obj));
 		}
 	}
 
-	class UserFileHandler extends UserHandler {
+	class UserFileHandler extends UserHandler implements IUserFileHandler {
 
 		UserFileHandler(int id) {
 			super(id);
 		}
 
 		@Override
-		public RuntimeObject read() {
-			return null;
-		}
-
-		@Override
-		public void write(RuntimeObject obj) {
-
+		public IUserFileHandler getFile() {
+			return this;
 		}
 	}
 
@@ -203,6 +269,7 @@ public class RuntimeUserService implements IRuntimeUserService {
 				if (cyclePtr >= MAX_USER) {
 					cyclePtr -= MAX_USER;
 				}
+				service.getProcessService().getRing3().addHandle(id);
 				return id;
 			}
 			cyclePtr++;
@@ -210,6 +277,21 @@ public class RuntimeUserService implements IRuntimeUserService {
 				cyclePtr -= MAX_USER;
 			}
 		}
+	}
+
+	@Override
+	public IRuntimeUserPipeService getPipe() {
+		return this;
+	}
+
+	@Override
+	public IRuntimeUserShareService getShare() {
+		return this;
+	}
+
+	@Override
+	public IRuntimeUserFileService getFile() {
+		return this;
 	}
 
 	@Override
@@ -238,12 +320,12 @@ public class RuntimeUserService implements IRuntimeUserService {
 			return new RuntimeObject(true, RuntimeObjectType.kNoop);
 		}
 		UserStruct user = arrUsers[id];
-		if (user.handler.isEmpty()) {
+		if (user.handler.getPipe().isEmpty()) {
 			int pid = service.getProcessService().getPid();
 			arrUsers[id].handler.enqueue(pid);
 			return new RuntimeObject(false, RuntimeObjectType.kNoop);
 		}
-		return user.handler.read();
+		return user.handler.getPipe().read(id);
 	}
 
 	@Override
@@ -252,9 +334,27 @@ public class RuntimeUserService implements IRuntimeUserService {
 			return false;
 		}
 		UserStruct user = arrUsers[id];
-		user.handler.write(obj);
+		user.handler.getPipe().write(id, obj);
 		user.handler.dequeue();
 		return true;
+	}
+
+	@Override
+	public RuntimeObject get(int id) {
+		if (arrUsers[id] == null) {
+			return null;
+		}
+		UserStruct user = arrUsers[id];
+		return user.handler.getShare().get(id);
+	}
+
+	@Override
+	public RuntimeObject set(int id, RuntimeObject obj) {
+		if (arrUsers[id] == null) {
+			return null;
+		}
+		UserStruct user = arrUsers[id];
+		return user.handler.getShare().set(id, obj);
 	}
 
 	@Override

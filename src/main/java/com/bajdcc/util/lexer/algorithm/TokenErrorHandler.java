@@ -13,7 +13,7 @@ public abstract class TokenErrorHandler implements IErrorHandler {
 	/**
 	 * 迭代器接口
 	 */
-	protected IRegexStringIterator iterator = null;
+	protected IRegexStringIterator iterator;
 
 	public TokenErrorHandler(IRegexStringIterator iterator) {
 		this.iterator = iterator;

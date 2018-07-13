@@ -17,12 +17,12 @@ public class FollowSetSolver implements ISyntaxComponentVisitor {
 	/**
 	 * 当前求解的非终结符
 	 */
-	private RuleExp target = null;
+	private RuleExp target;
 
 	/**
 	 * 当前的产生式左部
 	 */
-	private RuleExp origin = null;
+	private RuleExp origin;
 
 	/**
 	 * Follow集是否更新，作为算法收敛的依据

@@ -17,7 +17,6 @@ import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.util.concurrent.GlobalEventExecutor;
 
-import java.nio.charset.Charset;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 

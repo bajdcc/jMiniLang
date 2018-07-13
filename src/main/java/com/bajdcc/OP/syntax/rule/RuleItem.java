@@ -12,12 +12,12 @@ public class RuleItem {
 	/**
 	 * 规则表达式
 	 */
-	public ISyntaxComponent expression = null;
+	public ISyntaxComponent expression;
 
 	/**
 	 * 父结点指针
 	 */
-	public Rule parent = null;
+	public Rule parent;
 
 	public RuleItem(ISyntaxComponent exp, Rule parent) {
 		expression = exp;

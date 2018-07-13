@@ -16,12 +16,12 @@ public class StringPairFilter implements IRegexStringFilter,
 	/**
 	 * 字符串首的终结符
 	 */
-	private MetaType kMetaBegin = MetaType.NULL;
+	private MetaType kMetaBegin;
 
 	/**
 	 * 字符串尾的终结符
 	 */
-	private MetaType kMetaEnd = MetaType.NULL;
+	private MetaType kMetaEnd;
 
 	public StringPairFilter(MetaType begin, MetaType end) {
 		kMetaBegin = begin;

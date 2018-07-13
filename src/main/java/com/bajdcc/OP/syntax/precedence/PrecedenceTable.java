@@ -30,12 +30,12 @@ public class PrecedenceTable extends OPTableSolver {
 	/**
 	 * 非终结符集合
 	 */
-	protected ArrayList<RuleExp> arrNonTerminals = null;
+	protected ArrayList<RuleExp> arrNonTerminals;
 
 	/**
 	 * 终结符集合
 	 */
-	protected ArrayList<TokenExp> arrTerminals = null;
+	protected ArrayList<TokenExp> arrTerminals;
 
 	/**
 	 * 非终结符映射
@@ -55,12 +55,12 @@ public class PrecedenceTable extends OPTableSolver {
 	/**
 	 * 归约模式映射
 	 */
-	private HashMap<String, IPatternHandler> mapPattern = null;
+	private HashMap<String, IPatternHandler> mapPattern;
 
 	/**
 	 * 字符串迭代器
 	 */
-	private IRegexStringIterator iter = null;
+	private IRegexStringIterator iter;
 
 	private static boolean debug = false;
 

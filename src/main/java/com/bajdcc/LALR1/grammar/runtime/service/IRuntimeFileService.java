@@ -1,6 +1,5 @@
 package com.bajdcc.LALR1.grammar.runtime.service;
 
-import com.bajdcc.LALR1.grammar.runtime.RuntimeObject;
 import com.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
 
 /**

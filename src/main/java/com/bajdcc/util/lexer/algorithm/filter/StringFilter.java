@@ -15,7 +15,7 @@ public class StringFilter implements IRegexStringFilter, IRegexStringFilterMeta 
 	/**
 	 * 字符串首尾的终结符
 	 */
-	private MetaType kMeta = MetaType.NULL;
+	private MetaType kMeta;
 
 	public StringFilter(MetaType meta) {
 		kMeta = meta;

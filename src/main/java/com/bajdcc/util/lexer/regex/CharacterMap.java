@@ -1,7 +1,6 @@
 package com.bajdcc.util.lexer.regex;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 /**
  * 字符集合，将字符范围按状态分组（Sigma集合）
@@ -130,7 +129,7 @@ public class CharacterMap implements IRegexComponentVisitor {
 			ranges.add(midRange);// 添加最后的范围
 		}
 		charset.arrPositiveBounds = ranges;
-		Collections.sort(charset.arrPositiveBounds, comparator);
+		charset.arrPositiveBounds.sort(comparator);
 	}
 
 	/**
@@ -174,7 +173,7 @@ public class CharacterMap implements IRegexComponentVisitor {
 	private void addRange(CharacterRange newRange) {
 
 		for (int i = 0; i < arrRanges.size(); i++) {
-			Collections.sort(arrRanges, comparator);
+			arrRanges.sort(comparator);
 			CharacterRange oldRange = arrRanges.get(i);
 			/*
 			 * 防止新增区间[New]与之前区间[Old]产生交集，若有，则将集合分裂

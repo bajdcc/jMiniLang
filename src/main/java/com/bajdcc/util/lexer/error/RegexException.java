@@ -60,7 +60,7 @@ public class RegexException extends Exception {
 	/**
 	 * 错误类型
 	 */
-	private RegexError kError = RegexError.NULL;
+	private RegexError kError;
 
 	/**
 	 * @return 错误类型

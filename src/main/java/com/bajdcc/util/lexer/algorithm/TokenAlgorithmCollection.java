@@ -23,17 +23,17 @@ public class TokenAlgorithmCollection implements Cloneable {
 	/**
 	 * 字符串迭代器
 	 */
-	private IRegexStringIterator iterator = null;
+	private IRegexStringIterator iterator;
 
 	/**
 	 * 字符转换主体
 	 */
-	private IRegexStringFilterHost filterHost = null;
+	private IRegexStringFilterHost filterHost;
 
 	/**
 	 * 错误处理
 	 */
-	private IErrorHandler handler = null;
+	private IErrorHandler handler;
 
 	public TokenAlgorithmCollection(IRegexStringIterator iterator,
 	                                IRegexStringFilterHost filterHost) {

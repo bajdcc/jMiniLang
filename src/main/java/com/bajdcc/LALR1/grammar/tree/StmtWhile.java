@@ -75,13 +75,12 @@ public class StmtWhile implements IStmt {
 
 	@Override
 	public String print(StringBuilder prefix) {
-		String sb = prefix.toString() +
+		return prefix.toString() +
 				KeywordType.WHILE.getName() +
 				" ( " +
 				cond.print(prefix) +
 				" ) " +
 				block.print(prefix);
-		return sb;
 	}
 
 	@Override

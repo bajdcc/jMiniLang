@@ -18,7 +18,7 @@ public class InstructionRecord {
 	/**
 	 * 前向指针
 	 */
-	public InstructionRecord prev = null;
+	public InstructionRecord prev;
 
 	public InstructionRecord(InstructionRecord prev) {
 		this.prev = prev;

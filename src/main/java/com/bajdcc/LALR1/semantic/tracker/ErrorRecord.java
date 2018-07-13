@@ -17,7 +17,7 @@ public class ErrorRecord {
 	/**
 	 * 前向指针
 	 */
-	public ErrorRecord prev = null;
+	public ErrorRecord prev;
 
 	public ErrorRecord(ErrorRecord prev) {
 		this.prev = prev;

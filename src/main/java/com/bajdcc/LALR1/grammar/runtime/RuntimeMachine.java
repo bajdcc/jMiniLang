@@ -106,7 +106,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 	private HashListMapEx<String, RuntimeCodePage> pageMap = new HashListMapEx<>();
 	private Map<String, List<RuntimeCodePage>> pageRefer = new HashMap<>();
 	private Map<String, RuntimeCodePage> codeCache = new HashMap<>();
-	private Stack<RuntimeObject> stkYieldData = new Stack<>();
+	private List<RuntimeObject> stkYieldData = new ArrayList<>();
 	private HashListMapEx2<String, Integer> stkYieldMap = new HashListMapEx2<>();
 	private RuntimeStack currentStack = null;
 	private List<RuntimeStack> stack = new ArrayList<>();
@@ -210,7 +210,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 		pageMap = machine.pageMap.copy();
 		pageRefer = machine.pageRefer.entrySet().stream().collect(Collectors.toMap(Entry::getKey, a -> new ArrayList<>(a.getValue())));
 		codeCache = new HashMap<>(machine.codeCache);
-		stkYieldData = (Stack<RuntimeObject>) machine.stkYieldData.clone();
+		stkYieldData = new ArrayList<>(machine.stkYieldData);
 		stkYieldMap = machine.stkYieldMap.copy();
 		stack = machine.stack.stream().map(RuntimeStack::copy).collect(Collectors.toList());
 		currentStack = stack.get(machine.stack.indexOf(machine.currentStack));
@@ -387,7 +387,9 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 		if (stkYieldData.isEmpty()) {
 			err(RuntimeError.NULL_QUEUE);
 		}
-		return stkYieldData.pop();
+		RuntimeObject obj = stkYieldData.get(stkYieldData.size() - 1);
+		stkYieldData.remove(stkYieldData.size() - 1);
+		return obj;
 	}
 
 	private void enqueue(RuntimeObject obj) {

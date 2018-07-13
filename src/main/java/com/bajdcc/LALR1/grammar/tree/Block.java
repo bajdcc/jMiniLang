@@ -18,7 +18,7 @@ public class Block implements ICommon {
 	/**
 	 * 语句集合
 	 */
-	private List<IStmt> stmts = null;
+	private List<IStmt> stmts;
 
 	public Block() {
 		stmts = new ArrayList<>();

@@ -1,7 +1,5 @@
 package com.bajdcc.LALR1.ui.drawing;
 
-import java.awt.RenderingHints;
-
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Queue;

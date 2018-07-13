@@ -19,7 +19,6 @@ import io.netty.util.concurrent.GlobalEventExecutor;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -68,10 +67,8 @@ public class ModuleNetClient extends Thread {
 	}
 
 	public void send(String msg, String address) {
-		CHANNEL_GROUP.forEach(channel -> {
-			channel.writeAndFlush(String.format("{ \"origin\": \"%s\", \"addr\": \"%s\", \"type\": \"MSG \", \"content\": %s }\r\n",
-					address, channel.localAddress().toString(), JSON.toJSONString(msg)));
-		});
+		CHANNEL_GROUP.forEach(channel -> channel.writeAndFlush(String.format("{ \"origin\": \"%s\", \"addr\": \"%s\", \"type\": \"MSG \", \"content\": %s }\r\n",
+				address, channel.localAddress().toString(), JSON.toJSONString(msg))));
 	}
 
 	public void exit() {

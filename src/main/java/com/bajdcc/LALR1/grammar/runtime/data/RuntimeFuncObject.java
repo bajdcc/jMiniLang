@@ -12,8 +12,8 @@ import java.util.Map;
  */
 public class RuntimeFuncObject {
 
-	private String page = null;
-	private int addr = -1;
+	private String page;
+	private int addr;
 	private Map<Integer, RuntimeObject> env = new HashMap<>();
 
 	public RuntimeFuncObject(String page, int addr) {

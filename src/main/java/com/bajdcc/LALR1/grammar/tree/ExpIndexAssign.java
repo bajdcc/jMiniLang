@@ -135,7 +135,7 @@ public class ExpIndexAssign implements IExp {
 
 	@Override
 	public String print(StringBuilder prefix) {
-		String sb = exp.print(prefix) +
+		return exp.print(prefix) +
 				OperatorType.LSQUARE.getName() +
 				index.print(prefix) +
 				OperatorType.RSQUARE.getName() +
@@ -143,7 +143,6 @@ public class ExpIndexAssign implements IExp {
 				((token == null) ? OperatorType.ASSIGN.getName() : token.toRealString()) +
 				" " +
 				obj.print(prefix);
-		return sb;
 	}
 
 	@Override

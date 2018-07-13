@@ -24,7 +24,7 @@ public class Grammar extends Syntax {
 	/**
 	 * 单词流工厂
 	 */
-	private TokenFactory tokenFactory = null;
+	private TokenFactory tokenFactory;
 
 	/**
 	 * 单词流

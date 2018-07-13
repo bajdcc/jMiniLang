@@ -2,19 +2,11 @@ package com.bajdcc.LALR1.interpret.module.api;
 
 import com.bajdcc.LALR1.grammar.runtime.RuntimeObject;
 import com.bajdcc.LALR1.grammar.runtime.data.RuntimeMap;
-import com.bajdcc.LALR1.interpret.module.web.ModuleNetWebHelper;
 
-import java.math.BigInteger;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.channels.SelectionKey;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * 【模块】API请求上下文

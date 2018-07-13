@@ -23,8 +23,8 @@ public class ModuleMathUnaryFunc implements IRuntimeDebugExec {
 		kSin,
 	}
 
-	private String doc = null;
-	private ModuleMathUnaryFuncType type = null;
+	private String doc;
+	private ModuleMathUnaryFuncType type;
 
 	public ModuleMathUnaryFunc(String doc, ModuleMathUnaryFuncType type) {
 		this.doc = doc;

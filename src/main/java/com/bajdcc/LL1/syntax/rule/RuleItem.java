@@ -17,7 +17,7 @@ public class RuleItem {
 	/**
 	 * 规则表达式
 	 */
-	public ISyntaxComponent expression = null;
+	public ISyntaxComponent expression;
 
 	/**
 	 * First集合（终结符）
@@ -37,7 +37,7 @@ public class RuleItem {
 	/**
 	 * 父结点指针
 	 */
-	public Rule parent = null;
+	public Rule parent;
 
 	/**
 	 * 是否产生空串

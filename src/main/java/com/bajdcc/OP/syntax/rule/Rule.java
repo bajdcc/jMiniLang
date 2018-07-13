@@ -21,7 +21,7 @@ public class Rule {
 	/**
 	 * 规则起始非终结符
 	 */
-	public RuleExp nonTerminal = null;
+	public RuleExp nonTerminal;
 
 	public ArrayList<TokenExp> arrFirstVT = new ArrayList<>();
 

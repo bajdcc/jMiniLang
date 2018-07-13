@@ -18,7 +18,7 @@ public class NFA implements IRegexComponentVisitor {
 	/**
 	 * 是否为调试模式（打印信息）
 	 */
-	protected boolean bDebug = false;
+	protected boolean bDebug;
 
 	/**
 	 * 深度
@@ -43,7 +43,7 @@ public class NFA implements IRegexComponentVisitor {
 	/**
 	 * 表达式树根结点
 	 */
-	protected IRegexComponent expression = null;
+	protected IRegexComponent expression;
 
 	/**
 	 * Sigma状态集

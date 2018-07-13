@@ -1,13 +1,12 @@
 package com.bajdcc.LALR1.grammar.runtime.service;
 
-import org.apache.log4j.Logger;
 import com.bajdcc.LALR1.grammar.runtime.RuntimeObject;
 import com.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
+import org.apache.log4j.Logger;
 
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * 【运行时】运行时共享服务

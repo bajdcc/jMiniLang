@@ -13,7 +13,7 @@ public class RegexStringUtility {
 	/**
 	 * 迭代接口
 	 */
-	private IRegexStringIterator iterator = null;
+	private IRegexStringIterator iterator;
 
 	public RegexStringUtility(IRegexStringIterator iterator) {
 		this.iterator = iterator;

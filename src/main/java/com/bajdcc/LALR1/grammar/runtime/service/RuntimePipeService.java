@@ -1,12 +1,10 @@
 package com.bajdcc.LALR1.grammar.runtime.service;
 
-import org.apache.log4j.Logger;
 import com.bajdcc.LALR1.grammar.runtime.RuntimeObject;
 import com.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
+import org.apache.log4j.Logger;
 
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * 【运行时】运行时管道服务

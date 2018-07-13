@@ -1529,19 +1529,6 @@ var import_handle_class = func ~() {
         this."name" := g_null;
         this."is_valid" := lambda(this) -> g_is_valid_handle(this."handle");
         this."destroy" := lambda(this) -> g_destroy_handle(this."handle");
-        this."write" := lambda(this, obj) -> g_write_handle(this."handle", obj);
-        this."writeln" := lambda(this, obj) -> g_write_handle(this."handle", obj + g_endl);
-        this."pipe" := lambda(this, output) {
-            var r = g_null;
-            while (true) {
-                r := g_read_handle(this."handle");
-                if (!g_is_noop(r)) {
-                    output."write"(r);
-                } else if (g_from_noop(r)) {
-                    break;
-                }
-            }
-        };
     });
 
     var g_pipe = func ~(name) {
@@ -1552,6 +1539,19 @@ var import_handle_class = func ~() {
         this."init" := lambda(this, name) {
             this."name" := name;
             this."handle" := g_handle("pipe|" + name);
+            this."write" := lambda(this, obj) -> g_write_pipe(this."handle", obj);
+            this."writeln" := lambda(this, obj) -> g_write_pipe(this."handle", obj + g_endl);
+            this."pipe" := lambda(this, output) {
+                var r = g_null;
+                while (true) {
+                    r := g_read_pipe(this."handle");
+                    if (!g_is_noop(r)) {
+                        output."write"(r);
+                    } else if (g_from_noop(r)) {
+                        break;
+                    }
+                }
+            };
         };
     });
 
@@ -1563,6 +1563,8 @@ var import_handle_class = func ~() {
         this."init" := lambda(this, name) {
             this."name" := name;
             this."handle" := g_handle("share|" + name);
+            this."set" := lambda(this, obj) -> g_set_share(this."handle", obj);
+            this."get" := lambda(this) -> g_get_share(this."handle");
         };
     });
 

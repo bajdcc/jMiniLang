@@ -17,7 +17,7 @@ public class TrackerError {
 	/**
 	 * 位置
 	 */
-	public Position position = null;
+	public Position position;
 
 	public TrackerError(Position pos) {
 		position = pos;

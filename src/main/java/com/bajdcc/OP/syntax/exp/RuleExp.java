@@ -15,12 +15,12 @@ public class RuleExp implements ISyntaxComponent {
 	/**
 	 * 非终结符ID
 	 */
-	public int id = -1;
+	public int id;
 
 	/**
 	 * 非终结符名称
 	 */
-	public String name = null;
+	public String name;
 
 	/**
 	 * 规则

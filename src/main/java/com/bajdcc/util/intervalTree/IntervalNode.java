@@ -90,8 +90,7 @@ public class IntervalNode<Type> {
 
 		for (Entry<Interval<Type>, List<Interval<Type>>> entry : intervals.entrySet()) {
 			if (entry.getKey().intersects(target))
-				for (Interval<Type> interval : entry.getValue())
-					result.add(interval);
+				result.addAll(entry.getValue());
 			else if (entry.getKey().getStart() > target.getEnd())
 				break;
 		}
@@ -147,9 +146,9 @@ public class IntervalNode<Type> {
 		StringBuilder sb = new StringBuilder();
 		sb.append(center).append(": ");
 		for (Entry<Interval<Type>, List<Interval<Type>>> entry : intervals.entrySet()) {
-			sb.append("[" + entry.getKey().getStart() + "," + entry.getKey().getEnd() + "]:{");
+			sb.append("[").append(entry.getKey().getStart()).append(",").append(entry.getKey().getEnd()).append("]:{");
 			for (Interval<Type> interval : entry.getValue()) {
-				sb.append("(" + interval.getStart() + "," + interval.getEnd() + "," + interval.getData() + ")");
+				sb.append("(").append(interval.getStart()).append(",").append(interval.getEnd()).append(",").append(interval.getData()).append(")");
 			}
 			sb.append("} ");
 		}

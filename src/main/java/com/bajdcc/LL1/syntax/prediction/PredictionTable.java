@@ -25,22 +25,22 @@ public class PredictionTable extends SelectSetSolver {
 	/**
 	 * 非终结符集合
 	 */
-	protected ArrayList<RuleExp> arrNonTerminals = null;
+	protected ArrayList<RuleExp> arrNonTerminals;
 
 	/**
 	 * 终结符集合
 	 */
-	protected ArrayList<TokenExp> arrTerminals = null;
+	protected ArrayList<TokenExp> arrTerminals;
 
 	/**
 	 * 起始规则
 	 */
-	private Rule initRule = null;
+	private Rule initRule;
 
 	/**
 	 * 空串规则
 	 */
-	private TokenExp epsilon = null;
+	private TokenExp epsilon;
 
 	/**
 	 * 预测分析表
@@ -70,7 +70,7 @@ public class PredictionTable extends SelectSetSolver {
 	/**
 	 * 字符串迭代器
 	 */
-	private IRegexStringIterator iter = null;
+	private IRegexStringIterator iter;
 
 	/**
 	 * 指令包

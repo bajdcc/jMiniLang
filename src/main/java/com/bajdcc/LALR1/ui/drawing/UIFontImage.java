@@ -1,7 +1,6 @@
 package com.bajdcc.LALR1.ui.drawing;
 
 import org.apache.log4j.Logger;
-import java.awt.RenderingHints;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

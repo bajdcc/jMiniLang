@@ -27,7 +27,7 @@ public class LastVTSolver implements ISyntaxComponentVisitor {
 	/**
 	 * 产生式左部
 	 */
-	private RuleExp origin = null;
+	private RuleExp origin;
 
 	public LastVTSolver(RuleExp exp) {
 		origin = exp;

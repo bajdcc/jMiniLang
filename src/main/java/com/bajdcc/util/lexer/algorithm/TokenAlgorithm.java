@@ -18,7 +18,7 @@ public abstract class TokenAlgorithm implements ITokenAlgorithm,
 	/**
 	 * 用来匹配的正则表达式
 	 */
-	protected Regex regex = null;
+	protected Regex regex;
 
 	/**
 	 * 匹配结果

@@ -21,12 +21,12 @@ public class PropertyExp implements ISyntaxComponent {
 	/**
 	 * 存储序号
 	 */
-	public int iStorage = -1;
+	public int iStorage;
 
 	/**
 	 * 子表达式
 	 */
-	public IErrorHandler errorHandler = null;
+	public IErrorHandler errorHandler;
 
 	/**
 	 * 动作名称

@@ -20,8 +20,8 @@ public class ModuleBaseIORead implements IRuntimeDebugExec {
 	}
 
 	private static Scanner scanner = new Scanner(System.in);
-	private String doc = null;
-	private ModuleBaseIOReadType type = null;
+	private String doc;
+	private ModuleBaseIOReadType type;
 
 	public ModuleBaseIORead(String doc, ModuleBaseIOReadType type) {
 		this.doc = doc;

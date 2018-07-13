@@ -25,12 +25,12 @@ public class NGA implements ISyntaxComponentVisitor {
 	/**
 	 * 非终结符集合
 	 */
-	protected List<RuleExp> arrNonTerminals = null;
+	protected List<RuleExp> arrNonTerminals;
 
 	/**
 	 * 终结符集合
 	 */
-	protected List<TokenExp> arrTerminals = null;
+	protected List<TokenExp> arrTerminals;
 
 	/**
 	 * 规则到文法自动机状态的映射

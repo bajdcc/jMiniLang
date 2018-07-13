@@ -58,7 +58,7 @@ public class SyntaxException extends Exception {
 	/**
 	 * 错误类型
 	 */
-	private SyntaxError kError = SyntaxError.NULL;
+	private SyntaxError kError;
 
 	/**
 	 * @return 错误类型

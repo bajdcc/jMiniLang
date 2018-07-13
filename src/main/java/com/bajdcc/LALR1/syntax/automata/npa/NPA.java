@@ -37,12 +37,12 @@ public class NPA extends NGA {
 	/**
 	 * 语义动作集合
 	 */
-	private List<ISemanticAction> arrActions = new ArrayList<>();
+	private List<ISemanticAction> arrActions;
 
 	/**
 	 * 起始规则
 	 */
-	private Rule initRule = null;
+	private Rule initRule;
 
 	public NPA(List<RuleExp> nonterminals, List<TokenExp> terminals,
 	           Rule initNonterminal, List<ISemanticAction> actions) {

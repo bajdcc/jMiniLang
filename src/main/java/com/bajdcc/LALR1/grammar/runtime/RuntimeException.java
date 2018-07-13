@@ -62,9 +62,9 @@ public class RuntimeException extends Exception {
 		this.info = info;
 	}
 
-	private int position = -1;
-	private RuntimeError kError = RuntimeError.NULL;
-	private String info = "";
+	private int position;
+	private RuntimeError kError;
+	private String info;
 
 	public int getPosition() {
 		return position;

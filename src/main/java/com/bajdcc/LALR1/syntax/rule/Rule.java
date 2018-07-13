@@ -20,7 +20,7 @@ public class Rule {
 	/**
 	 * 规则起始非终结符
 	 */
-	public RuleExp nonTerminal = null;
+	public RuleExp nonTerminal;
 
 	/**
 	 * 左递归等级：0为否，1为直接，大于1为间接

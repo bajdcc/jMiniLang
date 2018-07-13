@@ -36,7 +36,7 @@ public class Semantic extends Syntax implements IErrorHandler {
 	/**
 	 * 单词流工厂
 	 */
-	protected TokenFactory tokenFactory = null;
+	protected TokenFactory tokenFactory;
 
 	/**
 	 * 错误处理器

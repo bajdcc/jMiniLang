@@ -38,17 +38,17 @@ public class SemanticMachine implements IRandomAccessOfTokens {
 	/**
 	 * 规则集合
 	 */
-	private List<RuleItem> items = null;
+	private List<RuleItem> items;
 
 	/**
 	 * 语义动作集合
 	 */
-	private List<ISemanticAction> actions = null;
+	private List<ISemanticAction> actions;
 
 	/**
 	 * 单词流
 	 */
-	private List<Token> tokens = null;
+	private List<Token> tokens;
 
 	/**
 	 * 数据处理堆栈
@@ -58,17 +58,17 @@ public class SemanticMachine implements IRandomAccessOfTokens {
 	/**
 	 * 符号表查询接口
 	 */
-	private IQuerySymbol query = null;
+	private IQuerySymbol query;
 
 	/**
 	 * 符号表管理接口
 	 */
-	private IManageSymbol manage = null;
+	private IManageSymbol manage;
 
 	/**
 	 * 语义错误处理接口
 	 */
-	private ISemanticRecorder recorder = null;
+	private ISemanticRecorder recorder;
 
 	/**
 	 * 调试

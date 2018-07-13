@@ -180,8 +180,8 @@ public class Lexer extends RegexStringIterator implements
 		String str;
 		int start = arrLinesNo.get(position.iLine) + 1;
 		if (position.iLine == arrLinesNo.size() - 1) {
-			if (start < context.length() - 1)
-				str = context.substring(start, Math.min(context.length() - 1, start + position.iColumn));
+			if (start < context.length())
+				str = context.substring(start, Math.min(context.length(), start + position.iColumn));
 			else
 				str = "";
 		} else {
@@ -194,7 +194,6 @@ public class Lexer extends RegexStringIterator implements
 			for (int i = 0; i < str.length(); i++) {
 				sb.append('^');
 			}
-			sb.append('^');
 			return sb.toString();
 		} else {
 			StringBuilder sb = new StringBuilder();

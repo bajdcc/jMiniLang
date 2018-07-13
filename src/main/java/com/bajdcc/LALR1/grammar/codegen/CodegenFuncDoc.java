@@ -16,8 +16,8 @@ import java.util.stream.Collectors;
  */
 public class CodegenFuncDoc implements IRuntimeDebugExec {
 
-	private String doc = null;
-	private String params = null;
+	private String doc;
+	private String params;
 
 	public CodegenFuncDoc(String doc, List<Token> args) {
 		this.doc = doc;

@@ -11,7 +11,7 @@ public class Constructure implements IRegexComponent {
 	/**
 	 * 若是则为分支，否则为顺序
 	 */
-	public boolean bBranch = false;
+	public boolean bBranch;
 
 	/**
 	 * 孩子结点

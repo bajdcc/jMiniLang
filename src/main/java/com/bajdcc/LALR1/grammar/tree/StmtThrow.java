@@ -45,12 +45,11 @@ public class StmtThrow implements IStmt {
 
 	@Override
 	public String print(StringBuilder prefix) {
-		String sb = prefix.toString() +
+		return prefix.toString() +
 				KeywordType.THROW.getName() +
 				" " +
 				exp.print(prefix) +
 				OperatorType.SEMI.getName();
-		return sb;
 	}
 
 	@Override

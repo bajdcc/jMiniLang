@@ -18,7 +18,7 @@ public class RuntimeStack {
 	private int level = 0;
 
 	public RuntimeRegister reg = new RuntimeRegister();
-	private Stack<Integer> dataTryCounts = new Stack<>();
+	private List<Integer> dataTryCounts = new ArrayList<>();
 	private boolean catchState = false;
 
 	/**
@@ -197,13 +197,13 @@ public class RuntimeStack {
 
 	public void setTry(int jmp) {
 		if (jmp != -1)
-			dataTryCounts.push(stkData.size());
+			dataTryCounts.add(stkData.size());
 		stkCall.get(0).setTryJmp(jmp);
 		catchState = false;
 	}
 
 	public boolean hasNoTry() {
-		return dataTryCounts.empty();
+		return dataTryCounts.isEmpty();
 	}
 
 	public int getTry() {
@@ -211,7 +211,8 @@ public class RuntimeStack {
 	}
 
 	public void resetTry() {
-		int last = dataTryCounts.pop();
+		int last = dataTryCounts.get(dataTryCounts.size() - 1);
+		dataTryCounts.remove(dataTryCounts.size() - 1);
 		RuntimeObject obj = stkData.pop();
 		while (stkData.size() > last)
 			stkData.pop();
@@ -235,7 +236,7 @@ public class RuntimeStack {
 		stack.catchState = catchState;
 		stack.stkData = new Stack<>();
 		Arrays.stream(stkData.toArray(new RuntimeObject[0])).map(RuntimeObject::clone).forEach(a -> stack.stkData.push(a));
-		stack.dataTryCounts = (Stack<Integer>) dataTryCounts.clone();
+		stack.dataTryCounts = new ArrayList<>(dataTryCounts);
 		stack.stkCall = stkCall.stream().map(a -> a.copy(stack)).collect(Collectors.toList());
 		stack.parent = parent;
 		stack.level = level;

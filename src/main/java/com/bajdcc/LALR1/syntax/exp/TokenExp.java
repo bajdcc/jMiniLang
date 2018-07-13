@@ -15,22 +15,22 @@ public class TokenExp implements ISyntaxComponent {
 	/**
 	 * 终结符ID
 	 */
-	public int id = -1;
+	public int id;
 
 	/**
 	 * 终结符名称
 	 */
-	public String name = null;
+	public String name;
 
 	/**
 	 * 终结符对应的正则表达式
 	 */
-	public TokenType kType = null;
+	public TokenType kType;
 
 	/**
 	 * 终结符对应的正则表达式解析组件（用于语义分析中的单词流解析）
 	 */
-	public Object object = null;
+	public Object object;
 
 	public TokenExp(int id, String name, TokenType type, Object obj) {
 		this.id = id;

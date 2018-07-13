@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 【目标代码】代码页
@@ -20,22 +21,22 @@ public class RuntimeCodePage implements Serializable {
 	/**
 	 * 数据
 	 */
-	private List<Object> data = null;
+	private List<Object> data;
 
 	/**
 	 * 指令
 	 */
-	private List<Byte> insts = null;
+	private List<Byte> insts;
 
 	/**
 	 * 调试开发
 	 */
-	private IRuntimeDebugInfo info = null;
+	private IRuntimeDebugInfo info;
 
 	/**
 	 * 汇编调试的符号表
 	 */
-	private List<Interval<Object>> itvList = null;
+	private List<Interval<Object>> itvList;
 
 	private transient IntervalTree<Object> tree = null;
 
@@ -64,13 +65,13 @@ public class RuntimeCodePage implements Serializable {
 		return insts;
 	}
 
-	public Object getDebugInfoByInc(long index) {
+	public String getDebugInfoByInc(long index) {
 		if (tree == null)
 			tree = new IntervalTree<>(itvList);
-		List list = tree.get(index);
+		List<Object> list = tree.get(index);
 		if (list.isEmpty())
 			return "[NO DEBUG INFO]";
-		return String.join("\n", list);
+		return list.stream().map(String::valueOf).collect(Collectors.joining(System.lineSeparator()));
 	}
 
 	public IRuntimeDebugInfo getInfo() {

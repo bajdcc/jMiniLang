@@ -55,7 +55,7 @@ public class GrammarException extends Exception {
 	/**
 	 * 错误类型
 	 */
-	private GrammarError kError = GrammarError.SYNTAX;
+	private GrammarError kError;
 
 	/**
 	 * @return 错误类型

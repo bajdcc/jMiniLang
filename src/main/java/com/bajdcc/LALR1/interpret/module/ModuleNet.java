@@ -120,7 +120,7 @@ public class ModuleNet implements IInterpreterModule {
 					URL url = new URL(txt);
 					URLConnection urlConnection = url.openConnection(); // 打开连接
 					BufferedReader br = new BufferedReader(new InputStreamReader(urlConnection.getInputStream(), "utf-8")); // 获取输入流
-					String line = null;
+					String line;
 					StringBuilder sb = new StringBuilder();
 					while ((line = br.readLine()) != null) {
 						sb.append(line).append("\n");
@@ -157,7 +157,7 @@ public class ModuleNet implements IInterpreterModule {
 					urlConnection.setRequestProperty("connection", "Keep-Alive");
 					urlConnection.setRequestProperty("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)");
 					BufferedReader br = new BufferedReader(new InputStreamReader(urlConnection.getInputStream(), "utf-8")); // 获取输入流
-					String line = null;
+					String line;
 					StringBuilder sb = new StringBuilder();
 					while ((line = br.readLine()) != null) {
 						sb.append(line).append("\n");
@@ -201,7 +201,7 @@ public class ModuleNet implements IInterpreterModule {
 					out.print(data);
 					out.flush();
 					BufferedReader br = new BufferedReader(new InputStreamReader(urlConnection.getInputStream(), "utf-8")); // 获取输入流
-					String line = null;
+					String line;
 					StringBuilder sb = new StringBuilder();
 					while ((line = br.readLine()) != null) {
 						sb.append(line).append("\n");
@@ -820,9 +820,7 @@ public class ModuleNet implements IInterpreterModule {
 		} else if (o instanceof JSONArray) {
 			JSONArray obj = (JSONArray) o;
 			RuntimeArray arr = new RuntimeArray();
-			obj.forEach((key) -> {
-				arr.add(parseInternal(key));
-			});
+			obj.forEach((key) -> arr.add(parseInternal(key)));
 			return new RuntimeObject(arr);
 		} else {
 			if (o instanceof Integer) {

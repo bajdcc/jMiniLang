@@ -24,6 +24,7 @@ import static com.bajdcc.util.lexer.token.TokenType.ID;
  *
  * @author bajdcc
  */
+@SuppressWarnings("unchecked")
 public class SemanticHandler {
 
 	/**
@@ -481,6 +482,7 @@ public class SemanticHandler {
 		mapSemanticAnalyzier.put("lambda", (indexed, query, recorder) -> {
 			Token token = indexed.get(1).getToken();
 			Function func = query.getQueryScopeService().getLambda();
+			func.setName(token);
 			if (indexed.exists(2)) {
 				func.setParams((List<Token>) indexed.get(2).getObject());
 			}
