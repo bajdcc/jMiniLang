@@ -215,6 +215,40 @@ public class ModuleUserBase implements IInterpreterModule {
 				return new RuntimeObject(status.getService().getUserService().getShare().set((int) args.get(0).getObj(), args.get(1)));
 			}
 		});
+		info.addExternalFunc("g_lock_share", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "锁定共享";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kPtr};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				return new RuntimeObject(status.getService().getUserService().getShare().lock((int) args.get(0).getObj()));
+			}
+		});
+		info.addExternalFunc("g_unlock_share", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "解锁共享";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kPtr};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				return new RuntimeObject(status.getService().getUserService().getShare().unlock((int) args.get(0).getObj()));
+			}
+		});
 	}
 
 	private static void importFromBase(IRuntimeDebugInfo info, IRuntimeDebugInfo refer) {

@@ -42,6 +42,20 @@ public interface IRuntimeUserService {
 		 * @return 上次保存的内容
 		 */
 		RuntimeObject set(int id, RuntimeObject obj);
+
+		/**
+		 * 锁定共享
+		 * @param id 句柄
+		 * @return 是否成功
+		 */
+		boolean lock(int id);
+
+		/**
+		 * 解锁共享
+		 * @param id 句柄
+		 * @return 是否成功
+		 */
+		boolean unlock(int id);
 	}
 
 	interface IRuntimeUserFileService {

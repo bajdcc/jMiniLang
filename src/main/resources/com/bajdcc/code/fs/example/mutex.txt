@@ -1,0 +1,48 @@
+import "user.base";
+
+var channel = g_pipe("TEST-MUTEX");
+var goods = g_share("TEST-MUTEX#GOOD", g_from([]));
+var index = g_share("TEST-MUTEX#INDEX", 0);
+
+var new_id = func ~() -> index."set!"(lambda(a) -> a++);
+var enqueue = func ~(id) -> goods."get!"(lambda(a) -> a."push"(id));
+var dequeue = func ~() -> goods."get!"(lambda(a) -> a."pop"());
+
+var consumer = func ~(id) {
+    var obj = g_null;
+    channel."writeln"("消费者 #" + id + " 已启动");
+    foreach (var i : g_range(1, 5)) {
+        while (g_is_null(obj := dequeue())) {}
+        channel."writeln"("消费者 #" + id + " 收到：" + obj);
+    }
+    channel."writeln"("消费者 #" + id + " 已退出");
+};
+
+var producer = func ~(id) {
+    var obj = g_null;
+    channel."writeln"("生产者 #" + id + " 已启动");
+    foreach (var i : g_range(1, 5)) {
+        enqueue(obj := new_id());
+        channel."writeln"("生产者 #" + id + " 发送：" + obj);
+    }
+    channel."writeln"("生产者 #" + id + " 已退出");
+};
+
+var child = false;
+
+foreach (var i : g_range(1, 5)) {
+    if (g_fork() == -1) {
+        consumer(i);
+        child := true;
+        break;
+    }
+    if (g_fork() == -1) {
+        producer(i);
+        child := true;
+        break;
+    }
+}
+
+if (child) { return; }
+
+channel."pipe"(g_system_output());

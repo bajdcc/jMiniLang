@@ -1049,6 +1049,7 @@ var g_from = func ~(arr) {
         throw "ERROR: " + "<From> Invalid type";
     }
 };
+export "g_from";
 
 var import_linq_class = func ~() {
 
@@ -1462,6 +1463,7 @@ var import_list_class = func ~() {
         this."append" := lambda(this, obj) -> g_array_append(this."array", obj);
         this."insert" := lambda(this, i, obj) -> g_array_insert(this."array", i, obj);
         this."set" := lambda(this, i, obj) -> g_array_set(this."array", i, obj);
+        this."push" := lambda(this, obj) -> g_array_insert(this."array", 0, obj);
         this."pop" := lambda(this) -> g_array_pop(this."array");
         this."clear" := lambda(this) -> g_array_clear(this."array");
         this."reverse" := lambda(this) -> g_array_reverse(this."array");
@@ -1555,16 +1557,32 @@ var import_handle_class = func ~() {
         };
     });
 
-    var g_share = func ~(name) {
-        return g_new_class("system::share", [], [["init", name]]);
+    var g_share = func ~(name, obj) {
+        return g_new_class("system::share", [], [["init", name, obj]]);
     };
     export "g_share";
     g_class("system::share", "system::handle", lambda(this) {
-        this."init" := lambda(this, name) {
+        this."init" := lambda(this, name, obj) {
             this."name" := name;
             this."handle" := g_handle("share|" + name);
             this."set" := lambda(this, obj) -> g_set_share(this."handle", obj);
             this."get" := lambda(this) -> g_get_share(this."handle");
+            this."lock" := lambda(this) -> g_lock_share(this."handle");
+            this."unlock" := lambda(this) -> g_unlock_share(this."handle");
+            this."set!" := lambda(this, f) {
+                this."lock"();
+                var r = f(this."get"());
+                this."set"(r);
+                this."unlock"();
+                return r;
+            };
+            this."get!" := lambda(this, f) {
+                this."lock"();
+                var r = f(this."get"());
+                this."unlock"();
+                return r;
+            };
+            this."set"(obj);
         };
     });
 

@@ -45,41 +45,43 @@ public class RuntimeUserService implements IRuntimeUserService,
 	interface IUserPipeHandler {
 		/**
 		 * 读取管道
-		 * @param id 句柄
 		 * @return 读取的对象
 		 */
-		RuntimeObject read(int id);
+		RuntimeObject read();
 
 		/**
 		 * 写入管道
-		 * @param id 句柄
 		 * @param obj 写入的对象
 		 * @return 是否成功
 		 */
-		boolean write(int id, RuntimeObject obj);
-
-		/**
-		 * 管道是否为空
-		 * @return 空为真
-		 */
-		boolean isEmpty();
+		boolean write(RuntimeObject obj);
 	}
 
 	interface IUserShareHandler {
 		/**
 		 * 获取共享
-		 * @param id 句柄
 		 * @return 共享对象
 		 */
-		RuntimeObject get(int id);
+		RuntimeObject get();
 
 		/**
 		 * 设置共享
-		 * @param id 句柄
 		 * @param obj 共享对象
 		 * @return 上次保存的内容
 		 */
-		RuntimeObject set(int id, RuntimeObject obj);
+		RuntimeObject set(RuntimeObject obj);
+
+		/**
+		 * 锁定共享
+		 * @return 是否成功
+		 */
+		boolean lock();
+
+		/**
+		 * 解锁共享
+		 * @return 是否成功
+		 */
+		boolean unlock();
 	}
 
 	interface IUserFileHandler {
@@ -110,6 +112,10 @@ public class RuntimeUserService implements IRuntimeUserService,
 		UserHandler(int id) {
 			this.id = id;
 			this.waiting_pids = new ArrayDeque<>();
+		}
+
+		protected boolean isEmpty() {
+			return waiting_pids.isEmpty();
 		}
 
 		@Override
@@ -173,18 +179,19 @@ public class RuntimeUserService implements IRuntimeUserService,
 		}
 
 		@Override
-		public boolean isEmpty() {
-			return queue.isEmpty();
-		}
-
-		@Override
-		public RuntimeObject read(int id) {
+		public RuntimeObject read() {
+			if (queue.isEmpty()) {
+				int pid = service.getProcessService().getPid();
+				enqueue(pid);
+				return new RuntimeObject(false, RuntimeObjectType.kNoop);
+			}
 			return queue.poll();
 		}
 
 		@Override
-		public boolean write(int id, RuntimeObject obj) {
+		public boolean write(RuntimeObject obj) {
 			queue.add(obj);
+			dequeue();
 			return true;
 		}
 
@@ -197,6 +204,7 @@ public class RuntimeUserService implements IRuntimeUserService,
 	class UserShareHandler extends UserHandler implements IUserShareHandler {
 
 		private RuntimeObject obj = null;
+		private boolean mutex = false;
 
 		UserShareHandler(int id) {
 			super(id);
@@ -208,15 +216,40 @@ public class RuntimeUserService implements IRuntimeUserService,
 		}
 
 		@Override
-		public RuntimeObject get(int id) {
+		public RuntimeObject get() {
 			return obj;
 		}
 
 		@Override
-		public RuntimeObject set(int id, RuntimeObject obj) {
+		public RuntimeObject set(RuntimeObject obj) {
 			RuntimeObject tmp = this.obj;
 			this.obj = obj;
 			return tmp;
+		}
+
+		@Override
+		public boolean lock() {
+			if (mutex) {
+				int pid = service.getProcessService().getPid();
+				enqueue(pid);
+			} else {
+				mutex = true;
+			}
+			return true;
+		}
+
+		@Override
+		public boolean unlock() {
+			if (mutex) {
+				if (isEmpty()) {
+					mutex = false;
+				} else {
+					dequeue();
+				}
+				return true;
+			} else {
+				return false;
+			}
 		}
 
 		@Override
@@ -320,12 +353,7 @@ public class RuntimeUserService implements IRuntimeUserService,
 			return new RuntimeObject(true, RuntimeObjectType.kNoop);
 		}
 		UserStruct user = arrUsers[id];
-		if (user.handler.getPipe().isEmpty()) {
-			int pid = service.getProcessService().getPid();
-			arrUsers[id].handler.enqueue(pid);
-			return new RuntimeObject(false, RuntimeObjectType.kNoop);
-		}
-		return user.handler.getPipe().read(id);
+		return user.handler.getPipe().read();
 	}
 
 	@Override
@@ -334,9 +362,7 @@ public class RuntimeUserService implements IRuntimeUserService,
 			return false;
 		}
 		UserStruct user = arrUsers[id];
-		user.handler.getPipe().write(id, obj);
-		user.handler.dequeue();
-		return true;
+		return user.handler.getPipe().write(obj);
 	}
 
 	@Override
@@ -345,7 +371,7 @@ public class RuntimeUserService implements IRuntimeUserService,
 			return null;
 		}
 		UserStruct user = arrUsers[id];
-		return user.handler.getShare().get(id);
+		return user.handler.getShare().get();
 	}
 
 	@Override
@@ -354,7 +380,25 @@ public class RuntimeUserService implements IRuntimeUserService,
 			return null;
 		}
 		UserStruct user = arrUsers[id];
-		return user.handler.getShare().set(id, obj);
+		return user.handler.getShare().set(obj);
+	}
+
+	@Override
+	public boolean lock(int id) {
+		if (arrUsers[id] == null) {
+			return false;
+		}
+		UserStruct user = arrUsers[id];
+		return user.handler.getShare().lock();
+	}
+
+	@Override
+	public boolean unlock(int id) {
+		if (arrUsers[id] == null) {
+			return false;
+		}
+		UserStruct user = arrUsers[id];
+		return user.handler.getShare().unlock();
 	}
 
 	@Override

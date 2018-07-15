@@ -201,6 +201,129 @@ TASK PROC:
 
 **Run on Server**
 
+** Online Compiler Example IV: Mutex **
+
+```javascript
+import "user.base";
+var channel = g_pipe("TEST-MUTEX");
+var goods = g_share("TEST-MUTEX#GOOD", g_from([]));
+var index = g_share("TEST-MUTEX#INDEX", 0);
+var new_id = func ~() -> index."set!"(lambda(a) -> a++);
+var enqueue = func ~(id) -> goods."get!"(lambda(a) -> a."push"(id));
+var dequeue = func ~() -> goods."get!"(lambda(a) -> a."pop"());
+var consumer = func ~(id) {
+    var obj = g_null;
+    channel."writeln"("消费者 #" + id + " 已启动");
+    foreach (var i : g_range(1, 5)) {
+        while (g_is_null(obj := dequeue())) {}
+        channel."writeln"("消费者 #" + id + " 收到：" + obj);
+    }
+    channel."writeln"("消费者 #" + id + " 已退出");
+};
+var producer = func ~(id) {
+    var obj = g_null;
+    channel."writeln"("生产者 #" + id + " 已启动");
+    foreach (var i : g_range(1, 5)) {
+        enqueue(obj := new_id());
+        channel."writeln"("生产者 #" + id + " 发送：" + obj);
+    }
+    channel."writeln"("生产者 #" + id + " 已退出");
+};
+var child = false;
+foreach (var i : g_range(1, 5)) {
+    if (g_fork() == -1) {
+        consumer(i);
+        child := true;
+        break;
+    }
+    if (g_fork() == -1) {
+        producer(i);
+        child := true;
+        break;
+    }
+}
+if (child) { return; }
+channel."pipe"(g_system_output());
+```
+
+**Output:**
+
+```
+运行成功！PID：54
+消费者 #1 已启动
+生产者 #1 已启动
+消费者 #2 已启动
+生产者 #2 已启动
+消费者 #3 已启动
+生产者 #3 已启动
+消费者 #4 已启动
+生产者 #4 已启动
+消费者 #5 已启动
+生产者 #5 已启动
+生产者 #1 发送：1
+消费者 #2 收到：1
+生产者 #2 发送：2
+消费者 #3 收到：2
+生产者 #3 发送：3
+消费者 #4 收到：3
+生产者 #4 发送：4
+消费者 #5 收到：4
+生产者 #5 发送：5
+消费者 #1 收到：5
+生产者 #1 发送：6
+消费者 #3 收到：6
+生产者 #2 发送：7
+消费者 #4 收到：7
+生产者 #3 发送：8
+消费者 #5 收到：8
+生产者 #4 发送：9
+消费者 #1 收到：9
+生产者 #5 发送：10
+消费者 #3 收到：10
+生产者 #1 发送：11
+消费者 #4 收到：11
+生产者 #2 发送：12
+消费者 #5 收到：12
+生产者 #3 发送：13
+消费者 #1 收到：13
+生产者 #4 发送：14
+消费者 #3 收到：14
+生产者 #5 发送：15
+消费者 #4 收到：15
+生产者 #1 发送：16
+消费者 #5 收到：16
+生产者 #2 发送：17
+消费者 #1 收到：17
+生产者 #3 发送：18
+消费者 #3 收到：18
+消费者 #3 已退出
+生产者 #4 发送：19
+消费者 #4 收到：19
+消费者 #4 已退出
+生产者 #5 发送：20
+消费者 #5 收到：20
+消费者 #5 已退出
+生产者 #1 发送：21
+生产者 #1 已退出
+消费者 #1 收到：21
+消费者 #1 已退出
+生产者 #2 发送：22
+生产者 #2 已退出
+生产者 #3 发送：23
+生产者 #3 已退出
+生产者 #4 发送：24
+生产者 #4 已退出
+生产者 #5 发送：25
+生产者 #5 已退出
+消费者 #2 收到：22
+消费者 #2 收到：23
+消费者 #2 收到：24
+消费者 #2 收到：25
+消费者 #2 已退出
+
+远程中止
+```
+
 ** Online Compiler Example III: Fork **
 
 *`Fork` support `yield`*
@@ -978,137 +1101,7 @@ call proc();
 
 **5. Multi-Process: Consumer-Producer Model**
 
-*Code:*
-
-```javascript
-import "sys.base";
-import "sys.list";
-import "sys.proc";
-
-var goods = [];
-call g_start_share("goods", goods);
-var index = 1;
-call g_start_share("index", index);
-var consumer = func ~() {
-    for (;;) {
-        var goods = call g_query_share("goods");
-        if (call g_is_null(goods)) {
-            break;
-        }
-        var g = call g_array_pop(goods);
-        if (!call g_is_null(g)) {
-            call g_printn("Consumer#" + call g_get_pid() + " ---- get " + g);
-        }
-    }
-    call g_printn("Consumer#" + call g_get_pid() + " exit");
-};
-var producer = func ~() {
-    foreach (var i : call g_range(1, 5)) {
-        var goods = call g_reference_share("goods");
-        call g_lock_share("index");
-        var index = call g_reference_share("index");
-        call g_printn("Producer#" + call g_get_pid() + " ++++ put " + index);
-        call g_array_add(goods, index);
-        index++;
-        call g_stop_share("index");
-        call g_unlock_share("index");
-        call g_stop_share("goods");
-    }
-    call g_printn("Producer#" + call g_get_pid() + " exit");
-};
-var create_consumer = func ~(n) {
-    var handles = [];
-    foreach (var i : call g_range(1, n)) {
-        var h = call g_create_process(consumer);
-        call g_array_add(handles, h);
-        call g_printn("[" + i + "] Create consumer: #" + h);
-    }
-    return handles;
-};
-var create_producer = func ~(n) {
-    var handles = [];
-    foreach (var i : call g_range(1, n)) {
-        var h = call g_create_process(producer);
-        call g_array_add(handles, h);
-        call g_printn("[" + i + "] Create producer: #" + h);
-    }
-    return handles;
-};
-
-var consumers = call create_consumer(3);
-var producers = call create_producer(4);
-call g_printn("Waiting for producers to exit...");
-call g_join_process_array(producers);
-call g_printn("Producers exit");
-call g_printn("Waiting for consumers to exit...");
-call g_stop_share("index");
-call g_stop_share("goods");
-call g_join_process_array(consumers);
-call g_printn("Consumers exit");
-```
-
-*Result:*
-
-```c
-[1] Create consumer: #1
-[2] Create consumer: #2
-[3] Create consumer: #3
-[1] Create producer: #4
-[2] Create producer: #5
-Producer#4 ++++ put 1
-Consumer#3 ---- get 1
-[3] Create producer: #6
-Producer#5 ++++ put 2
-[4] Create producer: #7
-Consumer#2 ---- get 2
-Producer#4 ++++ put 3
-Waiting for producers to exit...
-Consumer#1 ---- get 3
-Producer#7 ++++ put 4
-Consumer#2 ---- get 4
-Producer#7 ++++ put 5
-Consumer#3 ---- get 5
-Producer#5 ++++ put 6
-Consumer#2 ---- get 6
-Producer#5 ++++ put 7
-Consumer#1 ---- get 7
-Producer#7 ++++ put 8
-Consumer#3 ---- get 8
-Producer#6 ++++ put 9
-Consumer#3 ---- get 9
-Producer#5 ++++ put 10
-Consumer#2 ---- get 10
-Producer#7 ++++ put 11
-Consumer#1 ---- get 11
-Producer#4 ++++ put 12
-Consumer#3 ---- get 12
-Producer#5 ++++ put 13
-Consumer#1 ---- get 13
-Producer#5 exit
-Producer#6 ++++ put 14
-Consumer#2 ---- get 14
-Producer#4 ++++ put 15
-Consumer#3 ---- get 15
-Producer#7 ++++ put 16
-Consumer#2 ---- get 16
-Producer#7 exit
-Producer#6 ++++ put 17
-Consumer#1 ---- get 17
-Producer#4 ++++ put 18
-Consumer#1 ---- get 18
-Producer#4 exit
-Producer#6 ++++ put 19
-Consumer#1 ---- get 19
-Producer#6 ++++ put 20
-Consumer#3 ---- get 20
-Producer#6 exit
-Producers exit
-Waiting for consumers to exit...
-Consumer#3 exit
-Consumer#1 exit
-Consumer#2 exit
-Consumers exit
-```
+*See online compiler example above.*
 
 **6. Multi-Process: PC and Router**
 
