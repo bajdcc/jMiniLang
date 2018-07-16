@@ -368,7 +368,7 @@ var eval = func [
             };
         } else if (g_string_equal(head, "begin")) {   // begin (begin exp*)
             var size = g_array_size(x);
-            var val = g_null;
+            var val;
             for (var j = 1; j < size; j++) {
                 var _v = eval(x[j], env);
                 val := _v;

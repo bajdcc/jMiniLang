@@ -9,7 +9,7 @@ var enqueue = func ~(id) -> goods."get!"(lambda(a) -> a."push"(id));
 var dequeue = func ~() -> goods."get!"(lambda(a) -> a."pop"());
 
 var consumer = func ~(id) {
-    var obj = g_null;
+    var obj;
     channel."writeln"("消费者 #" + id + " 已启动");
     foreach (var i : g_range(1, 5)) {
         while (g_is_null(obj := dequeue())) {}
@@ -19,7 +19,7 @@ var consumer = func ~(id) {
 };
 
 var producer = func ~(id) {
-    var obj = g_null;
+    var obj;
     channel."writeln"("生产者 #" + id + " 已启动");
     foreach (var i : g_range(1, 5)) {
         enqueue(obj := new_id());

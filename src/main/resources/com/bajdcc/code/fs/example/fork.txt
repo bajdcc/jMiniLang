@@ -2,7 +2,7 @@ import "user.base";
 
 var channel = g_pipe("TEST-FORK");
 
-var pid = g_null;
+var pid;
 if ((pid := g_fork()) != -1) { // 父进程读取管道
     g_puts("父进程 PID：" + g_pid());
     g_puts("父进程 FORK 返回：" + pid);

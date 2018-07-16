@@ -31,7 +31,7 @@ var log = func ~(str) -> g_write_pipe_n(out, str);
 var ctx = g_create_context();
 g_import_std_base();
 
-var _ = g_null;
+var _;
 
 // 状态定义
 var STATE_EXECUTING = 0;

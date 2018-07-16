@@ -172,8 +172,8 @@ var g_func_fold = func
     ~(name, list, init, xs, map, arg, filter) {
     var len = g_array_size(list);
     if (len == 0) { return []; }
-    var val = g_null;
-    var x = g_null;
+    var val;
+    var x;
     if (g_is_null(init)) { // 没初值的话，取第一个元素为初值
         if (len == 1) { return list[0]; }
         x := xs(list);// 创建遍历闭包
@@ -888,7 +888,7 @@ var g_new_class = func ~() {
         }
     }
     if (c == 3) {
-        var m_ = g_null;
+        var m_;
         foreach (var m : g_range_array(g_args_index(2))) {
             m_ := m[0];
             g_array_remove(m, 0);
@@ -1037,7 +1037,7 @@ export "g_invoke_apply";
 // @ Refer: https://github.com/vczh-libraries/vlpp
 // ---- CODE BEGIN ----
 
-var _ = g_null;
+var _;
 
 var g_from = func ~(arr) {
     var t = g_get_type_ordinal(arr);
@@ -1544,7 +1544,7 @@ var import_handle_class = func ~() {
             this."write" := lambda(this, obj) -> g_write_pipe(this."handle", obj);
             this."writeln" := lambda(this, obj) -> g_write_pipe(this."handle", obj + g_endl);
             this."pipe" := lambda(this, output) {
-                var r = g_null;
+                var r;
                 while (true) {
                     r := g_read_pipe(this."handle");
                     if (!g_is_noop(r)) {

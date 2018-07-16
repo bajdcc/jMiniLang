@@ -190,7 +190,7 @@ public class Grammar extends Semantic {
 				"ret -> (@YIELD[1] | @RETURN) [exp[0]] @SEMI{lost_semi}");
 		/* 变量定义（赋值）语句（由于支持Lambda，函数定义皆为Lambda形式） */
 		infer(handler.getSemanticHandler("var"),
-				"var -> (@VARIABLE[11] | @LET[12]) @ID[0]#declear_variable#{lost_token} @ASSIGN{lost_assign} (func[1]{lost_func} | exp[2]{lost_exp})");
+				"var -> (@VARIABLE[11] | @LET[12]) @ID[0]#declear_variable#{lost_token} [@ASSIGN{lost_assign} (func[1]{lost_func} | exp[2]{lost_exp})]");
 		/* 类属性赋值语句 */
 		infer(handler.getSemanticHandler("set"),
 				"set -> @SET exp[3]{lost_exp} @PROPERTY{lost_property} exp[4]{lost_exp} @ASSIGN{lost_assign} exp[2]{lost_exp}");

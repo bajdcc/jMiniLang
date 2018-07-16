@@ -757,7 +757,7 @@ var g_new_class_ctx = func ~(ctx, name, data, method) {
     foreach (var d : g_range_array(data)) {
         set class::d[0] = d[1];
     }
-    var m_ = g_null;
+    var m_;
     foreach (var m : g_range_array(method)) {
         m_ := m[0];
         g_array_remove(m, 0);
@@ -771,7 +771,7 @@ var g_new_class_init = func ~(name, data, method) {
     foreach (var d : g_range_array(data)) {
         set class::d[0] = d[1];
     }
-    var m_ = g_null;
+    var m_;
     foreach (var m : g_range_array(method)) {
         m_ := m[0];
         g_array_remove(m, 0);

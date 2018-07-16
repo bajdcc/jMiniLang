@@ -42,7 +42,7 @@ if (!lock && !store) {
 g_start_share("APP#PC#CONTEXT", g_create_context());
 g_import_std_base();
 
-var _ = g_null;
+var _;
 
 // 状态定义
 var STATE_EXECUTING = 0;

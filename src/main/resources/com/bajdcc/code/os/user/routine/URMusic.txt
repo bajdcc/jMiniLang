@@ -28,7 +28,7 @@ g_start_share(signal, true);
 var ctx = g_create_context();
 g_import_std_base();
 
-var _ = g_null;
+var _;
 
 /* -----------------------------------------------------------------
 # CLASS [app::music::util.static_timer]

@@ -71,12 +71,16 @@ public class ExpAssign implements IExp {
 
 	@Override
 	public void analysis(ISemanticRecorder recorder) {
-		exp.analysis(recorder);
+		if (exp != null)
+			exp.analysis(recorder);
 	}
 
 	@Override
 	public void genCode(ICodegen codegen) {
-		exp.genCode(codegen);
+		if (exp != null)
+			exp.genCode(codegen);
+		else
+			codegen.genCode(RuntimeInst.ipushx);
 		codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(name.object));
 		if (decleared) {
 			codegen.genCode(RuntimeInst.ialloc);
@@ -95,8 +99,8 @@ public class ExpAssign implements IExp {
 		return (decleared ? KeywordType.VARIABLE.getName() : KeywordType.LET
 				.getName()) +
 				" " + name.toRealString() +
-				" " + OperatorType.ASSIGN.getName() + " " +
-				exp.print(prefix);
+				(exp != null ? (" " + OperatorType.ASSIGN.getName() + " " +
+				exp.print(prefix)) : "");
 	}
 
 	@Override
@@ -104,7 +108,8 @@ public class ExpAssign implements IExp {
 		if (decleared) {
 			scope.addDecl(name.object);
 		}
-		exp.addClosure(scope);
+		if (exp != null)
+			exp.addClosure(scope);
 	}
 
 	@Override

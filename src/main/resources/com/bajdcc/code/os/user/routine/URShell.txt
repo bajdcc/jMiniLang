@@ -69,7 +69,7 @@ var parse_cmd_1 = func ["PARSE"] ~(arg) {
         return;
     }
     g_map_put(share, "child", child);
-    var k = g_null;
+    var k;
     if (g_array_size(cmd) > 0) {
         k := g_create_user_process_args(parse, {"parse": parse, "args": cmd, "parent": child});
     }
@@ -126,7 +126,7 @@ var parse_cmd = func ["PARSE"] ~(cmd, parse) {
     var array = [];
     g_create_share("PIPE#CTRL", array);
     g_create_share("PIPE#HANDLE", g_new_array);
-    var k = g_null;
+    var k;
     if (g_array_size(cmd) > 0) {
         k := g_create_user_process_args(parse, {"parse": parse, "args": cmd, "parent": child});
     }

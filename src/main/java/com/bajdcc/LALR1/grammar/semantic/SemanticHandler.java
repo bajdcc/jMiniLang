@@ -348,8 +348,12 @@ public class SemanticHandler {
 					func.getFunc().setRealName(token.toRealString());
 				}
 				assign.setExp(func);
-			} else {
+			} else if (indexed.exists(2)) {
 				assign.setExp((IExp) indexed.get(2).getObject());
+			} else {
+				if (!assign.isDecleared()) {
+					recorder.add(SemanticError.INVALID_ASSIGNMENT, token);
+				}
 			}
 			return assign;
 		});
