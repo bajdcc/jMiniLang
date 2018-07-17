@@ -174,6 +174,15 @@ public class TestInterpret13 {
 							"}};\n" +
 							"g_printn(a());\n" +
 							"g_printn(a());",
+					"import \"sys.base\";\n" +
+					"import \"sys.proc\";\n" +
+							"g_proc_exec(\"" +
+							"import \\\"user.base\\\";" +
+							"import \\\"user.cparser\\\";" +
+							"var code = \\\"abc\\ndef\\n\\\";" +
+							"var s = g_new_class(\\\"clib::c::scanner\\\", [], [[\\\"init\\\", code]]);" +
+							"while (s.\\\"next\\\"()) { g_printn(s.\\\"REPORT\\\"()); }" +
+							"\");\n"
 			};
 
 			System.out.println(codes[codes.length - 1]);

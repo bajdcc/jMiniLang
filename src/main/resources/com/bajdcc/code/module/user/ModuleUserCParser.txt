@@ -1,0 +1,222 @@
+// -----------------------------------------------------------------------------------------
+// @ Class Reference: Go library
+// -----------------------------------------------------------------------------------------
+
+import "user.base";
+var _ = g_null;
+
+// -----------------------------------------------------------------------------------------
+// CLASS [clib::c::token]
+// 单词
+// ---- CODE BEGIN ----
+
+var import_token = func ~() {
+    g_class("clib::c::token", "object", lambda(this) {
+        this."token" := "NULL";
+        this."ordinal" := 1;
+        this."value" := _;
+        this."init_id" := lambda(this, id) {
+            this."token" := this."dict"."get"(id);
+            if (g_is_null(this."token")) {
+                this."token" := "ID";
+            }
+        };
+        this."ORDINAL" := lambda(this, token) ->
+            (g_class_context[this."type"]["dict"])."get"(token)[0];
+        this."DESC" := lambda(this, token) ->
+            (g_class_context[this."type"]["dict"])."get"(token)[1];
+        this."PRED" := lambda(this, token) ->
+            (g_class_context[this."type"]["dict"])."get"(token)[2];
+        this."is_literal" := lambda(this) ->
+            this."ORDINAL"("Literal-Begin") < this."ordinal" &&
+                this."ORDINAL"("Literal-End") > this."ordinal";
+        this."is_operator" := lambda(this) ->
+            this."ORDINAL"("Operator-Begin") < this."ordinal" &&
+                this."ORDINAL"("Operator-End") > this."ordinal";
+        this."is_keyword" := lambda(this) ->
+            this."ORDINAL"("Keyword-Begin") < this."ordinal" &&
+                this."ORDINAL"("Keyword-End") > this."ordinal";
+        if (g_map_contains(g_class_context[this."type"], "dict")) {
+            return;
+        }
+        var data = [
+            // ENUM              DESC            PRED
+            [ "NULL"           , "Null"          , 0 ],
+            [ "ILLEGAL"        , "Illegal char"  , 0 ],
+            [ "EOF"            , "End of file"   , 0 ],
+            [ "COMMENT"        , "Comment"       , 0 ],
+            [ "Literal-Begin"  , ""              , 0 ],
+            [ "ID"             , "Identifier"    , 0 ], // foo
+            [ "INT"            , "Integer"       , 0 ], // 12345
+            [ "FLOAT"          , "Float"         , 0 ], // 123.45
+            [ "CHAR"           , "Character"     , 0 ], // 'a'
+            [ "STRING"         , "String"        , 0 ], // "abc"
+            [ "Literal-End"    , ""              , 0 ],
+            [ "Operator-Begin" , ""              , 0 ],
+            [ "ADD"            , "+"             , 4 ],
+            [ "SUB"            , "-"             , 4 ],
+            [ "MUL"            , "*"             , 5 ],
+            [ "DIV"            , "/"             , 5 ],
+            [ "MOD"            , "%"             , 5 ],
+            [ "ESC"            , "\\"            , 0 ],
+            [ "ADDA"           , "+="            , 0 ],
+            [ "SUBA"           , "-="            , 0 ],
+            [ "MULA"           , "*="            , 0 ],
+            [ "DIVA"           , "/="            , 0 ],
+            [ "MODA"           , "%="            , 0 ],
+            [ "AND"            , "&"             , 5 ],
+            [ "OR"             , "|"             , 4 ],
+            [ "XOR"            , "^"             , 4 ],
+            [ "INV"            , "~"             , 0 ],
+            [ "SHL"            , "<<"            , 5 ],
+            [ "SHR"            , ">>"            , 5 ],
+            [ "ANDA"           , "&="            , 0 ],
+            [ "ORA"            , "|="            , 0 ],
+            [ "XORA"           , "^="            , 0 ],
+            [ "SHLA"           , "<<="           , 0 ],
+            [ "SHRA"           , ">>="           , 0 ],
+            [ "LAND"           , "&&"            , 2 ],
+            [ "LOR"            , "||"            , 1 ],
+            [ "INC"            , "++"            , 0 ],
+            [ "DEC"            , "--"            , 0 ],
+            [ "EQ"             , "=="            , 3 ],
+            [ "LT"             , "<"             , 3 ],
+            [ "GT"             , ">"             , 3 ],
+            [ "ASSIGN"         , "="             , 0 ],
+            [ "NOT"            , "!"             , 0 ],
+            [ "NE"             , "!="            , 3 ],
+            [ "LE"             , "<="            , 3 ],
+            [ "GE"             , ">="            , 3 ],
+            [ "LPA"            , "("             , 0 ],
+            [ "LSQ"            , "["             , 0 ],
+            [ "LBR"            , "{"             , 0 ],
+            [ "RPA"            , ")"             , 0 ],
+            [ "RSQ"            , "]"             , 0 ],
+            [ "RBR"            , "}"             , 0 ],
+            [ "DOT"            , "."             , 0 ],
+            [ "QUERY"          , "?"             , 0 ],
+            [ "SEMI"           , ";"             , 0 ],
+            [ "COLON"          , ":"             , 0 ],
+            [ "Operator-End"   , ""              , 0 ],
+            [ "Keyword-Begin"  , ""              , 0 ],
+            [ "AUTO"           , "auto"          , 0 ],
+            [ "BOOL"           , "bool"          , 0 ],
+            [ "BREAK"          , "break"         , 0 ],
+            [ "CASE"           , "case"          , 0 ],
+            [ "CHAR"           , "char"          , 0 ],
+            [ "CONST"          , "const"         , 0 ],
+            [ "CONTINUE"       , "continue"      , 0 ],
+            [ "DEFAULT"        , "default"       , 0 ],
+            [ "DO"             , "do"            , 0 ],
+            [ "DOUBLE"         , "double"        , 0 ],
+            [ "ELSE"           , "else"          , 0 ],
+            [ "ENUM"           , "enum"          , 0 ],
+            [ "EXTERN"         , "extern"        , 0 ],
+            [ "FALSE"          , "false"         , 0 ],
+            [ "FLOAT"          , "float"         , 0 ],
+            [ "FOR"            , "for"           , 0 ],
+            [ "GOTO"           , "goto"          , 0 ],
+            [ "IF"             , "if"            , 0 ],
+            [ "INT"            , "int"           , 0 ],
+            [ "LONG"           , "long"          , 0 ],
+            [ "REGISTER"       , "register"      , 0 ],
+            [ "RETURN"         , "return"        , 0 ],
+            [ "SHORT"          , "short"         , 0 ],
+            [ "SIGNED"         , "signed"        , 0 ],
+            [ "SIZEOF"         , "sizeof"        , 0 ],
+            [ "STATIC"         , "static"        , 0 ],
+            [ "STRUCT"         , "struct"        , 0 ],
+            [ "SWITCH"         , "switch"        , 0 ],
+            [ "TRUE"           , "true"          , 0 ],
+            [ "TYPEDEF"        , "typedef"       , 0 ],
+            [ "UNION"          , "union"         , 0 ],
+            [ "UNSIGNED"       , "unsigned"      , 0 ],
+            [ "VOID"           , "void"          , 0 ],
+            [ "VOLATILE"       , "volatile"      , 0 ],
+            [ "WHILE"          , "while"         , 0 ],
+            [ "Keyword-End"    , ""              , 0 ]
+        ];
+        var d2 = g_from({});
+        var idx = 0;
+        foreach (var d : g_range(data)) {
+            d2."put"(d[0], [idx++, d[1], d[2]]);
+        }
+        g_map_put(g_class_context[this."type"], "dict", d2);
+    });
+};
+
+// ---- CODE END ----
+// -----------------------------------------------------------------------------------------
+// CLASS [clib::c::scanner]
+// ---- CODE BEGIN ----
+
+var import_scanner = func ~() {
+    g_class("clib::c::scanner", "object", lambda(this) {
+        this."ch" := '\0';
+        this."offset" := 0;
+        this."rdOffset" := 0;
+        this."lineOffset" := 0;
+        this."lines" := g_from([]);
+        this."str" := _;
+        this."next" := lambda(this) {
+            if (this."rdOffset" < this."str"."length"()) {
+                this."offset" := this."rdOffset";
+                if (this."ch" == '\n') {
+                    this."lineOffset" := this."offset";
+                    this."lines"."add"(this."offset");
+                }
+                this."ch" := this."str"."get"(this."rdOffset");
+                this."rdOffset"++;
+                return true;
+            } else {
+                this."offset" := this."str"."length"();
+                if (this."ch" == '\n') {
+                    this."lineOffset" := this."offset";
+                    this."lines"."add"(this."offset");
+                }
+                this."ch" := g_null;
+                return false;
+            }
+        };
+        this."init" := lambda(this, str) {
+            this."str" := g_from(str);
+        };
+        this."REPORT" := lambda() ->
+            "" + this."lines"."size"() + "," + this."lineOffset" + "," + this."offset" + "," + this."ch";
+    });
+};
+
+// ---- CODE END ----
+// -----------------------------------------------------------------------------------------
+// CLASS [clib::c::ast]
+// ---- CODE BEGIN ----
+
+var import_ast = func ~() {
+};
+
+// ---- CODE END ----
+// -----------------------------------------------------------------------------------------
+// CLASS [clib::c::parser]
+// ---- CODE BEGIN ----
+
+var import_parser = func ~() {
+};
+
+// ---- CODE END ----
+// -----------------------------------------------------------------------------------------
+
+var import_c_parser_library = func ~() {
+    if (g_map_contains(g_class_context, "clib::c::parser")) {
+        return;
+    }
+    // Token
+    import_token();
+    // Scanner
+    import_scanner();
+    // AST
+    import_ast();
+    // Parser
+    import_parser();
+};
+
+import_c_parser_library(); // import cparser library!

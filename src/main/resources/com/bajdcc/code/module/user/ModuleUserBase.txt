@@ -1039,12 +1039,14 @@ export "g_invoke_apply";
 
 var _;
 
-var g_from = func ~(arr) {
-    var t = g_get_type_ordinal(arr);
+var g_from = func ~(o) {
+    var t = g_get_type_ordinal(o);
     if (t == 9) {
-        return g_new_class("list::array", [["array", arr]], []);
+        return g_new_class("list::array", [["array", o]], []);
     } else if (t == 10) {
-        return g_new_class("list::map", [["map", arr]], []);
+        return g_new_class("list::map", [["map", o]], []);
+    } else if (t == 6) {
+        return g_new_class("string", [["str", o]], []);
     } else {
         throw "ERROR: " + "<From> Invalid type";
     }
