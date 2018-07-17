@@ -12,45 +12,67 @@ var _ = g_null;
 
 var import_token = func ~() {
     g_class("clib::c::token", "object", lambda(this) {
-        this."token" := "NULL";
-        this."ordinal" := 1;
+        this."token" := _;
+        this."ordinal" := _;
         this."value" := _;
+        this."start" := _;
+        this."end" := _;
+        this."line" := _;
         this."init_id" := lambda(this, id) {
-            this."token" := this."dict"."get"(id);
-            if (g_is_null(this."token")) {
-                this."token" := "ID";
+            this."ordinal" := this."kws"."get"(id);
+            if (g_not_null(this."ordinal")) {
+                this."token" := this."ordinal";
+                this."ordinal" := this."dict"."get"(this."token");
+            } else {
+                this."set_token"("#ID");
+                this."value" := id;
             }
         };
-        this."ORDINAL" := lambda(this, token) ->
-            (g_class_context[this."type"]["dict"])."get"(token)[0];
-        this."DESC" := lambda(this, token) ->
-            (g_class_context[this."type"]["dict"])."get"(token)[1];
-        this."PRED" := lambda(this, token) ->
-            (g_class_context[this."type"]["dict"])."get"(token)[2];
+        this."set_token" := lambda(this, token) {
+            this."token" := token;
+            this."ordinal" := this."dict"."get"(token);
+        };
+        this."set_value" := lambda(this, value) {
+            this."value" := value;
+        };
+        this."ORDINAL" := lambda(this, token) -> this."dict"."get"(token)[0];
+        this."DESC" := lambda(this, token) -> this."dict"."get"(token)[1];
+        this."PRED" := lambda(this, token) -> this."dict"."get"(token)[2];
         this."is_literal" := lambda(this) ->
-            this."ORDINAL"("Literal-Begin") < this."ordinal" &&
-                this."ORDINAL"("Literal-End") > this."ordinal";
+            this."ORDINAL"("Literal-Begin") < this."ordinal"[0] &&
+                this."ORDINAL"("Literal-End") > this."ordinal"[0];
         this."is_operator" := lambda(this) ->
-            this."ORDINAL"("Operator-Begin") < this."ordinal" &&
-                this."ORDINAL"("Operator-End") > this."ordinal";
+            this."ORDINAL"("Operator-Begin") < this."ordinal"[0] &&
+                this."ORDINAL"("Operator-End") > this."ordinal"[0];
         this."is_keyword" := lambda(this) ->
-            this."ORDINAL"("Keyword-Begin") < this."ordinal" &&
-                this."ORDINAL"("Keyword-End") > this."ordinal";
+            this."ORDINAL"("Keyword-Begin") < this."ordinal"[0] &&
+                this."ORDINAL"("Keyword-End") > this."ordinal"[0];
+        this."eof" := lambda(this) -> this."token" == "EOF";
+        this."to_string" := lambda(this) {
+            var s = "[" + this."line" + ":" + this."start" + "-" + this."end"+ "] ";
+            s += this."token" + ", " + this."ordinal"[1];
+            if (this."is_literal"() || this."token" == "ILLEGAL") {
+                s += ", " + this."value";
+            }
+            return s;
+        };
         if (g_map_contains(g_class_context[this."type"], "dict")) {
+            this."dict" := g_class_context[this."type"]["dict"];
+            this."ops" := g_class_context[this."type"]["ops"];
+            this."kws" := g_class_context[this."type"]["kws"];
             return;
         }
         var data = [
             // ENUM              DESC            PRED
-            [ "NULL"           , "Null"          , 0 ],
-            [ "ILLEGAL"        , "Illegal char"  , 0 ],
+            [ "ILLEGAL"        , "Illegal token" , 0 ],
             [ "EOF"            , "End of file"   , 0 ],
             [ "COMMENT"        , "Comment"       , 0 ],
             [ "Literal-Begin"  , ""              , 0 ],
-            [ "ID"             , "Identifier"    , 0 ], // foo
-            [ "INT"            , "Integer"       , 0 ], // 12345
-            [ "FLOAT"          , "Float"         , 0 ], // 123.45
-            [ "CHAR"           , "Character"     , 0 ], // 'a'
-            [ "STRING"         , "String"        , 0 ], // "abc"
+            [ "#ID"            , "Identifier"    , 0 ], // foo
+            [ "#INT"           , "Integer"       , 0 ], // 12345
+            [ "#FLOAT"         , "Float"         , 0 ], // 123.45
+            [ "#CHAR"          , "Character"     , 0 ], // 'a'
+            [ "#STRING"        , "String"        , 0 ], // "abc"
             [ "Literal-End"    , ""              , 0 ],
             [ "Operator-Begin" , ""              , 0 ],
             [ "ADD"            , "+"             , 4 ],
@@ -137,52 +159,196 @@ var import_token = func ~() {
             [ "Keyword-End"    , ""              , 0 ]
         ];
         var d2 = g_from({});
+        var ops = g_from({});
+        var kws = g_from({});
         var idx = 0;
-        foreach (var d : g_range(data)) {
+        foreach (var d : g_range_array(data)) {
             d2."put"(d[0], [idx++, d[1], d[2]]);
         }
         g_map_put(g_class_context[this."type"], "dict", d2);
+        g_map_put(g_class_context[this."type"], "ops", ops);
+        g_map_put(g_class_context[this."type"], "kws", kws);
+        this."dict" := d2;
+        this."ops" := ops;
+        this."kws" := kws;
+        var opa = this."ORDINAL"("Operator-Begin");
+        var opb = this."ORDINAL"("Operator-End");
+        foreach (var op : g_range(opa + 1, opb - 1)) {
+            ops."put"(data[op][1], data[op][0]);
+        }
+        var kwa = this."ORDINAL"("Keyword-Begin");
+        var kwb = this."ORDINAL"("Keyword-End");
+        foreach (var kw : g_range(kwa + 1, kwb - 1)) {
+            kws."put"(data[kw][1], data[kw][0]);
+        }
     });
 };
 
 // ---- CODE END ----
 // -----------------------------------------------------------------------------------------
 // CLASS [clib::c::scanner]
+// 单词扫描器
 // ---- CODE BEGIN ----
 
 var import_scanner = func ~() {
     g_class("clib::c::scanner", "object", lambda(this) {
-        this."ch" := '\0';
-        this."offset" := 0;
-        this."rdOffset" := 0;
-        this."lineOffset" := 0;
-        this."lines" := g_from([]);
-        this."str" := _;
+        this."ch" := '\0'; // 当前字符
+        this."offset" := 0; // 当前指针
+        this."rdOffset" := 0; // 预读指针
+        this."lineOffset" := 0; // 行偏移
+        this."lines" := g_from([]); // 行偏移数组
+        this."errors" := g_from([]); // 错误
+        this."str" := _; // 源码
+        this."available" := true; // 是否可用
+        this."init" := lambda(this, str) {
+            this."str" := g_from(str);
+            this."next"();
+        };
         this."next" := lambda(this) {
-            if (this."rdOffset" < this."str"."length"()) {
+            if (this."rdOffset" < this."str"."length"()) { // 没到末尾
                 this."offset" := this."rdOffset";
-                if (this."ch" == '\n') {
+                if (this."ch" == '\n') { // 新行
                     this."lineOffset" := this."offset";
                     this."lines"."add"(this."offset");
                 }
                 this."ch" := this."str"."get"(this."rdOffset");
                 this."rdOffset"++;
-                return true;
-            } else {
+                return true; // 继续
+            } else { // 读到末尾
+                this."available" := false;
                 this."offset" := this."str"."length"();
                 if (this."ch" == '\n') {
                     this."lineOffset" := this."offset";
                     this."lines"."add"(this."offset");
                 }
-                this."ch" := g_null;
-                return false;
+                this."ch" := '\0';
+                return false; // 中止
             }
         };
-        this."init" := lambda(this, str) {
-            this."str" := g_from(str);
+        this."err" := lambda(this, line, start, end, msg) {
+            this."errors"."add"([line, start, end, msg]);
         };
-        this."REPORT" := lambda() ->
+        this."ERROR" := lambda(this) -> this."errors"."to_string"();
+        this."REPORT" := lambda(this) -> // 报告当前位置
             "" + this."lines"."size"() + "," + this."lineOffset" + "," + this."offset" + "," + this."ch";
+        // ---------------- Public Method ----------------
+        this."is_letter" := lambda(this) -> g_is_letter(this."ch") || this."ch" == '_';
+        this."is_digit" := lambda(this) -> g_is_digit(this."ch");
+        this."is_letter_or_digit" := lambda(this) -> g_is_letter_or_digit(this."ch") || this."ch" == '_';
+        this."is_whitespace" := lambda(this) -> g_is_whitespace(this."ch");
+        this."next_id" := lambda(this) {
+            var i = this."offset";
+            while (this."is_letter_or_digit"()) {
+                this."next"();
+            }
+            return g_new_class("clib::c::token", [["start", i], ["end", this."offset"], ["line", this."lines"."size"()]],
+                [["init_id", this."str"."substr"(i, this."offset")]]);
+        };
+        this."next_digit" := lambda(this, base) {
+            while (this."available" && g_char_to_digit(this."ch") < base) {
+                this."next"();
+            }
+        };
+        this."next_number" := lambda(this, decimal) {
+            var i = this."offset";
+            var token = g_new_class("clib::c::token", [], [["set_token", "#INT"]]); // 默认为整型
+            token."start" := i;
+            token."line" := this."lines"."size"();
+            var exponent = func ~() { // 识别指数部分
+                if (this."ch" == 'e' || this."ch" == 'E') { // 表示指数
+                    token."set_token"("#FLOAT");
+                    this."next"();
+                    if (this."ch" == '+' || this."ch" == '-') { // 指数正负
+                        this."next"();
+                    }
+                    if (g_char_to_digit(this."ch") < 10) { // 指数数字
+                        this."next_digit"(10);
+                    } else { // 指数不是整数，报错
+                        this."err"(this."lines"."size"(), i, this."offset", "illegal floating-point exponent");
+                    }
+                }
+            };
+            var fraction = func ~() { // 识别小数部分
+                if (this."ch" == '.') {
+                    token."set_token"("#FLOAT"); // 识别为浮点
+                    this."next"(); // 跳过小数点
+                    this."next_digit"(10); // 识别小数
+                }
+            };
+            var exit = func ~() { // 识别正常数字
+                token."set_value"(this."str"."substr"(i, this."offset"));
+                token."end" := this."offset";
+                return token;
+            };
+            if (decimal) { // 确定是浮点
+                i--;
+                token."set_token"("#FLOAT");
+                this."next_digit"(10); // 识别数字
+                exponent();
+                return exit();
+            }
+            if (this."ch" == '0') { // '0'开头
+                i := this."offset";
+                this."next"();
+                if (this."ch" == 'x' || this."ch" == 'X') { // 0x 0X 十六进制数字
+                    this."next"();
+                    this."next_digit"(16); // 识别十六进制
+                    if (this."offset" - i <= 2) { // 只识别了 0x 0X，报错
+                        this."err"(this."lines"."size"(), i, this."offset", "illegal hexadecimal number");
+                    }
+                } else { // 八进制
+                    decimal := false; // 判断为整型
+                    this."next_digit"(8);
+                    if (this."ch" == '8' || this."ch" == '9') { // 非八进制数字，识别为浮点
+                        decimal := true;
+                        this."next_digit"(10);
+                    }
+                    if (this."ch" == '.' || this."ch" == 'e' || this."ch" == 'E') {
+                        fraction();
+                        exponent();
+                        return exit();
+                    }
+                    if (decimal) { // 非八进制字符，报错
+                        this."err"(this."lines"."size"(), i, this."offset", "illegal octal number");
+                    }
+                }
+                return exit();
+            }
+            this."next_digit"(10); // 识别正常数字
+            fraction();
+            exponent();
+            return exit();
+        };
+        this."skip_whitespace" := lambda(this) {
+            while (this."is_whitespace"()) {
+                this."next"();
+            }
+        };
+        this."scan" := lambda(this) {
+            if (!this."available") {
+                return g_new_class("clib::c::token", [["start", this."offset"],
+                ["end", this."offset"], ["line", this."lines"."size"()]],
+                [["set_token", "EOF"]]);
+            }
+            this."skip_whitespace"();
+            if (this."is_letter"()) {
+                return this."next_id"();
+            } else if (this."is_digit"()) {
+                return this."next_number"(false);
+            } else {
+                var i = this."offset";
+                if (this."next"()) {
+                    return g_new_class("clib::c::token", [["start", i],
+                        ["end", this."offset"], ["line", this."lines"."size"()],
+                        ["value", this."str"."substr"(i, this."offset")]],
+                        [["set_token", "ILLEGAL"]]);
+                } else {
+                    return g_new_class("clib::c::token", [["start", i],
+                    ["end", this."offset"], ["line", this."lines"."size"()]],
+                    [["set_token", "EOF"]]);
+                }
+            }
+        };
     });
 };
 

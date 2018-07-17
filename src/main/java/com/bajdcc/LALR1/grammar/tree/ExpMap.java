@@ -75,7 +75,8 @@ public class ExpMap implements IExp {
 	public String print(StringBuilder prefix) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(OperatorType.LBRACE.getName());
-		sb.append(" ");
+		if (!params.isEmpty())
+			sb.append(" ");
 		for (IExp exp : params) {
 			sb.append(exp.print(sb));
 			sb.append(", ");
@@ -84,7 +85,8 @@ public class ExpMap implements IExp {
 			sb.deleteCharAt(sb.length() - 1);
 			sb.deleteCharAt(sb.length() - 1);
 		}
-		sb.append(" ");
+		if (!params.isEmpty())
+			sb.append(" ");
 		sb.append(OperatorType.RBRACE.getName());
 		return sb.toString();
 	}

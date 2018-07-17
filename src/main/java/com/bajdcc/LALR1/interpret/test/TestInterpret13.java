@@ -182,7 +182,17 @@ public class TestInterpret13 {
 							"var code = \\\"abc\\ndef\\n\\\";" +
 							"var s = g_new_class(\\\"clib::c::scanner\\\", [], [[\\\"init\\\", code]]);" +
 							"while (s.\\\"next\\\"()) { g_printn(s.\\\"REPORT\\\"()); }" +
-							"\");\n"
+							"\");\n",
+					"import \"sys.base\";\n" +
+					"import \"sys.proc\";\n" +
+							"g_proc_exec(\"" +
+							"import \\\"user.base\\\";" +
+							"import \\\"user.cparser\\\";" +
+							"var code = \\\"abc int auto 123\\ndef 0xabcd 5.6e+78\\n+ 0x 4e 6ea 88. 7e-4\\\";" +
+							"var s = g_new_class(\\\"clib::c::scanner\\\", [], [[\\\"init\\\", code]]);" +
+							"var token; while (!(token := s.\\\"scan\\\"()).\\\"eof\\\"()) { g_printn(token.\\\"to_string\\\"()); }" +
+							"g_printn(\\\"Errors: \\\" + s.\\\"ERROR\\\"());" +
+							"\");\n",
 			};
 
 			System.out.println(codes[codes.length - 1]);

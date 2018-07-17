@@ -171,6 +171,9 @@ public class RuntimeTools {
 			case istore:
 				stk.opStore();
 				break;
+			case icopy:
+				stk.opStoreCopy();
+				break;
 			case iimp:
 				stk.opImport();
 				break;

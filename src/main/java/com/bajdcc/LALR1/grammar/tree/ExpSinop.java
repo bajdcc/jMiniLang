@@ -89,7 +89,7 @@ public class ExpSinop implements IExp {
 			ExpValue value = (ExpValue) operand;
 			codegen.genCode(RuntimeInst.ipush,
 					codegen.genDataRef(value.getToken().object));
-			codegen.genCode(RuntimeInst.istore);
+			codegen.genCode(RuntimeInst.icopy);
 		}
 	}
 

@@ -19,8 +19,9 @@
 
 *一言以蔽之，本项目涉及的玩法包括：*
 
-- **开发完善中** Spring-boot与layui制作的管理后台，包括资源查看、文档查看、**在线编译**！
-- **开发完善中** `UserService` RING3级用户服务，FORK机制
+- Spring-boot与layui制作的管理后台，包括资源查看、文档查看、**在线编译**！
+- `UserService` RING3级用户服务，实现**FORK**、**管道**、**互斥**。
+- **开发中** 【C语言解释器】类似[CParser](https://github.com/bajdcc/CParser)的类设计，参考GO语言库，[代码](https://github.com/bajdcc/jMiniLang/blob/master/src/main/resources/com/bajdcc/code/module/user/ModuleUserCParser.txt)
 - Shell层面的管道机制，类似`echo a | > b.txt`等，语法层面有Bash接口的实现
 - 基于Map数据的原型链实现面向对象特性（`ModuleClass`），应用有：状态机实例--百度新闻（URNews）、行为树实例-AI（URAI）、状态机实例-歌词动画（URMusic）、图论-路由距离算法-PC（URPC）
 - BadApple黑白动画播放（`test badapple`），测试IO性能
@@ -65,6 +66,7 @@
 24. **Behavior Tree**, including PC network simulator.
 25. **RING 3 Process**, including User Service, `fork`.
 26. **Web Server**, including Online Compiler and Runner.
+27. **CParser** class on `ModuleUser`.
 
 #### What it generates
 

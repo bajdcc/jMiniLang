@@ -858,7 +858,7 @@ export "g_invoke_method_9";
 var g_class = func ~(name, base, init) {
     var class = {};
     g_create_property(class, "name", name);
-    if (!g_is_null(base) && g_map_contains(g_class_context, base)) {
+    if (g_not_null(base) && g_map_contains(g_class_context, base)) {
         g_create_property(class, "base", base);
     }
     g_create_method(class, "init", init);

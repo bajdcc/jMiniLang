@@ -23,6 +23,8 @@ public interface IRuntimeStack {
 
 	void opStore() throws RuntimeException;
 
+	void opStoreCopy() throws RuntimeException;
+
 	void opStoreDirect() throws RuntimeException;
 
 	void opOpenFunc() throws RuntimeException;

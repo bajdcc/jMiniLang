@@ -841,6 +841,18 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 	}
 
 	@Override
+	public void opStoreCopy() throws RuntimeException {
+		int idx = loadInt();
+		RuntimeObject obj = load();
+		RuntimeObject target = currentStack.findVariable(pageName, idx);
+		if (target == null) {
+			err(RuntimeError.WRONG_OPERATOR);
+		}
+		target.copyFrom(obj);
+		store(target.clone());
+	}
+
+	@Override
 	public void opStoreDirect() throws RuntimeException {
 		int idx = loadInt();
 		RuntimeObject obj = load();

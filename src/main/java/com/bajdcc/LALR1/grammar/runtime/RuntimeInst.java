@@ -37,6 +37,7 @@ public enum RuntimeInst {
 	ildfun,           // 函数地址载入
 	irefun,           // 声明递归函数
 	istore,           // 栈顶[top]数据存入[top-1]索引指向的位置（引用）
+	icopy,            // 栈顶[top]数据存入[top-1]索引指向的位置（拷贝）
 	ialloc,           // 栈顶[top]数据存入[top-1]索引指向的位置（新建）
 
 	iimp,             // 导入[top]

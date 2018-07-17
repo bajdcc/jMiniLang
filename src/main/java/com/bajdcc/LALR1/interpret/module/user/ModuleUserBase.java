@@ -621,6 +621,99 @@ public class ModuleUserBase implements IInterpreterModule {
 		for (String key : importFunc) {
 			info.addExternalFunc(key, refer.getExecCallByName(key));
 		}
+		info.addExternalFunc("g_is_letter", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "是否是英文字符";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kChar};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				return new RuntimeObject(Character.isLetter((char) args.get(0).getObj()));
+			}
+		});
+		info.addExternalFunc("g_is_digit", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "是否是数字字符";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kChar};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				return new RuntimeObject(Character.isDigit((char) args.get(0).getObj()));
+			}
+		});
+		info.addExternalFunc("g_is_letter_or_digit", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "是否是数字与英文字符";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kChar};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				return new RuntimeObject(Character.isLetterOrDigit((char) args.get(0).getObj()));
+			}
+		});
+		info.addExternalFunc("g_is_whitespace", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "是否是空白字符";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kChar};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				return new RuntimeObject(Character.isWhitespace((char) args.get(0).getObj()));
+			}
+		});
+		info.addExternalFunc("g_char_to_digit", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "字符转数字";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return new RuntimeObjectType[]{RuntimeObjectType.kChar};
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				char ch = (char) args.get(0).getObj();
+				if (Character.isDigit(ch)) {
+					return new RuntimeObject(BigInteger.valueOf(ch - '0'));
+				}
+				ch = Character.toLowerCase(ch);
+				if (ch >= 'a' && ch <= 'f') {
+					return new RuntimeObject(BigInteger.valueOf(ch + 10 - 'a'));
+				}
+				return new RuntimeObject(BigInteger.valueOf(16));
+			}
+		});
 	}
 
 	private static void importFromTask(IRuntimeDebugInfo info, IRuntimeDebugInfo refer) {
