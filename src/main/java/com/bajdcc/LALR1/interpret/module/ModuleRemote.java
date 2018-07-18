@@ -105,7 +105,7 @@ public class ModuleRemote implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				graphics.drawText((char) args.get(0).getObj());
+				graphics.drawText(args.get(0).getChar());
 				return null;
 			}
 		});

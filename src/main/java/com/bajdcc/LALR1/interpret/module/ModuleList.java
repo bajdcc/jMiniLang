@@ -7,7 +7,6 @@ import com.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
 import com.bajdcc.LALR1.grammar.runtime.data.RuntimeMap;
 import com.bajdcc.util.ResourceLoader;
 
-import java.math.BigInteger;
 import java.util.List;
 
 /**
@@ -78,7 +77,7 @@ public class ModuleList implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				RuntimeArray array = (RuntimeArray) args.get(0).getObj();
+				RuntimeArray array = args.get(0).getArray();
 				array.add(args.get(1));
 				return args.get(0);
 			}
@@ -97,7 +96,7 @@ public class ModuleList implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				RuntimeArray array = (RuntimeArray) args.get(0).getObj();
+				RuntimeArray array = args.get(0).getArray();
 				return new RuntimeObject(array.contains(args.get(1)));
 			}
 		});
@@ -115,8 +114,8 @@ public class ModuleList implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				RuntimeArray array = (RuntimeArray) args.get(0).getObj();
-				RuntimeArray array2 = (RuntimeArray) args.get(1).getObj();
+				RuntimeArray array = args.get(0).getArray();
+				RuntimeArray array2 = args.get(1).getArray();
 				array.add(array2);
 				return args.get(0);
 			}
@@ -135,9 +134,9 @@ public class ModuleList implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				RuntimeArray array = (RuntimeArray) args.get(0).getObj();
-				BigInteger n = (BigInteger) args.get(1).getObj();
-				array.insert(n.intValue(), args.get(2));
+				RuntimeArray array = args.get(0).getArray();
+				int n = args.get(1).getInt();
+				array.insert(n, args.get(2));
 				return args.get(0);
 			}
 		});
@@ -155,9 +154,9 @@ public class ModuleList implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) throws Exception {
-				RuntimeArray array = (RuntimeArray) args.get(0).getObj();
-				BigInteger index = (BigInteger) args.get(1).getObj();
-				if (!array.set(index.intValue(), args.get(2))) {
+				RuntimeArray array = args.get(0).getArray();
+				int index = args.get(1).getInt();
+				if (!array.set(index, args.get(2))) {
 					status.err(RuntimeException.RuntimeError.INVALID_INDEX, "array.set");
 				}
 				return null;
@@ -177,7 +176,7 @@ public class ModuleList implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				RuntimeArray array = (RuntimeArray) args.get(0).getObj();
+				RuntimeArray array = args.get(0).getArray();
 				return new RuntimeObject(array.pop());
 			}
 		});
@@ -195,7 +194,7 @@ public class ModuleList implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				RuntimeArray array = (RuntimeArray) args.get(0).getObj();
+				RuntimeArray array = args.get(0).getArray();
 				array.clear();
 				return new RuntimeObject(array);
 			}
@@ -214,7 +213,7 @@ public class ModuleList implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				RuntimeArray array = (RuntimeArray) args.get(0).getObj();
+				RuntimeArray array = args.get(0).getArray();
 				array.reverse();
 				return new RuntimeObject(array);
 			}
@@ -233,9 +232,9 @@ public class ModuleList implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				RuntimeArray array = (RuntimeArray) args.get(0).getObj();
-				BigInteger index = (BigInteger) args.get(1).getObj();
-				return new RuntimeObject(array.get(index.intValue()));
+				RuntimeArray array = args.get(0).getArray();
+				int index = args.get(1).getInt();
+				return new RuntimeObject(array.get(index));
 			}
 		});
 		info.addExternalFunc("g_array_get_ex", new IRuntimeDebugExec() {
@@ -252,9 +251,9 @@ public class ModuleList implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) throws Exception {
-				RuntimeArray array = (RuntimeArray) args.get(0).getObj();
-				BigInteger index = (BigInteger) args.get(1).getObj();
-				return new RuntimeObject(array.get(index.intValue(), status));
+				RuntimeArray array = args.get(0).getArray();
+				int index = args.get(1).getInt();
+				return new RuntimeObject(array.get(index, status));
 			}
 		});
 		info.addExternalFunc("g_array_size", new IRuntimeDebugExec() {
@@ -271,7 +270,7 @@ public class ModuleList implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				RuntimeArray array = (RuntimeArray) args.get(0).getObj();
+				RuntimeArray array = args.get(0).getArray();
 				return array.size();
 			}
 		});
@@ -289,9 +288,9 @@ public class ModuleList implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				RuntimeArray array = (RuntimeArray) args.get(0).getObj();
-				BigInteger index = (BigInteger) args.get(1).getObj();
-				return new RuntimeObject(array.remove(index.intValue()));
+				RuntimeArray array = args.get(0).getArray();
+				int index = args.get(1).getInt();
+				return new RuntimeObject(array.remove(index));
 			}
 		});
 		info.addExternalFunc("g_array_delete", new IRuntimeDebugExec() {
@@ -308,7 +307,7 @@ public class ModuleList implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				RuntimeArray array = (RuntimeArray) args.get(0).getObj();
+				RuntimeArray array = args.get(0).getArray();
 				RuntimeObject obj = args.get(1);
 				return new RuntimeObject(array.delete(obj));
 			}
@@ -327,7 +326,7 @@ public class ModuleList implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				RuntimeArray array = (RuntimeArray) args.get(0).getObj();
+				RuntimeArray array = args.get(0).getArray();
 				return new RuntimeObject(array.isEmpty());
 			}
 		});
@@ -346,10 +345,10 @@ public class ModuleList implements IInterpreterModule {
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
 				RuntimeArray array = new RuntimeArray();
-				int a = ((BigInteger) args.get(0).getObj()).intValue();
-				int b = ((BigInteger) args.get(1).getObj()).intValue();
-				for (int i = a; i <= b; i++) {
-					array.add(new RuntimeObject(BigInteger.valueOf(i)));
+				long a = args.get(0).getLong();
+				long b = args.get(1).getLong();
+				for (long i = a; i <= b; i++) {
+					array.add(new RuntimeObject(i));
 				}
 				return new RuntimeObject(array);
 			}
@@ -368,7 +367,7 @@ public class ModuleList implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				RuntimeArray array = (RuntimeArray) args.get(0).getObj();
+				RuntimeArray array = args.get(0).getArray();
 				RuntimeObject obj = args.get(1);
 				for (int i = 0; i <= array.length(); i++) {
 					array.set(i, obj);
@@ -390,7 +389,7 @@ public class ModuleList implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				RuntimeArray array = (RuntimeArray) args.get(0).getObj();
+				RuntimeArray array = args.get(0).getArray();
 				return new RuntimeObject(array.distinct());
 			}
 		});
@@ -416,8 +415,8 @@ public class ModuleList implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				RuntimeMap map = (RuntimeMap) args.get(0).getObj();
-				String key = args.get(1).getObj().toString();
+				RuntimeMap map = args.get(0).getMap();
+				String key = args.get(1).getString();
 				map.put(key, args.get(2));
 				return null;
 			}
@@ -436,8 +435,8 @@ public class ModuleList implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				RuntimeMap map = (RuntimeMap) args.get(0).getObj();
-				String key = args.get(1).getObj().toString();
+				RuntimeMap map = args.get(0).getMap();
+				String key = args.get(1).getString();
 				return new RuntimeObject(map.contains(key));
 			}
 		});
@@ -455,8 +454,8 @@ public class ModuleList implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				RuntimeMap map = (RuntimeMap) args.get(0).getObj();
-				String key = args.get(1).getObj().toString();
+				RuntimeMap map = args.get(0).getMap();
+				String key = args.get(1).getString();
 				return new RuntimeObject(map.get(key));
 			}
 		});
@@ -474,7 +473,7 @@ public class ModuleList implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				RuntimeMap map = (RuntimeMap) args.get(0).getObj();
+				RuntimeMap map = args.get(0).getMap();
 				return map.size();
 			}
 		});
@@ -492,8 +491,8 @@ public class ModuleList implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				RuntimeMap map = (RuntimeMap) args.get(0).getObj();
-				String key = args.get(1).getObj().toString();
+				RuntimeMap map = args.get(0).getMap();
+				String key = args.get(1).getString();
 				return new RuntimeObject(map.remove(key));
 			}
 		});
@@ -511,7 +510,7 @@ public class ModuleList implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				RuntimeMap map = (RuntimeMap) args.get(0).getObj();
+				RuntimeMap map = args.get(0).getMap();
 				map.clear();
 				return new RuntimeObject(map);
 			}
@@ -530,7 +529,7 @@ public class ModuleList implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				RuntimeMap map = (RuntimeMap) args.get(0).getObj();
+				RuntimeMap map = args.get(0).getMap();
 				return new RuntimeObject(map.isEmpty());
 			}
 		});
@@ -548,7 +547,7 @@ public class ModuleList implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				RuntimeMap map = (RuntimeMap) args.get(0).getObj();
+				RuntimeMap map = args.get(0).getMap();
 				return new RuntimeObject(map.getKeys());
 			}
 		});
@@ -566,7 +565,7 @@ public class ModuleList implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				RuntimeMap map = (RuntimeMap) args.get(0).getObj();
+				RuntimeMap map = args.get(0).getMap();
 				return new RuntimeObject(map.getValues());
 			}
 		});

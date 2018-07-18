@@ -6,7 +6,6 @@ import com.bajdcc.LALR1.ui.drawing.UIGraphics;
 import com.bajdcc.util.ResourceLoader;
 
 import javax.swing.*;
-import java.math.BigInteger;
 import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Queue;
@@ -89,7 +88,7 @@ public class ModuleUI implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				boolean failure = graphics.drawText((char) args.get(0).getObj());
+				boolean failure = graphics.drawText(args.get(0).getChar());
 				if (failure) {
 					status.getService().getProcessService().waitForUI();
 					status.getService().getProcessService().sleep(status.getPid(), PRINT_BLOCK_TIME);
@@ -211,7 +210,7 @@ public class ModuleUI implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				boolean caret = (boolean) args.get(0).getObj();
+				boolean caret = args.get(0).getBool();
 				if (caret) {
 					graphics.setCaret(true);
 					return null;
@@ -255,7 +254,7 @@ public class ModuleUI implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				return new RuntimeObject(BigInteger.valueOf(graphics.getCols()));
+				return new RuntimeObject((long) (graphics.getCols()));
 			}
 		});
 		info.addExternalFunc("g_ui_rows", new IRuntimeDebugExec() {
@@ -272,7 +271,7 @@ public class ModuleUI implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				return new RuntimeObject(BigInteger.valueOf(graphics.getRows()));
+				return new RuntimeObject((long) (graphics.getRows()));
 			}
 		});
 		info.addExternalFunc("g_ui_text_length", new IRuntimeDebugExec() {
@@ -290,7 +289,7 @@ public class ModuleUI implements IInterpreterModule {
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
 				String str = String.valueOf(args.get(0).getObj());
-				return new RuntimeObject(BigInteger.valueOf(graphics.calcWidth(str)));
+				return new RuntimeObject((long) (graphics.calcWidth(str)));
 			}
 		});
 		info.addExternalFunc("g_ui_create_dialog_internal", new IRuntimeDebugExec() {
@@ -309,8 +308,8 @@ public class ModuleUI implements IInterpreterModule {
 			                                      IRuntimeStatus status) {
 				String caption = String.valueOf(args.get(0).getObj());
 				String text = String.valueOf(args.get(1).getObj());
-				int mode = ((BigInteger)args.get(2).getObj()).intValue();
-				return new RuntimeObject(status.getService().getDialogService().create(caption, text, mode, panel));
+				long mode = args.get(2).getLong();
+				return new RuntimeObject(status.getService().getDialogService().create(caption, text, (int) mode, panel));
 			}
 		});
 		info.addExternalFunc("g_ui_show_dialog_internal", new IRuntimeDebugExec() {
@@ -327,7 +326,7 @@ public class ModuleUI implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				int handle = (int) args.get(0).getObj();
+				int handle = args.get(0).getInt();
 				return new RuntimeObject(status.getService().getDialogService().show(handle));
 			}
 		});

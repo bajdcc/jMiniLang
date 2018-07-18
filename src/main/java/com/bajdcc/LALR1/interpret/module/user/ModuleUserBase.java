@@ -12,8 +12,6 @@ import org.apache.log4j.Logger;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -109,7 +107,7 @@ public class ModuleUserBase implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				int id = (int) args.get(0).getObj();
+				int id = args.get(0).getInt();
 				return new RuntimeObject(status.getService().getUserService().destroy(id));
 			}
 		});
@@ -161,7 +159,7 @@ public class ModuleUserBase implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				return status.getService().getUserService().getPipe().read((int) args.get(0).getObj());
+				return status.getService().getUserService().getPipe().read(args.get(0).getInt());
 			}
 		});
 		info.addExternalFunc("g_write_pipe", new IRuntimeDebugExec() {
@@ -178,7 +176,7 @@ public class ModuleUserBase implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				return new RuntimeObject(status.getService().getUserService().getPipe().write((int) args.get(0).getObj(), args.get(1)));
+				return new RuntimeObject(status.getService().getUserService().getPipe().write(args.get(0).getInt(), args.get(1)));
 			}
 		});
 		info.addExternalFunc("g_get_share", new IRuntimeDebugExec() {
@@ -195,7 +193,7 @@ public class ModuleUserBase implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				return status.getService().getUserService().getShare().get((int) args.get(0).getObj());
+				return status.getService().getUserService().getShare().get(args.get(0).getInt());
 			}
 		});
 		info.addExternalFunc("g_set_share", new IRuntimeDebugExec() {
@@ -212,7 +210,7 @@ public class ModuleUserBase implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				return new RuntimeObject(status.getService().getUserService().getShare().set((int) args.get(0).getObj(), args.get(1)));
+				return new RuntimeObject(status.getService().getUserService().getShare().set(args.get(0).getInt(), args.get(1)));
 			}
 		});
 		info.addExternalFunc("g_lock_share", new IRuntimeDebugExec() {
@@ -229,7 +227,7 @@ public class ModuleUserBase implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				return new RuntimeObject(status.getService().getUserService().getShare().lock((int) args.get(0).getObj()));
+				return new RuntimeObject(status.getService().getUserService().getShare().lock(args.get(0).getInt()));
 			}
 		});
 		info.addExternalFunc("g_unlock_share", new IRuntimeDebugExec() {
@@ -246,7 +244,7 @@ public class ModuleUserBase implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				return new RuntimeObject(status.getService().getUserService().getShare().unlock((int) args.get(0).getObj()));
+				return new RuntimeObject(status.getService().getUserService().getShare().unlock(args.get(0).getInt()));
 			}
 		});
 	}
@@ -397,10 +395,8 @@ public class ModuleUserBase implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				BigInteger turn = (BigInteger) args.get(0).getObj();
-				int time = turn.intValue();
-				return new RuntimeObject(BigInteger.valueOf(
-						status.getService().getProcessService().sleep(status.getPid(), time > 0 ? time : 0)));
+				int time = args.get(0).getInt();
+				return new RuntimeObject((long) status.getService().getProcessService().sleep(status.getPid(), time > 0 ? time : 0));
 			}
 		});
 		info.addExternalFunc("g_env_get", new IRuntimeDebugExec() {
@@ -506,7 +502,7 @@ public class ModuleUserBase implements IInterpreterModule {
 						try {
 							int pid = status.getRing3().exec_file(EXEC_PATH_PREFIX + id, code);
 							status.getRing3(pid).setOptionsBool(LOG_PIPE, true);
-							map.put("pid", new RuntimeObject(BigInteger.valueOf(pid)));
+							map.put("pid", new RuntimeObject((long) (pid)));
 						} catch (RuntimeException e) {
 							e.printStackTrace();
 							map.put("error", new RuntimeObject(true));
@@ -605,7 +601,7 @@ public class ModuleUserBase implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) throws Exception {
-				return new RuntimeObject(BigInteger.valueOf(status.getService().getProcessService().getRing3().fork()));
+				return new RuntimeObject((long) (status.getService().getProcessService().getRing3().fork()));
 			}
 		});
 	}
@@ -635,7 +631,7 @@ public class ModuleUserBase implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				return new RuntimeObject(Character.isLetter((char) args.get(0).getObj()));
+				return new RuntimeObject(Character.isLetter(args.get(0).getChar()));
 			}
 		});
 		info.addExternalFunc("g_is_digit", new IRuntimeDebugExec() {
@@ -652,7 +648,7 @@ public class ModuleUserBase implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				return new RuntimeObject(Character.isDigit((char) args.get(0).getObj()));
+				return new RuntimeObject(Character.isDigit(args.get(0).getChar()));
 			}
 		});
 		info.addExternalFunc("g_is_letter_or_digit", new IRuntimeDebugExec() {
@@ -669,7 +665,7 @@ public class ModuleUserBase implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				return new RuntimeObject(Character.isLetterOrDigit((char) args.get(0).getObj()));
+				return new RuntimeObject(Character.isLetterOrDigit(args.get(0).getChar()));
 			}
 		});
 		info.addExternalFunc("g_is_whitespace", new IRuntimeDebugExec() {
@@ -686,7 +682,7 @@ public class ModuleUserBase implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				return new RuntimeObject(Character.isWhitespace((char) args.get(0).getObj()));
+				return new RuntimeObject(Character.isWhitespace(args.get(0).getChar()));
 			}
 		});
 		info.addExternalFunc("g_char_to_digit", new IRuntimeDebugExec() {
@@ -703,15 +699,15 @@ public class ModuleUserBase implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				char ch = (char) args.get(0).getObj();
+				char ch = args.get(0).getChar();
 				if (Character.isDigit(ch)) {
-					return new RuntimeObject(BigInteger.valueOf(ch - '0'));
+					return new RuntimeObject((long) (ch - '0'));
 				}
 				ch = Character.toLowerCase(ch);
 				if (ch >= 'a' && ch <= 'f') {
-					return new RuntimeObject(BigInteger.valueOf(ch + 10 - 'a'));
+					return new RuntimeObject((long) (ch + 10 - 'a'));
 				}
-				return new RuntimeObject(BigInteger.valueOf(16));
+				return new RuntimeObject((long) (16));
 			}
 		});
 	}
@@ -732,7 +728,7 @@ public class ModuleUserBase implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				long speed = BigDecimal.valueOf(status.getService().getProcessService().getSpeed()).longValue();
+				long speed = (long) status.getService().getProcessService().getSpeed();
 				if (speed > 1000000L) {
 					return new RuntimeObject(String.valueOf(speed / 1000000L) + "M");
 				} else if (speed > 1000L) {
@@ -772,7 +768,7 @@ public class ModuleUserBase implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				return new RuntimeObject(BigInteger.valueOf(status.getService().getPipeService().size()));
+				return new RuntimeObject(status.getService().getPipeService().size());
 			}
 		});
 		info.addExternalFunc("g_res_get_share", new IRuntimeDebugExec() {
@@ -806,7 +802,7 @@ public class ModuleUserBase implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				return new RuntimeObject(BigInteger.valueOf(status.getService().getShareService().size()));
+				return new RuntimeObject(status.getService().getShareService().size());
 			}
 		});
 		info.addExternalFunc("g_res_get_user_list", new IRuntimeDebugExec() {
@@ -884,7 +880,7 @@ public class ModuleUserBase implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				return new RuntimeObject(BigInteger.valueOf(status.getService().getProcessService().getProcInfoCache().size()));
+				return new RuntimeObject((long) (status.getService().getProcessService().getProcInfoCache().size()));
 			}
 		});
 	}
@@ -961,7 +957,7 @@ public class ModuleUserBase implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				return new RuntimeObject(BigInteger.valueOf(status.getService().getFileService().getVfsListSize()));
+				return new RuntimeObject(status.getService().getFileService().getVfsListSize());
 			}
 		});
 	}
@@ -975,7 +971,7 @@ public class ModuleUserBase implements IInterpreterModule {
 		}
 
 		String[] importFunc = new String[]{
-				"g_sqrt", "g_sqrt_double", "g_cos", "g_sin", "g_floor",
+				"g_sqrt", "g_cos", "g_sin", "g_floor",
 				"g_atan2", "g_random_int"
 		};
 		for (String key : importFunc) {

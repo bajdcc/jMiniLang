@@ -535,8 +535,8 @@ g_register_class(ctx, "app::ai::node.terminal::test.move_to", lambda(this) {
         var p = input."get"("p");
         var v = input."get"("v");
         var d = [target[0] - p[0], target[1] - p[1]];
-        var dl = g_sqrt_double(d[0] * d[0] + d[1] * d[1]);
-        var vl = g_sqrt_double(v[0] * v[0] + v[1] * v[1]);
+        var dl = g_sqrt(d[0] * d[0] + d[1] * d[1]);
+        var vl = g_sqrt(v[0] * v[0] + v[1] * v[1]);
         if (dl < vl) {
             output."put"("p", g_new(target));
             return STATE_FINISH;
@@ -570,7 +570,7 @@ g_register_class(ctx, "app::ai::node.terminal::test.look_around", lambda(this) {
         }
         var dir = output."get"("dir");
         var v = input."get"("v");
-        var vl = g_sqrt_double(v[0] * v[0] + v[1] * v[1]);
+        var vl = g_sqrt(v[0] * v[0] + v[1] * v[1]);
         output."put"("v", [g_cos(dir) * vl, g_sin(dir) * vl]);
         input."put"("reached_target", true);
         return STATE_FINISH;
@@ -608,7 +608,7 @@ g_register_class(ctx, "app::ai::node.terminal::test.hovering", lambda(this) {
         if (this."ticks" % 20 == 0) {
             v := [0.0 - v[0], 0.0 - v[1]];
         }
-        var vl = g_sqrt_double(v[0] * v[0] + v[1] * v[1]);
+        var vl = g_sqrt(v[0] * v[0] + v[1] * v[1]);
         output."put"("v", [this."v" * v[0] / vl, this."v" * v[1] / vl]);
         output."put"("p", [p[0] + v[0], p[1] + v[1]]);
         output."put"("dir", g_atan2(v[1], v[0]));

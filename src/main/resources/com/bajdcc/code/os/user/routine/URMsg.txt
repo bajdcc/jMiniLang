@@ -47,7 +47,7 @@ var pipe = func ["PIPE"] ~(ch, out) {
 var type = args[0];
 if (type == "server" || type == "s") {
     var port = g_string_atoi(args[1]);
-    if (port == g_minus_1) {
+    if (port == -1) {
         g_write_pipe_n(out, "Error: invalid port '" + args[1] + "'");
         return help(in, out);
     }

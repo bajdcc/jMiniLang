@@ -283,7 +283,7 @@ var sshd_msg_receive = func ~(port) {
 
 var g_net_sshd = func ~(port) {
     port := g_string_atoi(port);
-    if (port == g_minus_1) {
+    if (port == -1) {
         return "Error: Invalid port";
     }
     var r = g_net_msg_create_server_internal(port);

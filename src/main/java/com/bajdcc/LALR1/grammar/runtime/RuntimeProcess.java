@@ -309,8 +309,7 @@ public class RuntimeProcess implements IRuntimeProcessService {
 		for (; ; ) {
 			if (arrProcess[cyclePtr] == null) {
 				if (ring == 3) {
-					if (!name.startsWith("/"))
-						name = USER_PROC_FILE_PREFIX + cyclePtr;
+					name = USER_PROC_FILE_PREFIX + cyclePtr;
 				}
 				RuntimeMachine machine = new RuntimeMachine(name, ring, cyclePtr, creatorId, this);
 				if (pc >= 0)

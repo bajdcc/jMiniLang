@@ -2,7 +2,7 @@ import "sys.base";
 import "sys.list";
 import "sys.string";
 var g_join_process = func ~(pid) {
-    if (pid == g_minus_1) {
+    if (pid == -1) {
         return false;
     }
     g_printdn("Waiting proc: #" + g_get_pid() + " -> #" + pid);

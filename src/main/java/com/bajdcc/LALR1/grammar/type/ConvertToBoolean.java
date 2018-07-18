@@ -3,9 +3,6 @@ package com.bajdcc.LALR1.grammar.type;
 import com.bajdcc.util.lexer.token.Token;
 import com.bajdcc.util.lexer.token.TokenType;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-
 /**
  * 【类型转换】转换为布尔类型
  *
@@ -45,11 +42,11 @@ public class ConvertToBoolean implements ITokenConventer {
 			case STRING:
 				return true;
 			case DECIMAL:
-				BigDecimal decimal = (BigDecimal) token.object;
-				return decimal.signum() != 0;
+				double decimal = (double) token.object;
+				return decimal != 0D;
 			case INTEGER:
-				BigInteger integer = (BigInteger) token.object;
-				return integer.signum() != 0;
+				long integer = (long) token.object;
+				return integer != 0L;
 			default:
 				break;
 		}

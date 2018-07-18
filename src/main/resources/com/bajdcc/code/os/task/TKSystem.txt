@@ -60,7 +60,7 @@ var time = func ~(msg, caller) {
     } else if (id == "sleep") {
         var arg = msg["arg"];
         var second = arg[2];
-        if (g_is_null(second)) { second := g_minus_1; }
+        if (g_is_null(second)) { second := -1; }
         else { second := g_string_atoi(second); }
         if (second < 0) { second := 1; }
         g_task_sleep(second);

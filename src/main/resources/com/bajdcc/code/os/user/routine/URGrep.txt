@@ -19,15 +19,15 @@ if (g_is_null(pat)) {
 }
 
 var patlen = g_string_length(pat);
-var m1 = g_minus_1;
+var m1 = -1;
 
 var next = func ["CALC NEXT"] ~(str) {
     var n = [];
     var u = 0;
-    var v = g_minus_1;
-    g_array_add(n, g_minus_1);
+    var v = -1;
+    g_array_add(n, -1);
     for (var t = 1; t < patlen; t++) {
-        g_array_add(n, g_minus_1);
+        g_array_add(n, -1);
     }
     while (u < patlen - 1) {
         if (v == m1 || (str[u] == str[v])) {

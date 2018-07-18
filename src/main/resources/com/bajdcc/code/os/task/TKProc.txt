@@ -53,7 +53,7 @@ var time = func ~(msg, caller) {
         var val = g_proc_kill(key);
         g_map_put(msg, "val", val);
     } else if (id == "info") {
-        var val = g_read_file_utf8_all(key);
+        var val = g_read_file_utf8_all("$/proc/" + key);
         if (g_not_null(val)) {
             g_map_put(msg, "val", val);
         } else {

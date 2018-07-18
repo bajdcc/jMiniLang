@@ -11,8 +11,6 @@ import com.bajdcc.util.lexer.token.OperatorType;
 import com.bajdcc.util.lexer.token.Token;
 import com.bajdcc.util.lexer.token.TokenType;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -114,29 +112,28 @@ public class TokenTools {
 				break;
 			case BIT_NOT:
 				if (token.kToken == TokenType.INTEGER) {
-					token.object = ((BigInteger) token.object).xor(BigInteger.ZERO);
+					token.object = ~((long) token.object);
 					return true;
 				} else if (token.kToken == TokenType.DECIMAL) {
-					token.object = ((BigDecimal) token.object).negate();
+					token.object = -((double) token.object);
 					return true;
 				}
 				break;
 			case PLUS_PLUS:
 				if (token.kToken == TokenType.INTEGER) {
-					token.object = ((BigInteger) token.object).add(BigInteger.ONE);
+					token.object = ((long) token.object) + 1L;
 					return true;
 				} else if (token.kToken == TokenType.DECIMAL) {
-					token.object = ((BigDecimal) token.object).add(BigDecimal.ONE);
+					token.object = ((double) token.object) + 1D;
 					return true;
 				}
 				break;
 			case MINUS_MINUS:
 				if (token.kToken == TokenType.INTEGER) {
-					token.object = ((BigInteger) token.object)
-							.subtract(BigInteger.ONE);
+					token.object = ((long) token.object) - 1L;
 					return true;
 				} else if (token.kToken == TokenType.DECIMAL) {
-					token.object = ((BigDecimal) token.object).add(BigDecimal.ONE);
+					token.object = ((double) token.object) - 1D;
 					return true;
 				}
 				break;
@@ -298,27 +295,20 @@ public class TokenTools {
 					}
 					return true;
 				case DECIMAL:
-					BigDecimal ldec = (BigDecimal) lop.object;
-					BigDecimal rdec = (BigDecimal) rop.object;
+					Double ldec = (Double) lop.object;
+					Double rdec = (Double) rop.object;
 					switch (type) {
 						case PLUS:
-							lop.object = ldec.add(rdec);
+							lop.object = ldec + rdec;
 							break;
 						case MINUS:
-							lop.object = ldec.subtract(rdec);
+							lop.object = ldec - rdec;
 							break;
 						case TIMES:
-							lop.object = ldec.multiply(rdec);
+							lop.object = ldec * rdec;
 							break;
 						case DIVIDE:
-							lop.object = ldec.divide(rdec, SCALE_NUM,
-									BigDecimal.ROUND_HALF_UP);
-							break;
-						case LEFT_SHIFT:
-							lop.object = ldec.movePointLeft(rdec.intValue());
-							break;
-						case RIGHT_SHIFT:
-							lop.object = ldec.movePointRight(rdec.intValue());
+							lop.object = ldec / rdec;
 							break;
 						case LESS_THAN:
 							lop.kToken = TokenType.BOOL;
@@ -349,38 +339,38 @@ public class TokenTools {
 					}
 					return true;
 				case INTEGER:
-					BigInteger lint = (BigInteger) lop.object;
-					BigInteger rint = (BigInteger) rop.object;
+					Long lint = (Long) lop.object;
+					Long rint = (Long) rop.object;
 					switch (type) {
 						case PLUS:
-							lop.object = lint.add(rint);
+							lop.object = lint + rint;
 							break;
 						case MINUS:
-							lop.object = lint.subtract(rint);
+							lop.object = lint - rint;
 							break;
 						case TIMES:
-							lop.object = lint.multiply(rint);
+							lop.object = lint * rint;
 							break;
 						case DIVIDE:
-							lop.object = lint.divide(rint);
+							lop.object = lint / rint;
 							break;
 						case MOD:
-							lop.object = lint.mod(rint);
+							lop.object = lint % rint;
 							break;
 						case LEFT_SHIFT:
-							lop.object = lint.shiftLeft(rint.intValue());
+							lop.object = lint << rint;
 							break;
 						case RIGHT_SHIFT:
-							lop.object = lint.shiftRight(rint.intValue());
+							lop.object = lint >> rint;
 							break;
 						case BIT_AND:
-							lop.object = lint.and(rint);
+							lop.object = lint & rint;
 							break;
 						case BIT_OR:
-							lop.object = lint.or(rint);
+							lop.object = lint | rint;
 							break;
 						case BIT_XOR:
-							lop.object = lint.xor(rint);
+							lop.object = lint ^ rint;
 							break;
 						case LESS_THAN:
 							lop.kToken = TokenType.BOOL;

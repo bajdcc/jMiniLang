@@ -17,7 +17,6 @@ import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.parser.ParserEmulationProfile;
 import com.vladsch.flexmark.util.options.MutableDataSet;
 
-import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
 
@@ -77,12 +76,12 @@ public class ModuleUserWeb implements IInterpreterModule {
 					ModuleNetWebContext ctx = server.dequeue();
 					if (ctx != null) {
 						RuntimeMap map = new RuntimeMap();
-						map.put("code", new RuntimeObject(BigInteger.valueOf(ctx.getCode())));
+						map.put("code", new RuntimeObject((long) (ctx.getCode())));
 						map.put("request", new RuntimeObject(ctx.getReqHeader()));
 						map.put("response", new RuntimeObject(ctx.getResponse()));
 						map.put("header", new RuntimeObject(ctx.getRespHeader()));
 						map.put("mime", new RuntimeObject(ctx.getMime()));
-						map.put("content_type", new RuntimeObject(BigInteger.valueOf(ctx.getContentType())));
+						map.put("content_type", new RuntimeObject((long) (ctx.getContentType())));
 						map.put("__ctx__", new RuntimeObject(ctx));
 						return new RuntimeObject(map);
 					}
@@ -104,13 +103,13 @@ public class ModuleUserWeb implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				RuntimeMap map = (RuntimeMap) args.get(0).getObj();
+				RuntimeMap map = args.get(0).getMap();
 				ModuleNetWebContext ctx = (ModuleNetWebContext) map.get("__ctx__").getObj();
-				ctx.setCode(((BigInteger) map.get("code").getObj()).intValue());
-				ctx.setResponse(String.valueOf(map.get("response").getObj()));
-				ctx.setRespHeader((RuntimeMap) map.get("header").getObj());
-				ctx.setMime(String.valueOf(map.get("mime").getObj()));
-				ctx.setContentType(((BigInteger) map.get("content_type").getObj()).intValue());
+				ctx.setCode(map.get("code").getInt());
+				ctx.setResponse(map.get("response").getString());
+				ctx.setRespHeader(map.get("header").getMap());
+				ctx.setMime(map.get("mime").getString());
+				ctx.setContentType((int) map.get("content_type").getLong());
 				ctx.unblock();
 				return null;
 			}
@@ -153,7 +152,7 @@ public class ModuleUserWeb implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				RuntimeMap map = (RuntimeMap) args.get(0).getObj();
+				RuntimeMap map = args.get(0).getMap();
 				ModuleNetWebApiContext ctx = (ModuleNetWebApiContext) map.get("__ctx__").getObj();
 				ctx.setResp(map.get("resp"));
 				ctx.unblock();

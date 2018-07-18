@@ -6,7 +6,6 @@ import com.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
 import org.apache.log4j.Logger;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import java.math.BigInteger;
 import java.util.*;
 
 /**
@@ -435,7 +434,7 @@ public class RuntimeUserService implements IRuntimeUserService,
 			mapNames.values().stream().sorted(Comparator.naturalOrder())
 					.forEach((value) -> {
 						RuntimeArray item = new RuntimeArray();
-						item.add(new RuntimeObject(BigInteger.valueOf(value)));
+						item.add(new RuntimeObject((long) (value)));
 						item.add(new RuntimeObject(arrUsers[value].type.name));
 						item.add(new RuntimeObject(arrUsers[value].name));
 						item.add(new RuntimeObject(arrUsers[value].page));
@@ -448,7 +447,7 @@ public class RuntimeUserService implements IRuntimeUserService,
 			mapNames.values().stream().sorted(Comparator.naturalOrder())
 					.forEach((value) -> array.add(
 							new RuntimeObject(String.format("   %-5s   %-15s   %-15s   %-20s",
-									BigInteger.valueOf(value), arrUsers[value].name,
+									(long) (value), arrUsers[value].name,
 									arrUsers[value].type.toString(), arrUsers[value].handler.toString()))));
 		}
 		return array;

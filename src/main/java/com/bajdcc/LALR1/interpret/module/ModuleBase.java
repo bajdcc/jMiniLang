@@ -1,15 +1,14 @@
 package com.bajdcc.LALR1.interpret.module;
 
-import org.apache.log4j.Logger;
 import com.bajdcc.LALR1.grammar.Grammar;
 import com.bajdcc.LALR1.grammar.runtime.*;
 import com.bajdcc.LALR1.grammar.runtime.RuntimeException;
 import com.bajdcc.LALR1.grammar.runtime.RuntimeException.RuntimeError;
 import com.bajdcc.util.ResourceLoader;
+import org.apache.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.math.BigInteger;
 import java.util.List;
 
 /**
@@ -48,8 +47,6 @@ public class ModuleBase implements IInterpreterModule {
 		RuntimeCodePage page = grammar.getCodePage();
 		IRuntimeDebugInfo info = page.getInfo();
 		info.addExternalValue("g_null", () -> new RuntimeObject(null));
-		final BigInteger MINUS_ONE = new BigInteger("-1");
-		info.addExternalValue("g_minus_1", () -> new RuntimeObject(MINUS_ONE));
 		info.addExternalValue("g_true", () -> new RuntimeObject(true));
 		info.addExternalValue("g_false", () -> new RuntimeObject(false));
 		final String NEWLINE = System.lineSeparator();
@@ -86,7 +83,7 @@ public class ModuleBase implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				return new RuntimeObject(((int) args.get(0).getObj()) >= 0);
+				return new RuntimeObject((args.get(0).getInt()) >= 0);
 			}
 		});
 		info.addExternalFunc("g_set_flag", new IRuntimeDebugExec() {
@@ -103,8 +100,8 @@ public class ModuleBase implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				BigInteger flag = (BigInteger) args.get(1).getObj();
-				args.get(0).setFlag(flag.longValue());
+				long flag = args.get(1).getLong();
+				args.get(0).setFlag(flag);
 				return args.get(0);
 			}
 		});
@@ -122,7 +119,7 @@ public class ModuleBase implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				return new RuntimeObject(BigInteger.valueOf(args.get(0).getFlag()));
+				return new RuntimeObject(args.get(0).getFlag());
 			}
 		});
 		info.addExternalFunc("g_is_flag", new IRuntimeDebugExec() {
@@ -139,8 +136,8 @@ public class ModuleBase implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				BigInteger flag = (BigInteger) args.get(1).getObj();
-				return new RuntimeObject(args.get(0).getFlag() == flag.longValue());
+				long flag = args.get(1).getLong();
+				return new RuntimeObject(args.get(0).getFlag() == flag);
 			}
 		});
 		info.addExternalFunc("g_set_debug", new IRuntimeDebugExec() {
@@ -157,7 +154,7 @@ public class ModuleBase implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				boolean debug = (boolean) args.get(0).getObj();
+				boolean debug = args.get(0).getBool();
 				status.getService().getProcessService().setDebug(status.getPid(), debug);
 				return null;
 			}
@@ -176,7 +173,7 @@ public class ModuleBase implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				boolean mode = (boolean) args.get(0).getObj();
+				boolean mode = args.get(0).getBool();
 				status.getService().getProcessService().setHighSpeed(mode);
 				return null;
 			}
@@ -343,7 +340,7 @@ public class ModuleBase implements IInterpreterModule {
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
 				return new RuntimeObject(status.getHelpString(args.get(0)
-						.getObj().toString()));
+						.getString()));
 			}
 		});
 		info.addExternalFunc("g_get_type", new IRuntimeDebugExec() {
@@ -377,7 +374,7 @@ public class ModuleBase implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				return new RuntimeObject(BigInteger.valueOf(args.get(0).getTypeIndex()));
+				return new RuntimeObject(args.get(0).getTypeIndex());
 			}
 		});
 		info.addExternalFunc("g_type", new IRuntimeDebugExec() {
@@ -447,7 +444,7 @@ public class ModuleBase implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) throws Exception {
-				return new RuntimeObject(BigInteger.valueOf(status.runProcess(args.get(0).getObj().toString())));
+				return new RuntimeObject((long) status.runProcess(args.get(0).getString()));
 			}
 		});
 		info.addExternalFunc("g_load_x", new IRuntimeDebugExec() {
@@ -464,7 +461,7 @@ public class ModuleBase implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) throws Exception {
-				return new RuntimeObject(BigInteger.valueOf(status.runProcessX(args.get(0).getObj().toString())));
+				return new RuntimeObject((long) status.runProcessX(args.get(0).getString()));
 			}
 		});
 		info.addExternalFunc("g_load_user", new IRuntimeDebugExec() {
@@ -481,7 +478,7 @@ public class ModuleBase implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) throws Exception {
-				return new RuntimeObject(BigInteger.valueOf(status.runUsrProcess(args.get(0).getObj().toString())));
+				return new RuntimeObject((long) status.runUsrProcess(args.get(0).getString()));
 			}
 		});
 		info.addExternalFunc("g_load_user_x", new IRuntimeDebugExec() {
@@ -498,7 +495,7 @@ public class ModuleBase implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) throws Exception {
-				return new RuntimeObject(BigInteger.valueOf(status.runUsrProcessX(args.get(0).getObj().toString())));
+				return new RuntimeObject((long) status.runUsrProcessX(args.get(0).getString()));
 			}
 		});
 		info.addExternalFunc("g_print_file", new IRuntimeDebugExec() {
@@ -516,8 +513,7 @@ public class ModuleBase implements IInterpreterModule {
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
 				try {
-					BufferedReader br = new BufferedReader(new FileReader(args
-							.get(0).getObj().toString()));
+					BufferedReader br = new BufferedReader(new FileReader(args.get(0).getString()));
 					String line;
 					while ((line = br.readLine()) != null) {
 						System.out.println(line);
@@ -543,7 +539,7 @@ public class ModuleBase implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				return new RuntimeObject(BigInteger.valueOf(status.getFuncArgsCount()));
+				return new RuntimeObject((long) status.getFuncArgsCount());
 			}
 		});
 		info.addExternalFunc("g_args_index", new IRuntimeDebugExec() {
@@ -560,8 +556,8 @@ public class ModuleBase implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				BigInteger index = (BigInteger) args.get(0).getObj();
-				return status.getFuncArgs(index.intValue());
+				long index = args.get(0).getLong();
+				return status.getFuncArgs((int) index);
 			}
 		});
 		info.addExternalFunc("g_get_timestamp", new IRuntimeDebugExec() {
@@ -578,7 +574,7 @@ public class ModuleBase implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				return new RuntimeObject(BigInteger.valueOf(System.currentTimeMillis()));
+				return new RuntimeObject(System.currentTimeMillis());
 			}
 		});
 		buildIORead(info);
@@ -591,10 +587,10 @@ public class ModuleBase implements IInterpreterModule {
 				ModuleBaseIORead.ModuleBaseIOReadType.kNextChar));
 		info.addExternalFunc("g_stdin_read_int", new ModuleBaseIORead(
 				"标准输入读取整数",
-				ModuleBaseIORead.ModuleBaseIOReadType.kNextBigInteger));
+				ModuleBaseIORead.ModuleBaseIOReadType.kNextLong));
 		info.addExternalFunc("g_stdin_read_real", new ModuleBaseIORead(
 				"标准输入读取实数",
-				ModuleBaseIORead.ModuleBaseIOReadType.kNextBigDecimal));
+				ModuleBaseIORead.ModuleBaseIOReadType.kNextDouble));
 		info.addExternalFunc("g_stdin_read_bool",
 				new ModuleBaseIORead("标准输入读取布尔值",
 						ModuleBaseIORead.ModuleBaseIOReadType.kNextBoolean));
@@ -602,10 +598,10 @@ public class ModuleBase implements IInterpreterModule {
 				"标准输入读取行", ModuleBaseIORead.ModuleBaseIOReadType.kNextLine));
 		info.addExternalFunc("g_stdin_read_has_int", new ModuleBaseIORead(
 				"标准输入是否匹配整数",
-				ModuleBaseIORead.ModuleBaseIOReadType.kHasNextBigInteger));
+				ModuleBaseIORead.ModuleBaseIOReadType.kHasNextLong));
 		info.addExternalFunc("g_stdin_read_has_real", new ModuleBaseIORead(
 				"标准输入是否匹配实数",
-				ModuleBaseIORead.ModuleBaseIOReadType.kHasNextBigDecimal));
+				ModuleBaseIORead.ModuleBaseIOReadType.kHasNextDouble));
 		info.addExternalFunc("g_stdin_read_has_bool", new ModuleBaseIORead(
 				"标准输入是否匹配布尔值",
 				ModuleBaseIORead.ModuleBaseIOReadType.kHasNextBoolean));

@@ -5,8 +5,6 @@ import com.bajdcc.LALR1.grammar.runtime.*;
 import com.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
 import com.bajdcc.util.ResourceLoader;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -65,9 +63,9 @@ public class ModuleString implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				String str = (String) args.get(0).getObj();
-				String pat = (String) args.get(1).getObj();
-				String sub = (String) args.get(2).getObj();
+				String str = args.get(0).getString();
+				String pat = args.get(1).getString();
+				String sub = args.get(2).getString();
 				RuntimeArray arr = new RuntimeArray();
 				return new RuntimeObject(str.replaceAll(pat, sub));
 			}
@@ -86,8 +84,8 @@ public class ModuleString implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				String str = (String) args.get(0).getObj();
-				String split = (String) args.get(1).getObj();
+				String str = args.get(0).getString();
+				String split = args.get(1).getString();
 				RuntimeArray arr = new RuntimeArray();
 				for (String item : str.split(split, Integer.MAX_VALUE)) {
 					arr.add(new RuntimeObject(item));
@@ -109,9 +107,9 @@ public class ModuleString implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				String str = (String) args.get(0).getObj();
-				String split = (String) args.get(1).getObj();
-				int n = (int) args.get(1).getObj();
+				String str = args.get(0).getString();
+				String split = args.get(1).getString();
+				int n = (int) args.get(1).getLong();
 				RuntimeArray arr = new RuntimeArray();
 				for (String item : str.split(split, n)) {
 					arr.add(new RuntimeObject(item));
@@ -133,7 +131,7 @@ public class ModuleString implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				String str = (String) args.get(0).getObj();
+				String str = args.get(0).getString();
 				return new RuntimeObject(str.trim());
 			}
 		});
@@ -151,8 +149,8 @@ public class ModuleString implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				String str = (String) args.get(0).getObj();
-				return new RuntimeObject(BigInteger.valueOf(str.length()));
+				String str = args.get(0).getString();
+				return new RuntimeObject((long) (str.length()));
 			}
 		});
 		info.addExternalFunc("g_string_empty", new IRuntimeDebugExec() {
@@ -169,7 +167,7 @@ public class ModuleString implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				return new RuntimeObject(args.get(0).getObj().toString().isEmpty());
+				return new RuntimeObject(args.get(0).getString().isEmpty());
 			}
 		});
 		info.addExternalFunc("g_string_get", new IRuntimeDebugExec() {
@@ -186,9 +184,9 @@ public class ModuleString implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				String str = (String) args.get(0).getObj();
-				BigInteger index = (BigInteger) args.get(1).getObj();
-				return new RuntimeObject(str.charAt(index.intValue()));
+				String str = args.get(0).getString();
+				long index = args.get(1).getLong();
+				return new RuntimeObject(str.charAt((int) index));
 			}
 		});
 		info.addExternalFunc("g_string_regex", new IRuntimeDebugExec() {
@@ -205,8 +203,8 @@ public class ModuleString implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				String str = (String) args.get(0).getObj();
-				String regex = (String) args.get(1).getObj();
+				String str = args.get(0).getString();
+				String regex = args.get(1).getString();
 				Matcher m = Pattern.compile(regex).matcher(str);
 				RuntimeArray arr = new RuntimeArray();
 				if (m.find()) {
@@ -231,7 +229,7 @@ public class ModuleString implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				RuntimeArray array = (RuntimeArray) args.get(0).getObj();
+				RuntimeArray array = args.get(0).getArray();
 				StringBuilder sb = new StringBuilder();
 				for (Object obj : array.toList()) {
 					sb.append(obj);
@@ -253,12 +251,11 @@ public class ModuleString implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				String str = (String) args.get(0).getObj();
+				String str = args.get(0).getString();
 				try {
-					BigInteger bi = new BigInteger(str);
-					return new RuntimeObject(new BigInteger(str));
+					return new RuntimeObject(Long.parseLong(str));
 				} catch (NumberFormatException e) {
-					return new RuntimeObject(BigInteger.valueOf(-1));
+					return new RuntimeObject(-1L);
 				}
 			}
 		});
@@ -276,10 +273,9 @@ public class ModuleString implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				String str = (String) args.get(0).getObj();
+				String str = args.get(0).getString();
 				try {
-					BigInteger bi = new BigInteger(str);
-					return new RuntimeObject(new BigInteger(str));
+					return new RuntimeObject(Long.parseLong(str));
 				} catch (NumberFormatException e) {
 					return null;
 				}
@@ -299,8 +295,8 @@ public class ModuleString implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				RuntimeArray arr = (RuntimeArray) args.get(0).getObj();
-				String delim = (String) args.get(1).getObj();
+				RuntimeArray arr = args.get(0).getArray();
+				String delim = args.get(1).getString();
 				return new RuntimeObject(String.join(delim, arr.toStringList()));
 			}
 		});
@@ -318,7 +314,7 @@ public class ModuleString implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				String delim = (String) args.get(0).getObj();
+				String delim = args.get(0).getString();
 				return new RuntimeObject(delim.toUpperCase());
 			}
 		});
@@ -336,7 +332,7 @@ public class ModuleString implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				String delim = (String) args.get(0).getObj();
+				String delim = args.get(0).getString();
 				return new RuntimeObject(delim.toLowerCase());
 			}
 		});
@@ -354,9 +350,9 @@ public class ModuleString implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				String str = (String) args.get(0).getObj();
-				BigInteger dup = (BigInteger) args.get(1).getObj();
-				int n = dup.intValue();
+				String str = args.get(0).getString();
+				long dup = args.get(1).getLong();
+				int n = (int) dup;
 				StringBuilder sb = new StringBuilder();
 				for (int i = 0; i < n; i++) {
 					sb.append(str);
@@ -378,12 +374,12 @@ public class ModuleString implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				String str = (String) args.get(0).getObj();
+				String str = args.get(0).getString();
 				try {
-					return new RuntimeObject(new BigInteger(str));
+					return new RuntimeObject(Long.parseLong(str));
 				} catch (Exception e1) {
 					try {
-						return new RuntimeObject(new BigDecimal(str));
+						return new RuntimeObject(Double.parseDouble(str));
 					} catch (Exception e2) {
 						return null;
 					}
@@ -405,8 +401,8 @@ public class ModuleString implements IInterpreterModule {
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
 				if (args.get(0).getType() == RuntimeObjectType.kString) {
-					String str = (String) args.get(0).getObj();
-					String cmp = (String) args.get(1).getObj();
+					String str = args.get(0).getString();
+					String cmp = args.get(1).getString();
 					return new RuntimeObject(str.compareTo(cmp) == 0);
 				}
 				return new RuntimeObject(false);
@@ -427,8 +423,8 @@ public class ModuleString implements IInterpreterModule {
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
 				if (args.get(0).getType() == RuntimeObjectType.kString) {
-					String str = (String) args.get(0).getObj();
-					String cmp = (String) args.get(1).getObj();
+					String str = args.get(0).getString();
+					String cmp = args.get(1).getString();
 					return new RuntimeObject(str.compareTo(cmp) != 0);
 				}
 				return new RuntimeObject(true);
@@ -448,8 +444,8 @@ public class ModuleString implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				String str = (String) args.get(0).getObj();
-				String cmp = (String) args.get(1).getObj();
+				String str = args.get(0).getString();
+				String cmp = args.get(1).getString();
 				return new RuntimeObject(str.startsWith(cmp));
 			}
 		});
@@ -467,8 +463,8 @@ public class ModuleString implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				String str = (String) args.get(0).getObj();
-				String cmp = (String) args.get(1).getObj();
+				String str = args.get(0).getString();
+				String cmp = args.get(1).getString();
 				return new RuntimeObject(str.endsWith(cmp));
 			}
 		});
@@ -486,10 +482,10 @@ public class ModuleString implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				String str = (String) args.get(0).getObj();
-				BigInteger a = (BigInteger) args.get(1).getObj();
-				BigInteger b = (BigInteger) args.get(2).getObj();
-				return new RuntimeObject(str.substring(a.intValue(), b.intValue()));
+				String str = args.get(0).getString();
+				long a = args.get(1).getLong();
+				long b = args.get(2).getLong();
+				return new RuntimeObject(str.substring((int) a, (int) b));
 			}
 		});
 		info.addExternalFunc("g_string_left", new IRuntimeDebugExec() {
@@ -506,9 +502,9 @@ public class ModuleString implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				String str = (String) args.get(0).getObj();
-				BigInteger a = (BigInteger) args.get(1).getObj();
-				return new RuntimeObject(str.substring(0, a.intValue()));
+				String str = args.get(0).getString();
+				long a = args.get(1).getLong();
+				return new RuntimeObject(str.substring(0, (int) a));
 			}
 		});
 		info.addExternalFunc("g_string_right", new IRuntimeDebugExec() {
@@ -525,9 +521,9 @@ public class ModuleString implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				String str = (String) args.get(0).getObj();
-				BigInteger a = (BigInteger) args.get(1).getObj();
-				return new RuntimeObject(str.substring(a.intValue()));
+				String str = args.get(0).getString();
+				long a = args.get(1).getLong();
+				return new RuntimeObject(str.substring((int) a));
 			}
 		});
 	}

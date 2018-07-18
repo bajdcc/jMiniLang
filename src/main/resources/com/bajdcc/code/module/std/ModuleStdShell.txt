@@ -31,7 +31,7 @@ var import_shell_class = func ~(ctx) {
         g_set_process_desc("shell: " + exec);
         var path = "/usr/p/" + exec;
         var child = g_load_user_x(path);
-        if (child == g_minus_1) {
+        if (child == -1) {
             g_printn("Cannot execute '"+path+"'.");
             var p = g_wait_pipe("PIPEIN#" + parent);
             g_sleep(50);
@@ -78,7 +78,7 @@ var import_shell_class = func ~(ctx) {
         g_set_process_desc("shell: " + exec);
         var path = "/usr/p/" + exec;
         var child = g_load_user_x(path);
-        if (child == g_minus_1) {
+        if (child == -1) {
             g_printn("Cannot execute '"+path+"'.");
             return;
         }

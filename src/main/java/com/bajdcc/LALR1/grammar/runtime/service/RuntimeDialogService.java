@@ -1,12 +1,11 @@
 package com.bajdcc.LALR1.grammar.runtime.service;
 
-import org.apache.log4j.Logger;
 import com.bajdcc.LALR1.grammar.runtime.RuntimeObject;
 import com.bajdcc.LALR1.grammar.runtime.RuntimeObjectType;
 import com.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
+import org.apache.log4j.Logger;
 
 import javax.swing.*;
-import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -81,11 +80,11 @@ public class RuntimeDialogService implements IRuntimeDialogService {
 		} else if (mode >= 10 && mode <= 13) {
 			int type = mode - 11;
 			SwingUtilities.invokeLater(() -> {
-				int value = JOptionPane.showConfirmDialog(ds.panel, ds.text, ds.caption, type);
+				long value = JOptionPane.showConfirmDialog(ds.panel, ds.text, ds.caption, type);
 				// 取得共享变量
 				RuntimeObject obj = service.getShareService().getSharing("DIALOG#DATA#" + handle, false);
 				assert obj.getType() == RuntimeObjectType.kArray;
-				((RuntimeArray) obj.getObj()).add(new RuntimeObject(BigInteger.valueOf(value)));
+				((RuntimeArray) obj.getObj()).add(new RuntimeObject(value));
 				// 发送信号
 				synchronized (setDialogId) {
 					arrDialogs[handle] = null;

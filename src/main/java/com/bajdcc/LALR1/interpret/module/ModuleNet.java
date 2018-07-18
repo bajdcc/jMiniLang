@@ -22,8 +22,6 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.net.*;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -96,6 +94,27 @@ public class ModuleNet implements IInterpreterModule {
 			e.printStackTrace();
 		}
 		return new RuntimeObject("json - parse error");
+	}
+
+	private static RuntimeObject parseInternal(Object o) {
+		if (o instanceof JSONObject) {
+			JSONObject obj = (JSONObject) o;
+			RuntimeMap map = new RuntimeMap();
+			obj.forEach((key, value) -> map.put(key, parseInternal(value)));
+			return new RuntimeObject(map);
+		} else if (o instanceof JSONArray) {
+			JSONArray obj = (JSONArray) o;
+			RuntimeArray arr = new RuntimeArray();
+			obj.forEach((key) -> arr.add(parseInternal(key)));
+			return new RuntimeObject(arr);
+		} else {
+			if (o instanceof Integer) {
+				return new RuntimeObject((long) ((int) o));
+			} else if (o instanceof Float) {
+				return new RuntimeObject((double) ((float) o));
+			}
+			return new RuntimeObject(o);
+		}
 	}
 
 	private void buildRemoteMethods(IRuntimeDebugInfo info) {
@@ -232,7 +251,7 @@ public class ModuleNet implements IInterpreterModule {
 			                                      IRuntimeStatus status) {
 				if (getServer() != null || getClient() != null)
 					return new RuntimeObject(false);
-				int port = ((BigInteger) args.get(0).getObj()).intValue();
+				int port = args.get(0).getInt();
 				setServer(new ModuleNetServer(port));
 				getServer().start();
 				return new RuntimeObject(true);
@@ -279,9 +298,9 @@ public class ModuleNet implements IInterpreterModule {
 						setServer(null);
 					}
 					status.getService().getProcessService().sleep(status.getPid(), MSG_QUERY_TIME);
-					return new RuntimeObject(BigInteger.valueOf(s.ordinal()));
+					return new RuntimeObject((long) (s.ordinal()));
 				}
-				return new RuntimeObject(BigInteger.valueOf(ModuleNetServer.Status.NULL.ordinal()));
+				return new RuntimeObject((long) (ModuleNetServer.Status.NULL.ordinal()));
 			}
 		});
 		// server
@@ -350,9 +369,9 @@ public class ModuleNet implements IInterpreterModule {
 						setClient(null);
 					}
 					status.getService().getProcessService().sleep(status.getPid(), MSG_QUERY_TIME);
-					return new RuntimeObject(BigInteger.valueOf(s.ordinal()));
+					return new RuntimeObject((long) (s.ordinal()));
 				}
-				return new RuntimeObject(BigInteger.valueOf(ModuleNetClient.Status.NULL.ordinal()));
+				return new RuntimeObject((long) (ModuleNetClient.Status.NULL.ordinal()));
 			}
 		});
 		info.addExternalFunc("g_net_msg_client_send", new IRuntimeDebugExec() {
@@ -809,27 +828,6 @@ public class ModuleNet implements IInterpreterModule {
 				return null;
 			}
 		});
-	}
-
-	private static RuntimeObject parseInternal(Object o) {
-		if (o instanceof JSONObject) {
-			JSONObject obj = (JSONObject) o;
-			RuntimeMap map = new RuntimeMap();
-			obj.forEach((key, value) -> map.put(key, parseInternal(value)));
-			return new RuntimeObject(map);
-		} else if (o instanceof JSONArray) {
-			JSONArray obj = (JSONArray) o;
-			RuntimeArray arr = new RuntimeArray();
-			obj.forEach((key) -> arr.add(parseInternal(key)));
-			return new RuntimeObject(arr);
-		} else {
-			if (o instanceof Integer) {
-				return new RuntimeObject(BigInteger.valueOf((int) o));
-			} else if (o instanceof Float) {
-				return new RuntimeObject(BigDecimal.valueOf((float) o));
-			}
-			return new RuntimeObject(o);
-		}
 	}
 
 	public ModuleNetServer getServer() {

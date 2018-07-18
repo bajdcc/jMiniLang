@@ -15,8 +15,32 @@ import java.util.Scanner;
  */
 public class ModuleBaseIORead implements IRuntimeDebugExec {
 
-	public enum ModuleBaseIOReadType {
-		kHasNextBigDecimal, kHasNextBigInteger, kHasNextBoolean, kHasNextLine, kNextBigDecimal, kNextBigInteger, kNextBoolean, kNextChar, kNextLine,
+	@Override
+	public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+	                                      IRuntimeStatus status) throws Exception {
+		switch (type) {
+			case kHasNextDouble:
+				return new RuntimeObject(scanner.hasNextDouble());
+			case kHasNextLong:
+				return new RuntimeObject(scanner.hasNextLong());
+			case kHasNextBoolean:
+				return new RuntimeObject(scanner.hasNextBoolean());
+			case kHasNextLine:
+				return new RuntimeObject(scanner.hasNextLine());
+			case kNextDouble:
+				return new RuntimeObject(scanner.nextDouble());
+			case kNextLong:
+				return new RuntimeObject(scanner.nextLong());
+			case kNextBoolean:
+				return new RuntimeObject(scanner.nextBoolean());
+			case kNextChar:
+				return new RuntimeObject((char) System.in.read());
+			case kNextLine:
+				return new RuntimeObject(scanner.nextLine());
+			default:
+				break;
+		}
+		return null;
 	}
 
 	private static Scanner scanner = new Scanner(System.in);
@@ -28,32 +52,8 @@ public class ModuleBaseIORead implements IRuntimeDebugExec {
 		this.type = type;
 	}
 
-	@Override
-	public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
-	                                      IRuntimeStatus status) throws Exception {
-		switch (type) {
-			case kHasNextBigDecimal:
-				return new RuntimeObject(scanner.hasNextBigDecimal());
-			case kHasNextBigInteger:
-				return new RuntimeObject(scanner.hasNextBigInteger());
-			case kHasNextBoolean:
-				return new RuntimeObject(scanner.hasNextBoolean());
-			case kHasNextLine:
-				return new RuntimeObject(scanner.hasNextLine());
-			case kNextBigDecimal:
-				return new RuntimeObject(scanner.nextBigDecimal());
-			case kNextBigInteger:
-				return new RuntimeObject(scanner.nextBigInteger());
-			case kNextBoolean:
-				return new RuntimeObject(scanner.nextBoolean());
-			case kNextChar:
-				return new RuntimeObject((char) System.in.read());
-			case kNextLine:
-				return new RuntimeObject(scanner.nextLine());
-			default:
-				break;
-		}
-		return null;
+	public enum ModuleBaseIOReadType {
+		kHasNextDouble, kHasNextLong, kHasNextBoolean, kHasNextLine, kNextDouble, kNextLong, kNextBoolean, kNextChar, kNextLine,
 	}
 
 	@Override

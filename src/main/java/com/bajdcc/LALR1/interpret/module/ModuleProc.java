@@ -7,7 +7,6 @@ import com.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
 import com.bajdcc.LALR1.grammar.runtime.data.RuntimeFuncObject;
 import com.bajdcc.util.ResourceLoader;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,7 +70,7 @@ public class ModuleProc implements IInterpreterModule {
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) throws Exception {
 				RuntimeFuncObject func = (RuntimeFuncObject) args.get(0).getObj();
-				return new RuntimeObject(BigInteger.valueOf(status.createProcess(func)));
+				return new RuntimeObject((long) (status.createProcess(func)));
 			}
 		});
 		info.addExternalFunc("g_create_process_args", new IRuntimeDebugExec() {
@@ -90,7 +89,7 @@ public class ModuleProc implements IInterpreterModule {
 			                                      IRuntimeStatus status) throws Exception {
 				RuntimeFuncObject func = (RuntimeFuncObject) args.get(0).getObj();
 				RuntimeObject obj = args.get(1);
-				return new RuntimeObject(BigInteger.valueOf(status.createProcess(func, obj)));
+				return new RuntimeObject((long) (status.createProcess(func, obj)));
 			}
 		});
 		info.addExternalFunc("g_create_user_process", new IRuntimeDebugExec() {
@@ -108,7 +107,7 @@ public class ModuleProc implements IInterpreterModule {
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) throws Exception {
 				RuntimeFuncObject func = (RuntimeFuncObject) args.get(0).getObj();
-				return new RuntimeObject(BigInteger.valueOf(status.createUsrProcess(func)));
+				return new RuntimeObject((long) (status.createUsrProcess(func)));
 			}
 		});
 		info.addExternalFunc("g_create_user_process_args", new IRuntimeDebugExec() {
@@ -127,7 +126,7 @@ public class ModuleProc implements IInterpreterModule {
 			                                      IRuntimeStatus status) throws Exception {
 				RuntimeFuncObject func = (RuntimeFuncObject) args.get(0).getObj();
 				RuntimeObject obj = args.get(1);
-				return new RuntimeObject(BigInteger.valueOf(status.createUsrProcess(func, obj)));
+				return new RuntimeObject((long) (status.createUsrProcess(func, obj)));
 			}
 		});
 		info.addExternalFunc("g_get_user_procs", new IRuntimeDebugExec() {
@@ -166,7 +165,7 @@ public class ModuleProc implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				return new RuntimeObject(BigInteger.valueOf(status.getPid()));
+				return new RuntimeObject((long) (status.getPid()));
 			}
 		});
 		info.addExternalFunc("g_get_parent_pid", new IRuntimeDebugExec() {
@@ -183,7 +182,7 @@ public class ModuleProc implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				return new RuntimeObject(BigInteger.valueOf(status.getParentPid()));
+				return new RuntimeObject((long) (status.getParentPid()));
 			}
 		});
 		info.addExternalFunc("g_get_process_priority", new IRuntimeDebugExec() {
@@ -200,7 +199,7 @@ public class ModuleProc implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				return new RuntimeObject(BigInteger.valueOf(status.getPriority()));
+				return new RuntimeObject((long) (status.getPriority()));
 			}
 		});
 		info.addExternalFunc("g_set_process_priority", new IRuntimeDebugExec() {
@@ -217,8 +216,8 @@ public class ModuleProc implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				BigInteger priority = (BigInteger) args.get(0).getObj();
-				return new RuntimeObject(status.setPriority(priority.intValue()));
+				long priority = args.get(0).getLong();
+				return new RuntimeObject(status.setPriority((int) priority));
 			}
 		});
 		info.addExternalFunc("g_join_process_once", new IRuntimeDebugExec() {
@@ -235,8 +234,8 @@ public class ModuleProc implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				BigInteger pid = (BigInteger) args.get(0).getObj();
-				return new RuntimeObject(status.getService().getProcessService().join(pid.intValue(), status.getPid()));
+				long pid = args.get(0).getLong();
+				return new RuntimeObject(status.getService().getProcessService().join((int) pid, status.getPid()));
 			}
 		});
 		info.addExternalFunc("g_live_process", new IRuntimeDebugExec() {
@@ -253,8 +252,8 @@ public class ModuleProc implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				BigInteger pid = (BigInteger) args.get(0).getObj();
-				return new RuntimeObject(status.getService().getProcessService().live(pid.intValue()));
+				long pid = args.get(0).getLong();
+				return new RuntimeObject(status.getService().getProcessService().live((int) pid));
 			}
 		});
 		info.addExternalFunc("g_sleep", new IRuntimeDebugExec() {
@@ -271,9 +270,8 @@ public class ModuleProc implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				BigInteger turn = (BigInteger) args.get(0).getObj();
-				int time = turn.intValue();
-				return new RuntimeObject(BigInteger.valueOf(
+				int time = args.get(0).getInt();
+				return new RuntimeObject((long) (
 						status.getService().getProcessService().sleep(status.getPid(), time > 0 ? time : 0)));
 			}
 		});
@@ -363,7 +361,7 @@ public class ModuleProc implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) throws Exception {
-				String name = args.get(0).getObj().toString();
+				String name = args.get(0).getString();
 				int handle = status.getService().getPipeService().create(name, status.getPage());
 				if (handle == -1)
 					status.err(RuntimeException.RuntimeError.MAX_HANDLE);
@@ -384,7 +382,7 @@ public class ModuleProc implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				String name = args.get(0).getObj().toString();
+				String name = args.get(0).getString();
 				return new RuntimeObject(status.getService().getPipeService().query(name));
 			}
 		});
@@ -402,7 +400,7 @@ public class ModuleProc implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				int handle = (int) args.get(0).getObj();
+				int handle = args.get(0).getInt();
 				return new RuntimeObject(status.getService().getPipeService().destroy(handle));
 			}
 		});
@@ -438,7 +436,7 @@ public class ModuleProc implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				int handle = (int) args.get(0).getObj();
+				int handle = args.get(0).getInt();
 				status.getService().getProcessService().sleep(status.getPid(), PIPE_READ_TIME);
 				return new RuntimeObject(status.getService().getPipeService().hasData(handle));
 			}
@@ -457,7 +455,7 @@ public class ModuleProc implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				int handle = (int) args.get(0).getObj();
+				int handle = args.get(0).getInt();
 				char ch = status.getService().getPipeService().read(status.getPid(), handle);
 				return new RuntimeObject(ch);
 			}
@@ -476,7 +474,7 @@ public class ModuleProc implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				int handle = (int) args.get(0).getObj();
+				int handle = args.get(0).getInt();
 				char ch = status.getService().getPipeService().readNoBlock(status.getPid(), handle);
 				return new RuntimeObject(ch);
 			}
@@ -495,8 +493,8 @@ public class ModuleProc implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				int handle = (int) args.get(0).getObj();
-				char ch = (char) args.get(1).getObj();
+				int handle = args.get(0).getInt();
+				char ch = args.get(1).getChar();
 				return new RuntimeObject(status.getService().getPipeService().write(handle, ch));
 			}
 		});
@@ -517,13 +515,13 @@ public class ModuleProc implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) throws Exception {
-				String name = args.get(0).getObj().toString();
+				String name = args.get(0).getString();
 				int result = status.getService().getShareService().startSharing(name, args.get(1), status.getPage());
 				if (result == -1)
 					status.err(RuntimeException.RuntimeError.MAX_HANDLE, name);
 				if (result == 0)
 					status.err(RuntimeException.RuntimeError.DUP_SHARE_NAME, name);
-				return new RuntimeObject(BigInteger.valueOf(result));
+				return new RuntimeObject((long) (result));
 			}
 		});
 		info.addExternalFunc("g_create_share", new IRuntimeDebugExec() {
@@ -540,11 +538,11 @@ public class ModuleProc implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) throws Exception {
-				String name = args.get(0).getObj().toString();
+				String name = args.get(0).getString();
 				int result = status.getService().getShareService().createSharing(name, args.get(1), status.getPage());
 				if (result == -1)
 					status.err(RuntimeException.RuntimeError.MAX_HANDLE, name);
-				return new RuntimeObject(BigInteger.valueOf(result));
+				return new RuntimeObject((long) (result));
 			}
 		});
 		info.addExternalFunc("g_query_share", new IRuntimeDebugExec() {
@@ -561,7 +559,7 @@ public class ModuleProc implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				String name = args.get(0).getObj().toString();
+				String name = args.get(0).getString();
 				return status.getService().getShareService().getSharing(name, false);
 			}
 		});
@@ -579,7 +577,7 @@ public class ModuleProc implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				String name = args.get(0).getObj().toString();
+				String name = args.get(0).getString();
 				return status.getService().getShareService().getSharing(name, true);
 			}
 		});
@@ -597,7 +595,7 @@ public class ModuleProc implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) throws Exception {
-				String name = args.get(0).getObj().toString();
+				String name = args.get(0).getString();
 				int result = status.getService().getShareService().stopSharing(name);
 				if (result == -1)
 					status.err(RuntimeException.RuntimeError.INVALID_SHARE_NAME, name);
@@ -620,7 +618,7 @@ public class ModuleProc implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				String name = args.get(0).getObj().toString();
+				String name = args.get(0).getString();
 				if (status.getService().getShareService().isLocked(name)) {
 					status.getService().getProcessService().sleep(status.getPid(), LOCK_TIME);
 					return new RuntimeObject(true);
@@ -643,7 +641,7 @@ public class ModuleProc implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				String name = args.get(0).getObj().toString();
+				String name = args.get(0).getString();
 				if (status.getService().getShareService().isLocked(name)) {
 					status.getService().getShareService().setLocked(name, false);
 					return new RuntimeObject(true);
@@ -665,7 +663,7 @@ public class ModuleProc implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) throws Exception {
-				return new RuntimeObject(BigInteger.valueOf(status.getRing3().exec(args.get(0).getObj().toString())));
+				return new RuntimeObject((long) (status.getRing3().exec(args.get(0).getString())));
 			}
 		});
 		info.addExternalFunc("g_proc_exec_file", new IRuntimeDebugExec() {
@@ -682,7 +680,7 @@ public class ModuleProc implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) throws Exception {
-				return new RuntimeObject(BigInteger.valueOf(status.getRing3().exec_file(
+				return new RuntimeObject((long) (status.getRing3().exec_file(
 						String.valueOf(args.get(0).getObj()),
 						String.valueOf(args.get(1).getObj()))));
 			}
@@ -701,9 +699,9 @@ public class ModuleProc implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				BigInteger pid = (BigInteger) args.get(0).getObj();
-				return new RuntimeObject(BigInteger.valueOf(
-						status.getService().getProcessService().ring3Kill(pid.intValue(), "强制退出")));
+				long pid = args.get(0).getLong();
+				return new RuntimeObject((long) (
+						status.getService().getProcessService().ring3Kill((int) pid, "强制退出")));
 			}
 		});
 	}

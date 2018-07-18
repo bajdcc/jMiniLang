@@ -4,7 +4,6 @@ import com.bajdcc.LALR1.grammar.codegen.CodegenFuncDoc;
 import com.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
 
 import java.io.Serializable;
-import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -73,7 +72,7 @@ public class RuntimeDebugInfo implements IRuntimeDebugInfo, Serializable {
 		externalExec.entrySet().stream().sorted(Comparator.comparing(Map.Entry::getKey)).forEach(a -> {
 			RuntimeArray arr = new RuntimeArray();
 			arr.add(new RuntimeObject(a.getKey()));
-			arr.add(new RuntimeObject(BigInteger.valueOf(exports.getOrDefault(a.getKey(), -1))));
+			arr.add(new RuntimeObject((long) (exports.getOrDefault(a.getKey(), -1))));
 			if (a.getValue() instanceof CodegenFuncDoc)
 				arr.add(new RuntimeObject(((CodegenFuncDoc) a.getValue()).getParamsDoc()));
 			else

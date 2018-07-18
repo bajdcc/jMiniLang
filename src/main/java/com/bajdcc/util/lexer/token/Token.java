@@ -2,9 +2,6 @@ package com.bajdcc.util.lexer.token;
 
 import com.bajdcc.util.Position;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-
 /**
  * 单词
  *
@@ -89,9 +86,9 @@ public class Token implements Cloneable {
 			token.kToken = TokenType.STRING;
 		} else if (object instanceof Character) {
 			token.kToken = TokenType.CHARACTER;
-		} else if (object instanceof BigInteger) {
+		} else if (object instanceof Long) {
 			token.kToken = TokenType.INTEGER;
-		} else if (object instanceof BigDecimal) {
+		} else if (object instanceof Double) {
 			token.kToken = TokenType.DECIMAL;
 		} else if (object instanceof Boolean) {
 			token.kToken = TokenType.BOOL;

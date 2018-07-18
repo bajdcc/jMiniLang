@@ -8,6 +8,7 @@ import com.bajdcc.util.lexer.token.TokenType;
 
 import java.math.BigDecimal;
 
+
 /**
  * 数字解析
  *
@@ -41,9 +42,10 @@ public class NumberTokenizer extends TokenAlgorithm {
 			BigDecimal decimal = new BigDecimal(string);
 			token.object = decimal;
 			if (string.indexOf('.') == -1) {
-				token.object = decimal.toBigIntegerExact();
+				token.object = decimal.toBigIntegerExact().longValue();
 				token.kToken = TokenType.INTEGER;
 			} else {
+				token.object = decimal.doubleValue();
 				token.kToken = TokenType.DECIMAL;
 			}
 		} catch (ArithmeticException e) {

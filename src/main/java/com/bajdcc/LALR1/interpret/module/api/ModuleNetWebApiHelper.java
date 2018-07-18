@@ -5,8 +5,6 @@ import com.bajdcc.LALR1.grammar.runtime.RuntimeObjectType;
 import com.bajdcc.LALR1.grammar.runtime.data.RuntimeArray;
 import com.bajdcc.LALR1.grammar.runtime.data.RuntimeMap;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -30,11 +28,9 @@ public class ModuleNetWebApiHelper {
 			case kChar:
 			case kString:
 			case kBool:
-				return obj.getObj();
 			case kInt:
-				return ((BigInteger) obj.getObj()).longValue();
 			case kReal:
-				return ((BigDecimal) obj.getObj()).doubleValue();
+				return obj.getObj();
 			case kArray:
 				return ((RuntimeArray) obj.getObj()).getArray().stream()
 						.map(ModuleNetWebApiHelper::toJsonObject).collect(Collectors.toList());

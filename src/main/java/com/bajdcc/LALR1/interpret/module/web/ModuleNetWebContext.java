@@ -3,7 +3,6 @@ package com.bajdcc.LALR1.interpret.module.web;
 import com.bajdcc.LALR1.grammar.runtime.RuntimeObject;
 import com.bajdcc.LALR1.grammar.runtime.data.RuntimeMap;
 
-import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.channels.SelectionKey;
@@ -53,7 +52,7 @@ public class ModuleNetWebContext {
 		req.put("url", new RuntimeObject(url));
 		try {
 			URL u = new URL(url);
-			req.put("port", new RuntimeObject(BigInteger.valueOf(u.getPort())));
+			req.put("port", new RuntimeObject((long) (u.getPort())));
 			req.put("host", new RuntimeObject(u.getHost()));
 			req.put("path", new RuntimeObject(u.getPath()));
 			req.put("query", new RuntimeObject(u.getQuery()));

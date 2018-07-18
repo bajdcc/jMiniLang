@@ -28,7 +28,6 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.InputStream;
-import java.math.BigInteger;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
@@ -218,7 +217,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 		currentStack = stack.get(machine.stack.indexOf(machine.currentStack));
 		currentPage = machine.currentPage;
 		triesCount = machine.triesCount;
-		store(new RuntimeObject(BigInteger.valueOf(-1)));
+		store(new RuntimeObject(-1L));
 		opReturn();
 	}
 
@@ -696,12 +695,12 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 	@Override
 	public RuntimeArray getAllDocs() {
 		RuntimeArray array = new RuntimeArray();
-		int i = 1;
+		long i = 1L;
 		for (IInterpreterModule module : Stream.of(modulesSystem, modulesUser)
 				.flatMap(Arrays::stream).collect(Collectors.toList())) {
 			try {
 				for (RuntimeArray arr : module.getCodePage().getInfo().getExternFuncList()) {
-					arr.insert(0, new RuntimeObject(BigInteger.valueOf(i++)));
+					arr.insert(0, new RuntimeObject(i++));
 					arr.insert(1, new RuntimeObject(module.getModuleName()));
 					array.add(new RuntimeObject(arr));
 				}
@@ -720,7 +719,11 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 	private void switchPage() throws RuntimeException {
 		if (!currentStack.reg.pageId.isEmpty()) {
 			currentPage = pageMap.get(currentStack.reg.pageId);
-			pageName = currentPage.getInfo().getDataMap().get("name").toString();
+			pageName = currentPage.
+					getInfo().
+					getDataMap().
+					get("name").
+					toString();
 		} else {
 			err(RuntimeError.WRONG_CODEPAGE);
 		}
@@ -785,7 +788,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 			int id = loadInt();
 			if (id == -1) {
 				id = loadInt();
-				String name = fetchFromGlobalData(id).getObj().toString();
+				String name = fetchFromGlobalData(id).getString();
 				IRuntimeDebugValue value = currentPage.getInfo().getValueCallByName(name);
 				if (value != null) {
 					func.addEnv(id, value.getRuntimeObject());
@@ -1000,7 +1003,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 	public void opImport() throws RuntimeException {
 		int idx = loadInt();
 		RuntimeObject obj = fetchFromGlobalData(idx);
-		String name = obj.getObj().toString();
+		String name = obj.getString();
 		if (ring == 3 && !name.startsWith("user.")) {
 			err(RuntimeError.WRONG_IMPORT, name);
 		}
@@ -1015,7 +1018,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 	public void opLoadExtern() throws RuntimeException {
 		int idx = loadInt();
 		RuntimeObject obj = fetchFromGlobalData(idx);
-		String name = obj.getObj().toString();
+		String name = obj.getString();
 		IRuntimeDebugValue value = currentPage.getInfo().getValueCallByName(name);
 		if (value != null) {
 			currentStack.pushData(value.getRuntimeObject());
@@ -1084,13 +1087,13 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 				pop();
 				return;
 			} else if (obj.getType() == RuntimeObjectType.kString) {
-				name = obj.getObj().toString();
+				name = obj.getString();
 			} else {
 				err(RuntimeError.WRONG_LOAD_EXTERN, obj.toString());
 			}
 		} else {
 			RuntimeObject obj = fetchFromGlobalData(idx);
-			name = obj.getObj().toString();
+			name = obj.getString();
 		}
 		List<RuntimeCodePage> refers = pageRefer.get(pageName);
 		for (RuntimeCodePage page : refers) {
@@ -1341,15 +1344,15 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 		RuntimeObjectType typeObj = obj.getType();
 		if (typeIdx == RuntimeObjectType.kInt) {
 			if (typeObj == RuntimeObjectType.kArray) {
-				currentStack.pushData(new RuntimeObject(((RuntimeArray) obj.getObj()).get(((BigInteger) index.getObj()).intValue())));
+				currentStack.pushData(new RuntimeObject(obj.getArray().get(index.getInt())));
 				return;
 			} else if (typeObj == RuntimeObjectType.kString) {
-				currentStack.pushData(new RuntimeObject((String.valueOf(obj.getObj()).charAt(((BigInteger) index.getObj()).intValue()))));
+				currentStack.pushData(new RuntimeObject(obj.getString().charAt(index.getInt())));
 				return;
 			}
 		} else if (typeIdx == RuntimeObjectType.kString) {
 			if (typeObj == RuntimeObjectType.kMap) {
-				currentStack.pushData(new RuntimeObject(((RuntimeMap) obj.getObj()).get(String.valueOf(index.getObj()))));
+				currentStack.pushData(new RuntimeObject(obj.getMap().get(String.valueOf(index.getObj()))));
 				return;
 			}
 		}
@@ -1365,13 +1368,13 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 		RuntimeObjectType typeObj = obj.getType();
 		if (typeIdx == RuntimeObjectType.kInt) {
 			if (typeObj == RuntimeObjectType.kArray) {
-				((RuntimeArray) obj.getObj()).set(((BigInteger) index.getObj()).intValue(), exp);
+				obj.getArray().set((int) (long) index.getObj(), exp);
 				currentStack.pushData(obj);
 				return;
 			}
 		} else if (typeIdx == RuntimeObjectType.kString) {
 			if (typeObj == RuntimeObjectType.kMap) {
-				((RuntimeMap) obj.getObj()).put(String.valueOf(index.getObj()), exp);
+				obj.getMap().put(String.valueOf(index.getObj()), exp);
 				currentStack.pushData(obj);
 				return;
 			}

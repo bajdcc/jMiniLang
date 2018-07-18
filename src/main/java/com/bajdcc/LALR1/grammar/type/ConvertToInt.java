@@ -3,9 +3,6 @@ package com.bajdcc.LALR1.grammar.type;
 import com.bajdcc.util.lexer.token.Token;
 import com.bajdcc.util.lexer.token.TokenType;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-
 /**
  * 【类型转换】转换为整数类型
  *
@@ -41,30 +38,30 @@ public class ConvertToInt implements ITokenConventer {
 	 * @param token 操作数
 	 * @return 转换结果
 	 */
-	private static BigInteger getIntValue(Token token) {
+	private static long getIntValue(Token token) {
 		switch (token.kToken) {
 			case BOOL:
 				boolean bool = (boolean) token.object;
-				return bool ? BigInteger.ONE : BigInteger.ZERO;
+				return bool ? 1L : 0L;
 			case CHARACTER:
 				char ch = (char) token.object;
-				return BigInteger.valueOf(ch);
+				return (long) ch;
 			case STRING:
 				String str = (String) token.object;
 				try {
-					return new BigInteger(str);
+					return Long.parseLong(str);
 				} catch (NumberFormatException e) {
 					token.kToken = TokenType.ERROR;
 				}
 				break;
 			case INTEGER:
-				return (BigInteger) token.object;
+				return (long) token.object;
 			case DECIMAL:
-				BigDecimal decimal = (BigDecimal) token.object;
-				return decimal.toBigInteger();
+				double decimal = (double) token.object;
+				return (long) decimal;
 			default:
 				break;
 		}
-		return null;
+		return 0L;
 	}
 }

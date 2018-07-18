@@ -2,7 +2,6 @@ package com.bajdcc.LALR1.grammar.runtime.data;
 
 import com.bajdcc.LALR1.grammar.runtime.RuntimeObject;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -38,7 +37,7 @@ public class RuntimeMap implements Cloneable {
 	}
 
 	public RuntimeObject size() {
-		return new RuntimeObject(BigInteger.valueOf(map.size()));
+		return new RuntimeObject((long) (map.size()));
 	}
 
 	public boolean contains(String key) {

@@ -4,9 +4,7 @@ import com.bajdcc.LALR1.grammar.runtime.IRuntimeDebugExec;
 import com.bajdcc.LALR1.grammar.runtime.IRuntimeStatus;
 import com.bajdcc.LALR1.grammar.runtime.RuntimeObject;
 import com.bajdcc.LALR1.grammar.runtime.RuntimeObjectType;
-import com.bajdcc.LALR1.grammar.type.TokenTools;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -18,7 +16,6 @@ public class ModuleMathUnaryFunc implements IRuntimeDebugExec {
 
 	public enum ModuleMathUnaryFuncType {
 		kSqrt,
-		kSqrtDouble,
 		kCos,
 		kSin,
 	}
@@ -36,17 +33,11 @@ public class ModuleMathUnaryFunc implements IRuntimeDebugExec {
 	                                      IRuntimeStatus status) {
 		switch (type) {
 			case kSqrt:
-				return new RuntimeObject(ModuleMath.sqrt((BigDecimal) args.get(0)
-						.getObj(), TokenTools.SCALE_NUM));
-			case kSqrtDouble:
-				return new RuntimeObject(BigDecimal.valueOf(Math.sqrt(((BigDecimal) args.get(0)
-						.getObj()).doubleValue())));
+				return new RuntimeObject(Math.sqrt(args.get(0).getDouble()));
 			case kCos:
-				return new RuntimeObject(BigDecimal.valueOf(Math.cos(((BigDecimal) args.get(0)
-						.getObj()).doubleValue())));
+				return new RuntimeObject(Math.cos(args.get(0).getDouble()));
 			case kSin:
-				return new RuntimeObject(BigDecimal.valueOf(Math.sin(((BigDecimal) args.get(0)
-						.getObj()).doubleValue())));
+				return new RuntimeObject(Math.sin(args.get(0).getDouble()));
 			default:
 				break;
 		}

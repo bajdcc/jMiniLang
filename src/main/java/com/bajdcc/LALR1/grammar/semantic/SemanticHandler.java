@@ -11,8 +11,6 @@ import com.bajdcc.util.lexer.token.OperatorType;
 import com.bajdcc.util.lexer.token.Token;
 import com.bajdcc.util.lexer.token.TokenType;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -219,22 +217,22 @@ public class SemanticHandler {
 				Token token = indexed.get(10).getToken();
 				Token num = new Token();
 				if (token.kToken == TokenType.INTEGER) {
-					BigInteger n = (BigInteger) token.object;
-					if (n.signum() != -1) {
+					long n = (long) token.object;
+					if (n > 0L) {
 						recorder.add(SemanticError.INVALID_OPERATOR,
 								token);
 						return indexed.get(0).getObject();
 					}
-					num.object = n.negate();
+					num.object = -n;
 					num.kToken = TokenType.INTEGER;
 				} else {
-					BigDecimal n = (BigDecimal) token.object;
-					if (n.signum() != -1) {
+					double n = (double) token.object;
+					if (n > 0D) {
 						recorder.add(SemanticError.INVALID_OPERATOR,
 								token);
 						return indexed.get(0).getObject();
 					}
-					num.object = n.negate();
+					num.object = -n;
 					num.kToken = TokenType.DECIMAL;
 				}
 				ExpBinop binop = new ExpBinop();

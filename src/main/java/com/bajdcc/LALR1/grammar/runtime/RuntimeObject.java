@@ -5,9 +5,6 @@ import com.bajdcc.LALR1.grammar.runtime.data.RuntimeFuncObject;
 import com.bajdcc.LALR1.grammar.runtime.data.RuntimeMap;
 import com.bajdcc.util.lexer.token.TokenType;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-
 /**
  * 【运行时】运行时对象
  *
@@ -34,7 +31,72 @@ public class RuntimeObject implements Cloneable {
 		copyFrom(obj);
 	}
 
-	public void copyFrom(RuntimeObject obj) {
+	static RuntimeObject createObject(RuntimeObject obj) {
+		return new RuntimeObject(obj);
+	}
+
+	public static RuntimeObjectType fromObject(Object obj) {
+		if (obj == null) {
+			return RuntimeObjectType.kNull;
+		}
+		if (obj instanceof String) {
+			return RuntimeObjectType.kString;
+		}
+		if (obj instanceof Character) {
+			return RuntimeObjectType.kChar;
+		}
+		if (obj instanceof Long) {
+			return RuntimeObjectType.kInt;
+		}
+		if (obj instanceof Double) {
+			return RuntimeObjectType.kReal;
+		}
+		if (obj instanceof Boolean) {
+			return RuntimeObjectType.kBool;
+		}
+		if (obj instanceof Integer) {
+			return RuntimeObjectType.kPtr;
+		}
+		if (obj instanceof RuntimeFuncObject) {
+			return RuntimeObjectType.kFunc;
+		}
+		if (obj instanceof RuntimeArray) {
+			return RuntimeObjectType.kArray;
+		}
+		if (obj instanceof RuntimeMap) {
+			return RuntimeObjectType.kMap;
+		}
+		return RuntimeObjectType.kObject;
+	}
+
+	private void calcTypeFromObject() {
+		type = fromObject(obj);
+	}
+
+	public Object getObj() {
+		return obj;
+	}
+
+	static TokenType toTokenType(RuntimeObjectType obj) {
+		switch (obj) {
+			case kBool:
+				return TokenType.BOOL;
+			case kChar:
+				return TokenType.CHARACTER;
+			case kInt:
+				return TokenType.INTEGER;
+			case kReal:
+				return TokenType.DECIMAL;
+			case kString:
+				return TokenType.STRING;
+			case kPtr:
+				return TokenType.POINTER;
+			default:
+				return TokenType.ERROR;
+		}
+	}
+
+	void copyFrom(RuntimeObject obj) {
 		if (obj != null) {
 			this.obj = obj.obj; // 注意：这里是浅拷贝！
 			this.type = obj.type;
@@ -48,24 +110,40 @@ public class RuntimeObject implements Cloneable {
 		}
 	}
 
-	public static RuntimeObject createObject(RuntimeObject obj) {
-		return new RuntimeObject(obj);
+	public int getInt() {
+		if (type == RuntimeObjectType.kInt)
+			return (int) (long) obj;
+		return (int) obj;
 	}
 
-	private void calcTypeFromObject() {
-		type = fromObject(obj);
+	public long getLong() {
+		if (type == RuntimeObjectType.kPtr)
+			return (long) (int) obj;
+		return (long) obj;
 	}
 
-	public Object getObj() {
-		return obj;
+	public double getDouble() {
+		return (double) obj;
+	}
+
+	public RuntimeArray getArray() {
+		return (RuntimeArray) obj;
+	}
+
+	public RuntimeMap getMap() {
+		return (RuntimeMap) obj;
+	}
+
+	public String getString() {
+		return (String) obj;
 	}
 
 	public String getTypeName() {
 		return fromObject(obj).getName();
 	}
 
-	public int getTypeIndex() {
-		return fromObject(obj).ordinal();
+	public boolean getBool() {
+		return (boolean) obj;
 	}
 
 	public String getTypeString() {
@@ -102,57 +180,12 @@ public class RuntimeObject implements Cloneable {
 		this.flag[0] = flag;
 	}
 
-	public static RuntimeObjectType fromObject(Object obj) {
-		if (obj == null) {
-			return RuntimeObjectType.kNull;
-		}
-		if (obj instanceof String) {
-			return RuntimeObjectType.kString;
-		}
-		if (obj instanceof Character) {
-			return RuntimeObjectType.kChar;
-		}
-		if (obj instanceof BigInteger) {
-			return RuntimeObjectType.kInt;
-		}
-		if (obj instanceof BigDecimal) {
-			return RuntimeObjectType.kReal;
-		}
-		if (obj instanceof Boolean) {
-			return RuntimeObjectType.kBool;
-		}
-		if (obj instanceof Integer) {
-			return RuntimeObjectType.kPtr;
-		}
-		if (obj instanceof RuntimeFuncObject) {
-			return RuntimeObjectType.kFunc;
-		}
-		if (obj instanceof RuntimeArray) {
-			return RuntimeObjectType.kArray;
-		}
-		if (obj instanceof RuntimeMap) {
-			return RuntimeObjectType.kMap;
-		}
-		return RuntimeObjectType.kObject;
+	public char getChar() {
+		return (char) obj;
 	}
 
-	public static TokenType toTokenType(RuntimeObjectType obj) {
-		switch (obj) {
-			case kBool:
-				return TokenType.BOOL;
-			case kChar:
-				return TokenType.CHARACTER;
-			case kInt:
-				return TokenType.INTEGER;
-			case kReal:
-				return TokenType.DECIMAL;
-			case kString:
-				return TokenType.STRING;
-			case kPtr:
-				return TokenType.POINTER;
-			default:
-				return TokenType.ERROR;
-		}
+	public long getTypeIndex() {
+		return fromObject(obj).ordinal();
 	}
 
 	public RuntimeObject clone() {
@@ -189,12 +222,6 @@ public class RuntimeObject implements Cloneable {
 			if (this.obj == null)
 				return o.obj == null && this.type.equals(o.type) && equals_flag(this.flag, o.flag);
 			if (this.type.equals(o.type) && equals_flag(this.flag, o.flag)) {
-				switch (this.type) {
-					case kInt:
-						return ((BigInteger) this.obj).compareTo((BigInteger) o.obj) == 0;
-					case kReal:
-						return ((BigDecimal) this.obj).compareTo((BigDecimal) o.obj) == 0;
-				}
 				return this.obj.equals(o.obj);
 			}
 			return false;

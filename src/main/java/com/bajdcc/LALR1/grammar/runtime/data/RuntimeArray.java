@@ -4,8 +4,9 @@ import com.bajdcc.LALR1.grammar.runtime.IRuntimeStatus;
 import com.bajdcc.LALR1.grammar.runtime.RuntimeException;
 import com.bajdcc.LALR1.grammar.runtime.RuntimeObject;
 
-import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -86,7 +87,7 @@ public class RuntimeArray implements Cloneable {
 	}
 
 	public RuntimeObject size() {
-		return new RuntimeObject(BigInteger.valueOf(array.size()));
+		return new RuntimeObject((long) (array.size()));
 	}
 
 	public int length() {

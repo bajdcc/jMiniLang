@@ -1,6 +1,5 @@
 package com.bajdcc.LALR1.interpret.module;
 
-import org.apache.log4j.Logger;
 import com.bajdcc.LALR1.grammar.Grammar;
 import com.bajdcc.LALR1.grammar.runtime.*;
 import com.bajdcc.OP.grammar.error.GrammarException;
@@ -11,9 +10,8 @@ import com.bajdcc.util.lexer.error.RegexException;
 import com.bajdcc.util.lexer.token.OperatorType;
 import com.bajdcc.util.lexer.token.Token;
 import com.bajdcc.util.lexer.token.TokenType;
+import org.apache.log4j.Logger;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -96,7 +94,7 @@ public class ModuleTask implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				return new RuntimeObject(BigInteger.valueOf(System.currentTimeMillis()));
+				return new RuntimeObject(System.currentTimeMillis());
 			}
 		});
 		info.addExternalFunc("g_task_get_pipe_stat", new IRuntimeDebugExec() {
@@ -215,7 +213,7 @@ public class ModuleTask implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				return new RuntimeObject(BigDecimal.valueOf(status.getService().getProcessService().getSpeed()));
+				return new RuntimeObject(status.getService().getProcessService().getSpeed());
 			}
 		});
 	}

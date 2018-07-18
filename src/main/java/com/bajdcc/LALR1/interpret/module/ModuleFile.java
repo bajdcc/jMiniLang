@@ -4,7 +4,6 @@ import com.bajdcc.LALR1.grammar.Grammar;
 import com.bajdcc.LALR1.grammar.runtime.*;
 import com.bajdcc.util.ResourceLoader;
 
-import java.math.BigInteger;
 import java.util.List;
 
 /**
@@ -61,9 +60,9 @@ public class ModuleFile implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				String name = args.get(0).getObj().toString();
-				int mode = ((BigInteger) args.get(1).getObj()).intValue();
-				String encoding = args.get(2).getObj().toString();
+				String name = args.get(0).getString();
+				int mode = args.get(1).getInt();
+				String encoding = args.get(2).getString();
 				return new RuntimeObject(status.getService().getFileService().create(name, mode, encoding, status.getPage()));
 			}
 		});
@@ -81,7 +80,7 @@ public class ModuleFile implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				int handle = (int) args.get(0).getObj();
+				int handle = args.get(0).getInt();
 				return new RuntimeObject(status.getService().getFileService().destroy(handle));
 			}
 		});
@@ -99,8 +98,8 @@ public class ModuleFile implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				int handle = (int) args.get(0).getObj();
-				char ch = (char) args.get(1).getObj();
+				int handle = args.get(0).getInt();
+				char ch = args.get(1).getChar();
 				return new RuntimeObject(status.getService().getFileService().write(handle, ch));
 			}
 		});
@@ -118,8 +117,8 @@ public class ModuleFile implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				int handle = (int) args.get(0).getObj();
-				String str = (String) args.get(1).getObj();
+				int handle = args.get(0).getInt();
+				String str = args.get(1).getString();
 				return new RuntimeObject(status.getService().getFileService().writeString(handle, str));
 			}
 		});
@@ -137,7 +136,7 @@ public class ModuleFile implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				int handle = (int) args.get(0).getObj();
+				int handle = args.get(0).getInt();
 				int ch = status.getService().getFileService().read(handle);
 				if (ch == -1)
 					return null;
@@ -158,7 +157,7 @@ public class ModuleFile implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				int handle = (int) args.get(0).getObj();
+				int handle = args.get(0).getInt();
 				String str = status.getService().getFileService().readString(handle);
 				return new RuntimeObject(str);
 			}
@@ -177,7 +176,7 @@ public class ModuleFile implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				String filename = String.valueOf(args.get(0).getObj());
+				String filename = args.get(0).getString();
 				return new RuntimeObject(status.getService().getFileService().exists(filename));
 			}
 		});
@@ -195,7 +194,7 @@ public class ModuleFile implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				String filename = String.valueOf(args.get(0).getObj());
+				String filename = args.get(0).getString();
 				return new RuntimeObject(status.getService().getFileService().readAll(filename));
 			}
 		});

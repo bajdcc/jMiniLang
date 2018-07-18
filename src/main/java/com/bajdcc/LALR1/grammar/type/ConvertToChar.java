@@ -3,9 +3,6 @@ package com.bajdcc.LALR1.grammar.type;
 import com.bajdcc.util.lexer.token.Token;
 import com.bajdcc.util.lexer.token.TokenType;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-
 /**
  * 【类型转换】转换为字符类型
  *
@@ -40,11 +37,11 @@ public class ConvertToChar implements ITokenConventer {
 				String str = (String) token.object;
 				return str.isEmpty() ? '\0' : str.charAt(0);
 			case DECIMAL:
-				BigDecimal decimal = (BigDecimal) token.object;
-				return (char) decimal.intValue();
+				double decimal = (double) token.object;
+				return (char) (double) decimal;
 			case INTEGER:
-				BigInteger integer = (BigInteger) token.object;
-				return (char) integer.intValue();
+				long integer = (long) token.object;
+				return (char) (long) integer;
 			default:
 				break;
 		}
