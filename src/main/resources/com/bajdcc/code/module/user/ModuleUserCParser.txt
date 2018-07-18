@@ -51,7 +51,7 @@ var import_token = func ~() {
         this."to_string" := lambda(this) {
             var s = "[" + this."line" + ":" + this."start" + "-" + this."end"+ "] ";
             s += this."token" + ", " + this."ordinal"[1];
-            if (this."is_literal"() || this."token" == "ILLEGAL") {
+            if (this."is_literal"() || this."token" == "ILLEGAL" || this."token" == "COMMENT") {
                 s += ", " + this."value";
             }
             return s;
@@ -282,6 +282,7 @@ var import_scanner = func ~() {
             };
             if (decimal) { // 确定是浮点
                 i--;
+                token."start" := i;
                 token."set_token"("#FLOAT");
                 this."next_digit"(10); // 识别数字
                 exponent();
@@ -319,6 +320,39 @@ var import_scanner = func ~() {
             exponent();
             return exit();
         };
+        this."next_comment" := lambda(this) {
+            var i = this."offset";
+            i--;
+            var token = g_new_class("clib::c::token", [], [["set_token", "COMMENT"]]);
+            token."start" := i;
+            token."line" := this."lines"."size"();
+            var exit = func ~() {
+                token."set_value"(this."str"."substr"(i, this."offset"));
+                token."end" := this."offset";
+                return token;
+            };
+            var star = false;
+            if (this."ch" == '/') { // Comment -> '//'
+                this."next"();
+                while (this."ch" != '\n' && this."ch" > '\0') {
+                    this."next"();
+                }
+                return exit();
+            } else { // Comment -> '/*'
+                var star;
+                this."next"();
+                while (this."ch" > '\0') {
+                    star := this."ch" == '*';
+                    this."next"();
+                    if (star && this."ch" == '/') {
+                        this."next"();
+                        return exit();
+                    }
+                }
+            }
+            this."err"(this."lines"."size"(), i, this."offset", "comment not terminated");
+            return exit();
+        };
         this."skip_whitespace" := lambda(this) {
             while (this."is_whitespace"()) {
                 this."next"();
@@ -337,7 +371,13 @@ var import_scanner = func ~() {
                 return this."next_number"(false);
             } else {
                 var i = this."offset";
+                var ch = this."ch";
                 if (this."next"()) {
+                    if (ch == '/') { // 以 '/' 开头
+                        if (this."ch" == '/' || this."ch" == '*') { // 注释
+                            return this."next_comment"();
+                        }
+                    }
                     return g_new_class("clib::c::token", [["start", i],
                         ["end", this."offset"], ["line", this."lines"."size"()],
                         ["value", this."str"."substr"(i, this."offset")]],

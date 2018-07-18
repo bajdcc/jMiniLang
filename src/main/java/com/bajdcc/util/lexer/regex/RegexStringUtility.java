@@ -46,6 +46,11 @@ public class RegexStringUtility {
 			ch = fromDigit(8, 3, error);
 		} else if (ch == 'u') {
 			ch = fromDigit(16, 4, error);
+		} else if (ch >= '0' && ch <= '9') {
+			ch = (char)(ch - '0');
+			if (ch == 0) {
+				ch = '\uffff'; // skip regex \0
+			}
 		}
 		return ch;
 	}

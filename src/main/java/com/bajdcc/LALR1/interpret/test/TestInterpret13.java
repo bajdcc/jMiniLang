@@ -188,7 +188,8 @@ public class TestInterpret13 {
 							"g_proc_exec(\"" +
 							"import \\\"user.base\\\";" +
 							"import \\\"user.cparser\\\";" +
-							"var code = \\\"abc int auto 123\\ndef 0xabcd 5.6e+78\\n+ 0x 4e 6ea 88. 7e-4\\\";" +
+							"var code = \\\"abc int auto 123\\ndef 0xabcd 5.6e+78\\n+ 0x 4e 6ea 88. 7e-4\\n" +
+							"//123\\\n/*345*/\\\n/*abc\\\ndef*/ /*\\\";" +
 							"var s = g_new_class(\\\"clib::c::scanner\\\", [], [[\\\"init\\\", code]]);" +
 							"var token; while (!(token := s.\\\"scan\\\"()).\\\"eof\\\"()) { g_printn(token.\\\"to_string\\\"()); }" +
 							"g_printn(\\\"Errors: \\\" + s.\\\"ERROR\\\"());" +
