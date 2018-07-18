@@ -17,7 +17,7 @@ public class RuntimeStack {
 	private int parent = -1;
 	private int level = 0;
 
-	public RuntimeRegister reg = new RuntimeRegister();
+	RuntimeRegister reg = new RuntimeRegister();
 	private List<Integer> dataTryCounts = new ArrayList<>();
 	private boolean catchState = false;
 
@@ -37,6 +37,10 @@ public class RuntimeStack {
 
 	public RuntimeStack(int level) {
 		this.level = level;
+	}
+
+	private RuntimeFunc getCall() {
+		return stkCall.get(stkCall.size() - 1);
 	}
 
 	public int getParent() {
@@ -60,22 +64,22 @@ public class RuntimeStack {
 	}
 
 	public void addYield(int id) {
-		stkCall.get(0).addYield();
+		getCall().addYield();
 	}
 
-	public void popYield() {
-		stkCall.get(0).popYield();
+	void popYield() {
+		getCall().popYield();
 	}
 
 	public int getYield() {
-		return stkCall.get(0).getYield();
+		return getCall().getYield();
 	}
 
-	public void resetYield() {
-		stkCall.get(0).resetYield();
+	void resetYield() {
+		getCall().resetYield();
 	}
 
-	public void pushData(RuntimeObject obj) throws RuntimeException {
+	void pushData(RuntimeObject obj) throws RuntimeException {
 		if (obj == null) {
 			throw new NullPointerException("obj");
 		}
@@ -85,7 +89,7 @@ public class RuntimeStack {
 		}
 	}
 
-	public RuntimeObject popData() {
+	RuntimeObject popData() {
 		return stkData.pop();
 	}
 
@@ -93,12 +97,13 @@ public class RuntimeStack {
 		return stkData.peek();
 	}
 
-	public boolean isEmptyStack() {
+	boolean isEmptyStack() {
 		return stkData.isEmpty();
 	}
 
-	public RuntimeObject findVariable(String codePage, int idx) {
-		for (RuntimeFunc func : stkCall) {
+	RuntimeObject findVariable(String codePage, int idx) {
+		for (int i = stkCall.size() - 1; i >= 0; i--) {
+			RuntimeFunc func = stkCall.get(i);
 			if (func.getCurrentPage().equals(codePage)) {
 				List<Map<Integer, RuntimeObject>> tmp = func.getTmp();
 				RuntimeObject obj;
@@ -117,48 +122,54 @@ public class RuntimeStack {
 		return new RuntimeObject(null);
 	}
 
-	public void storeVariableDirect(int idx, RuntimeObject obj) {
-		stkCall.get(0).addTmp(idx, obj);
+	void storeVariableDirect(int idx, RuntimeObject obj) {
+		getCall().addTmp(idx, obj);
 	}
 
-	public void enterScope() {
-		stkCall.get(0).enterScope();
+	void enterScope() {
+		getCall().enterScope();
 	}
 
-	public void leaveScope() {
-		stkCall.get(0).leaveScope();
+	void leaveScope() {
+		getCall().leaveScope();
 	}
 
-	public void storeClosure(int idx, RuntimeObject obj) {
-		stkCall.get(0).addClosure(idx, obj);
+	void storeClosure(int idx, RuntimeObject obj) {
+		getCall().addClosure(idx, obj);
 	}
 
-	public boolean pushFuncData() {
-		stkCall.add(0, new RuntimeFunc());
+	boolean pushFuncData() {
+		stkCall.add(new RuntimeFunc());
 		return stkCall.size() < MAX_CALLSTACKSIZE;
 	}
 
-	public boolean pushFuncArgs(RuntimeObject obj) {
-		stkCall.get(0).addParams(obj);
-		return stkCall.get(0).getParams().size() < MAX_ARGSIZE;
+	boolean pushFuncArgs(RuntimeObject obj) {
+		getCall().addParams(obj);
+		return getCall().getParams().size() < MAX_ARGSIZE;
 	}
 
-	public void opReturn(RuntimeRegister reg) {
-		reg.execId = stkCall.get(0).getRetPc();
-		reg.pageId = stkCall.get(0).getRetPage();
-		stkCall.remove(0);
+	void opReturn(RuntimeRegister reg) {
+		reg.execId = getCall().getRetPc();
+		reg.pageId = getCall().getRetPage();
+		stkCall.remove(stkCall.size() - 1);
 	}
 
-	public int getFuncArgsCount() {
-		return stkCall.get(0).getParams().size();
+	int getFuncArgsCount() {
+		return getCall().getParams().size();
 	}
 
-	public int getFuncArgsCount1() {
-		return stkCall.get(1).getParams().size();
+	int getFuncArgsCount1() {
+		return stkCall.get(stkCall.size() - 2).getParams().size();
 	}
 
-	public RuntimeObject getFuncArgs(int index) {
-		RuntimeFunc func = stkCall.stream().skip(1).filter(a -> a.getName() != null).findFirst().orElse(null);
+	RuntimeObject getFuncArgs(int index) {
+		RuntimeFunc func = null;
+		for (int i = stkCall.size() - 2; i >= 0; i--) {
+			if (stkCall.get(i).getName() != null) {
+				func = stkCall.get(i);
+				break;
+			}
+		}
 		if (func == null)
 			return null;
 		if (index >= 0 && index < func.getParams().size())
@@ -166,51 +177,51 @@ public class RuntimeStack {
 		return null;
 	}
 
-	public int getFuncLevel() {
+	int getFuncLevel() {
 		return stkCall.size();
 	}
 
 	public String getFuncName() {
-		return stkCall.get(0).getName();
+		return getCall().getName();
 	}
 
-	public String getFuncSimpleName() {
-		return stkCall.get(0).getSimpleName();
+	String getFuncSimpleName() {
+		return getCall().getSimpleName();
 	}
 
-	public RuntimeObject loadFuncArgs(int idx) {
-		return stkCall.get(0).getParam(idx);
+	RuntimeObject loadFuncArgs(int idx) {
+		return getCall().getParam(idx);
 	}
 
-	public void opCall(int jmpPc, String jmpPage, int retPc, String retPage,
-	                   String funcName) {
-		stkCall.get(0).setCurrentPc(jmpPc);
-		stkCall.get(0).setCurrentPage(jmpPage);
-		stkCall.get(0).setRetPc(retPc);
-		stkCall.get(0).setRetPage(retPage);
-		stkCall.get(0).setName(funcName == null ? "unknown" : funcName);
+	void opCall(int jmpPc, String jmpPage, int retPc, String retPage,
+	            String funcName) {
+		getCall().setCurrentPc(jmpPc);
+		getCall().setCurrentPage(jmpPage);
+		getCall().setRetPc(retPc);
+		getCall().setRetPage(retPage);
+		getCall().setName(funcName == null ? "unknown" : funcName);
 	}
 
-	public boolean hasCatch() {
+	boolean hasCatch() {
 		return catchState;
+	}
+
+	boolean hasNoTry() {
+		return dataTryCounts.isEmpty();
+	}
+
+	public int getTry() {
+		return getCall().getTryJmp();
 	}
 
 	public void setTry(int jmp) {
 		if (jmp != -1)
 			dataTryCounts.add(stkData.size());
-		stkCall.get(0).setTryJmp(jmp);
+		getCall().setTryJmp(jmp);
 		catchState = false;
 	}
 
-	public boolean hasNoTry() {
-		return dataTryCounts.isEmpty();
-	}
-
-	public int getTry() {
-		return stkCall.get(0).getTryJmp();
-	}
-
-	public void resetTry() {
+	void resetTry() {
 		int last = dataTryCounts.get(dataTryCounts.size() - 1);
 		dataTryCounts.remove(dataTryCounts.size() - 1);
 		RuntimeObject obj = stkData.pop();
