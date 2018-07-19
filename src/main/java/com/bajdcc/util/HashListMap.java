@@ -41,4 +41,11 @@ public class HashListMap<T> {
 	public int indexOf(T t) {
 		return map.get(t);
 	}
+
+	public void rename(T from, T to) {
+		int index = indexOf(from);
+		list.set(index, to);
+		map.remove(from);
+		map.put(to, index);
+	}
 }

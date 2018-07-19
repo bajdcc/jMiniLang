@@ -28,6 +28,11 @@ public class Function implements IExp {
 	private String realName = null;
 
 	/**
+	 * 类方法名
+	 */
+	private String methodName = null;
+
+	/**
 	 * 参数
 	 */
 	private List<Token> params = new ArrayList<>();
@@ -57,7 +62,12 @@ public class Function implements IExp {
 	}
 
 	public String getRefName() {
-		return name.toRealString() + "$" + realName;
+		if (name.toRealString().equals(realName)) {
+			if (methodName != null)
+				return realName + "#" + methodName;
+			return realName;
+		}
+		return name.toRealString() + "#" + realName;
 	}
 
 	public void setName(Token name) {
@@ -70,6 +80,10 @@ public class Function implements IExp {
 
 	public void setRealName(String realName) {
 		this.realName = realName;
+	}
+
+	public void setMethodName(String methodName) {
+		this.methodName = methodName;
 	}
 
 	public List<Token> getParams() {
@@ -180,6 +194,8 @@ public class Function implements IExp {
 		sb.append(KeywordType.FUNCTION.getName());
 		sb.append(" ");
 		sb.append(realName);
+		if (methodName != null)
+			sb.append(" [ ").append(methodName).append(" ] ");
 		sb.append("(");
 		for (Token param : params) {
 			sb.append(param.toRealString());

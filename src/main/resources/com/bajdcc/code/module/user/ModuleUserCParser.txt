@@ -435,6 +435,43 @@ var import_scanner = func ~() {
                 return false;
             }
         };
+        this."next_char" := lambda(this) {
+            var i = this."offset";
+            i--;
+            var token = g_new_class("clib::c::token", [], [["set_token", "#CHAR"]]);
+            token."start" := i;
+            token."line" := this."lines"."size"();
+            var exit = func ~() {
+                token."set_value"(this."str"."substr"(i, this."offset"));
+                token."end" := this."offset";
+                return token;
+            };
+            var valid = true;
+            var n = 0;
+            var ch;
+            while (true) {
+                ch := this."ch";
+                if (ch == '\n' || ch == '\0') {
+                    if (valid) {
+                        valid := false;
+                        this."err"(this."lines"."size"(), i, this."offset", "char literal not terminated");
+                    }
+                    break;
+                }
+                this."next"();
+                if (ch == '\'') {
+                    break;
+                }
+                n++;
+                if (ch == '\\') {
+                    valid := this."next_escape"('\'');
+                }
+            }
+            if (valid && n != 1) {
+                this."err"(this."lines"."size"(), i, this."offset", "illegal char literal");
+            }
+            return exit();
+        };
         this."skip_whitespace" := lambda(this) {
             while (this."is_whitespace"()) {
                 this."next"();
@@ -446,7 +483,8 @@ var import_scanner = func ~() {
                     return this."next_comment"();
                 }
             },
-            "\"": lambda(this) -> this."next_string"() // 字符串
+            "\"": lambda(this) -> this."next_string"(), // 字符串
+            "'": lambda(this) -> this."next_char"() // 字符
         });
         this."scan" := lambda(this) {
             if (!this."available") {

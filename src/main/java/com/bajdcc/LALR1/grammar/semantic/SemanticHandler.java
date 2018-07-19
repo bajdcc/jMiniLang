@@ -149,6 +149,12 @@ public class SemanticHandler {
 								assign.setObj(bin.getLeftOperand());
 								assign.setProperty(bin.getRightOperand());
 								assign.setExp((IExp) indexed.get(0).getObject());
+								if (assign.getProperty() instanceof ExpValue &&
+										assign.getExp() instanceof ExpFunc) {
+									ExpValue v = (ExpValue) assign.getProperty();
+									ExpFunc f = (ExpFunc) assign.getExp();
+									f.getFunc().setMethodName(v.toString().replace("\"", ""));
+								}
 								return assign;
 							}
 						} else if (indexed.get(1).getObject() instanceof ExpIndex) {
