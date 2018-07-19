@@ -110,13 +110,13 @@ public class Codegen implements ICodegen, ICodegenBlock, ICodegenByteWriter {
 	}
 
 	@Override
-	public ICodegenBlock getBlockService() {
-		return this;
+	public void genDebugInfo(int start, int end, Object info) {
+		itvList.add(new Interval<>(start - 1, end + 1, info));
 	}
 
 	@Override
-	public void genDebugInfo(int start, int end, Object info) {
-		itvList.add(new Interval<>(start, end, info));
+	public ICodegenBlock getBlockService() {
+		return this;
 	}
 
 	@Override

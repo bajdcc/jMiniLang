@@ -71,7 +71,7 @@ public class RuntimeCodePage implements Serializable {
 		List<Object> list = tree.get(index);
 		if (list.isEmpty())
 			return "[NO DEBUG INFO]";
-		return list.stream().map(String::valueOf).collect(Collectors.joining(System.lineSeparator()));
+		return list.stream().map(String::valueOf).map(a -> "---=== 代码片段 ===---" + (System.lineSeparator() + a)).collect(Collectors.joining(System.lineSeparator()));
 	}
 
 	public IRuntimeDebugInfo getInfo() {

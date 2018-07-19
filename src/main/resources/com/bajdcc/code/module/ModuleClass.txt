@@ -94,7 +94,7 @@ var g_create_method = func ~(class, name, method) {
 export "g_create_method";
 var g_invoke_method = func ~(class, name) {
     var method = class.name;
-    if (g_is_null(method)) { return; }
+    if (g_is_null(method)) { throw "Class method '" + name + "' not found"; }
     var flag = g_get_flag(method);
     if ((flag & 1) > 0) {
         var _ret = [];
@@ -141,8 +141,8 @@ var g_invoke_method = func ~(class, name) {
 };
 export "g_invoke_method";
 var g_invoke_method_1 = func ~(class, name, arg1) {
-var method = class.name;
-    if (g_is_null(method)) { return; }
+    var method = class.name;
+    if (g_is_null(method)) { throw "Class method '" + name + "' not found"; }
     var flag = g_get_flag(method);
     if ((flag & 1) > 0) {
         var _ret = [];
@@ -189,8 +189,8 @@ var method = class.name;
 };
 export "g_invoke_method_1";
 var g_invoke_method_2 = func ~(class, name, arg1, arg2) {
-var method = class.name;
-    if (g_is_null(method)) { return; }
+    var method = class.name;
+    if (g_is_null(method)) { throw "Class method '" + name + "' not found"; }
     var flag = g_get_flag(method);
     if ((flag & 1) > 0) {
         var _ret = [];
@@ -237,8 +237,8 @@ var method = class.name;
 };
 export "g_invoke_method_2";
 var g_invoke_method_3 = func ~(class, name, arg1, arg2, arg3) {
-var method = class.name;
-    if (g_is_null(method)) { return; }
+    var method = class.name;
+    if (g_is_null(method)) { throw "Class method '" + name + "' not found"; }
     var flag = g_get_flag(method);
     if ((flag & 1) > 0) {
         var _ret = [];
@@ -285,8 +285,8 @@ var method = class.name;
 };
 export "g_invoke_method_3";
 var g_invoke_method_4 = func ~(class, name, arg1, arg2, arg3, arg4) {
-var method = class.name;
-    if (g_is_null(method)) { return; }
+    var method = class.name;
+    if (g_is_null(method)) { throw "Class method '" + name + "' not found"; }
     var flag = g_get_flag(method);
     if ((flag & 1) > 0) {
         var _ret = [];
@@ -333,8 +333,8 @@ var method = class.name;
 };
 export "g_invoke_method_4";
 var g_invoke_method_5 = func ~(class, name, arg1, arg2, arg3, arg4, arg5) {
-var method = class.name;
-    if (g_is_null(method)) { return; }
+    var method = class.name;
+    if (g_is_null(method)) { throw "Class method '" + name + "' not found"; }
     var flag = g_get_flag(method);
     if ((flag & 1) > 0) {
         var _ret = [];
@@ -381,8 +381,8 @@ var method = class.name;
 };
 export "g_invoke_method_5";
 var g_invoke_method_6 = func ~(class, name, arg1, arg2, arg3, arg4, arg5, arg6) {
-var method = class.name;
-    if (g_is_null(method)) { return; }
+    var method = class.name;
+    if (g_is_null(method)) { throw "Class method '" + name + "' not found"; }
     var flag = g_get_flag(method);
     if ((flag & 1) > 0) {
         var _ret = [];
@@ -429,8 +429,8 @@ var method = class.name;
 };
 export "g_invoke_method_6";
 var g_invoke_method_7 = func ~(class, name, arg1, arg2, arg3, arg4, arg5, arg6, arg7) {
-var method = class.name;
-    if (g_is_null(method)) { return; }
+    var method = class.name;
+    if (g_is_null(method)) { throw "Class method '" + name + "' not found"; }
     var flag = g_get_flag(method);
     if ((flag & 1) > 0) {
         var _ret = [];
@@ -477,8 +477,8 @@ var method = class.name;
 };
 export "g_invoke_method_7";
 var g_invoke_method_8 = func ~(class, name, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) {
-var method = class.name;
-    if (g_is_null(method)) { return; }
+    var method = class.name;
+    if (g_is_null(method)) { throw "Class method '" + name + "' not found"; }
     var flag = g_get_flag(method);
     if ((flag & 1) > 0) {
         var _ret = [];
@@ -525,8 +525,8 @@ var method = class.name;
 };
 export "g_invoke_method_8";
 var g_invoke_method_9 = func ~(class, name, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) {
-var method = class.name;
-    if (g_is_null(method)) { return; }
+    var method = class.name;
+    if (g_is_null(method)) { throw "Class method '" + name + "' not found"; }
     var flag = g_get_flag(method);
     if ((flag & 1) > 0) {
         var _ret = [];

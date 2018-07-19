@@ -21,7 +21,7 @@ public class NumberTokenizer extends TokenAlgorithm {
 	}
 
 	public static String getRegexString() {
-		return "[+-]?(\\d*\\.?\\d+|\\d+\\.?\\d*)([eE][+-]?\\d+)?";
+		return "[+-]?(\\d*\\.?\\d+|\\d+\\.?\\d*|0x[0-9ABCDEFabcdef]{1,4})([eE][+-]?\\d+)?";
 	}
 
 	@Override
@@ -38,18 +38,29 @@ public class NumberTokenizer extends TokenAlgorithm {
 	 */
 	@Override
 	public Token getToken(String string, Token token, IRegexStringIterator iterator) {
-		try {
-			BigDecimal decimal = new BigDecimal(string);
-			token.object = decimal;
-			if (string.indexOf('.') == -1) {
-				token.object = decimal.toBigIntegerExact().longValue();
+		if (string.startsWith("0x")) {
+			try {
+				token.object = Long.parseLong(string.substring(2).toLowerCase(), 0x10);
 				token.kToken = TokenType.INTEGER;
-			} else {
-				token.object = decimal.doubleValue();
-				token.kToken = TokenType.DECIMAL;
+			} catch (NumberFormatException e) {
+				e.printStackTrace();
+				return null;
 			}
-		} catch (ArithmeticException e) {
-			token.kToken = TokenType.DECIMAL;
+		} else {
+			try {
+				BigDecimal decimal = new BigDecimal(string);
+				token.object = decimal;
+				if (string.indexOf('.') == -1) {
+					token.object = decimal.toBigIntegerExact().longValue();
+					token.kToken = TokenType.INTEGER;
+				} else {
+					token.object = decimal.doubleValue();
+					token.kToken = TokenType.DECIMAL;
+				}
+			} catch (ArithmeticException | NumberFormatException e) {
+				e.printStackTrace();
+				return null;
+			}
 		}
 		return token;
 	}

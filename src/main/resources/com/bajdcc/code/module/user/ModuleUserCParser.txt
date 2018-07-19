@@ -353,11 +353,101 @@ var import_scanner = func ~() {
             this."err"(this."lines"."size"(), i, this."offset", "comment not terminated");
             return exit();
         };
+        this."next_string" := lambda(this) {
+            var i = this."offset";
+            i--;
+            var token = g_new_class("clib::c::token", [], [["set_token", "#STRING"]]);
+            token."start" := i;
+            token."line" := this."lines"."size"();
+            var exit = func ~() {
+                token."set_value"(this."str"."substr"(i, this."offset"));
+                token."end" := this."offset";
+                return token;
+            };
+            var ch;
+            while (true) {
+                ch := this."ch";
+                if (ch == '\n' || ch == '\0') {
+                    this."err"(this."lines"."size"(), i, this."offset", "string literal not terminated");
+                    break;
+                }
+                this."next"();
+                if (ch == '"') {
+                    break;
+                }
+                if (ch == '\\') {
+                    this."next_escape"('"');
+                }
+            }
+            return exit();
+        };
+        this."escape_switch" := g_from({
+            "a": 1, "b": 1, "f": 1, "n": 1, "r": 1, "t": 1, "v": 1, "\\": 1,
+            "0": 2, "1": 2, "2": 2, "3": 2, "4": 2, "5": 2, "6": 2, "7": 2,
+            "x": 3, "X": 3, "u": 4, "U": 4
+        });
+        this."next_escape" := lambda(this, quote) {
+            var i = this."offset";
+            var data = _; // [n, base, max]
+            var ch = this."ch";
+            var key = "" + ch;
+            var idx = this."escape_switch"."get"(key);
+            if (g_not_null(idx)) {
+                if (idx == 1 || ch == quote) { // abfnrtv'
+                    this."next"();
+                    return true;
+                } else if (idx == 2) { // 01234567
+                    data := [3, 8, 255];
+                } else if (idx == 3) { // xX
+                    this."next"();
+                    data := [2, 16, 255];
+                } else if (idx == 4) { // uU
+                    this."next"();
+                    data := [4, 16, 65535];
+                }
+                var x = 0; var d;
+                var n = data[0];
+                var base = data[1];
+                var max = data[2];
+                for (; n > 0; n--) {
+                    d := g_char_to_digit(this."ch");
+                    if (d >= base) {
+                        this."err"(this."lines"."size"(), i, this."offset", "illegal character in escape sequence: " + this."ch");
+                        return false;
+                    }
+                    x := x * base + d;
+                    if (!this."next"()) {
+                        this."err"(this."lines"."size"(), i, this."offset", "escape sequence not terminated");
+                        return false;
+                    }
+                }
+                if (x > max || 0xD800 <= x && x < 0xE000) {
+                    this."err"(this."lines"."size"(), i, this."offset", "escape sequence is invalid Unicode code point");
+                    return false;
+                }
+                return true;
+            } else {
+                if (this."available") {
+                    this."err"(this."lines"."size"(), i, this."offset", "unknown escape sequence");
+                } else {
+                    this."err"(this."lines"."size"(), i, this."offset", "escape sequence not terminated");
+                }
+                return false;
+            }
+        };
         this."skip_whitespace" := lambda(this) {
             while (this."is_whitespace"()) {
                 this."next"();
             }
         };
+        this."scan_switch" := g_from({
+            "/": lambda(this) {
+                if (this."ch" == '/' || this."ch" == '*') { // 注释
+                    return this."next_comment"();
+                }
+            },
+            "\"": lambda(this) -> this."next_string"() // 字符串
+        });
         this."scan" := lambda(this) {
             if (!this."available") {
                 return g_new_class("clib::c::token", [["start", this."offset"],
@@ -372,21 +462,17 @@ var import_scanner = func ~() {
             } else {
                 var i = this."offset";
                 var ch = this."ch";
-                if (this."next"()) {
-                    if (ch == '/') { // 以 '/' 开头
-                        if (this."ch" == '/' || this."ch" == '*') { // 注释
-                            return this."next_comment"();
-                        }
-                    }
-                    return g_new_class("clib::c::token", [["start", i],
-                        ["end", this."offset"], ["line", this."lines"."size"()],
-                        ["value", this."str"."substr"(i, this."offset")]],
-                        [["set_token", "ILLEGAL"]]);
-                } else {
-                    return g_new_class("clib::c::token", [["start", i],
-                    ["end", this."offset"], ["line", this."lines"."size"()]],
-                    [["set_token", "EOF"]]);
+                this."next"();
+                var key = "" + ch;
+                var _switch = this."scan_switch"."get"(key);
+                if (g_not_null(_switch)) {
+                    var ret = _switch(this);
+                    if (g_not_null(ret)) { return ret; }
                 }
+                return g_new_class("clib::c::token", [["start", i],
+                    ["end", this."offset"], ["line", this."lines"."size"()],
+                    ["value", this."str"."substr"(i, this."offset")]],
+                    [["set_token", "ILLEGAL"]]);
             }
         };
     });
