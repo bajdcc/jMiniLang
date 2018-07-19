@@ -60,7 +60,7 @@ public class RuntimeStack {
 	}
 
 	public boolean isYield() {
-		return stkCall.get(0).getYield() > 0;
+		return getCall().getYield() > 0;
 	}
 
 	public void addYield(int id) {

@@ -140,6 +140,8 @@ public class ExpInvokeProperty implements IExp {
 
 	@Override
 	public void addClosure(IClosureScope scope) {
+		obj.addClosure(scope);
+		property.addClosure(scope);
 		for (IExp exp : params) {
 			exp.addClosure(scope);
 		}

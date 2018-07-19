@@ -35,6 +35,9 @@ var import_token = func ~() {
         this."set_value" := lambda(this, value) {
             this."value" := value;
         };
+        this."set_op" := lambda(this, op) {
+            this."set_token"(this."ops"."get"(op));
+        };
         this."ORDINAL" := lambda(this, token) -> this."dict"."get"(token)[0];
         this."DESC" := lambda(this, token) -> this."dict"."get"(token)[1];
         this."PRED" := lambda(this, token) -> this."dict"."get"(token)[2];
@@ -116,6 +119,7 @@ var import_token = func ~() {
             [ "RSQ"            , "]"             , 0 ],
             [ "RBR"            , "}"             , 0 ],
             [ "DOT"            , "."             , 0 ],
+            [ "COMMA"          , ","             , 0 ],
             [ "QUERY"          , "?"             , 0 ],
             [ "SEMI"           , ";"             , 0 ],
             [ "COLON"          , ":"             , 0 ],
@@ -173,12 +177,12 @@ var import_token = func ~() {
         this."kws" := kws;
         var opa = this."ORDINAL"("Operator-Begin");
         var opb = this."ORDINAL"("Operator-End");
-        foreach (var op : g_range(opa + 1, opb - 1)) {
+        foreach (var op : g_range(opa, opb - 2)) {
             ops."put"(data[op][1], data[op][0]);
         }
         var kwa = this."ORDINAL"("Keyword-Begin");
         var kwb = this."ORDINAL"("Keyword-End");
-        foreach (var kw : g_range(kwa + 1, kwb - 1)) {
+        foreach (var kw : g_range(kwa, kwb - 2)) {
             kws."put"(data[kw][1], data[kw][0]);
         }
     });
@@ -477,14 +481,55 @@ var import_scanner = func ~() {
                 this."next"();
             }
         };
+        this."op" := lambda(this, i, ch) ->
+            g_new_class("clib::c::token", [["start", i],
+                ["end", this."offset"], ["line", this."lines"."size"()],
+                ["value", this."str"."substr"(i, this."offset")]],
+                [["set_op", ch]]);
+        this."op1" := lambda(this, op) {
+            return lambda(this, i, ch) {
+                foreach (var o : g_range_string(op)) {
+                    if (this."ch" == o) {
+                        this."next"();
+                        return this."op"(i, "" + ch + o);
+                    }
+                }
+                return this."op"(i, ch);
+            };
+        };
         this."scan_switch" := g_from({
-            "/": lambda(this) {
+            "/": lambda(this, i, ch) {
                 if (this."ch" == '/' || this."ch" == '*') { // 注释
                     return this."next_comment"();
                 }
+                var o = this."op1"("=");
+                return o(this, i, ch);
             },
-            "\"": lambda(this) -> this."next_string"(), // 字符串
-            "'": lambda(this) -> this."next_char"() // 字符
+            "\"": lambda(this, i, ch) -> this."next_string"(), // 字符串
+            "'": lambda(this, i, ch) -> this."next_char"(), // 字符
+            "(": this."op",
+            ")": this."op",
+            "[": this."op",
+            "]": this."op",
+            "{": this."op",
+            "}": this."op",
+            ",": this."op",
+            ".": this."op",
+            ":": this."op",
+            ";": this."op",
+            "?": this."op",
+            "~": this."op",
+            "=": this."op1"("="),
+            "+": this."op1"("+="),
+            "-": this."op1"("-="),
+            "*": this."op1"("="),
+            "%": this."op1"("="),
+            "!": this."op1"("="),
+            "&": this."op1"("&="),
+            "|": this."op1"("|="),
+            "^": this."op1"("^="),
+            "<": this."op1"("<="),
+            ">": this."op1"(">=")
         });
         this."scan" := lambda(this) {
             if (!this."available") {
@@ -504,7 +549,7 @@ var import_scanner = func ~() {
                 var key = "" + ch;
                 var _switch = this."scan_switch"."get"(key);
                 if (g_not_null(_switch)) {
-                    var ret = _switch(this);
+                    var ret = _switch(this, i, ch);
                     if (g_not_null(ret)) { return ret; }
                 }
                 return g_new_class("clib::c::token", [["start", i],

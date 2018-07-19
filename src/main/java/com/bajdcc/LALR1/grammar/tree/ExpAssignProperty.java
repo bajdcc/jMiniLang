@@ -184,6 +184,10 @@ public class ExpAssignProperty implements IExp {
 	public void addClosure(IClosureScope scope) {
 		if (exp != null)
 			exp.addClosure(scope);
+		if (property != null)
+			property.addClosure(scope);
+		if (obj != null)
+			obj.addClosure(scope);
 	}
 
 	@Override

@@ -115,6 +115,7 @@ public class StmtForeach implements IStmt {
 
 	@Override
 	public void addClosure(IClosureScope scope) {
-
+		enumerator.addClosure(scope);
+		block.addClosure(scope);
 	}
 }
