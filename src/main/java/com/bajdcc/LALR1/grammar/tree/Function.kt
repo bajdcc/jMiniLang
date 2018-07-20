@@ -147,7 +147,7 @@ class Function(var name: Token) : IExp {
 
     override fun addClosure(scope: IClosureScope) {
         for (param in params) {
-            scope.addDecl(param.obj)
+            scope.addDecl(param.obj!!)
         }
         block!!.addClosure(scope)
     }

@@ -566,7 +566,7 @@ public class SemanticHandler {
 			query.getQueryBlockService().leaveBlock(BlockType.kCycle);
 			StmtFor stmt = new StmtFor();
 			if (indexed.exists(0)) {
-				stmt.setVar((IExp) indexed.get(0).getObject());
+				stmt.setVariable((IExp) indexed.get(0).getObject());
 			}
 			if (indexed.exists(1)) {
 				stmt.setCond((IExp) indexed.get(1).getObject());
@@ -587,11 +587,11 @@ public class SemanticHandler {
 		mapSemanticAnalyzier.put("foreach", (indexed, query, recorder) -> {
 			query.getQueryBlockService().leaveBlock(BlockType.kCycle);
 			StmtForeach stmt = new StmtForeach();
-			stmt.setVar(indexed.get(0).getToken());
+			stmt.setVariable(indexed.get(0).getToken());
 			stmt.setEnumerator((IExp) indexed.get(1).getObject());
 			stmt.setBlock((Block) indexed.get(2).getObject());
 			if (!stmt.getEnumerator().isEnumerable()) {
-				recorder.add(SemanticError.WRONG_ENUMERABLE, stmt.getVar());
+				recorder.add(SemanticError.WRONG_ENUMERABLE, stmt.getVariable());
 			}
 			stmt.getEnumerator().setYield();
 			return stmt;
