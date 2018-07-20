@@ -217,7 +217,7 @@ public class NGA implements ISyntaxComponentVisitor {
 	protected static List<NGAStatus> getNGAStatusClosure(
 			BreadthFirstSearch<NGAEdge, NGAStatus> bfs, NGAStatus status) {
 		status.visit(bfs);
-		return bfs.arrStatus;
+		return bfs.getArrStatus();
 	}
 
 	/**

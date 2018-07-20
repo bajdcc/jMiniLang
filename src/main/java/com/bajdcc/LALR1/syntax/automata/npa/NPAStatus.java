@@ -33,7 +33,7 @@ public class NPAStatus {
 	 * @param bfs 遍历算法
 	 */
 	public void visit(BreadthFirstSearch<NPAEdge, NPAStatus> bfs) {
-		ArrayList<NPAStatus> stack = bfs.arrStatus;
+		ArrayList<NPAStatus> stack = bfs.getArrStatus();
 		HashSet<NPAStatus> set = new HashSet<>();
 		stack.clear();
 		set.add(this);

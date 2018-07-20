@@ -43,7 +43,7 @@ public class NGAToString extends BreadthFirstSearch<NGAEdge, NGAStatus> {
 		if (arrNGAStatus.isEmpty()) {
 			BreadthFirstSearch<NGAEdge, NGAStatus> bfs = new BreadthFirstSearch<>();
 			status.visit(bfs);
-			arrNGAStatus = bfs.arrStatus;
+			arrNGAStatus = bfs.getArrStatus();
 		}
 		/* 输出状态标签 */
 		appendLine();

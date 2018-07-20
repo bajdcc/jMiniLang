@@ -333,7 +333,7 @@ public class NPA extends NGA {
 	protected static List<NPAStatus> getNGAStatusClosure(
 			BreadthFirstSearch<NPAEdge, NPAStatus> bfs, NPAStatus status) {
 		status.visit(bfs);
-		return bfs.arrStatus;
+		return bfs.getArrStatus();
 	}
 
 	/**
