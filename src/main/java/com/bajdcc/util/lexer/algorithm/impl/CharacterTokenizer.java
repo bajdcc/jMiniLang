@@ -29,9 +29,6 @@ public class CharacterTokenizer extends TokenAlgorithm {
 	public Token getToken(String string, Token token, IRegexStringIterator iterator) {
 		token.kToken = TokenType.CHARACTER;
 		token.object = string.charAt(0);
-		if (string.charAt(0) == '\uffff'){
-			token.object = '\0';
-		}
 		return token;
 	}
 }

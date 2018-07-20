@@ -527,7 +527,7 @@ var import_scanner = func ~() {
             "!": this."op1"("="),
             "&": this."op1"("&="),
             "|": this."op1"("|="),
-            "^": this."op1"("^="),
+            "^": this."op1"("="),
             "<": this."op1"("<="),
             ">": this."op1"(">=")
         });

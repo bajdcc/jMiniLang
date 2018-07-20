@@ -214,7 +214,7 @@ public class Regex extends RegexStringIterator {
 			}
 			/* 存储字符 */
 			if (!skipStore) {
-				sb.append(local);
+				sb.append(data.zero ? '\0' : local);
 			}
 			/* 获得字符区间索引 */
 			int charClass = charMap[local];

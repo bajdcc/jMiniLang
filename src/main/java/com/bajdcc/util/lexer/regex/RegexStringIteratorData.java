@@ -17,6 +17,11 @@ public class RegexStringIteratorData implements Cloneable {
 	public char chCurrent = 0;
 
 	/**
+	 * 允许空
+	 */
+	public boolean zero = false;
+
+	/**
 	 * 字符类型
 	 */
 	public MetaType kMeta = MetaType.END;

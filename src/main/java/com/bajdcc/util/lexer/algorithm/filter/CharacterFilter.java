@@ -31,6 +31,8 @@ public class CharacterFilter implements IRegexStringFilter,
 					data.chCurrent = iterator.current();
 					iterator.next();
 					data.kMeta = MetaType.MUST_SAVE;
+					if (data.chCurrent == '0')
+						data.zero = true;
 					data.chCurrent = utility.fromEscape(data.chCurrent,
 							RegexError.ESCAPE);
 				}
