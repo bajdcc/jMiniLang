@@ -50,7 +50,7 @@ public class StmtExp implements IStmt {
 		if (exp != null) {
 			sb.append(exp.print(prefix));
 		}
-		sb.append(OperatorType.SEMI.getName());
+		sb.append(OperatorType.SEMI.getDesc());
 		return sb.toString();
 	}
 

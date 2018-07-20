@@ -51,14 +51,14 @@ public class SyntaxLexer extends RegexStringIterator implements
 	 */
 	public void setContext(String context) {
 		/* 初始化 */
-		this.context = context;
-		position.iColumn = 0;
-		position.iLine = 0;
-		data.chCurrent = 0;
-		data.iIndex = 0;
-		data.kMeta = MetaType.END;
-		stkIndex.clear();
-		stkPosition.clear();
+		super.setContext(context);
+		getPosition().setColumn(0);
+		getPosition().setLine(0);
+		getData().setCurrent('\0');
+		getData().setIndex(0);
+		getData().setMeta(MetaType.END);
+		getStackIndex().clear();
+		getStackPosition().clear();
 	}
 
 	/**
@@ -92,7 +92,9 @@ public class SyntaxLexer extends RegexStringIterator implements
 	protected void transform() {
 		super.transform();
 		if (tokenAlgorithm != null) {
-			data.kMeta = tokenAlgorithm.getMetaHash().get(data.chCurrent);
+			MetaType type = tokenAlgorithm.getMetaHash().get(getData().getCurrent());
+			if (type != null)
+				getData().setMeta(type);
 		}
 	}
 

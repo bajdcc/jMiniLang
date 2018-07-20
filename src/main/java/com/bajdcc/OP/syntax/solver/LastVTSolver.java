@@ -44,8 +44,8 @@ public class LastVTSolver implements ISyntaxComponentVisitor {
 
 	@Override
 	public void visitBegin(TokenExp node, VisitBag bag) {
-		bag.bVisitChildren = false;
-		bag.bVisitEnd = false;
+		bag.setVisitChildren(false);
+		bag.setVisitEnd(false);
 		if (!stop) {
 			update = origin.rule.setLastVT.add(node);// 直接加入终结符，并中止遍历
 			stop = true;
@@ -54,8 +54,8 @@ public class LastVTSolver implements ISyntaxComponentVisitor {
 
 	@Override
 	public void visitBegin(RuleExp node, VisitBag bag) {
-		bag.bVisitChildren = false;
-		bag.bVisitEnd = false;
+		bag.setVisitChildren(false);
+		bag.setVisitEnd(false);
 		if (!stop) {
 			update = origin.rule.setLastVT.addAll(node.rule.setLastVT);// 加入当前非终结符的LastVT
 		}
@@ -63,13 +63,13 @@ public class LastVTSolver implements ISyntaxComponentVisitor {
 
 	@Override
 	public void visitBegin(SequenceExp node, VisitBag bag) {
-		bag.bVisitEnd = false;
+		bag.setVisitEnd(false);
 		stop = false;
 	}
 
 	@Override
 	public void visitBegin(BranchExp node, VisitBag bag) {
-		bag.bVisitEnd = false;
+		bag.setVisitEnd(false);
 	}
 
 	@Override

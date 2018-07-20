@@ -83,13 +83,13 @@ public class SyntaxToString implements ISyntaxComponentVisitor {
 
 	@Override
 	public void visitBegin(TokenExp node, VisitBag bag) {
-		bag.bVisitEnd = false;
+		bag.setVisitEnd(false);
 		store(node, " `" + node.name + "` ");
 	}
 
 	@Override
 	public void visitBegin(RuleExp node, VisitBag bag) {
-		bag.bVisitEnd = false;
+		bag.setVisitEnd(false);
 		store(node, " " + node.name + " ");
 	}
 

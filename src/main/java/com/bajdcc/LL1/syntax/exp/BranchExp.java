@@ -22,12 +22,12 @@ public class BranchExp implements ISyntaxComponent, IExpCollction {
 	public void visit(ISyntaxComponentVisitor visitor) {
 		VisitBag bag = new VisitBag();
 		visitor.visitBegin(this, bag);
-		if (bag.bVisitChildren) {
+		if (bag.getVisitChildren()) {
 			for (ISyntaxComponent exp : arrExpressions) {
 				exp.visit(visitor);
 			}
 		}
-		if (bag.bVisitEnd) {
+		if (bag.getVisitEnd()) {
 			visitor.visitEnd(this);
 		}
 	}

@@ -37,8 +37,8 @@ public class NumberTokenizer extends TokenAlgorithm {
 	 */
 	@Override
 	public Token getToken(String string, Token token, IRegexStringIterator iterator) {
-		token.kToken = TokenType.INTEGER;
-		token.object = Integer.parseInt(string);
+		token.setType(TokenType.INTEGER);
+		token.setObj(Integer.parseInt(string));
 		return token;
 	}
 }

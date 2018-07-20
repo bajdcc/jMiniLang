@@ -173,8 +173,8 @@ public class PredictionTable extends SelectSetSolver {
 	private int getTokenId() {
 		Token token = iter.ex().token();
 		for (TokenExp exp : arrTerminals) {
-			if (exp.kType == token.kToken
-					&& (exp.object == null || exp.object.equals(token.object))) {
+			if (exp.kType == token.getType()
+					&& (exp.object == null || exp.object.equals(token.getObj()))) {
 				return exp.id;
 			}
 		}

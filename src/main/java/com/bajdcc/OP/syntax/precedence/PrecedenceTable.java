@@ -210,12 +210,12 @@ public class PrecedenceTable extends OPTableSolver {
 	 */
 	private int getTokenId() {
 		Token token = iter.ex().token();
-		if (token.kToken == TokenType.EOF) {
+		if (token.getType() == TokenType.EOF) {
 			return -2;
 		}
 		for (TokenExp exp : arrTerminals) {
-			if (exp.kType == token.kToken
-					&& (exp.object == null || exp.object.equals(token.object))) {
+			if (exp.kType == token.getType()
+					&& (exp.object == null || exp.object.equals(token.getObj()))) {
 				return exp.id;
 			}
 		}
@@ -368,7 +368,7 @@ public class PrecedenceTable extends OPTableSolver {
 						break;
 					case EPSILON:
 						println("\t" + i + ": ["
-								+ TokenType.EOF.getName() + "]");
+								+ TokenType.EOF.getDesc() + "]");
 						break;
 					default:
 						break;
@@ -390,7 +390,7 @@ public class PrecedenceTable extends OPTableSolver {
 		}
 		println();
 		if (sobj.peek().obj == null)
-			return sobj.peek().token.object;
+			return sobj.peek().token.getObj();
 		return sobj.peek().obj;
 	}
 

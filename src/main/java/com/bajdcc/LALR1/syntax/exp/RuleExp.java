@@ -36,7 +36,7 @@ public class RuleExp implements ISyntaxComponent {
 	public void visit(ISyntaxComponentVisitor visitor) {
 		VisitBag bag = new VisitBag();
 		visitor.visitBegin(this, bag);
-		if (bag.bVisitEnd) {
+		if (bag.getVisitEnd()) {
 			visitor.visitEnd(this);
 		}
 	}

@@ -98,9 +98,9 @@ public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
 	@Override
 	public Token getEntryToken() {
 		Token token = new Token();
-		token.kToken = TokenType.ID;
-		token.object = getEntryName();
-		token.position = new Position();
+		token.setType(TokenType.ID);
+		token.setObj(getEntryName());
+		token.setPosition(new Position());
 		return token;
 	}
 
@@ -141,7 +141,7 @@ public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
 
 	@Override
 	public void registerFunc(Function func) {
-		if (func.getName().kToken == TokenType.ID) {
+		if (func.getName().getType() == TokenType.ID) {
 			func.setRealName(func.getName().toRealString());
 			symbolList.add(func.getRealName());
 		} else {
@@ -156,8 +156,8 @@ public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
 	@Override
 	public void registerLambda(Function func) {
 		stkLambdaId.push(lambdaId);
-		stkLambdaLine.push(func.getName().position.iLine);
-		func.getName().kToken = TokenType.ID;
+		stkLambdaLine.push(func.getName().getPosition().getLine());
+		func.getName().setType(TokenType.ID);
 		func.setRealName(LAMBDA_PREFIX + (lambdaId++) + "!" + stkLambdaLine.peek());
 		funcScope.get(funcScope.size() - 1).put(func.getRealName(), func);
 		ArrayList<Function> f = new ArrayList<>();
@@ -167,8 +167,7 @@ public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
 
 	@Override
 	public boolean isRegisteredFunc(String name) {
-		List<Function> funcs = funcMap.get(name);
-		return funcs != null && !funcs.isEmpty();
+		return funcMap.contains(name);
 	}
 
 	@Override
@@ -177,7 +176,7 @@ public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
 	}
 
 	public void check(ISemanticRecorder recorder) {
-		for (List<Function> funcs : funcMap.list) {
+		for (List<Function> funcs : funcMap.toList()) {
 			for (Function func : funcs) {
 				func.analysis(recorder);
 			}
@@ -212,7 +211,7 @@ public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
 		sb.append("#### 过程表 ####");
 		sb.append(System.lineSeparator());
 		int i = 0;
-		for (List<Function> funcs : funcMap.list) {
+		for (List<Function> funcs : funcMap.toList()) {
 			for (Function func : funcs) {
 				sb.append("----==== #").append(i).append(" ====----");
 				sb.append(System.lineSeparator());

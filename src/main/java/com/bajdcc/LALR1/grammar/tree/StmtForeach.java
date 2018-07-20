@@ -65,7 +65,7 @@ public class StmtForeach implements IStmt {
 	@Override
 	public void genCode(ICodegen codegen) {
 		codegen.genCode(RuntimeInst.ipushx);
-		codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(var.object));
+		codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(var.getObj()));
 		codegen.genCode(RuntimeInst.ialloc);
 		codegen.genCode(RuntimeInst.ipop);
 		CodegenBlock cb = new CodegenBlock();
@@ -81,7 +81,7 @@ public class StmtForeach implements IStmt {
 		int content = codegen.getCodeIndex();
 		enumerator.genCode(codegen);
 		codegen.genCode(RuntimeInst.ijnan, exit);
-		codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(var.object));
+		codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(var.getObj()));
 		codegen.genCode(RuntimeInst.istore);
 		codegen.genCode(RuntimeInst.ipop);
 		codegen.getBlockService().enterBlockEntry(cb);
@@ -100,13 +100,13 @@ public class StmtForeach implements IStmt {
 	@Override
 	public String print(StringBuilder prefix) {
 		return prefix.toString() +
-				KeywordType.FOREACH.getName() +
+				KeywordType.FOREACH.getDesc() +
 				" ( " +
-				KeywordType.VARIABLE.getName() +
+				KeywordType.VARIABLE.getDesc() +
 				" " +
 				var.toRealString() +
 				" " +
-				OperatorType.COLON.getName() +
+				OperatorType.COLON.getDesc() +
 				" " +
 				enumerator.print(prefix) +
 				" ) " +

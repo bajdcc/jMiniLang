@@ -48,7 +48,7 @@ public class ExpCycleCtrl implements IExp {
 
 	@Override
 	public void genCode(ICodegen codegen) {
-		KeywordType keyword = (KeywordType) name.object;
+		KeywordType keyword = (KeywordType) name.getObj();
 		if (keyword == KeywordType.BREAK) {
 			codegen.getBlockService().genBreak();
 		} else {

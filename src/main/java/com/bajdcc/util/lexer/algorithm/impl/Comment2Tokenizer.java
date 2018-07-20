@@ -37,8 +37,8 @@ public class Comment2Tokenizer extends TokenAlgorithm {
 	 */
 	@Override
 	public Token getToken(String string, Token token, IRegexStringIterator iterator) {
-		token.kToken = TokenType.COMMENT;
-		token.object = string.trim();
+		token.setType(TokenType.COMMENT);
+		token.setObj(string.trim());
 		return token;
 	}
 }

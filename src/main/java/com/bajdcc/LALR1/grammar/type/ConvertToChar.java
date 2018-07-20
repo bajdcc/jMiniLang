@@ -12,12 +12,12 @@ public class ConvertToChar implements ITokenConventer {
 
 	@Override
 	public Token convert(Token token) {
-		switch (token.kToken) {
+		switch (token.getType()) {
 			case STRING:
 			case DECIMAL:
 			case INTEGER:
-				token.object = getCharValue(token);
-				token.kToken = TokenType.CHARACTER;
+				token.setObj(getCharValue(token));
+				token.setType(TokenType.CHARACTER);
 				break;
 			default:
 				break;
@@ -32,15 +32,15 @@ public class ConvertToChar implements ITokenConventer {
 	 * @return 转换结果
 	 */
 	private static char getCharValue(Token token) {
-		switch (token.kToken) {
+		switch (token.getType()) {
 			case STRING:
-				String str = (String) token.object;
+				String str = (String) token.getObj();
 				return str.isEmpty() ? '\0' : str.charAt(0);
 			case DECIMAL:
-				double decimal = (double) token.object;
+				double decimal = (double) token.getObj();
 				return (char) (double) decimal;
 			case INTEGER:
-				long integer = (long) token.object;
+				long integer = (long) token.getObj();
 				return (char) (long) integer;
 			default:
 				break;

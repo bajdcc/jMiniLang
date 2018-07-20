@@ -16,6 +16,6 @@ public class URRange implements IOSCodePage {
 
 	@Override
 	public String getCode() {
-		return ResourceLoader.load(getClass());
+		return ResourceLoader.INSTANCE.load(getClass());
 	}
 }

@@ -51,10 +51,10 @@ public abstract class TokenAlgorithm implements ITokenAlgorithm,
 	@Override
 	public boolean accept(IRegexStringIterator iterator, Token token) {
 		if (!iterator.available()) {
-			token.kToken = TokenType.EOF;
+			token.setType(TokenType.EOF);
 			return true;
 		}
-		token.position = new Position(iterator.position());
+		token.setPosition(new Position(iterator.position()));
 		iterator.snapshot();
 		if (regex.match(iterator, this)) {// 匹配成功
 			if (getToken(strMatch, token, iterator) != null) {// 自动转换单词
@@ -93,6 +93,6 @@ public abstract class TokenAlgorithm implements ITokenAlgorithm,
 
 	@Override
 	public String getRegexDescription() {
-		return regex.getRegexDescription();
+		return regex.getContext();
 	}
 }

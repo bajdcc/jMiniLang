@@ -34,7 +34,7 @@ public class OperatorTokenizer extends TokenAlgorithm {
 				MetaType.RBRACE, MetaType.DOT, MetaType.BAR, MetaType.QUERY};
 		StringBuilder sb = new StringBuilder();
 		for (OperatorType type : OperatorType.values()) {
-			String op = type.getName();
+			String op = type.getDesc();
 			for (MetaType meta : metaTypes) {
 				op = op.replace(meta.getChar() + "", "\\" + meta.getChar());
 			}
@@ -58,7 +58,7 @@ public class OperatorTokenizer extends TokenAlgorithm {
 	 */
 	private void initializeHashMap() {
 		for (OperatorType operator : OperatorType.values()) {// 关键字
-			hashOperator.put(operator.getName(), operator);
+			hashOperator.put(operator.getDesc(), operator);
 		}
 	}
 
@@ -71,7 +71,7 @@ public class OperatorTokenizer extends TokenAlgorithm {
 	 */
 	@Override
 	public Token getToken(String string, Token token, IRegexStringIterator iterator) {
-		token.kToken = TokenType.OPERATOR;
+		token.setType(TokenType.OPERATOR);
 		OperatorType op = hashOperator.get(string);
 		if (op == OperatorType.MINUS) {
 			if (iterator.available()) {
@@ -81,7 +81,7 @@ public class OperatorTokenizer extends TokenAlgorithm {
 				}
 			}
 		}
-		token.object = op;
+		token.setObj(op);
 		return token;
 	}
 }

@@ -28,8 +28,8 @@ public class ActionTokenizer extends TokenAlgorithm {
 	 */
 	@Override
 	public Token getToken(String string, Token token, IRegexStringIterator iterator) {
-		token.kToken = TokenType.RESERVE;
-		token.object = string;
+		token.setType(TokenType.RESERVE);
+		token.setObj(string);
 		return token;
 	}
 }

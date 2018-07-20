@@ -59,7 +59,7 @@ public class ExpSinop implements IExp {
 			return this;
 		}
 		if (operand instanceof ExpValue) {
-			if (token.kToken == TokenType.OPERATOR) {
+			if (token.getType() == TokenType.OPERATOR) {
 				if (TokenTools.sinop(recorder, this)) {
 					return operand;
 				}
@@ -70,7 +70,7 @@ public class ExpSinop implements IExp {
 
 	@Override
 	public void analysis(ISemanticRecorder recorder) {
-		OperatorType type = (OperatorType) token.object;
+		OperatorType type = (OperatorType) token.getObj();
 		if (type == OperatorType.PLUS_PLUS || type == OperatorType.MINUS_MINUS) {
 			if (!(operand instanceof ExpValue)) {
 				recorder.add(SemanticError.INVALID_OPERATOR, token);
@@ -84,11 +84,11 @@ public class ExpSinop implements IExp {
 	public void genCode(ICodegen codegen) {
 		operand.genCode(codegen);
 		codegen.genCode(TokenTools.op2ins(token));
-		OperatorType type = (OperatorType) token.object;
+		OperatorType type = (OperatorType) token.getObj();
 		if (type == OperatorType.PLUS_PLUS || type == OperatorType.MINUS_MINUS) {
 			ExpValue value = (ExpValue) operand;
 			codegen.genCode(RuntimeInst.ipush,
-					codegen.genDataRef(value.getToken().object));
+					codegen.genDataRef(value.getToken().getObj()));
 			codegen.genCode(RuntimeInst.icopy);
 		}
 	}

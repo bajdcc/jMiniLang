@@ -65,7 +65,7 @@ class Function(var name: Token) : IExp {
         }
         val sb = StringBuilder()
         for (token in doc!!) {
-            sb.append(token.`object`.toString())
+            sb.append(token.obj.toString())
             sb.append(System.lineSeparator())
         }
         return sb.toString()
@@ -102,7 +102,7 @@ class Function(var name: Token) : IExp {
         var i = 0
         for (token in params) {
             codegen.genCode(RuntimeInst.iloada, i)
-            codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(token.`object`))
+            codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(token.obj))
             codegen.genCode(RuntimeInst.ialloc)
             codegen.genCode(RuntimeInst.ipop)
             i++
@@ -122,10 +122,10 @@ class Function(var name: Token) : IExp {
     override fun print(prefix: StringBuilder): String {
         val sb = StringBuilder()
         if (isYield) {
-            sb.append(KeywordType.YIELD.getName())
+            sb.append(KeywordType.YIELD.desc)
             sb.append(" ")
         }
-        sb.append(KeywordType.FUNCTION.getName())
+        sb.append(KeywordType.FUNCTION.desc)
         sb.append(" ")
         sb.append(realName)
         sb.append(" [ ").append(methodName).append(" ] ")
@@ -147,7 +147,7 @@ class Function(var name: Token) : IExp {
 
     override fun addClosure(scope: IClosureScope) {
         for (param in params) {
-            scope.addDecl(param.`object`)
+            scope.addDecl(param.obj)
         }
         block!!.addClosure(scope)
     }

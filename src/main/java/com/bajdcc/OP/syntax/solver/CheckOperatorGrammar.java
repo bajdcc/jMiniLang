@@ -44,8 +44,8 @@ public class CheckOperatorGrammar implements ISyntaxComponentVisitor {
 
 	@Override
 	public void visitBegin(TokenExp node, VisitBag bag) {
-		bag.bVisitChildren = false;
-		bag.bVisitEnd = false;
+		bag.setVisitChildren(false);
+		bag.setVisitEnd(false);
 		if (invalidName == null) {
 			nonTerminalJustPast = false;
 		}
@@ -53,8 +53,8 @@ public class CheckOperatorGrammar implements ISyntaxComponentVisitor {
 
 	@Override
 	public void visitBegin(RuleExp node, VisitBag bag) {
-		bag.bVisitChildren = false;
-		bag.bVisitEnd = false;
+		bag.setVisitChildren(false);
+		bag.setVisitEnd(false);
 		if (nonTerminalJustPast) {
 			invalidName = node.name;
 		} else {
@@ -69,7 +69,7 @@ public class CheckOperatorGrammar implements ISyntaxComponentVisitor {
 
 	@Override
 	public void visitBegin(BranchExp node, VisitBag bag) {
-		bag.bVisitEnd = false;
+		bag.setVisitEnd(false);
 	}
 
 	@Override

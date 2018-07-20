@@ -77,9 +77,9 @@ public class ExpIndex implements IExp {
 	@Override
 	public String print(StringBuilder prefix) {
 		return exp.print(prefix) +
-				OperatorType.LSQUARE.getName() +
+				OperatorType.LSQUARE.getDesc() +
 				index.print(prefix) +
-				OperatorType.RSQUARE.getName();
+				OperatorType.RSQUARE.getDesc();
 	}
 
 	@Override

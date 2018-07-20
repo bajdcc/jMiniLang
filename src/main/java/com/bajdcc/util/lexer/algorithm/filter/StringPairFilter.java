@@ -34,26 +34,26 @@ public class StringPairFilter implements IRegexStringFilter,
 		RegexStringIteratorData data = new RegexStringIteratorData();
 		try {
 			if (!iterator.available()) {
-				data.kMeta = MetaType.END;
-				data.chCurrent = MetaType.END.getChar();
+				data.setMeta(MetaType.END);
+				data.setCurrent(MetaType.END.getChar());
 			} else {
-				data.kMeta = iterator.meta();
-				data.chCurrent = iterator.current();
+				data.setMeta(iterator.meta());
+				data.setCurrent(iterator.current());
 				iterator.next();
-				if (data.kMeta == kMetaBegin || data.kMeta == kMetaEnd) {// 过滤终结符
-					data.kMeta = MetaType.NULL;
-				} else if (data.kMeta == MetaType.ESCAPE) {// 处理转义
-					data.chCurrent = iterator.current();
+				if (data.getMeta() == kMetaBegin || data.getMeta() == kMetaEnd) {// 过滤终结符
+					data.setMeta(MetaType.NULL);
+				} else if (data.getMeta() == MetaType.ESCAPE) {// 处理转义
+					data.setCurrent(iterator.current());
 					iterator.next();
-					data.kMeta = MetaType.MUST_SAVE;
-					data.chCurrent = utility.fromEscape(data.chCurrent,
-							RegexError.ESCAPE);
+					data.setMeta(MetaType.MUST_SAVE);
+					data.setCurrent(utility.fromEscape(data.getCurrent(),
+							RegexError.ESCAPE));
 				}
 			}
 		} catch (RegexException e) {
 			System.err.println(e.getPosition() + " : " + e.getMessage());
-			data.kMeta = MetaType.ERROR;
-			data.chCurrent = MetaType.ERROR.getChar();
+			data.setMeta(MetaType.ERROR);
+			data.setCurrent(MetaType.ERROR.getChar());
 		}
 		return data;
 	}

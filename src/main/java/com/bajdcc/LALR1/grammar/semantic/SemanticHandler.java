@@ -52,7 +52,7 @@ public class SemanticHandler {
 		mapSemanticAction.put("predeclear_funcname", (indexed, manage, access, recorder) -> {
 			Token token = access.relativeGet(0);
 			String funcName = token.toRealString();
-			if (token.kToken == ID) {
+			if (token.getType() == ID) {
 				if (manage.getQueryScopeService().getEntryName()
 						.equals(funcName)) {
 					recorder.add(SemanticError.DUP_ENTRY, token);
@@ -63,14 +63,14 @@ public class SemanticHandler {
 			}
 			Function func = new Function(token);
 			manage.getManageScopeService().registerFunc(func);
-			if (token.kToken != ID) {
-				token.object = func.getRealName();
-				token.kToken = ID;
+			if (token.getType() != ID) {
+				token.setObj(func.getRealName());
+				token.setType(ID);
 			}
 		});
 		/* 声明变量名 */
 		mapSemanticAction.put("declear_variable", (indexed, manage, access, recorder) -> {
-			KeywordType spec = (KeywordType) access.relativeGet(-1).object;
+			KeywordType spec = (KeywordType) access.relativeGet(-1).getObj();
 			Token token = access.relativeGet(0);
 			String name = token.toRealString();
 			if (spec == KeywordType.VARIABLE) {
@@ -105,7 +105,7 @@ public class SemanticHandler {
 		mapSemanticAction.put("func_clearargs", (indexed, manage, access, recorder) -> {
 			manage.getManageScopeService().clearFutureArgs();
 			Token token = access.relativeGet(0);
-			KeywordType type = (KeywordType) token.object;
+			KeywordType type = (KeywordType) token.getObj();
 			if (type == KeywordType.YIELD) {
 				manage.getQueryBlockService().enterBlock(BlockType.kYield);
 			}
@@ -119,7 +119,7 @@ public class SemanticHandler {
 			Token token = access.relativeGet(0);
 			Function func = new Function(token);
 			manage.getManageScopeService().registerLambda(func);
-			token.object = func.getRealName();
+			token.setObj(func.getRealName());
 		});
 	}
 
@@ -133,15 +133,15 @@ public class SemanticHandler {
 		mapSemanticAnalyzier.put("exp", (indexed, query, recorder) -> {
 			if (indexed.exists(2)) {// 双目运算
 				Token token = indexed.get(2).getToken();
-				if (token.kToken == TokenType.OPERATOR) {
-					if (token.object == OperatorType.DOT && indexed.get(0).getObject() instanceof ExpInvokeProperty) {
+				if (token.getType() == TokenType.OPERATOR) {
+					if (token.getObj() == OperatorType.DOT && indexed.get(0).getObject() instanceof ExpInvokeProperty) {
 						ExpInvokeProperty invoke = (ExpInvokeProperty) indexed.get(0).getObject();
 						invoke.setObj((IExp) indexed.get(1).getObject());
 						return invoke;
-					} else if (TokenTools.isAssignment((OperatorType) token.object)) {
+					} else if (TokenTools.isAssignment((OperatorType) token.getObj())) {
 						if (indexed.get(1).getObject() instanceof ExpBinop) {
 							ExpBinop bin = (ExpBinop) indexed.get(1).getObject();
-							if (bin.getToken().object == OperatorType.DOT) {
+							if (bin.getToken().getObj() == OperatorType.DOT) {
 								ExpAssignProperty assign = new ExpAssignProperty();
 								assign.setToken(token);
 								assign.setObj(bin.getLeftOperand());
@@ -173,11 +173,11 @@ public class SemanticHandler {
 				return binop.simplify(recorder);
 			} else if (indexed.exists(3)) {// 单目运算
 				Token token = indexed.get(3).getToken();
-				if (token.kToken == TokenType.OPERATOR) {
-					if ((token.object == OperatorType.PLUS_PLUS || token.object == OperatorType.MINUS_MINUS)
+				if (token.getType() == TokenType.OPERATOR) {
+					if ((token.getObj() == OperatorType.PLUS_PLUS || token.getObj() == OperatorType.MINUS_MINUS)
 							&& indexed.get(1).getObject() instanceof ExpBinop) {
 						ExpBinop bin = (ExpBinop) indexed.get(1).getObject();
-						if (bin.getToken().object == OperatorType.DOT) {
+						if (bin.getToken().getObj() == OperatorType.DOT) {
 							ExpAssignProperty assign = new ExpAssignProperty();
 							assign.setToken(token);
 							assign.setObj(bin.getLeftOperand());
@@ -220,34 +220,34 @@ public class SemanticHandler {
 			} else {
 				Token token = indexed.get(10).getToken();
 				Token num = new Token();
-				if (token.kToken == TokenType.INTEGER) {
-					long n = (long) token.object;
+				if (token.getType() == TokenType.INTEGER) {
+					long n = (long) token.getObj();
 					if (n > 0L) {
 						recorder.add(SemanticError.INVALID_OPERATOR,
 								token);
 						return indexed.get(0).getObject();
 					}
-					num.object = -n;
-					num.kToken = TokenType.INTEGER;
+					num.setObj(-n);
+					num.setType(TokenType.INTEGER);
 				} else {
-					double n = (double) token.object;
+					double n = (double) token.getObj();
 					if (n > 0D) {
 						recorder.add(SemanticError.INVALID_OPERATOR,
 								token);
 						return indexed.get(0).getObject();
 					}
-					num.object = -n;
-					num.kToken = TokenType.DECIMAL;
+					num.setObj(-n);
+					num.setType(TokenType.DECIMAL);
 				}
 				ExpBinop binop = new ExpBinop();
 				Token minus = new Token();
-				minus.object = OperatorType.MINUS;
-				minus.kToken = TokenType.OPERATOR;
-				minus.position = token.position;
+				minus.setObj(OperatorType.MINUS);
+				minus.setType(TokenType.OPERATOR);
+				minus.setPosition(token.getPosition());
 				binop.setToken(minus);
 				binop.setLeftOperand((IExp) indexed.get(0).getObject());
-				num.position = token.position;
-				num.position.iColumn++;
+				num.setPosition(token.getPosition());
+				num.getPosition().setColumn(num.getPosition().getColumn() + 1);
 				ExpValue value = new ExpValue();
 				value.setToken(num);
 				binop.setRightOperand(value);
@@ -262,7 +262,7 @@ public class SemanticHandler {
 				return indexed.get(2).getObject();
 			} else if (indexed.exists(3)) {
 				Token token = indexed.get(0).getToken();
-				if (token.kToken == ID) {
+				if (token.getType() == ID) {
 					ExpInvoke invoke = new ExpInvoke();
 					invoke.setName(token);
 					Function func = query.getQueryScopeService().getFuncByName(
@@ -530,7 +530,7 @@ public class SemanticHandler {
 			if (!indexed.exists(1)) {
 				port.setImported(false);
 				Function func = query.getQueryScopeService()
-						.getFuncByName(token.object.toString());
+						.getFuncByName(token.getObj().toString());
 				if (func == null) {
 					recorder.add(SemanticError.WRONG_EXTERN_SYMBOL, token);
 				} else {

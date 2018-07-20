@@ -27,9 +27,9 @@ public class RuntimeTools {
 					stk.store(obj);
 					return true;
 				}
-				Token tk = Token.createFromObject(obj.getObj());
+				Token tk = Token.Companion.createFromObject(obj.getObj());
 				if (TokenTools.sin(TokenTools.ins2op(inst), tk)) {
-					stk.store(new RuntimeObject(tk.object));
+					stk.store(new RuntimeObject(tk.getObj()));
 				} else {
 					return false;
 				}
@@ -63,10 +63,10 @@ public class RuntimeTools {
 					stk.store(obj2);
 					return true;
 				}
-				Token tk = Token.createFromObject(obj.getObj());
+				Token tk = Token.Companion.createFromObject(obj.getObj());
 				if (TokenTools.bin(TokenTools.ins2op(inst), tk,
-						Token.createFromObject(obj2.getObj()))) {
-					stk.store(new RuntimeObject(tk.object));
+						Token.Companion.createFromObject(obj2.getObj()))) {
+					stk.store(new RuntimeObject(tk.getObj()));
 				} else {
 					return false;
 				}

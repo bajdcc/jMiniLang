@@ -12,18 +12,18 @@ public class ConvertToInt implements ITokenConventer {
 
 	@Override
 	public Token convert(Token token) {
-		TokenType type = token.kToken;
-		switch (token.kToken) {
+		TokenType type = token.getType();
+		switch (token.getType()) {
 			case BOOL:
 			case CHARACTER:
 			case STRING:
 			case DECIMAL:
 			case INTEGER:
-				token.object = getIntValue(token);
-				if (token.kToken == TokenType.ERROR) {
-					token.kToken = type;
+				token.setObj(getIntValue(token));
+				if (token.getType() == TokenType.ERROR) {
+					token.setType(type);
 				} else {
-					token.kToken = TokenType.INTEGER;
+					token.setType(TokenType.INTEGER);
 				}
 				break;
 			default:
@@ -39,25 +39,25 @@ public class ConvertToInt implements ITokenConventer {
 	 * @return 转换结果
 	 */
 	private static long getIntValue(Token token) {
-		switch (token.kToken) {
+		switch (token.getType()) {
 			case BOOL:
-				boolean bool = (boolean) token.object;
+				boolean bool = (boolean) token.getObj();
 				return bool ? 1L : 0L;
 			case CHARACTER:
-				char ch = (char) token.object;
+				char ch = (char) token.getObj();
 				return (long) ch;
 			case STRING:
-				String str = (String) token.object;
+				String str = (String) token.getObj();
 				try {
 					return Long.parseLong(str);
 				} catch (NumberFormatException e) {
-					token.kToken = TokenType.ERROR;
+					token.setType(TokenType.ERROR);
 				}
 				break;
 			case INTEGER:
-				return (long) token.object;
+				return (long) token.getObj();
 			case DECIMAL:
-				double decimal = (double) token.object;
+				double decimal = (double) token.getObj();
 				return (long) decimal;
 			default:
 				break;

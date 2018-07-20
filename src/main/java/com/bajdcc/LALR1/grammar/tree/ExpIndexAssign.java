@@ -89,14 +89,14 @@ public class ExpIndexAssign implements IExp {
 
 	@Override
 	public void genCode(ICodegen codegen) {
-		if (token == null || token.object == OperatorType.EQ_ASSIGN) {
+		if (token == null || token.getObj() == OperatorType.EQ_ASSIGN) {
 			obj.genCode(codegen);
 		} else {
 			exp.genCode(codegen);
 			index.genCode(codegen);
 			codegen.genCode(RuntimeInst.iidx);
 			obj.genCode(codegen);
-			switch ((OperatorType) token.object) {
+			switch ((OperatorType) token.getObj()) {
 				case PLUS_ASSIGN:
 					codegen.genCode(RuntimeInst.iadd);
 					break;
@@ -136,11 +136,11 @@ public class ExpIndexAssign implements IExp {
 	@Override
 	public String print(StringBuilder prefix) {
 		return exp.print(prefix) +
-				OperatorType.LSQUARE.getName() +
+				OperatorType.LSQUARE.getDesc() +
 				index.print(prefix) +
-				OperatorType.RSQUARE.getName() +
+				OperatorType.RSQUARE.getDesc() +
 				" " +
-				((token == null) ? OperatorType.ASSIGN.getName() : token.toRealString()) +
+				((token == null) ? OperatorType.ASSIGN.getDesc() : token.toRealString()) +
 				" " +
 				obj.print(prefix);
 	}

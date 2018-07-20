@@ -40,8 +40,8 @@ public class NumberTokenizer extends TokenAlgorithm {
 	public Token getToken(String string, Token token, IRegexStringIterator iterator) {
 		if (string.startsWith("0x")) {
 			try {
-				token.object = Long.parseLong(string.substring(2).toLowerCase(), 0x10);
-				token.kToken = TokenType.INTEGER;
+				token.setObj(Long.parseLong(string.substring(2).toLowerCase(), 0x10));
+				token.setType(TokenType.INTEGER);
 			} catch (NumberFormatException e) {
 				e.printStackTrace();
 				return null;
@@ -49,13 +49,13 @@ public class NumberTokenizer extends TokenAlgorithm {
 		} else {
 			try {
 				BigDecimal decimal = new BigDecimal(string);
-				token.object = decimal;
+				token.setObj(decimal);
 				if (string.indexOf('.') == -1) {
-					token.object = decimal.toBigIntegerExact().longValue();
-					token.kToken = TokenType.INTEGER;
+					token.setObj(decimal.toBigIntegerExact().longValue());
+					token.setType(TokenType.INTEGER);
 				} else {
-					token.object = decimal.doubleValue();
-					token.kToken = TokenType.DECIMAL;
+					token.setObj(decimal.doubleValue());
+					token.setType(TokenType.DECIMAL);
 				}
 			} catch (ArithmeticException | NumberFormatException e) {
 				e.printStackTrace();

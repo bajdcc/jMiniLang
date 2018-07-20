@@ -35,8 +35,8 @@ public class NonTerminalTokenizer extends TokenAlgorithm {
 	 */
 	@Override
 	public Token getToken(String string, Token token, IRegexStringIterator iterator) {
-		token.kToken = TokenType.ID;
-		token.object = string;
+		token.setType(TokenType.ID);
+		token.setObj(string);
 		return token;
 	}
 }

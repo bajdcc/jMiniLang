@@ -26,12 +26,12 @@ public class TestInterpret10 {
 							"\n" +
 							"var pc = func ~(index) {\n" +
 							"    var pc_router = call g_query_share(\"pc_router\");\n" +
-							"    var name = \"pc_\" + index;\n" +
+							"    var desc = \"pc_\" + index;\n" +
 							"    var router = index / pc_router;\n" +
 							"    var display = \"PC #\" + index;\n" +
 							"    call g_printn(display + \" started\");\n" +
 							"    call g_sleep(50);\n" +
-							"    var handle = call g_create_pipe(name);\n" +
+							"    var handle = call g_create_pipe(desc);\n" +
 							"    call g_printn(display + \" connecting...\");\n" +
 							"    var router_connection = \"router#\" + router;\n" +
 							"    for (;;) {\n" +
@@ -59,7 +59,7 @@ public class TestInterpret10 {
 							"\n" +
 							"var router = func ~(index) {\n" +
 							"    var pc_router = call g_query_share(\"pc_router\");\n" +
-							"    var name = \"router_\" + index;\n" +
+							"    var desc = \"router_\" + index;\n" +
 							"    var display = \"Router #\" + index;\n" +
 							"    call g_printn(display + \" started\");\n" +
 							"    var router_connection = \"router#\" + index;\n" +
@@ -86,8 +86,8 @@ public class TestInterpret10 {
 							"            call g_array_add(list, new_pc);\n" +
 							"            call g_printn(display + \" connecting to pc #\" + new_pc);\n" +
 							"            call g_unlock_share(router_connection);\n" +
-							"            var name = \"pc_\" + new_pc;\n" +
-							"            var handle = call g_create_pipe(name);\n" +
+							"            var desc = \"pc_\" + new_pc;\n" +
+							"            var handle = call g_create_pipe(desc);\n" +
 							"            call g_destroy_pipe(handle);\n" +
 							"            call g_printn(display + \" connected to #\" + new_pc);\n" +
 							"            if (connected == pc_router) { break; }\n" +
@@ -106,8 +106,8 @@ public class TestInterpret10 {
 							"        var size = call g_array_size(list);\n" +
 							"        for (var i = 0; i < size; i++) {\n" +
 							"            call g_sleep(10);\n" +
-							"            var name = \"pc_\" + call g_array_get(list, i);\n" +
-							"            var handle = call g_create_pipe(name);\n" +
+							"            var desc = \"pc_\" + call g_array_get(list, i);\n" +
+							"            var handle = call g_create_pipe(desc);\n" +
 							"            call g_write_pipe(handle, \"!\");\n" +
 							"            call g_printn(display + \" disconnected with #\" + i);\n" +
 							"        }\n" +

@@ -30,7 +30,7 @@ public class ExpValue implements IExp {
 
 	@Override
 	public boolean isConstant() {
-		return token.kToken != TokenType.ID;
+		return token.getType() != TokenType.ID;
 	}
 
 	@Override
@@ -50,8 +50,8 @@ public class ExpValue implements IExp {
 
 	@Override
 	public void genCode(ICodegen codegen) {
-		codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(token.object));
-		if (token.kToken != TokenType.ID) {
+		codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(token.getObj()));
+		if (token.getType() != TokenType.ID) {
 			codegen.genCode(RuntimeInst.iload);
 		} else {
 			if (TokenTools.isExternalName(token)) {
@@ -74,8 +74,8 @@ public class ExpValue implements IExp {
 
 	@Override
 	public void addClosure(IClosureScope scope) {
-		if (token.kToken == TokenType.ID) {
-			scope.addRef(token.object);
+		if (token.getType() == TokenType.ID) {
+			scope.addRef(token.getObj());
 		}
 	}
 

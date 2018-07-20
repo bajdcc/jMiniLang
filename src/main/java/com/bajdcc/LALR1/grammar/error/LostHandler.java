@@ -22,10 +22,10 @@ public class LostHandler implements IErrorHandler {
 
 	@Override
 	public String handle(IRegexStringIterator iterator, TrackerErrorBag bag) {
-		bag.bRead = false;
-		bag.bPass = true;
+		bag.setRead(false);
+		bag.setPass(true);
 		String def = "缺少：" + message + System.lineSeparator();
-		String snapshot = iterator.ex().getErrorSnapshot(bag.position);
+		String snapshot = iterator.ex().getErrorSnapshot(bag.getPosition());
 		if (snapshot != null) {
 			return def + snapshot;
 		}

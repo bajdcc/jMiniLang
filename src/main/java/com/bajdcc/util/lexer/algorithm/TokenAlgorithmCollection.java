@@ -69,9 +69,9 @@ public class TokenAlgorithmCollection implements Cloneable {
 
 	public Token scan() {
 		Token token = new Token();
-		token.kToken = TokenType.ERROR;
+		token.setType(TokenType.ERROR);
 		if (!iterator.available()) {
-			token.kToken = TokenType.EOF;
+			token.setType(TokenType.EOF);
 		} else {
 			for (ITokenAlgorithm alg : arrAlgorithms) {
 				filterHost.setFilter(alg);

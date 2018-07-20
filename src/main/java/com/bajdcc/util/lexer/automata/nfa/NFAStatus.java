@@ -42,7 +42,7 @@ public class NFAStatus {
 			NFAStatus status = stack.get(i);
 			VisitBag bag = new VisitBag();
 			bfs.visitBegin(status, bag);
-			if (bag.bVisitChildren) {
+			if (bag.getVisitChildren()) {
 				// 遍历状态的出边
 // 边未被访问，且边类型符合要求
 				status.outEdges.stream().filter(edge -> !set.contains(edge.end) && bfs.testEdge(edge)).forEach(edge -> {// 边未被访问，且边类型符合要求
@@ -50,7 +50,7 @@ public class NFAStatus {
 					set.add(edge.end);
 				});
 			}
-			if (bag.bVisitEnd) {
+			if (bag.getVisitEnd()) {
 				bfs.visitEnd(status);
 			}
 		}

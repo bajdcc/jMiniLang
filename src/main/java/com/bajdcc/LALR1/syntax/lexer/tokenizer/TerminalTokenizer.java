@@ -35,8 +35,8 @@ public class TerminalTokenizer extends TokenAlgorithm {
 	 */
 	@Override
 	public Token getToken(String string, Token token, IRegexStringIterator iterator) {
-		token.kToken = TokenType.STRING;
-		token.object = string.substring(1);
+		token.setType(TokenType.STRING);
+		token.setObj(string.substring(1));
 		return token;
 	}
 }

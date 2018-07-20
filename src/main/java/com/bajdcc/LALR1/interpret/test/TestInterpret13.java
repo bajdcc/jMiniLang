@@ -215,7 +215,7 @@ public class TestInterpret13 {
 			System.err.println();
 			System.err.println(String.format("模块名：%s. 位置：%s. 错误：%s-%s(%s:%d)",
 					e.getPageName(), e.getPosition(), e.getMessage(),
-					e.getInfo(), e.getFileName(), e.getPosition().iLine + 1));
+					e.getInfo(), e.getFileName(), e.getPosition().getLine() + 1));
 			e.printStackTrace();
 		} catch (RuntimeException e) {
 			System.err.println();

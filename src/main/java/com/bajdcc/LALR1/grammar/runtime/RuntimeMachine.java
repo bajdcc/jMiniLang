@@ -296,7 +296,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 		pageMap.add(name, page);
 		pageRefer.put(name, new ArrayList<>());
 		pageRefer.get(name).add(page);
-		page.getInfo().getDataMap().put("name", name);
+		page.getInfo().getDataMap().put("desc", name);
 	}
 
 	public void run(String name, RuntimeCodePage page) throws Exception {
@@ -352,7 +352,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 		nextInst();
 		if (op != null) {
 			if (!RuntimeTools.calcOp(currentStack.reg, inst, this)) {
-				err(RuntimeError.UNDEFINED_CONVERT, op.getName());
+				err(RuntimeError.UNDEFINED_CONVERT, op.getDesc());
 			}
 		} else {
 			if (!RuntimeTools.calcData(currentStack.reg, inst, this)) {
@@ -722,7 +722,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 			pageName = currentPage.
 					getInfo().
 					getDataMap().
-					get("name").
+					get("desc").
 					toString();
 		} else {
 			err(RuntimeError.WRONG_CODEPAGE);
@@ -800,7 +800,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 					continue;
 				}
 				List<RuntimeCodePage> refers = pageRefer.get(currentPage.getInfo()
-						.getDataMap().get("name").toString());
+						.getDataMap().get("desc").toString());
 				for (RuntimeCodePage page : refers) {
 					value = page.getInfo().getValueCallByName(name);
 					if (value != null) {
@@ -810,7 +810,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 					index = page.getInfo().getAddressOfExportFunc(name);
 					if (index != -1) {
 						func.addEnv(id, new RuntimeObject(new RuntimeFuncObject(page.getInfo()
-								.getDataMap().get("name").toString(), index)));
+								.getDataMap().get("desc").toString(), index)));
 						continue FOR_LOOP;
 					}
 				}
@@ -1030,7 +1030,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 			return;
 		}
 		List<RuntimeCodePage> refers = pageRefer.get(currentPage.getInfo()
-				.getDataMap().get("name").toString());
+				.getDataMap().get("desc").toString());
 		for (RuntimeCodePage page : refers) {
 			value = page.getInfo().getValueCallByName(name);
 			if (value != null) {
@@ -1040,7 +1040,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 			index = page.getInfo().getAddressOfExportFunc(name);
 			if (index != -1) {
 				currentStack.pushData(new RuntimeObject(new RuntimeFuncObject(page.getInfo()
-						.getDataMap().get("name").toString(), index)));
+						.getDataMap().get("desc").toString(), index)));
 				return;
 			}
 		}
@@ -1099,7 +1099,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 		for (RuntimeCodePage page : refers) {
 			int address = page.getInfo().getAddressOfExportFunc(name);
 			if (address != -1) {
-				String jmpPage = page.getInfo().getDataMap().get("name")
+				String jmpPage = page.getInfo().getDataMap().get("desc")
 						.toString();
 				currentStack.opCall(address, jmpPage, currentStack.reg.execId,
 						currentStack.reg.pageId, name);
@@ -1125,17 +1125,17 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 					if (type != RuntimeObjectType.kObject) {
 						RuntimeObjectType objType = objParam.getType();
 						if (objType != type) {
-							Token token = Token.createFromObject(objParam
+							Token token = Token.Companion.createFromObject(objParam
 									.getObj());
 							TokenType objTokenType = RuntimeObject
 									.toTokenType(type);
 							if (objTokenType == TokenType.ERROR) {
-								err(RuntimeError.WRONG_ARGTYPE, name + " " + objTokenType.getName());
+								err(RuntimeError.WRONG_ARGTYPE, name + " " + objTokenType.getDesc());
 							}
 							if (!TokenTools.promote(objTokenType, token)) {
-								err(RuntimeError.UNDEFINED_CONVERT, name + " " + token.toString() + " " + objTokenType.getName());
+								err(RuntimeError.UNDEFINED_CONVERT, name + " " + token.toString() + " " + objTokenType.getDesc());
 							} else {
-								objParam.setObj(token.object);
+								objParam.setObj(token.getObj());
 							}
 						}
 					}
@@ -1271,7 +1271,7 @@ public class RuntimeMachine implements IRuntimeStack, IRuntimeStatus, IRuntimeRi
 		next();
 		String hash = RuntimeTools.getYieldHash(currentStack.getLevel(),
 				currentStack.getFuncLevel(), pageName, yldLine);
-		stkYieldMap.put(hash, newStack.getLevel());
+		stkYieldMap.add(hash, newStack.getLevel());
 		currentStack.addYield(newStack.getLevel());
 		stack.add(newStack);
 		refreshStack();

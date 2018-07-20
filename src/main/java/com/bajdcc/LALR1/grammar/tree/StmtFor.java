@@ -120,17 +120,17 @@ public class StmtFor implements IStmt {
 	public String print(StringBuilder prefix) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(prefix.toString());
-		sb.append(KeywordType.FOR.getName());
+		sb.append(KeywordType.FOR.getDesc());
 		sb.append(" ( ");
 		if (var != null) {
 			sb.append(var.print(prefix));
 		}
-		sb.append(OperatorType.SEMI.getName());
+		sb.append(OperatorType.SEMI.getDesc());
 		if (cond != null) {
 			sb.append(" ");
 			sb.append(cond.print(prefix));
 		}
-		sb.append(OperatorType.SEMI.getName());
+		sb.append(OperatorType.SEMI.getDesc());
 		if (ctrl != null) {
 			sb.append(" ");
 			sb.append(ctrl.print(prefix));

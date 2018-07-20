@@ -69,8 +69,8 @@ public abstract class SelectSetSolver implements ISyntaxComponentVisitor {
 
 	@Override
 	public void visitBegin(TokenExp node, VisitBag bag) {
-		bag.bVisitChildren = false;
-		bag.bVisitEnd = false;
+		bag.setVisitChildren(false);
+		bag.setVisitEnd(false);
 		if (node.kType == TokenType.EOF) {// Epsilon
 			addRule();// 空串，则指令集为空（不压入新状态）
 			for (TokenExp token : getFollow()) {// 有空串，添加Follow集
@@ -93,8 +93,8 @@ public abstract class SelectSetSolver implements ISyntaxComponentVisitor {
 
 	@Override
 	public void visitBegin(RuleExp node, VisitBag bag) {
-		bag.bVisitChildren = false;
-		bag.bVisitEnd = false;
+		bag.setVisitChildren(false);
+		bag.setVisitEnd(false);
 		if (firstSymbol) {
 			addRule();// 需要添加指令集
 			insertSymbol = true;
@@ -117,7 +117,7 @@ public abstract class SelectSetSolver implements ISyntaxComponentVisitor {
 
 	@Override
 	public void visitBegin(SequenceExp node, VisitBag bag) {
-		bag.bVisitEnd = false;
+		bag.setVisitEnd(false);
 		firstSymbol = true;
 		insertSymbol = false;
 		epsilon = true;
@@ -125,7 +125,7 @@ public abstract class SelectSetSolver implements ISyntaxComponentVisitor {
 
 	@Override
 	public void visitBegin(BranchExp node, VisitBag bag) {
-		bag.bVisitEnd = false;
+		bag.setVisitEnd(false);
 	}
 
 	@Override

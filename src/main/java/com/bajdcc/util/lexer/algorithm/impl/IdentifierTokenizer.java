@@ -31,7 +31,7 @@ public class IdentifierTokenizer extends TokenAlgorithm {
 	 */
 	private void initKeywords() {
 		for (KeywordType keyword : KeywordType.values()) {// 关键字
-			mapKeywords.put(keyword.getName(), keyword);
+			mapKeywords.put(keyword.getDesc(), keyword);
 		}
 	}
 
@@ -57,21 +57,21 @@ public class IdentifierTokenizer extends TokenAlgorithm {
 			KeywordType kw = mapKeywords.get(string);
 			switch (kw) {
 				case TRUE:
-					token.kToken = TokenType.BOOL;
-					token.object = true;
+					token.setType(TokenType.BOOL);
+					token.setObj(true);
 					break;
 				case FALSE:
-					token.kToken = TokenType.BOOL;
-					token.object = false;
+					token.setType(TokenType.BOOL);
+					token.setObj(false);
 					break;
 				default:
-					token.kToken = TokenType.KEYWORD;
-					token.object = kw;
+					token.setType(TokenType.KEYWORD);
+					token.setObj(kw);
 					break;
 			}
 		} else {
-			token.kToken = TokenType.ID;
-			token.object = string;
+			token.setType(TokenType.ID);
+			token.setObj(string);
 		}
 		return token;
 	}

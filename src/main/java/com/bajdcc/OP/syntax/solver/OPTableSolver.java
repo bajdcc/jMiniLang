@@ -50,7 +50,7 @@ public abstract class OPTableSolver implements ISyntaxComponentVisitor {
 
 	@Override
 	public void visitBegin(TokenExp node, VisitBag bag) {
-		bag.bVisitChildren = false;
+		bag.setVisitChildren(false);
 		if (index > 0) {
 			if (lastToken != null) {
 				// [b=node,a=lastToken]
@@ -76,7 +76,7 @@ public abstract class OPTableSolver implements ISyntaxComponentVisitor {
 
 	@Override
 	public void visitBegin(RuleExp node, VisitBag bag) {
-		bag.bVisitChildren = false;
+		bag.setVisitChildren(false);
 		if (index > 0) {
 			// [a=lastToken,b=token=FirstVT(R),R=node]
 			// A->...aR...且b属于FirstVT(R)才能得出a<b
@@ -89,13 +89,13 @@ public abstract class OPTableSolver implements ISyntaxComponentVisitor {
 
 	@Override
 	public void visitBegin(SequenceExp node, VisitBag bag) {
-		bag.bVisitEnd = false;
+		bag.setVisitEnd(false);
 		index = 0;
 	}
 
 	@Override
 	public void visitBegin(BranchExp node, VisitBag bag) {
-		bag.bVisitEnd = false;
+		bag.setVisitEnd(false);
 	}
 
 	@Override

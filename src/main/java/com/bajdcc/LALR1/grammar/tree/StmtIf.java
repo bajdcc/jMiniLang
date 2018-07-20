@@ -86,14 +86,14 @@ public class StmtIf implements IStmt {
 	public String print(StringBuilder prefix) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(prefix.toString());
-		sb.append(KeywordType.IF.getName());
+		sb.append(KeywordType.IF.getDesc());
 		sb.append(" (");
 		sb.append(exp.print(prefix));
 		sb.append(") ");
 		sb.append(trueBlock.print(prefix));
 		if (falseBlock != null) {
 			sb.append(" ");
-			sb.append(KeywordType.ELSE.getName());
+			sb.append(KeywordType.ELSE.getDesc());
 			sb.append(" ");
 			sb.append(falseBlock.print(prefix));
 		}

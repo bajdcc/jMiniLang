@@ -30,7 +30,7 @@ public class ModuleList implements IInterpreterModule {
 
 	@Override
 	public String getModuleCode() {
-		return ResourceLoader.load(getClass());
+		return ResourceLoader.INSTANCE.load(getClass());
 	}
 
 	@Override
@@ -38,7 +38,7 @@ public class ModuleList implements IInterpreterModule {
 		if (runtimeCodePage != null)
 			return runtimeCodePage;
 
-		String base = ResourceLoader.load(getClass());
+		String base = ResourceLoader.INSTANCE.load(getClass());
 
 		Grammar grammar = new Grammar(base);
 		RuntimeCodePage page = grammar.getCodePage();

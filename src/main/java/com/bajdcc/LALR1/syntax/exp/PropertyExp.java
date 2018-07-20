@@ -42,10 +42,10 @@ public class PropertyExp implements ISyntaxComponent {
 	public void visit(ISyntaxComponentVisitor visitor) {
 		VisitBag bag = new VisitBag();
 		visitor.visitBegin(this, bag);
-		if (bag.bVisitChildren) {
+		if (bag.getVisitChildren()) {
 			expression.visit(visitor);
 		}
-		if (bag.bVisitEnd) {
+		if (bag.getVisitEnd()) {
 			visitor.visitEnd(this);
 		}
 	}

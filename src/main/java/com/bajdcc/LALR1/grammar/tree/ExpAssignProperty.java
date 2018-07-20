@@ -87,7 +87,7 @@ public class ExpAssignProperty implements IExp {
 
 	@Override
 	public void genCode(ICodegen codegen) {
-		if (token == null || token.object == OperatorType.EQ_ASSIGN) {
+		if (token == null || token.getObj() == OperatorType.EQ_ASSIGN) {
 			codegen.genCode(RuntimeInst.iopena);
 			obj.genCode(codegen);
 			codegen.genCode(RuntimeInst.ipusha);
@@ -97,7 +97,7 @@ public class ExpAssignProperty implements IExp {
 			codegen.genCode(RuntimeInst.ipusha);
 			codegen.genCode(RuntimeInst.ipush, codegen.genDataRef("g_set_property_unary"));
 			codegen.genCode(RuntimeInst.icallx);
-		} else if (token.object == OperatorType.PLUS_PLUS || token.object == OperatorType.MINUS_MINUS) {
+		} else if (token.getObj() == OperatorType.PLUS_PLUS || token.getObj() == OperatorType.MINUS_MINUS) {
 			codegen.genCode(RuntimeInst.iopena);
 			obj.genCode(codegen);
 			codegen.genCode(RuntimeInst.ipusha);
@@ -110,7 +110,7 @@ public class ExpAssignProperty implements IExp {
 			codegen.genCode(RuntimeInst.ipusha);
 			codegen.genCode(RuntimeInst.ipush, codegen.genDataRef("g_get_property"));
 			codegen.genCode(RuntimeInst.icallx);
-			if (token.object == OperatorType.PLUS_PLUS) {
+			if (token.getObj() == OperatorType.PLUS_PLUS) {
 				codegen.genCode(RuntimeInst.iinc);
 			} else {
 				codegen.genCode(RuntimeInst.idec);
@@ -132,7 +132,7 @@ public class ExpAssignProperty implements IExp {
 			codegen.genCode(RuntimeInst.ipush, codegen.genDataRef("g_get_property"));
 			codegen.genCode(RuntimeInst.icallx);
 			exp.genCode(codegen);
-			switch ((OperatorType) token.object) {
+			switch ((OperatorType) token.getObj()) {
 				case PLUS_ASSIGN:
 					codegen.genCode(RuntimeInst.iadd);
 					break;
@@ -171,12 +171,12 @@ public class ExpAssignProperty implements IExp {
 
 	@Override
 	public String print(StringBuilder prefix) {
-		if (token != null && (token.object == OperatorType.PLUS_PLUS || token.object == OperatorType.MINUS_MINUS)) {
+		if (token != null && (token.getObj() == OperatorType.PLUS_PLUS || token.getObj() == OperatorType.MINUS_MINUS)) {
 			return obj.print(prefix) + "." + property.print(prefix) +
 					" " + token.toRealString();
 		}
 		return obj.print(prefix) + "." + property.print(prefix) +
-				" " + ((token == null) ? OperatorType.ASSIGN.getName() : token.toRealString()) + " " +
+				" " + ((token == null) ? OperatorType.ASSIGN.getDesc() : token.toRealString()) + " " +
 				exp.print(prefix);
 	}
 

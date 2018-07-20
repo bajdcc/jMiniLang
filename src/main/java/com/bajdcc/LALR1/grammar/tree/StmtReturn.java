@@ -73,19 +73,19 @@ public class StmtReturn implements IStmt {
 		StringBuilder sb = new StringBuilder();
 		sb.append(prefix.toString());
 		if (yield) {
-			sb.append(KeywordType.YIELD.getName());
+			sb.append(KeywordType.YIELD.getDesc());
 			sb.append(" ");
 		}
 		if (exp != null) {
-			sb.append(KeywordType.RETURN.getName());
+			sb.append(KeywordType.RETURN.getDesc());
 			sb.append(" ");
 			sb.append(exp.print(prefix));
 		} else if (yield) {
-			sb.append(KeywordType.BREAK.getName());
+			sb.append(KeywordType.BREAK.getDesc());
 		} else {
-			sb.append(KeywordType.RETURN.getName());
+			sb.append(KeywordType.RETURN.getDesc());
 		}
-		sb.append(OperatorType.SEMI.getName());
+		sb.append(OperatorType.SEMI.getDesc());
 		return sb.toString();
 	}
 

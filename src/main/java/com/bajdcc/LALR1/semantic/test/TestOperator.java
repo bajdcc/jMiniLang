@@ -37,13 +37,13 @@ public class TestOperator {
 			semantic.addActionHandler("enter_paran", (indexed, manage, access, recorder) -> System.out.println("enter"));
 			semantic.addActionHandler("leave_paran", (indexed, manage, access, recorder) -> System.out.println("leave"));
 			semantic.addErrorHandler("lost_exp", (iterator, bag) -> {
-				bag.bRead = false;
-				bag.bPass = true;
+				bag.setRead(false);
+				bag.setPass(true);
 				return "表达式不完整";
 			});
 			semantic.addErrorHandler("lost_exp_right", (iterator, bag) -> {
-				bag.bRead = false;
-				bag.bPass = true;
+				bag.setRead(false);
+				bag.setPass(true);
 				return "缺少右括号";
 			});
 			ISemanticAnalyzer handleCopy = (indexed, query, recorder) -> indexed.get(0).getObject();
@@ -53,8 +53,8 @@ public class TestOperator {
 				int rop = Integer
 						.parseInt(indexed.get(2).getObject().toString());
 				Token op = indexed.get(1).getToken();
-				if (op.kToken == TokenType.OPERATOR) {
-					OperatorType kop = (OperatorType) op.object;
+				if (op.getType() == TokenType.OPERATOR) {
+					OperatorType kop = (OperatorType) op.getObj();
 					switch (kop) {
 						case PLUS:
 							return lop + rop;
@@ -75,7 +75,7 @@ public class TestOperator {
 					return 0;
 				}
 			};
-			ISemanticAnalyzer handleValue = (indexed, query, recorder) -> indexed.get(0).getToken().object;
+			ISemanticAnalyzer handleValue = (indexed, query, recorder) -> indexed.get(0).getToken().getObj();
 			// syntax.infer("E -> T `PLUS`<+> E | T `MINUS`<-> E | T");
 			// syntax.infer("T -> F `TIMES`<*> T | F `DIVIDE`</> T | F");
 			// syntax.infer("F -> `LPA`<(> E `RPA`<)>  | `SYMBOL`<i>");

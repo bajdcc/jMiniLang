@@ -17,30 +17,30 @@ public class LineFilter implements IRegexStringFilter, IRegexStringFilterMeta {
 	public RegexStringIteratorData filter(IRegexStringIterator iterator) {
 		RegexStringIteratorData data = new RegexStringIteratorData();
 		if (!iterator.available()) {
-			data.kMeta = MetaType.END;
-			data.chCurrent = MetaType.END.getChar();
+			data.setMeta(MetaType.END);
+			data.setCurrent(MetaType.END.getChar());
 		} else {
-			data.kMeta = iterator.meta();
-			data.chCurrent = iterator.current();
+			data.setMeta(iterator.meta());
+			data.setCurrent(iterator.current());
 			iterator.next();
-			if (data.kMeta == MetaType.ESCAPE) {// 过滤转义换行
+			if (data.getMeta() == MetaType.ESCAPE) {// 过滤转义换行
 				iterator.next();
 				iterator.snapshot();
-				data.kMeta = iterator.meta();
-				if (data.kMeta == MetaType.NEW_LINE
-						|| data.kMeta == MetaType.CARRIAGE_RETURN) {// 确认换行
+				data.setMeta(iterator.meta());
+				if (data.getMeta() == MetaType.NEW_LINE
+						|| data.getMeta() == MetaType.CARRIAGE_RETURN) {// 确认换行
 					iterator.next();
 					iterator.cover();
-					data.kMeta = iterator.meta();
-					if (data.kMeta == MetaType.NEW_LINE
-							|| data.kMeta == MetaType.CARRIAGE_RETURN) {// 确认换行
+					data.setMeta(iterator.meta());
+					if (data.getMeta() == MetaType.NEW_LINE
+							|| data.getMeta() == MetaType.CARRIAGE_RETURN) {// 确认换行
 						iterator.discard();
 						iterator.next();
 					} else {
 						iterator.restore();
 					}
-					data.kMeta = MetaType.MUST_SAVE;
-					data.chCurrent = iterator.current();
+					data.setMeta(MetaType.MUST_SAVE);
+					data.setCurrent(iterator.current());
 					iterator.next();
 				} else {
 					iterator.restore();

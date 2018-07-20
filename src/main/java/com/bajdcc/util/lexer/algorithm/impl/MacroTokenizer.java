@@ -36,8 +36,8 @@ public class MacroTokenizer extends TokenAlgorithm {
 	 */
 	@Override
 	public Token getToken(String string, Token token, IRegexStringIterator iterator) {
-		token.kToken = TokenType.MACRO;
-		token.object = string.trim();
+		token.setType(TokenType.MACRO);
+		token.setObj(string.trim());
 		return token;
 	}
 }

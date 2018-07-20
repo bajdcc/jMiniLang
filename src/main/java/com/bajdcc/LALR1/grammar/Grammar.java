@@ -332,7 +332,7 @@ public class Grammar extends Semantic {
 			String error = getSemanticError();
 			System.err.println(error);
 			throw new SyntaxException(SyntaxError.COMPILE_ERROR,
-					recorder.getErrorList().get(0).getPosition().position, error);
+					recorder.getErrorList().get(0).getPosition().getPosition(), error);
 		}
 	}
 
@@ -389,7 +389,7 @@ public class Grammar extends Semantic {
 		if (!recorder.isCorrect()) {
 			System.err.println(getSemanticError());
 			throw new SyntaxException(SyntaxError.COMPILE_ERROR,
-					recorder.getErrorList().get(0).getPosition().position, getSemanticError());
+					recorder.getErrorList().get(0).getPosition().getPosition(), getSemanticError());
 		}
 		return code.genCodePage();
 	}

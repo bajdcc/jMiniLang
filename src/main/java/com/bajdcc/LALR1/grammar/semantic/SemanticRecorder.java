@@ -22,7 +22,7 @@ public class SemanticRecorder implements ISemanticRecorder {
 		if (errors.isEmpty())
 			errors.add(new SemanticException(error, token));
 		SemanticException e = errors.get(errors.size() - 1);
-		if (e.getErrorCode() != error || e.getPosition().position.different(token.position))
+		if (e.getErrorCode() != error || e.getPosition().getPosition().different(token.getPosition()))
 			errors.add(new SemanticException(error, token));
 	}
 

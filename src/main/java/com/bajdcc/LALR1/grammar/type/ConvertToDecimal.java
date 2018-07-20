@@ -12,17 +12,17 @@ public class ConvertToDecimal implements ITokenConventer {
 
 	@Override
 	public Token convert(Token token) {
-		TokenType type = token.kToken;
-		switch (token.kToken) {
+		TokenType type = token.getType();
+		switch (token.getType()) {
 			case BOOL:
 			case STRING:
 			case DECIMAL:
 			case INTEGER:
-				token.object = getDecimalValue(token);
-				if (token.kToken == TokenType.ERROR) {
-					token.kToken = type;
+				token.setObj(getDecimalValue(token));
+				if (token.getType() == TokenType.ERROR) {
+					token.setType(type);
 				} else {
-					token.kToken = TokenType.DECIMAL;
+					token.setType(TokenType.DECIMAL);
 				}
 				break;
 			default:
@@ -38,23 +38,23 @@ public class ConvertToDecimal implements ITokenConventer {
 	 * @return 转换结果
 	 */
 	private static double getDecimalValue(Token token) {
-		switch (token.kToken) {
+		switch (token.getType()) {
 			case BOOL:
-				boolean bool = (boolean) token.object;
+				boolean bool = (boolean) token.getObj();
 				return bool ? 1D : 0D;
 			case STRING:
-				String str = (String) token.object;
+				String str = (String) token.getObj();
 				try {
 					return Double.parseDouble(str);
 				} catch (NumberFormatException e) {
-					token.kToken = TokenType.ERROR;
+					token.setType(TokenType.ERROR);
 				}
 				break;
 			case INTEGER:
-				long integer = (long) token.object;
+				long integer = (long) token.getObj();
 				return (double) integer;
 			case DECIMAL:
-				return (double) token.object;
+				return (double) token.getObj();
 			default:
 				break;
 		}

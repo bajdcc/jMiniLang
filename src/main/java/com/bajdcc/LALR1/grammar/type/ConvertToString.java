@@ -12,8 +12,8 @@ public class ConvertToString implements ITokenConventer {
 
 	@Override
 	public Token convert(Token token) {
-		token.kToken = TokenType.STRING;
-		token.object = String.valueOf(token.object);
+		token.setType(TokenType.STRING);
+		token.setObj(String.valueOf(token.getObj()));
 		return token;
 	}
 }

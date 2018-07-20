@@ -121,10 +121,10 @@ public class NFA implements IRegexComponentVisitor {
 // 若在当前结点范围内，则添加边
 // 连接两个状态
 // 字符类型
-		chMap.getRanges().stream().filter(range -> node.include(range.chLowerBound)).forEach(range -> {// 若在当前结点范围内，则添加边
+		chMap.getRanges().stream().filter(range -> node.include(range.getLowerBound())).forEach(range -> {// 若在当前结点范围内，则添加边
 			NFAEdge edge = connect(enfa.begin, enfa.end);// 连接两个状态
 			edge.data.kAction = EdgeType.CHARSET;// 字符类型
-			edge.data.param = chMap.find(range.chLowerBound);
+			edge.data.param = chMap.find(range.getLowerBound());
 		});
 		storeENFA(enfa);
 	}
@@ -150,7 +150,7 @@ public class NFA implements IRegexComponentVisitor {
 	public void visitEnd(Constructure node) {
 		leaveChildren();
 		ENFA result = null;
-		if (!node.bBranch) {
+		if (!node.getBranch()) {
 			/* 将当前NFA的两端同每个子结点的两端串联 */
 			for (ENFA enfa : childNFA) {
 				if (result == null) {
@@ -185,7 +185,7 @@ public class NFA implements IRegexComponentVisitor {
 		ENFA enfa = new ENFA();
 		enfa.begin = childNFA.get(0).begin;
 		enfa.end = childNFA.get(0).end;
-		int count = Math.max(node.iLowerBound, node.iUpperBound);
+		int count = Math.max(node.getLowerBound(), node.getUpperBound());
 		subENFAList.add(enfa);
 		/* 循环复制ENFA */
 		for (int i = 1; i <= count; i++) {
@@ -193,16 +193,16 @@ public class NFA implements IRegexComponentVisitor {
 		}
 		enfa = new ENFA();
 		/* 构造循环起始部分 */
-		if (node.iLowerBound > 0) {
+		if (node.getLowerBound() > 0) {
 			enfa.begin = childNFA.get(0).begin;
 			enfa.end = childNFA.get(0).end;
-			for (int i = 1; i < node.iLowerBound; i++) {
+			for (int i = 1; i < node.getLowerBound(); i++) {
 				connect(enfa.end, subENFAList.get(i).begin);// 连接首尾
 				enfa.end = subENFAList.get(i).end;
 			}
 		}
-		if (node.iUpperBound != -1) {// 有限循环，构造循环结束部分
-			for (int i = node.iLowerBound; i < node.iUpperBound; i++) {
+		if (node.getUpperBound() != -1) {// 有限循环，构造循环结束部分
+			for (int i = node.getLowerBound(); i < node.getUpperBound(); i++) {
 				if (enfa.end != null) {
 					connect(enfa.end, subENFAList.get(i).begin);// 连接首尾
 					enfa.end = subENFAList.get(i).end;
@@ -210,7 +210,7 @@ public class NFA implements IRegexComponentVisitor {
 					enfa = subENFAList.get(i);
 				}
 				connect(subENFAList.get(i).begin,
-						subENFAList.get(node.iUpperBound - 1).end);
+						subENFAList.get(node.getUpperBound() - 1).end);
 			}
 		} else {// 无限循环
 			NFAStatus tailBegin, tailEnd;
@@ -222,8 +222,8 @@ public class NFA implements IRegexComponentVisitor {
 				tailEnd = enfa.end = new NFAStatus();
 			}
 			/* 构造无限循环的结束部分，连接起始端与循环端的双向e边 */
-			connect(tailBegin, subENFAList.get(node.iLowerBound).begin);
-			connect(subENFAList.get(node.iLowerBound).end, tailBegin);
+			connect(tailBegin, subENFAList.get(node.getLowerBound()).begin);
+			connect(subENFAList.get(node.getLowerBound()).end, tailBegin);
 			connect(tailBegin, tailEnd);
 		}
 		/* 构造循环的头尾部分 */

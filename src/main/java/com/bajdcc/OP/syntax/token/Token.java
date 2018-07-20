@@ -26,16 +26,16 @@ public class Token {
 
 	@Override
 	public String toString() {
-		return String.format("%04d,%03d: %s %s", position.iLine,
-				position.iColumn, kToken.getName(),
+		return String.format("%04d,%03d: %s %s", position.getLine(),
+				position.getColumn(), kToken.getName(),
 				object == null ? "(null)" : object.toString());
 	}
 
 	public static Token transfer(com.bajdcc.util.lexer.token.Token token) {
 		Token tk = new Token();
-		tk.object = token.object;
-		tk.position = token.position;
-		switch (token.kToken) {
+		tk.object = token.getObj();
+		tk.position = token.getPosition();
+		switch (token.getType()) {
 			case COMMENT:
 				tk.kToken = TokenType.COMMENT;
 				break;

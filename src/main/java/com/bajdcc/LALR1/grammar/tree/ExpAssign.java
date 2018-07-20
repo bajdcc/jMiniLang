@@ -81,7 +81,7 @@ public class ExpAssign implements IExp {
 			exp.genCode(codegen);
 		else
 			codegen.genCode(RuntimeInst.ipushx);
-		codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(name.object));
+		codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(name.getObj()));
 		if (decleared) {
 			codegen.genCode(RuntimeInst.ialloc);
 		} else {
@@ -96,17 +96,17 @@ public class ExpAssign implements IExp {
 
 	@Override
 	public String print(StringBuilder prefix) {
-		return (decleared ? KeywordType.VARIABLE.getName() : KeywordType.LET
-				.getName()) +
+		return (decleared ? KeywordType.VARIABLE.getDesc() : KeywordType.LET
+				.getDesc()) +
 				" " + name.toRealString() +
-				(exp != null ? (" " + OperatorType.ASSIGN.getName() + " " +
+				(exp != null ? (" " + OperatorType.ASSIGN.getDesc() + " " +
 				exp.print(prefix)) : "");
 	}
 
 	@Override
 	public void addClosure(IClosureScope scope) {
 		if (decleared) {
-			scope.addDecl(name.object);
+			scope.addDecl(name.getObj());
 		}
 		if (exp != null)
 			exp.addClosure(scope);

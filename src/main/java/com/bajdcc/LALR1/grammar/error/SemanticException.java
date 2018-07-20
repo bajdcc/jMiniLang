@@ -41,7 +41,7 @@ public class SemanticException extends Exception {
 	}
 
 	public String toString(IRegexStringIterator iter) {
-		String snapshot = iter.ex().getErrorSnapshot(token.position);
+		String snapshot = iter.ex().getErrorSnapshot(token.getPosition());
 		if (snapshot == null) {
 			return toString();
 		}

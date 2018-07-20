@@ -197,7 +197,7 @@ public class UIMainFrame extends JFrame {
 			System.err.println();
 			System.err.println(String.format("模块名：%s. 位置：%s. 错误：%s-%s(%s:%d)",
 					e.getPageName(), e.getPosition(), e.getMessage(),
-					e.getInfo(), e.getFileName(), e.getPosition().iLine + 1));
+					e.getInfo(), e.getFileName(), e.getPosition().getLine() + 1));
 			e.printStackTrace();
 		} catch (RuntimeException e) {
 			System.err.println();
@@ -214,7 +214,7 @@ public class UIMainFrame extends JFrame {
 		new Timer().schedule(new TimerTask() {
 			@Override
 			public void run() {
-				if (System.getProperty("os.name").startsWith("Windows")) {
+				if (System.getProperty("os.desc").startsWith("Windows")) {
 					HWND hwnd = User32.INSTANCE.FindWindow("SunAwtFrame", mainWndTitle);
 					if (hwnd != null) {
 						User32.INSTANCE.SetForegroundWindow(hwnd);

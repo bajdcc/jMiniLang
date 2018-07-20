@@ -71,7 +71,7 @@ public class StmtTry implements IStmt {
 		codegen.genCode(RuntimeInst.iscpi);
 		if (token != null) {
 			// 'throw' push exp to stack top
-			codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(token.object));
+			codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(token.getObj()));
 			codegen.genCode(RuntimeInst.ialloc);
 		}
 		catchBlock.genCode(codegen);
@@ -92,11 +92,11 @@ public class StmtTry implements IStmt {
 	public String print(StringBuilder prefix) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(prefix.toString());
-		sb.append(KeywordType.TRY.getName());
+		sb.append(KeywordType.TRY.getDesc());
 		sb.append(" ");
 		sb.append(tryBlock.print(prefix));
 		sb.append(" ");
-		sb.append(KeywordType.CATCH.getName());
+		sb.append(KeywordType.CATCH.getDesc());
 		sb.append(" ");
 		if (token != null) {
 			sb.append("( ");
@@ -110,7 +110,7 @@ public class StmtTry implements IStmt {
 	@Override
 	public void addClosure(IClosureScope scope) {
 		if (token != null)
-			scope.addRef(token.object);
+			scope.addRef(token.getObj());
 		tryBlock.addClosure(scope);
 		catchBlock.addClosure(scope);
 	}

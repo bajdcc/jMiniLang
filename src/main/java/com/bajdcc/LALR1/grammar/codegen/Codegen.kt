@@ -35,7 +35,7 @@ class Codegen(symbol: SymbolTable) : ICodegen, ICodegenBlock, ICodegenByteWriter
         }
 
     init {
-        for (funcs in symbol.manageDataService.funcMap.list) {
+        for (funcs in symbol.manageDataService.funcMap.toList()) {
             for (func in funcs) {
                 funcMap.add(func)
             }

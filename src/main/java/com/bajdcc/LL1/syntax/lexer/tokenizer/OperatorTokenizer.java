@@ -53,8 +53,8 @@ public class OperatorTokenizer extends TokenAlgorithm {
 	 */
 	@Override
 	public Token getToken(String string, Token token, IRegexStringIterator iterator) {
-		token.kToken = TokenType.OPERATOR;
-		token.object = hashOperator.get(string);
+		token.setType(TokenType.OPERATOR);
+		token.setObj(hashOperator.get(string));
 		return token;
 	}
 }

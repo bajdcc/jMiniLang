@@ -43,7 +43,7 @@ public class TokenExp implements ISyntaxComponent {
 	public void visit(ISyntaxComponentVisitor visitor) {
 		VisitBag bag = new VisitBag();
 		visitor.visitBegin(this, bag);
-		if (bag.bVisitEnd) {
+		if (bag.getVisitEnd()) {
 			visitor.visitEnd(this);
 		}
 	}
@@ -52,14 +52,14 @@ public class TokenExp implements ISyntaxComponent {
 	public void visitReverse(ISyntaxComponentVisitor visitor) {
 		VisitBag bag = new VisitBag();
 		visitor.visitBegin(this, bag);
-		if (bag.bVisitEnd) {
+		if (bag.getVisitEnd()) {
 			visitor.visitEnd(this);
 		}
 	}
 
 	@Override
 	public String toString() {
-		return String.format("%d: `%s`，%s，%s", id, name, kType.getName(),
+		return String.format("%d: `%s`，%s，%s", id, name, kType.getDesc(),
 				object == null ? "(null)" : object.toString());
 	}
 }

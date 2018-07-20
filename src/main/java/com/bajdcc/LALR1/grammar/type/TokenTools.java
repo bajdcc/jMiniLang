@@ -86,7 +86,7 @@ public class TokenTools {
 	public static boolean sinop(ISemanticRecorder recorder, ExpSinop exp) {
 		ExpValue value = (ExpValue) exp.getOperand();
 		Token token = value.getToken();
-		OperatorType type = (OperatorType) exp.getToken().object;
+		OperatorType type = (OperatorType) exp.getToken().getObj();
 		if (sin(type, token)) {
 			return true;
 		}
@@ -105,35 +105,35 @@ public class TokenTools {
 		switch (type) {
 			case LOGICAL_NOT:
 				Token bool = mapConverter.get(TokenType.BOOL).convert(token);
-				if (bool.kToken == TokenType.BOOL) {
-					bool.object = !((boolean) bool.object);
+				if (bool.getType() == TokenType.BOOL) {
+					bool.setObj(!((boolean) bool.getObj()));
 					return true;
 				}
 				break;
 			case BIT_NOT:
-				if (token.kToken == TokenType.INTEGER) {
-					token.object = ~((long) token.object);
+				if (token.getType() == TokenType.INTEGER) {
+					token.setObj(~((long) token.getObj()));
 					return true;
-				} else if (token.kToken == TokenType.DECIMAL) {
-					token.object = -((double) token.object);
+				} else if (token.getType() == TokenType.DECIMAL) {
+					token.setObj(-((double) token.getObj()));
 					return true;
 				}
 				break;
 			case PLUS_PLUS:
-				if (token.kToken == TokenType.INTEGER) {
-					token.object = ((long) token.object) + 1L;
+				if (token.getType() == TokenType.INTEGER) {
+					token.setObj(((long) token.getObj()) + 1L);
 					return true;
-				} else if (token.kToken == TokenType.DECIMAL) {
-					token.object = ((double) token.object) + 1D;
+				} else if (token.getType() == TokenType.DECIMAL) {
+					token.setObj(((double) token.getObj()) + 1D);
 					return true;
 				}
 				break;
 			case MINUS_MINUS:
-				if (token.kToken == TokenType.INTEGER) {
-					token.object = ((long) token.object) - 1L;
+				if (token.getType() == TokenType.INTEGER) {
+					token.setObj(((long) token.getObj()) - 1L);
 					return true;
-				} else if (token.kToken == TokenType.DECIMAL) {
-					token.object = ((double) token.object) - 1D;
+				} else if (token.getType() == TokenType.DECIMAL) {
+					token.setObj(((double) token.getObj()) - 1D);
 					return true;
 				}
 				break;
@@ -156,7 +156,7 @@ public class TokenTools {
 		Token token = exp.getToken();
 		Token leftToken = leftValue.getToken();
 		Token rightToken = rightValue.getToken();
-		OperatorType type = (OperatorType) token.object;
+		OperatorType type = (OperatorType) token.getObj();
 		if (bin(type, leftToken, rightToken)) {
 			return true;
 		}
@@ -206,195 +206,195 @@ public class TokenTools {
 					break;
 			}
 		}
-		if (lop.kToken == rop.kToken) {// 操作数类型相同
-			switch (lop.kToken) {
+		if (lop.getType() == rop.getType()) {// 操作数类型相同
+			switch (lop.getType()) {
 				case BOOL:
-					boolean lbo = (boolean) lop.object;
-					boolean rbo = (boolean) rop.object;
+					boolean lbo = (boolean) lop.getObj();
+					boolean rbo = (boolean) rop.getObj();
 					switch (type) {
 						case PLUS:
 						case LOGICAL_OR:
-							lop.object = lbo || rbo;
+							lop.setObj(lbo || rbo);
 							break;
 						case MINUS:
 						case DIVIDE:
-							lop.object = lbo && !rbo;
+							lop.setObj(lbo && !rbo);
 							break;
 						case TIMES:
 						case LOGICAL_AND:
-							lop.object = lbo && rbo;
+							lop.setObj(lbo && rbo);
 							break;
 						default:
 							return false;
 					}
 					return true;
 				case CHARACTER:
-					char lch = (char) lop.object;
-					char rch = (char) rop.object;
+					char lch = (char) lop.getObj();
+					char rch = (char) rop.getObj();
 					switch (type) {
 						case PLUS:
-							lop.object = (char) (lch + rch);
+							lop.setObj((char) (lch + rch));
 							break;
 						case MINUS:
-							lop.object = (char) (lch - rch);
+							lop.setObj((char) (lch - rch));
 							break;
 						case TIMES:
-							lop.object = (char) (lch * rch);
+							lop.setObj((char) (lch * rch));
 							break;
 						case DIVIDE:
-							lop.object = (char) (lch / rch);
+							lop.setObj((char) (lch / rch));
 							break;
 						case MOD:
-							lop.object = (char) (lch % rch);
+							lop.setObj((char) (lch % rch));
 							break;
 						case LESS_THAN:
-							lop.kToken = TokenType.BOOL;
-							lop.object = lch < rch;
+							lop.setType(TokenType.BOOL);
+							lop.setObj(lch < rch);
 							break;
 						case LESS_THAN_OR_EQUAL:
-							lop.kToken = TokenType.BOOL;
-							lop.object = lch <= rch;
+							lop.setType(TokenType.BOOL);
+							lop.setObj(lch <= rch);
 							break;
 						case GREATER_THAN:
-							lop.kToken = TokenType.BOOL;
-							lop.object = lch > rch;
+							lop.setType(TokenType.BOOL);
+							lop.setObj(lch > rch);
 							break;
 						case GREATER_THAN_OR_EQUAL:
-							lop.kToken = TokenType.BOOL;
-							lop.object = lch >= rch;
+							lop.setType(TokenType.BOOL);
+							lop.setObj(lch >= rch);
 							break;
 						case EQUAL:
-							lop.kToken = TokenType.BOOL;
-							lop.object = lch == rch;
+							lop.setType(TokenType.BOOL);
+							lop.setObj(lch == rch);
 							break;
 						case NOT_EQUAL:
-							lop.kToken = TokenType.BOOL;
-							lop.object = lch != rch;
+							lop.setType(TokenType.BOOL);
+							lop.setObj(lch != rch);
 							break;
 						default:
 							return false;
 					}
 					return true;
 				case STRING:
-					String lstr = (String) lop.object;
-					String rstr = (String) rop.object;
+					String lstr = (String) lop.getObj();
+					String rstr = (String) rop.getObj();
 					switch (type) {
 						case PLUS:
-							lop.object = lstr + rstr;
+							lop.setObj(lstr + rstr);
 							break;
 						case EQUAL:
-							lop.object = lstr.equals(rstr);
-							lop.kToken = TokenType.BOOL;
+							lop.setObj(lstr.equals(rstr));
+							lop.setType(TokenType.BOOL);
 							break;
 						case NOT_EQUAL:
-							lop.object = !lstr.equals(rstr);
-							lop.kToken = TokenType.BOOL;
+							lop.setObj(!lstr.equals(rstr));
+							lop.setType(TokenType.BOOL);
 							break;
 						default:
 							return false;
 					}
 					return true;
 				case DECIMAL:
-					Double ldec = (Double) lop.object;
-					Double rdec = (Double) rop.object;
+					Double ldec = (Double) lop.getObj();
+					Double rdec = (Double) rop.getObj();
 					switch (type) {
 						case PLUS:
-							lop.object = ldec + rdec;
+							lop.setObj(ldec + rdec);
 							break;
 						case MINUS:
-							lop.object = ldec - rdec;
+							lop.setObj(ldec - rdec);
 							break;
 						case TIMES:
-							lop.object = ldec * rdec;
+							lop.setObj(ldec * rdec);
 							break;
 						case DIVIDE:
-							lop.object = ldec / rdec;
+							lop.setObj(ldec / rdec);
 							break;
 						case LESS_THAN:
-							lop.kToken = TokenType.BOOL;
-							lop.object = ldec.compareTo(rdec) < 0;
+							lop.setType(TokenType.BOOL);
+							lop.setObj(ldec.compareTo(rdec) < 0);
 							break;
 						case LESS_THAN_OR_EQUAL:
-							lop.kToken = TokenType.BOOL;
-							lop.object = ldec.compareTo(rdec) <= 0;
+							lop.setType(TokenType.BOOL);
+							lop.setObj(ldec.compareTo(rdec) <= 0);
 							break;
 						case GREATER_THAN:
-							lop.kToken = TokenType.BOOL;
-							lop.object = ldec.compareTo(rdec) > 0;
+							lop.setType(TokenType.BOOL);
+							lop.setObj(ldec.compareTo(rdec) > 0);
 							break;
 						case GREATER_THAN_OR_EQUAL:
-							lop.kToken = TokenType.BOOL;
-							lop.object = ldec.compareTo(rdec) >= 0;
+							lop.setType(TokenType.BOOL);
+							lop.setObj(ldec.compareTo(rdec) >= 0);
 							break;
 						case EQUAL:
-							lop.kToken = TokenType.BOOL;
-							lop.object = ldec.compareTo(rdec) == 0;
+							lop.setType(TokenType.BOOL);
+							lop.setObj(ldec.compareTo(rdec) == 0);
 							break;
 						case NOT_EQUAL:
-							lop.kToken = TokenType.BOOL;
-							lop.object = ldec.compareTo(rdec) != 0;
+							lop.setType(TokenType.BOOL);
+							lop.setObj(ldec.compareTo(rdec) != 0);
 							break;
 						default:
 							return false;
 					}
 					return true;
 				case INTEGER:
-					Long lint = (Long) lop.object;
-					Long rint = (Long) rop.object;
+					Long lint = (Long) lop.getObj();
+					Long rint = (Long) rop.getObj();
 					switch (type) {
 						case PLUS:
-							lop.object = lint + rint;
+							lop.setObj(lint + rint);
 							break;
 						case MINUS:
-							lop.object = lint - rint;
+							lop.setObj(lint - rint);
 							break;
 						case TIMES:
-							lop.object = lint * rint;
+							lop.setObj(lint * rint);
 							break;
 						case DIVIDE:
-							lop.object = lint / rint;
+							lop.setObj(lint / rint);
 							break;
 						case MOD:
-							lop.object = lint % rint;
+							lop.setObj(lint % rint);
 							break;
 						case LEFT_SHIFT:
-							lop.object = lint << rint;
+							lop.setObj(lint << rint);
 							break;
 						case RIGHT_SHIFT:
-							lop.object = lint >> rint;
+							lop.setObj(lint >> rint);
 							break;
 						case BIT_AND:
-							lop.object = lint & rint;
+							lop.setObj(lint & rint);
 							break;
 						case BIT_OR:
-							lop.object = lint | rint;
+							lop.setObj(lint | rint);
 							break;
 						case BIT_XOR:
-							lop.object = lint ^ rint;
+							lop.setObj(lint ^ rint);
 							break;
 						case LESS_THAN:
-							lop.kToken = TokenType.BOOL;
-							lop.object = lint.compareTo(rint) < 0;
+							lop.setType(TokenType.BOOL);
+							lop.setObj(lint.compareTo(rint) < 0);
 							break;
 						case LESS_THAN_OR_EQUAL:
-							lop.kToken = TokenType.BOOL;
-							lop.object = lint.compareTo(rint) <= 0;
+							lop.setType(TokenType.BOOL);
+							lop.setObj(lint.compareTo(rint) <= 0);
 							break;
 						case GREATER_THAN:
-							lop.kToken = TokenType.BOOL;
-							lop.object = lint.compareTo(rint) > 0;
+							lop.setType(TokenType.BOOL);
+							lop.setObj(lint.compareTo(rint) > 0);
 							break;
 						case GREATER_THAN_OR_EQUAL:
-							lop.kToken = TokenType.BOOL;
-							lop.object = lint.compareTo(rint) >= 0;
+							lop.setType(TokenType.BOOL);
+							lop.setObj(lint.compareTo(rint) >= 0);
 							break;
 						case EQUAL:
-							lop.kToken = TokenType.BOOL;
-							lop.object = lint.compareTo(rint) == 0;
+							lop.setType(TokenType.BOOL);
+							lop.setObj(lint.compareTo(rint) == 0);
 							break;
 						case NOT_EQUAL:
-							lop.kToken = TokenType.BOOL;
-							lop.object = lint.compareTo(rint) != 0;
+							lop.setType(TokenType.BOOL);
+							lop.setObj(lint.compareTo(rint) != 0);
 							break;
 						default:
 							return false;
@@ -439,8 +439,8 @@ public class TokenTools {
 	 * @return 运算是否合法
 	 */
 	public static int tri(Token op1, Token op2, Token token) {
-		if (op1.object == OperatorType.QUERY
-				&& op2.object == OperatorType.COLON) {
+		if (op1.getObj() == OperatorType.QUERY
+				&& op2.getObj() == OperatorType.COLON) {
 			return tri(token);
 		}
 		return 0;
@@ -454,8 +454,8 @@ public class TokenTools {
 	 */
 	public static int tri(Token token) {
 		Token bool = mapConverter.get(TokenType.BOOL).convert(token);
-		if (bool.kToken == TokenType.BOOL) {
-			return ((boolean) bool.object) ? 1 : 2;
+		if (bool.getType() == TokenType.BOOL) {
+			return ((boolean) bool.getObj()) ? 1 : 2;
 		}
 		return 0;
 	}
@@ -468,7 +468,7 @@ public class TokenTools {
 	 * @return 运算是否合法
 	 */
 	private static boolean promote(Token lop, Token rop) {
-		return promote(lop.kToken, rop);
+		return promote(lop.getType(), rop);
 	}
 
 	/**
@@ -482,15 +482,15 @@ public class TokenTools {
 		ITokenConventer conventer = mapConverter.get(type);
 		if (conventer != null) {
 			Token token = mapConverter.get(type).convert(rop);
-			return token.kToken == type;
+			return token.getType() == type;
 		} else {
 			return false;
 		}
 	}
 
 	public static RuntimeInst op2ins(Token token) {
-		if (token.kToken == TokenType.OPERATOR) {
-			RuntimeInst inst = mapOp2Ins.get(token.object);
+		if (token.getType() == TokenType.OPERATOR) {
+			RuntimeInst inst = mapOp2Ins.get(token.getObj());
 			if (inst != null)
 				return inst;
 		}
@@ -502,7 +502,7 @@ public class TokenTools {
 	}
 
 	public static boolean isExternalName(Token token) {
-		if (token.kToken == TokenType.ID) {
+		if (token.getType() == TokenType.ID) {
 			String name = token.toRealString();
 			return isExternalName(name);
 		}

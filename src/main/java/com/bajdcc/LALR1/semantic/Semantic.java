@@ -474,18 +474,18 @@ public class Semantic extends Syntax implements IErrorHandler {
 				TrackerErrorBag bag = new TrackerErrorBag(position);
 				error.message = handler.handle(tracker.iter, bag);
 				/* 如果没有放弃则进行处理 */
-				if (!bag.bGiveUp) {
-					if (bag.bPass) {// 通过
+				if (!bag.getGiveUp()) {
+					if (bag.getPass()) {// 通过
 						if (edge.data.errorJump != null) {// 有自定义错误处理器
 							tracker.npaStatus = edge.data.errorJump;
 						} else {
 							tracker.npaStatus = edge.end;// 通过
 						}
 					}
-					if (bag.bRead) {// 跳过当前记号
+					if (bag.getRead()) {// 跳过当前记号
 						tracker.iter.scan();
 					}
-					if (bag.bHalt) {// 中止
+					if (bag.getHalt()) {// 中止
 						tracker.bFinished = true;
 					}
 					return true;
@@ -507,11 +507,11 @@ public class Semantic extends Syntax implements IErrorHandler {
 		TrackerErrorBag bag = new TrackerErrorBag(position);
 		error.message = errorHandler.handle(tracker.iter, bag);
 		/* 如果没有放弃则进行处理 */
-		if (!bag.bGiveUp) {
-			if (bag.bRead) {// 跳过当前记号
+		if (!bag.getGiveUp()) {
+			if (bag.getRead()) {// 跳过当前记号
 				tracker.iter.scan();
 			}
-			if (bag.bHalt) {// 中止
+			if (bag.getHalt()) {// 中止
 				tracker.bFinished = true;
 			}
 			return true;
@@ -528,8 +528,8 @@ public class Semantic extends Syntax implements IErrorHandler {
 	private int getTokenId(Tracker tracker) {
 		Token token = tracker.iter.ex().token();
 		for (TokenExp exp : arrTerminals) {
-			if (exp.kType == token.kToken
-					&& (exp.object == null || exp.object.equals(token.object))) {
+			if (exp.kType == token.getType()
+					&& (exp.object == null || exp.object.equals(token.getObj()))) {
 				return exp.id;
 			}
 		}
@@ -604,8 +604,8 @@ public class Semantic extends Syntax implements IErrorHandler {
 	 */
 	@Override
 	public String handle(IRegexStringIterator iterator, TrackerErrorBag bag) {
-		bag.bHalt = true;
-		bag.bGiveUp = false;
+		bag.setHalt(true);
+		bag.setGiveUp(false);
 		return "Error";
 	}
 

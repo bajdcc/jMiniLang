@@ -8,6 +8,7 @@ import com.bajdcc.util.lexer.error.RegexException;
 import com.bajdcc.util.lexer.regex.IRegexStringFilterHost;
 import com.bajdcc.util.lexer.regex.IRegexStringIteratorEx;
 import com.bajdcc.util.lexer.regex.RegexStringIterator;
+import com.bajdcc.util.lexer.token.MetaType;
 import com.bajdcc.util.lexer.token.Token;
 import com.bajdcc.util.lexer.token.TokenType;
 
@@ -60,7 +61,7 @@ public class Lexer extends RegexStringIterator implements
 	 */
 	private Token scanInternal() {
 		token = algorithmCollection.scan();
-		if (setDiscardToken.contains(token.kToken)) {// 需要丢弃
+		if (setDiscardToken.contains(token.getType())) {// 需要丢弃
 			return null;
 		}
 		return token;
@@ -76,7 +77,7 @@ public class Lexer extends RegexStringIterator implements
 		do {
 			token = scanInternal();
 		} while (token == null);
-		lastPosition = token.position;
+		lastPosition = token.getPosition();
 		return token;
 	}
 
@@ -108,7 +109,9 @@ public class Lexer extends RegexStringIterator implements
 	protected void transform() {
 		super.transform();
 		if (tokenAlgorithm != null) {
-			data.kMeta = tokenAlgorithm.getMetaHash().get(data.chCurrent);
+			MetaType type = tokenAlgorithm.getMetaHash().get(getData().getCurrent());
+			if (type != null)
+				getData().setMeta(type);
 		}
 	}
 
@@ -147,7 +150,7 @@ public class Lexer extends RegexStringIterator implements
 
 	@Override
 	public boolean isEOF() {
-		return token.kToken == TokenType.EOF;
+		return token.getType() == TokenType.EOF;
 	}
 
 	@Override
@@ -161,7 +164,7 @@ public class Lexer extends RegexStringIterator implements
 	}
 
 	@Override
-	protected Object clone() throws CloneNotSupportedException {
+	public Object clone() throws CloneNotSupportedException {
 		Lexer o = (Lexer) super.clone();
 		o.algorithmCollection = algorithmCollection.copy(o, o);
 		return o;
@@ -174,20 +177,20 @@ public class Lexer extends RegexStringIterator implements
 
 	@Override
 	public String getErrorSnapshot(Position position) {
-		if (position.iLine < 0 || position.iLine >= arrLinesNo.size()) {
+		if (position.getLine() < 0 || position.getLine() >= getArrLinesNo().size()) {
 			return null;
 		}
 		String str;
-		int start = arrLinesNo.get(position.iLine) + 1;
-		if (position.iLine == arrLinesNo.size() - 1) {
-			if (start < context.length())
-				str = context.substring(start, Math.min(context.length(), start + position.iColumn));
+		int start = getArrLinesNo().get(position.getLine()) + 1;
+		if (position.getLine() == getArrLinesNo().size() - 1) {
+			if (start < getContext().length())
+				str = getContext().substring(start, Math.min(getContext().length(), start + position.getColumn()));
 			else
 				str = "";
 		} else {
-			str = context.substring(start, arrLinesNo.get(position.iLine + 1));
+			str = getContext().substring(start, getArrLinesNo().get(position.getLine() + 1));
 		}
-		if (position.iColumn < 0 || position.iColumn >= str.length()) {
+		if (position.getColumn() < 0 || position.getColumn() >= str.length()) {
 			StringBuilder sb = new StringBuilder();
 			sb.append(str);
 			sb.append(System.lineSeparator());
@@ -199,7 +202,7 @@ public class Lexer extends RegexStringIterator implements
 			StringBuilder sb = new StringBuilder();
 			sb.append(str);
 			sb.append(System.lineSeparator());
-			for (int i = 0; i < position.iColumn - 1; i++) {
+			for (int i = 0; i < position.getColumn() - 1; i++) {
 				sb.append('^');
 			}
 			sb.append('^');

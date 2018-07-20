@@ -1,0 +1,58 @@
+package com.bajdcc.util.lexer.token
+
+/**
+ * 关键词
+ * [desc] 描述
+ * @author bajdcc
+ */
+enum class KeywordType constructor(var desc: String) {
+    AUTO("auto"),
+    BOOL("bool"),
+    BREAK("break"),
+    CASE("case"),
+    CHAR("char"),
+    CONST("const"),
+    CONTINUE("continue"),
+    DEFAULT("default"),
+    DO("do"),
+    DOUBLE("double"),
+    ELSE("else"),
+    ENUM("enum"),
+    EXTERN("extern"),
+    FALSE("false"),
+    FLOAT("float"),
+    FOR("for"),
+    GOTO("goto"),
+    IF("if"),
+    INT("int"),
+    LONG("long"),
+    REGISTER("register"),
+    RETURN("return"),
+    SHORT("short"),
+    SIGNED("signed"),
+    SIZEOF("sizeof"),
+    STATIC("static"),
+    STRUCT("struct"),
+    SWITCH("switch"),
+    TRUE("true"),
+    TYPEDEF("typedef"),
+    UNION("union"),
+    UNSIGNED("unsigned"),
+    VOID("void"),
+    VOLATILE("volatile"),
+    WHILE("while"),
+    VARIABLE("var"),
+    FUNCTION("func"),
+    LET("let"),
+    CALL("call"),
+    IMPORT("import"),
+    EXPORT("export"),
+    YIELD("yield"),
+    FOREACH("foreach"),
+    LAMBDA("lambda"),
+    SET("set"),
+    INVOKE("invoke"),
+    TRY("try"),
+    CATCH("catch"),
+    THROW("throw")
+}

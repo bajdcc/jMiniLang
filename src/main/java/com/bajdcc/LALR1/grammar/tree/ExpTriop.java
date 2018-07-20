@@ -98,8 +98,8 @@ public class ExpTriop implements IExp {
 			return this;
 		}
 		if (firstOperand instanceof ExpValue) {
-			if (firstToken.kToken == TokenType.OPERATOR
-					&& secondToken.kToken == TokenType.OPERATOR) {
+			if (firstToken.getType() == TokenType.OPERATOR
+					&& secondToken.getType() == TokenType.OPERATOR) {
 				int triop = TokenTools.triop(recorder, this);
 				switch (triop) {
 					case 0:

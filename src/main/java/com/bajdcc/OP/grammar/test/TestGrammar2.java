@@ -36,7 +36,7 @@ public class TestGrammar2 {
 			grammar.addPatternHandler("1", new IPatternHandler() {
 				@Override
 				public Object handle(List<Token> tokens, List<Object> symbols) {
-					return Integer.parseInt(tokens.get(0).object.toString());
+					return Integer.parseInt(tokens.get(0).getObj().toString());
 				}
 
 				@Override
@@ -50,8 +50,8 @@ public class TestGrammar2 {
 					int lop = (int) symbols.get(0);
 					int rop = (int) symbols.get(1);
 					Token op = tokens.get(0);
-					if (op.kToken == TokenType.OPERATOR) {
-						OperatorType kop = (OperatorType) op.object;
+					if (op.getType() == TokenType.OPERATOR) {
+						OperatorType kop = (OperatorType) op.getObj();
 						switch (kop) {
 							case PLUS:
 								return lop + rop;
@@ -84,8 +84,8 @@ public class TestGrammar2 {
 					Token ltok = tokens.get(0);
 					Token rtok = tokens.get(1);
 					Object exp = symbols.get(0);
-					if (ltok.object == OperatorType.LPARAN
-							&& rtok.object == OperatorType.RPARAN) {// 判断括号
+					if (ltok.getObj() == OperatorType.LPARAN
+							&& rtok.getObj() == OperatorType.RPARAN) {// 判断括号
 						return exp;
 					}
 					return null;
@@ -101,7 +101,7 @@ public class TestGrammar2 {
 				public Object handle(List<Token> tokens, List<Object> symbols) {
 					Token unary = tokens.get(0);
 					int op = (int) symbols.get(0);
-					if (unary.object == OperatorType.LOGICAL_NOT) {// 判断取反
+					if (unary.getObj() == OperatorType.LOGICAL_NOT) {// 判断取反
 						return -op;
 					}
 					return null;

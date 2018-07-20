@@ -47,8 +47,8 @@ public class FirstsetSolver implements ISyntaxComponentVisitor {
 
 	@Override
 	public void visitBegin(TokenExp node, VisitBag bag) {
-		bag.bVisitChildren = false;
-		bag.bVisitEnd = false;
+		bag.setVisitChildren(false);
+		bag.setVisitEnd(false);
 		setTokens.add(node);
 		if (bZero) {
 			bZero = false;
@@ -57,8 +57,8 @@ public class FirstsetSolver implements ISyntaxComponentVisitor {
 
 	@Override
 	public void visitBegin(RuleExp node, VisitBag bag) {
-		bag.bVisitChildren = false;
-		bag.bVisitEnd = false;
+		bag.setVisitChildren(false);
+		bag.setVisitEnd(false);
 		setRules.add(node);
 		if (bZero) {
 			bZero = false;
@@ -67,8 +67,8 @@ public class FirstsetSolver implements ISyntaxComponentVisitor {
 
 	@Override
 	public void visitBegin(SequenceExp node, VisitBag bag) {
-		bag.bVisitChildren = false;
-		bag.bVisitEnd = false;
+		bag.setVisitChildren(false);
+		bag.setVisitEnd(false);
 		boolean zero = false;
 		for (ISyntaxComponent exp : node.arrExpressions) {
 			exp.visit(this);
@@ -82,8 +82,8 @@ public class FirstsetSolver implements ISyntaxComponentVisitor {
 
 	@Override
 	public void visitBegin(BranchExp node, VisitBag bag) {
-		bag.bVisitChildren = false;
-		bag.bVisitEnd = false;
+		bag.setVisitChildren(false);
+		bag.setVisitEnd(false);
 		boolean zero = false;
 		for (ISyntaxComponent exp : node.arrExpressions) {
 			exp.visit(this);
@@ -96,16 +96,16 @@ public class FirstsetSolver implements ISyntaxComponentVisitor {
 
 	@Override
 	public void visitBegin(OptionExp node, VisitBag bag) {
-		bag.bVisitChildren = false;
-		bag.bVisitEnd = false;
+		bag.setVisitChildren(false);
+		bag.setVisitEnd(false);
 		node.expression.visit(this);
 		bZero = true;
 	}
 
 	@Override
 	public void visitBegin(PropertyExp node, VisitBag bag) {
-		bag.bVisitChildren = false;
-		bag.bVisitEnd = false;
+		bag.setVisitChildren(false);
+		bag.setVisitEnd(false);
 		node.expression.visit(this);
 		bZero = false;
 	}

@@ -12,13 +12,13 @@ public class ConvertToBoolean implements ITokenConventer {
 
 	@Override
 	public Token convert(Token token) {
-		switch (token.kToken) {
+		switch (token.getType()) {
 			case CHARACTER:
 			case STRING:
 			case DECIMAL:
 			case INTEGER:
-				token.object = getBooleanValue(token);
-				token.kToken = TokenType.BOOL;
+				token.setObj(getBooleanValue(token));
+				token.setType(TokenType.BOOL);
 				break;
 			default:
 				break;
@@ -33,19 +33,19 @@ public class ConvertToBoolean implements ITokenConventer {
 	 * @return 转换结果
 	 */
 	private static boolean getBooleanValue(Token token) {
-		switch (token.kToken) {
+		switch (token.getType()) {
 			case BOOL:
-				return (boolean) token.object;
+				return (boolean) token.getObj();
 			case CHARACTER:
-				char ch = (char) token.object;
+				char ch = (char) token.getObj();
 				return ch != 0;
 			case STRING:
 				return true;
 			case DECIMAL:
-				double decimal = (double) token.object;
+				double decimal = (double) token.getObj();
 				return decimal != 0D;
 			case INTEGER:
-				long integer = (long) token.object;
+				long integer = (long) token.getObj();
 				return integer != 0L;
 			default:
 				break;

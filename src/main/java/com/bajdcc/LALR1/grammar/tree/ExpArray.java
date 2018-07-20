@@ -74,7 +74,7 @@ public class ExpArray implements IExp {
 	@Override
 	public String print(StringBuilder prefix) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(OperatorType.LSQUARE.getName());
+		sb.append(OperatorType.LSQUARE.getDesc());
 		if (!params.isEmpty())
 			sb.append(" ");
 		for (IExp exp : params) {
@@ -87,7 +87,7 @@ public class ExpArray implements IExp {
 		}
 		if (!params.isEmpty())
 			sb.append(" ");
-		sb.append(OperatorType.RSQUARE.getName());
+		sb.append(OperatorType.RSQUARE.getDesc());
 		return sb.toString();
 	}
 

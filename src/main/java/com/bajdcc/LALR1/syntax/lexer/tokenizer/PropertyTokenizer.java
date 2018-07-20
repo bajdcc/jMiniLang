@@ -28,8 +28,8 @@ public class PropertyTokenizer extends TokenAlgorithm {
 	 */
 	@Override
 	public Token getToken(String string, Token token, IRegexStringIterator iterator) {
-		token.kToken = TokenType.MACRO;
-		token.object = string;
+		token.setType(TokenType.MACRO);
+		token.setObj(string);
 		return token;
 	}
 }

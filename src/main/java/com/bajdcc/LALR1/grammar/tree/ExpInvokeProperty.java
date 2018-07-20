@@ -120,20 +120,20 @@ public class ExpInvokeProperty implements IExp {
 		StringBuilder sb = new StringBuilder();
 		sb.append(obj.print(prefix)).append(".").append(property.print(prefix));
 		if (!params.isEmpty()) {
-			sb.append(OperatorType.LPARAN.getName()).append(" ");
+			sb.append(OperatorType.LPARAN.getDesc()).append(" ");
 			if (params.size() == 1) {
 				sb.append(params.get(0).print(prefix));
 			} else {
 				for (int i = 0; i < params.size(); i++) {
 					sb.append(params.get(i).print(prefix));
 					if (i != params.size() - 1) {
-						sb.append(OperatorType.COMMA.getName()).append(" ");
+						sb.append(OperatorType.COMMA.getDesc()).append(" ");
 					}
 				}
 			}
-			sb.append(" ").append(OperatorType.RPARAN.getName());
+			sb.append(" ").append(OperatorType.RPARAN.getDesc());
 		} else {
-			sb.append(OperatorType.LPARAN.getName()).append(OperatorType.RPARAN.getName());
+			sb.append(OperatorType.LPARAN.getDesc()).append(OperatorType.RPARAN.getDesc());
 		}
 		return sb.toString();
 	}

@@ -49,7 +49,7 @@ public class StmtPort implements IStmt {
 	@Override
 	public void genCode(ICodegen codegen) {
 		if (imported) {
-			codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(name.object));
+			codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(name.getObj()));
 			codegen.genCode(RuntimeInst.iimp);
 		}
 	}
@@ -62,10 +62,10 @@ public class StmtPort implements IStmt {
 	@Override
 	public String print(StringBuilder prefix) {
 		return prefix.toString() +
-				(imported ? KeywordType.IMPORT.getName() : KeywordType.EXPORT
-						.getName()) +
+				(imported ? KeywordType.IMPORT.getDesc() : KeywordType.EXPORT
+						.getDesc()) +
 				" " + name.toRealString() +
-				OperatorType.SEMI.getName();
+				OperatorType.SEMI.getDesc();
 	}
 
 	@Override

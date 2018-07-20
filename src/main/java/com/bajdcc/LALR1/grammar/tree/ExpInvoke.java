@@ -185,7 +185,7 @@ public class ExpInvoke implements IExp {
 					codegen.genCode(RuntimeInst.iyldi);
 				}
 				codegen.genCode(RuntimeInst.ipush,
-						codegen.genDataRef(extern.object));
+						codegen.genDataRef(extern.getObj()));
 				codegen.genCode(RuntimeInst.iyldi);
 			}
 			codegen.genCode(RuntimeInst.iyldy, yldLine);
@@ -216,7 +216,7 @@ public class ExpInvoke implements IExp {
 				codegen.genCode(RuntimeInst.icall);
 			} else {
 				codegen.genCode(RuntimeInst.ipush,
-						codegen.genDataRef(extern.object));
+						codegen.genDataRef(extern.getObj()));
 				if (invoke) {
 					codegen.genCode(RuntimeInst.ically);
 				} else {
@@ -235,10 +235,10 @@ public class ExpInvoke implements IExp {
 	public String print(StringBuilder prefix) {
 		StringBuilder sb = new StringBuilder();
 		if (yield) {
-			sb.append(KeywordType.YIELD.getName());
+			sb.append(KeywordType.YIELD.getDesc());
 			sb.append(" ");
 		}
-		sb.append(KeywordType.CALL.getName()).append(" ");
+		sb.append(KeywordType.CALL.getDesc()).append(" ");
 		if (func != null) {
 			if (!func.getRealName().startsWith("~")) {
 				sb.append(func.getRealName());
@@ -250,7 +250,7 @@ public class ExpInvoke implements IExp {
 			sb.append(invokeExp.print(prefix));
 			sb.append(" )");
 		} else{
-			sb.append(KeywordType.EXTERN.getName());
+			sb.append(KeywordType.EXTERN.getDesc());
 			sb.append(" ");
 			sb.append(extern.toRealString());
 		}
@@ -274,7 +274,7 @@ public class ExpInvoke implements IExp {
 	@Override
 	public void addClosure(IClosureScope scope) {
 		if (invoke) {
-			scope.addRef(extern.object);
+			scope.addRef(extern.getObj());
 		}
 		if (invokeExp != null) {
 			invokeExp.addClosure(scope);

@@ -18,7 +18,7 @@ public class TestLexer {
 			Token token;
 			for (; ; ) {
 				token = lexer.scan();
-				if (token.kToken == TokenType.EOF) {
+				if (token.getType() == TokenType.EOF) {
 					break;
 				}
 				System.out.println(token.toString());

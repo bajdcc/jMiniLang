@@ -73,8 +73,8 @@ public class ExpBinop implements IExp {
 			return this;
 		}
 		if (leftOperand instanceof ExpValue && rightOperand instanceof ExpValue) {
-			if (token.kToken == TokenType.OPERATOR) {
-				OperatorType op = (OperatorType) token.object;
+			if (token.getType() == TokenType.OPERATOR) {
+				OperatorType op = (OperatorType) token.getObj();
 				if (op == OperatorType.COLON)
 					return this;
 				if (TokenTools.binop(recorder, this)) {
@@ -87,8 +87,8 @@ public class ExpBinop implements IExp {
 
 	@Override
 	public void analysis(ISemanticRecorder recorder) {
-		if (token.kToken == TokenType.OPERATOR) {
-			OperatorType op = (OperatorType) token.object;
+		if (token.getType() == TokenType.OPERATOR) {
+			OperatorType op = (OperatorType) token.getObj();
 			if (TokenTools.isAssignment(op)) {
 				if (!(leftOperand instanceof ExpValue)) {
 					recorder.add(SemanticException.SemanticError.INVALID_ASSIGNMENT, token);
@@ -101,7 +101,7 @@ public class ExpBinop implements IExp {
 
 	@Override
 	public void genCode(ICodegen codegen) {
-		if (token.kToken == TokenType.OPERATOR && token.object == OperatorType.DOT) {
+		if (token.getType() == TokenType.OPERATOR && token.getObj() == OperatorType.DOT) {
 			codegen.genCode(RuntimeInst.iopena);
 			leftOperand.genCode(codegen);
 			codegen.genCode(RuntimeInst.ipusha);
@@ -111,21 +111,21 @@ public class ExpBinop implements IExp {
 			codegen.genCode(RuntimeInst.icallx);
 			return;
 		}
-		if (token.kToken == TokenType.OPERATOR) {
-			OperatorType op = (OperatorType) token.object;
+		if (token.getType() == TokenType.OPERATOR) {
+			OperatorType op = (OperatorType) token.getObj();
 			if (TokenTools.isAssignment(op)) {
 				RuntimeInst ins = TokenTools.op2ins(token);
 				ExpValue left = (ExpValue) leftOperand;
 				if (ins == RuntimeInst.ice) {
 					rightOperand.genCode(codegen);
-					codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(left.getToken().object));
+					codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(left.getToken().getObj()));
 					codegen.genCode(RuntimeInst.istore);
 					return;
 				}
 				leftOperand.genCode(codegen);
 				rightOperand.genCode(codegen);
 				codegen.genCode(ins);
-				codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(left.getToken().object));
+				codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(left.getToken().getObj()));
 				codegen.genCode(RuntimeInst.istore);
 				return;
 			} else if (op == OperatorType.COLON) {
@@ -161,7 +161,7 @@ public class ExpBinop implements IExp {
 
 	@Override
 	public String print(StringBuilder prefix) {
-		if (token.kToken == TokenType.OPERATOR && token.object == OperatorType.COLON) {
+		if (token.getType() == TokenType.OPERATOR && token.getObj() == OperatorType.COLON) {
 			return leftOperand.print(prefix) + " " + token.toRealString() + " "
 					+ rightOperand.print(prefix);
 		}
