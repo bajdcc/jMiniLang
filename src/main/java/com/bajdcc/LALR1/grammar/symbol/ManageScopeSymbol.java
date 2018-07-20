@@ -36,7 +36,7 @@ public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
 	public ManageScopeSymbol() {
 		enterScope();
 		List<Function> entry = new ArrayList<>();
-		entry.add(new Function());
+		entry.add(new Function(new Token()));
 		funcMap.add(ENTRY_NAME, entry);
 		for (BlockType type : BlockType.values()) {
 			blockLevel.put(type, 0);
@@ -199,7 +199,7 @@ public class ManageScopeSymbol implements IQueryScopeSymbol, IQueryBlockSymbol,
 		sb.append("#### 符号表 ####");
 		sb.append(System.lineSeparator());
 		int i = 0;
-		for (Object symbol : symbolList.list) {
+		for (Object symbol : symbolList.toList()) {
 			sb.append(i).append(": ").append("[").append(RuntimeObject.fromObject(symbol).getName()).append("] ").append(symbol);
 			sb.append(System.lineSeparator());
 			i++;

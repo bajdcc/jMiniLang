@@ -61,8 +61,7 @@ public class SemanticHandler {
 					recorder.add(SemanticError.DUP_FUNCNAME, token);
 				}
 			}
-			Function func = new Function();
-			func.setName(token);
+			Function func = new Function(token);
 			manage.getManageScopeService().registerFunc(func);
 			if (token.kToken != ID) {
 				token.object = func.getRealName();
@@ -118,8 +117,7 @@ public class SemanticHandler {
 		/* 匿名函数处理 */
 		mapSemanticAction.put("lambda", (indexed, manage, access, recorder) -> {
 			Token token = access.relativeGet(0);
-			Function func = new Function();
-			func.setName(token);
+			Function func = new Function(token);
 			manage.getManageScopeService().registerLambda(func);
 			token.object = func.getRealName();
 		});
@@ -306,8 +304,7 @@ public class SemanticHandler {
 		});
 		/* 入口 */
 		mapSemanticAnalyzier.put("main", (indexed, query, recorder) -> {
-			Function func = new Function();
-			func.setName(query.getQueryScopeService().getEntryToken());
+			Function func = new Function(query.getQueryScopeService().getEntryToken());
 			func.setRealName(func.getName().toRealString());
 			Block block = new Block((List<IStmt>) indexed.get(0).getObject());
 			block.getStmts().add(new StmtReturn());
