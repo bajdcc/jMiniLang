@@ -43,7 +43,7 @@ class StmtTry : IStmt {
         codegen.genCode(RuntimeInst.iscpi)
         if (token != null) {
             // 'throw' push exp to stack top
-            codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(token!!.obj))
+            codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(token!!.obj!!))
             codegen.genCode(RuntimeInst.ialloc)
         }
         catchBlock!!.genCode(codegen)

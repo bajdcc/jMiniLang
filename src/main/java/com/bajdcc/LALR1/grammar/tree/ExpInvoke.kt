@@ -106,7 +106,7 @@ class ExpInvoke : IExp {
                     codegen.genCode(RuntimeInst.iyldi)
                 }
                 codegen.genCodeWithFuncWriteBack(RuntimeInst.ipush,
-                        codegen.getFuncIndex(func))
+                        codegen.getFuncIndex(func!!))
                 codegen.genCode(RuntimeInst.iyldi)
             } else {
                 if (isInvoke) {
@@ -121,7 +121,7 @@ class ExpInvoke : IExp {
                     codegen.genCode(RuntimeInst.iyldi)
                 }
                 codegen.genCode(RuntimeInst.ipush,
-                        codegen.genDataRef(extern!!.obj))
+                        codegen.genDataRef(extern!!.obj!!))
                 codegen.genCode(RuntimeInst.iyldi)
             }
             codegen.genCode(RuntimeInst.iyldy, yldLine)
@@ -148,11 +148,11 @@ class ExpInvoke : IExp {
             }
             if (func != null) {
                 codegen.genCodeWithFuncWriteBack(RuntimeInst.ipush,
-                        codegen.getFuncIndex(func))
+                        codegen.getFuncIndex(func!!))
                 codegen.genCode(RuntimeInst.icall)
             } else {
                 codegen.genCode(RuntimeInst.ipush,
-                        codegen.genDataRef(extern!!.obj))
+                        codegen.genDataRef(extern!!.obj!!))
                 if (isInvoke) {
                     codegen.genCode(RuntimeInst.ically)
                 } else {

@@ -56,7 +56,7 @@ class ExpFunc : ClosureScope(), IExp {
             }
             codegen.genCode(RuntimeInst.ipush, closure!!.size)
         }
-        codegen.genCodeWithFuncWriteBack(RuntimeInst.ipush, codegen.getFuncIndex(func))
+        codegen.genCodeWithFuncWriteBack(RuntimeInst.ipush, codegen.getFuncIndex(func!!))
         codegen.genCode(RuntimeInst.ildfun)
     }
 

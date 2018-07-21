@@ -102,7 +102,7 @@ class Function(var name: Token) : IExp {
         var i = 0
         for (token in params) {
             codegen.genCode(RuntimeInst.iloada, i)
-            codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(token.obj))
+            codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(token.obj!!))
             codegen.genCode(RuntimeInst.ialloc)
             codegen.genCode(RuntimeInst.ipop)
             i++

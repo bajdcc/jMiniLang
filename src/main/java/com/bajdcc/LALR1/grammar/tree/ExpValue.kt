@@ -37,7 +37,7 @@ class ExpValue : IExp {
     }
 
     override fun genCode(codegen: ICodegen) {
-        codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(token!!.obj))
+        codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(token!!.obj!!))
         if (token!!.type !== TokenType.ID) {
             codegen.genCode(RuntimeInst.iload)
         } else {

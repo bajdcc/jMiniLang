@@ -115,11 +115,12 @@ class Codegen(symbol: SymbolTable) : ICodegen, ICodegenBlock, ICodegenByteWriter
         itvList.add(Interval((start - 1).toLong(), (end + 1).toLong(), info))
     }
 
-    override fun getBlockService(): ICodegenBlock {
-        return this
-    }
+    override val blockService: ICodegenBlock
+        get() {
+            return this
+        }
 
-    override fun genBreak(): RuntimeInstUnary? {
+    override fun genBreak(): RuntimeInstUnary {
         val block = data.block
         val i = RuntimeInstUnary(RuntimeInst.ijmp,
                 block.breakId)
@@ -127,7 +128,7 @@ class Codegen(symbol: SymbolTable) : ICodegen, ICodegenBlock, ICodegenByteWriter
         return i
     }
 
-    override fun genContinue(): RuntimeInstUnary? {
+    override fun genContinue(): RuntimeInstUnary {
         val block = data.block
         val i = RuntimeInstUnary(RuntimeInst.ijmp,
                 block.continueId)
@@ -143,17 +144,19 @@ class Codegen(symbol: SymbolTable) : ICodegen, ICodegenBlock, ICodegenByteWriter
         data.leaveBlockEntry()
     }
 
-    override fun isInBlock(): Boolean {
-        return data.hasBlock()
-    }
+    override val isInBlock: Boolean
+        get() {
+            return data.hasBlock()
+        }
 
     override fun genDataRef(obj: Any): Int {
         return symbolList.put(obj)
     }
 
-    override fun getCodeIndex(): Int {
-        return data.codeIndex
-    }
+    override val codeIndex: Int
+        get() {
+            return data.codeIndex
+        }
 
     override fun toString(): String {
         return codeString

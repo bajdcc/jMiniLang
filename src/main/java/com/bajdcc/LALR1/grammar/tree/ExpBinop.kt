@@ -96,7 +96,7 @@ class ExpBinop : IExp {
                 leftOperand!!.genCode(codegen)
                 rightOperand!!.genCode(codegen)
                 codegen.genCode(ins)
-                codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(left!!.token!!.obj))
+                codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(left!!.token!!.obj!!))
                 codegen.genCode(RuntimeInst.istore)
                 return
             } else if (op === OperatorType.COLON) {

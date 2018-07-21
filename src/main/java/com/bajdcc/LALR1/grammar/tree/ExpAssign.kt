@@ -52,7 +52,7 @@ class ExpAssign : IExp {
             exp!!.genCode(codegen)
         else
             codegen.genCode(RuntimeInst.ipushx)
-        codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(name!!.obj))
+        codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(name!!.obj!!))
         if (isDecleared) {
             codegen.genCode(RuntimeInst.ialloc)
         } else {

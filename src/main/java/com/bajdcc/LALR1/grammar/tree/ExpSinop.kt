@@ -67,7 +67,7 @@ class ExpSinop : IExp {
         if (type == OperatorType.PLUS_PLUS || type == OperatorType.MINUS_MINUS) {
             val value = operand as ExpValue?
             codegen.genCode(RuntimeInst.ipush,
-                    codegen.genDataRef(value!!.token!!.obj))
+                    codegen.genDataRef(value!!.token!!.obj!!))
             codegen.genCode(RuntimeInst.icopy)
         }
     }

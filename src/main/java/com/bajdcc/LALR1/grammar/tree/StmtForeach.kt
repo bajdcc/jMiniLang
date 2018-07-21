@@ -38,7 +38,7 @@ class StmtForeach : IStmt {
 
     override fun genCode(codegen: ICodegen) {
         codegen.genCode(RuntimeInst.ipushx)
-        codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(variable!!.obj))
+        codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(variable!!.obj!!))
         codegen.genCode(RuntimeInst.ialloc)
         codegen.genCode(RuntimeInst.ipop)
         val cb = CodegenBlock()
@@ -54,7 +54,7 @@ class StmtForeach : IStmt {
         val content = codegen.codeIndex
         enumerator!!.genCode(codegen)
         codegen.genCode(RuntimeInst.ijnan, exit)
-        codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(variable!!.obj))
+        codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(variable!!.obj!!))
         codegen.genCode(RuntimeInst.istore)
         codegen.genCode(RuntimeInst.ipop)
         codegen.blockService.enterBlockEntry(cb)

@@ -31,7 +31,7 @@ class StmtPort : IStmt {
 
     override fun genCode(codegen: ICodegen) {
         if (isImported) {
-            codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(name!!.obj))
+            codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(name!!.obj!!))
             codegen.genCode(RuntimeInst.iimp)
         }
     }
