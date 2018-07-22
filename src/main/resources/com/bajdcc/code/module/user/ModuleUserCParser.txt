@@ -38,6 +38,7 @@ var import_token = func ~() {
         this."set_op" := lambda(this, op) {
             this."set_token"(this."ops"."get"(op));
         };
+        this."equals" := lambda(this, token) -> this."token" == token;
         this."ORDINAL" := lambda(this, token) -> this."dict"."get"(token)[0];
         this."DESC" := lambda(this, token) -> this."dict"."get"(token)[1];
         this."PRED" := lambda(this, token) -> this."dict"."get"(token)[2];
@@ -65,102 +66,103 @@ var import_token = func ~() {
             this."kws" := g_class_context[this."type"]["kws"];
             return;
         }
+        /* PRED Refer: https://github.com/bajdcc/CParser/blob/master/CParser/types.cpp */
         var data = [
-            // ENUM              DESC            PRED
-            [ "ILLEGAL"        , "Illegal token" , 0 ],
-            [ "EOF"            , "End of file"   , 0 ],
-            [ "COMMENT"        , "Comment"       , 0 ],
-            [ "Literal-Begin"  , ""              , 0 ],
-            [ "#ID"            , "Identifier"    , 0 ], // foo
-            [ "#INT"           , "Integer"       , 0 ], // 12345
-            [ "#FLOAT"         , "Float"         , 0 ], // 123.45
-            [ "#CHAR"          , "Character"     , 0 ], // 'a'
-            [ "#STRING"        , "String"        , 0 ], // "abc"
-            [ "Literal-End"    , ""              , 0 ],
-            [ "Operator-Begin" , ""              , 0 ],
-            [ "ADD"            , "+"             , 4 ],
-            [ "SUB"            , "-"             , 4 ],
-            [ "MUL"            , "*"             , 5 ],
-            [ "DIV"            , "/"             , 5 ],
-            [ "MOD"            , "%"             , 5 ],
-            [ "ESC"            , "\\"            , 0 ],
-            [ "ADDA"           , "+="            , 0 ],
-            [ "SUBA"           , "-="            , 0 ],
-            [ "MULA"           , "*="            , 0 ],
-            [ "DIVA"           , "/="            , 0 ],
-            [ "MODA"           , "%="            , 0 ],
-            [ "AND"            , "&"             , 5 ],
-            [ "OR"             , "|"             , 4 ],
-            [ "XOR"            , "^"             , 4 ],
-            [ "INV"            , "~"             , 0 ],
-            [ "SHL"            , "<<"            , 5 ],
-            [ "SHR"            , ">>"            , 5 ],
-            [ "ANDA"           , "&="            , 0 ],
-            [ "ORA"            , "|="            , 0 ],
-            [ "XORA"           , "^="            , 0 ],
-            [ "SHLA"           , "<<="           , 0 ],
-            [ "SHRA"           , ">>="           , 0 ],
-            [ "LAND"           , "&&"            , 2 ],
-            [ "LOR"            , "||"            , 1 ],
-            [ "INC"            , "++"            , 0 ],
-            [ "DEC"            , "--"            , 0 ],
-            [ "EQ"             , "=="            , 3 ],
-            [ "LT"             , "<"             , 3 ],
-            [ "GT"             , ">"             , 3 ],
-            [ "ASSIGN"         , "="             , 0 ],
-            [ "NOT"            , "!"             , 0 ],
-            [ "NE"             , "!="            , 3 ],
-            [ "LE"             , "<="            , 3 ],
-            [ "GE"             , ">="            , 3 ],
-            [ "LPA"            , "("             , 0 ],
-            [ "LSQ"            , "["             , 0 ],
-            [ "LBR"            , "{"             , 0 ],
-            [ "RPA"            , ")"             , 0 ],
-            [ "RSQ"            , "]"             , 0 ],
-            [ "RBR"            , "}"             , 0 ],
-            [ "DOT"            , "."             , 0 ],
-            [ "COMMA"          , ","             , 0 ],
-            [ "QUERY"          , "?"             , 0 ],
-            [ "SEMI"           , ";"             , 0 ],
-            [ "COLON"          , ":"             , 0 ],
-            [ "Operator-End"   , ""              , 0 ],
-            [ "Keyword-Begin"  , ""              , 0 ],
-            [ "AUTO"           , "auto"          , 0 ],
-            [ "BOOL"           , "bool"          , 0 ],
-            [ "BREAK"          , "break"         , 0 ],
-            [ "CASE"           , "case"          , 0 ],
-            [ "CHAR"           , "char"          , 0 ],
-            [ "CONST"          , "const"         , 0 ],
-            [ "CONTINUE"       , "continue"      , 0 ],
-            [ "DEFAULT"        , "default"       , 0 ],
-            [ "DO"             , "do"            , 0 ],
-            [ "DOUBLE"         , "double"        , 0 ],
-            [ "ELSE"           , "else"          , 0 ],
-            [ "ENUM"           , "enum"          , 0 ],
-            [ "EXTERN"         , "extern"        , 0 ],
-            [ "FALSE"          , "false"         , 0 ],
-            [ "FLOAT"          , "float"         , 0 ],
-            [ "FOR"            , "for"           , 0 ],
-            [ "GOTO"           , "goto"          , 0 ],
-            [ "IF"             , "if"            , 0 ],
-            [ "INT"            , "int"           , 0 ],
-            [ "LONG"           , "long"          , 0 ],
-            [ "REGISTER"       , "register"      , 0 ],
-            [ "RETURN"         , "return"        , 0 ],
-            [ "SHORT"          , "short"         , 0 ],
-            [ "SIGNED"         , "signed"        , 0 ],
-            [ "SIZEOF"         , "sizeof"        , 0 ],
-            [ "STATIC"         , "static"        , 0 ],
-            [ "STRUCT"         , "struct"        , 0 ],
-            [ "SWITCH"         , "switch"        , 0 ],
-            [ "TRUE"           , "true"          , 0 ],
-            [ "TYPEDEF"        , "typedef"       , 0 ],
-            [ "UNION"          , "union"         , 0 ],
-            [ "UNSIGNED"       , "unsigned"      , 0 ],
-            [ "VOID"           , "void"          , 0 ],
-            [ "VOLATILE"       , "volatile"      , 0 ],
-            [ "WHILE"          , "while"         , 0 ],
-            [ "Keyword-End"    , ""              , 0 ]
+            // ENUM              DESC              PRED
+            [ "ILLEGAL"        , "Illegal token" , 9999 ],
+            [ "EOF"            , "End of file"   , 9999 ],
+            [ "COMMENT"        , "Comment"       , 9999 ],
+            [ "Literal-Begin"  , ""              , 9999 ],
+            [ "#ID"            , "Identifier"    , 9999 ], // foo
+            [ "#INT"           , "Integer"       , 9999 ], // 12345
+            [ "#FLOAT"         , "Float"         , 9999 ], // 123.45
+            [ "#CHAR"          , "Character"     , 9999 ], // 'a'
+            [ "#STRING"        , "String"        , 9999 ], // "abc"
+            [ "Literal-End"    , ""              , 9999 ],
+            [ "Operator-Begin" , ""              , 9999 ],
+            [ "ADD"            , "+"             , 0401 ],
+            [ "SUB"            , "-"             , 0402 ],
+            [ "MUL"            , "*"             , 0302 ],
+            [ "DIV"            , "/"             , 0301 ],
+            [ "MOD"            , "%"             , 0303 ],
+            [ "ESC"            , "\\"            , 9000 ],
+            [ "ADDA"           , "+="            , 1405 ],
+            [ "SUBA"           , "-="            , 1406 ],
+            [ "MULA"           , "*="            , 1403 ],
+            [ "DIVA"           , "/="            , 1402 ],
+            [ "MODA"           , "%="            , 1404 ],
+            [ "AND"            , "&"             , 0801 ],
+            [ "OR"             , "|"             , 1001 ],
+            [ "XOR"            , "^"             , 0901 ],
+            [ "INV"            , "~"             , 0208 ],
+            [ "SHL"            , "<<"            , 0501 ],
+            [ "SHR"            , ">>"            , 0502 ],
+            [ "ANDA"           , "&="            , 1409 ],
+            [ "ORA"            , "|="            , 1411 ],
+            [ "XORA"           , "^="            , 1410 ],
+            [ "SHLA"           , "<<="           , 1407 ],
+            [ "SHRA"           , ">>="           , 1408 ],
+            [ "LAND"           , "&&"            , 1101 ],
+            [ "LOR"            , "||"            , 1201 ],
+            [ "INC"            , "++"            , 0203 ],
+            [ "DEC"            , "--"            , 0204 ],
+            [ "EQ"             , "=="            , 0701 ],
+            [ "LT"             , "<"             , 0603 ],
+            [ "GT"             , ">"             , 0601 ],
+            [ "ASSIGN"         , "="             , 1401 ],
+            [ "NOT"            , "!"             , 0207 ],
+            [ "NE"             , "!="            , 0702 ],
+            [ "LE"             , "<="            , 0604 ],
+            [ "GE"             , ">="            , 0602 ],
+            [ "LPA"            , "("             , 0102 ],
+            [ "LSQ"            , "["             , 0101 ],
+            [ "LBR"            , "{"             , 9000 ],
+            [ "RPA"            , ")"             , 0102 ],
+            [ "RSQ"            , "]"             , 0101 ],
+            [ "RBR"            , "}"             , 9000 ],
+            [ "DOT"            , "."             , 0103 ],
+            [ "COMMA"          , ","             , 1501 ],
+            [ "QUERY"          , "?"             , 1301 ],
+            [ "SEMI"           , ";"             , 9000 ],
+            [ "COLON"          , ":"             , 1302 ],
+            [ "Operator-End"   , ""              , 9999 ],
+            [ "Keyword-Begin"  , ""              , 9999 ],
+            [ "AUTO"           , "auto"          , 9999 ],
+            [ "BOOL"           , "bool"          , 9999 ],
+            [ "BREAK"          , "break"         , 9999 ],
+            [ "CASE"           , "case"          , 9999 ],
+            [ "CHAR"           , "char"          , 9999 ],
+            [ "CONST"          , "const"         , 9999 ],
+            [ "CONTINUE"       , "continue"      , 9999 ],
+            [ "DEFAULT"        , "default"       , 9999 ],
+            [ "DO"             , "do"            , 9999 ],
+            [ "DOUBLE"         , "double"        , 9999 ],
+            [ "ELSE"           , "else"          , 9999 ],
+            [ "ENUM"           , "enum"          , 9999 ],
+            [ "EXTERN"         , "extern"        , 9999 ],
+            [ "FALSE"          , "false"         , 9999 ],
+            [ "FLOAT"          , "float"         , 9999 ],
+            [ "FOR"            , "for"           , 9999 ],
+            [ "GOTO"           , "goto"          , 9999 ],
+            [ "IF"             , "if"            , 9999 ],
+            [ "INT"            , "int"           , 9999 ],
+            [ "LONG"           , "long"          , 9999 ],
+            [ "REGISTER"       , "register"      , 9999 ],
+            [ "RETURN"         , "return"        , 9999 ],
+            [ "SHORT"          , "short"         , 9999 ],
+            [ "SIGNED"         , "signed"        , 9999 ],
+            [ "SIZEOF"         , "sizeof"        , 9999 ],
+            [ "STATIC"         , "static"        , 9999 ],
+            [ "STRUCT"         , "struct"        , 9999 ],
+            [ "SWITCH"         , "switch"        , 9999 ],
+            [ "TRUE"           , "true"          , 9999 ],
+            [ "TYPEDEF"        , "typedef"       , 9999 ],
+            [ "UNION"          , "union"         , 9999 ],
+            [ "UNSIGNED"       , "unsigned"      , 9999 ],
+            [ "VOID"           , "void"          , 9999 ],
+            [ "VOLATILE"       , "volatile"      , 9999 ],
+            [ "WHILE"          , "while"         , 9999 ],
+            [ "Keyword-End"    , ""              , 9999 ]
         ];
         var d2 = g_from({});
         var ops = g_from({});
@@ -572,9 +574,166 @@ var import_ast = func ~() {
 // ---- CODE END ----
 // -----------------------------------------------------------------------------------------
 // CLASS [clib::c::parser]
+// 语法解析器
 // ---- CODE BEGIN ----
 
 var import_parser = func ~() {
+    g_class("clib::c::parser", "object", lambda(this) {
+        this."token" := _; // 当前单词
+        this."scanner" := _; // 扫描器
+        this."errors" := g_from([]); // 错误
+        this."err" := lambda(this, token, msg) {
+            this."errors"."add"([token, msg]);
+        };
+        this."eof" := lambda(this) -> this."token"."eof"();
+        this."ERROR" := lambda(this) -> this."errors"."to_string"();
+        this."init" := lambda(this, str) {
+            this."scanner" := g_new_class("clib::c::scanner", [], [["init", str]]);
+        };
+        // ---------------- Main Data ----------------
+        this."decls" := g_from([]); // 函数声明
+        this."scopes" := g_from([]); // 块环境
+        this."ast" := _; // 抽象语法树
+        // ---------------- Public Method ----------------
+        this."expect" := lambda(this, token, msg) {
+            this."err"(token, "expected " + msg);
+        };
+        this."expect_token" := lambda(this, token) {
+            if (this."token"."equals"(token)) {
+                this."next"();
+            } else {
+                this."expect"(token, token."to_string"());
+            }
+        };
+        this."consume_until" := lambda(this, skip) {
+            if (this."eof"()) { return; }
+            while (!this."of"(skip) && this."next"()) {}
+        };
+        this."assert" := lambda(this, token) {
+            if (!this."token"."equals"(token)) {
+                this."expect"(token, token);
+                this."consume_until"(["SEMI", "RBR"]);
+                return false;
+            }
+            return true;
+        };
+        this."assert_type" := lambda(this) {
+            if (!this."of"(["INT", "FLOAT", "CHAR"])) {
+                this."expect"(this."token", "type");
+                this."consume_until"(["SEMI", "RBR"]);
+                return false;
+            }
+            return true;
+        };
+        this."skip" := lambda(this, tokens) {
+            this."consume_until"(tokens);
+        };
+        this."is" := lambda(this, token) -> this."token"."equals"(token);
+        this."of" := lambda(this, tokens) {
+            foreach (var token : g_range_array(tokens)) {
+                if (this."token"."equals"(token)) {
+                    return true;
+                }
+            }
+            return false;
+        };
+        this."enter_block" := lambda(this) -> this."scopes"."add"([]);
+        this."leave_block" := lambda(this) -> this."scopes"."pop"();
+        this."this_block" := lambda(this) -> this."scopes"."last"();
+        this."next" := lambda(this) ->
+            !(this."token" := this."scanner"."scan"())."eof"();
+        this."advance" := lambda(this) {
+            var token = this."token";
+            this."next"();
+            return token;
+        };
+        this."walk_switch" := {
+            "prog": lambda(this, node) {
+                var s = "PROG {" + g_endl;
+                node."decls"."stream"()."for_each"(lambda(i, n) ->
+                    n."stream"()."for_each"(lambda(i_, n_) ->
+                        s += this."walk"(n_) + g_endl));
+                s += "}";
+                return s;
+            },
+            "var": lambda(this, node) {
+                var s = "VAR { ";
+                s += (node["type"])."to_string"();
+                s += ", " + (node["id"])."to_string"();
+                if (g_not_null(node["size"])) {
+                    s += ", " + (node["size"])."to_string"();
+                }
+                s += " }";
+                return s;
+            }
+        };
+        this."walk" := lambda(this, node) {
+            var f = this."walk_switch"[node[0]];
+            return f(this, node[1]);
+        };
+        this."parse" := lambda(this) {
+            this."ast" := this."#prog"();
+            return this."walk"(this."ast");
+        };
+        // LL Parser Refer: https://github.com/bajdcc/C-Compiler/blob/master/MainLogic/Grammar.cpp
+        this."#prog" := lambda(this) { // 程序
+            var decls = this."#decls"();
+            return ["prog", { "decls": decls }];
+        };
+        this."#decls" := lambda(this) { // 声明列表
+            var token;
+            var decls = g_from([]);
+            while (this."next"()) {
+                if (!this."assert_type"()) { continue; }
+                decls."add"(this."#decl"());
+            }
+            return decls;
+        };
+        this."#decl" := lambda(this) { // 声明
+            var type = this."advance"();
+            if (!this."assert"("#ID")) { return; }
+            var id = this."advance"();
+            if (this."is"("LPA")) {
+                return this."#decl!fun"(type, id);
+            } else if (this."of"(["SEMI", "COMMA", "LSQ"])) {
+                return this."#decl!var"(type, id, g_from([]));
+            }
+            this."skip"(["SEMI", "RBR"]);
+        };
+        this."#decl!fun" := lambda(this, type, id) { // 函数声明
+
+        };
+        this."#decl!var~rec" := lambda(this, type, vars) { // 变量声明
+            if (this."is"("#ID")) {
+                var id = this."advance"();
+                return this."#decl!var"(type, id, vars);
+            } else if (this."is"("SEMI")) {
+                return vars;
+            }
+            this."skip"(["SEMI", "RBR"]);
+            return vars;
+        };
+        this."#decl!var" := lambda(this, type, id, vars) { // 变量声明
+            if (this."is"("COMMA")) {
+                vars."add"(["var", { "type": type, "id": id }]);
+                this."next"();
+                return this."#decl!var~rec"(type, vars);
+            } else if (this."is"("LSQ")) {
+                this."next"();
+                var idx = this."advance"();
+                if (!this."assert"("#INT")) {
+                    vars."add"(["var", { "type": type, "id": id }]);
+                    return vars;
+                }
+                if (this."assert"("RSQ")) {
+                    vars."add"(["var", { "type": type, "id": id, "size": idx }]);
+                    return this."#decl!var~rec"(type, vars);
+                }
+            }
+            vars."add"(["var", { "type": type, "id": id }]);
+            return vars;
+        };
+    });
 };
 
 // ---- CODE END ----

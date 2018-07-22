@@ -370,12 +370,12 @@ class RuntimeMachine @Throws(Exception::class)
         val op = TokenTools.ins2op(inst)
         nextInst()
         if (op != null) {
-            if (!RuntimeTools.calcOp(currentStack.reg, inst, this)) {
+            if (!RuntimeTools.calcOp(inst, this)) {
                 err(RuntimeError.UNDEFINED_CONVERT, op.desc)
             }
         } else {
-            if (!RuntimeTools.calcData(currentStack.reg, inst, this)) {
-                if (!RuntimeTools.calcJump(currentStack.reg, inst, this)) {
+            if (!RuntimeTools.calcData(inst, this)) {
+                if (!RuntimeTools.calcJump(inst, this)) {
                     err(RuntimeError.WRONG_INST, inst.toString())
                 }
             }

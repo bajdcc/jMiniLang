@@ -34,6 +34,19 @@ public class TestInterpret14 {
 							"var token; while (!(token := s.\\\"scan\\\"()).\\\"eof\\\"()) { g_printn(token.\\\"to_string\\\"()); }\n" +
 							"g_printn(\\\"Errors: \\\" + s.\\\"ERROR\\\"());\n" +
 							"\");\n",
+
+					"import \"sys.base\";\n" +
+							"import \"sys.proc\";\n" +
+							"g_proc_exec(\"" +
+							"import \\\"user.base\\\";\n" +
+							"import \\\"user.cparser\\\";\n" +
+							"var code = \\\"" +
+							"int a,b,c;" +
+							"float d,e,f;\\\";\n" +
+							"var s = g_new_class(\\\"clib::c::parser\\\", [], [[\\\"init\\\", code]]);\n" +
+							"g_printn(s.\\\"parse\\\"());\n" +
+							"g_printn(\\\"Errors: \\\" + s.\\\"ERROR\\\"());\n" +
+							"\");\n",
 			};
 
 			System.out.println(codes[codes.length - 1]);

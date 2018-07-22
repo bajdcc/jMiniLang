@@ -11,8 +11,7 @@ import com.bajdcc.util.lexer.token.Token
 object RuntimeTools {
 
     @Throws(RuntimeException::class)
-    fun calcOp(reg: RuntimeRegister, inst: RuntimeInst,
-               stk: IRuntimeStack): Boolean {
+    fun calcOp(inst: RuntimeInst, stk: IRuntimeStack): Boolean {
         when (inst) {
             RuntimeInst.inot, RuntimeInst.iinv, RuntimeInst.iinc, RuntimeInst.idec -> {
                 val obj = stk.load()
@@ -53,8 +52,7 @@ object RuntimeTools {
     }
 
     @Throws(RuntimeException::class)
-    fun calcJump(reg: RuntimeRegister, inst: RuntimeInst,
-                 stk: IRuntimeStack): Boolean {
+    fun calcJump(inst: RuntimeInst, stk: IRuntimeStack): Boolean {
         when (inst) {
             RuntimeInst.ijmp -> stk.opJump()
             RuntimeInst.ijt -> stk.opJumpBool(true)
@@ -71,8 +69,7 @@ object RuntimeTools {
     }
 
     @Throws(Exception::class)
-    fun calcData(reg: RuntimeRegister, inst: RuntimeInst,
-                 stk: IRuntimeStack): Boolean {
+    fun calcData(inst: RuntimeInst, stk: IRuntimeStack): Boolean {
         when (inst) {
             RuntimeInst.ialloc -> stk.opStoreDirect()
             RuntimeInst.icall -> stk.opCall()
