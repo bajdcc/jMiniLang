@@ -7,8 +7,6 @@ import com.bajdcc.util.lexer.automata.nfa.NFAEdge
 import com.bajdcc.util.lexer.automata.nfa.NFAStatus
 import com.bajdcc.util.lexer.regex.IRegexComponent
 
-import kotlin.streams.toList
-
 /**
  * 确定性自动机（DFA）
  *
@@ -58,7 +56,7 @@ class DFA(exp: IRegexComponent, debug: Boolean) : NFA(exp, debug) {
             for (i in dfaStatusList.indices) {
                 val status = dfaStatusList[i]
                 sb.append("状态[").append(i).append("]").append(if (status.data.bFinal) "[结束]" else "").append(" => ").append(status.data.getStatusString(nfaStatusList)).append(System.lineSeparator())
-                for (edge in status.outEdges) {
+                status.outEdges.forEach { edge ->
                     sb.append("\t边 => [").append(dfaStatusList.indexOf(edge.end)).append("]").append(System.lineSeparator())
                     sb.append("\t\t类型 => ").append(edge.data.type.desc)
                     when (edge.data.type) {
@@ -174,45 +172,30 @@ class DFA(exp: IRegexComponent, debug: Boolean) : NFA(exp, debug) {
     private fun deleteEpsilonEdges() {
         val nfaStatusList = getNFAStatusClosure(
                 BreadthFirstSearch(), nfa!!.begin!!)// 获取状态闭包
-        val unaccessiableList = ArrayList<NFAStatus>()// 不可到达状态集合
-        for (status in nfaStatusList) {
-            var epsilon = true
-            for ((_, _, data) in status.inEdges) {
-                if (data.type !== EdgeType.EPSILON) {// 不是Epsilon边
-                    epsilon = false// 当前可到达
-                    break
-                }
-            }
-            if (epsilon) {
-                unaccessiableList.add(status)// 如果所有入边为Epsilon边，则不可到达
-            }
-        }
-        unaccessiableList.remove(nfa!!.begin)// 初态设为有效
+        val unaccessiableList = nfaStatusList.filter {
+            it != nfa!!.begin && it.inEdges.all { it.data.type == EdgeType.EPSILON }
+        }.toList()
         val epsilonBFS = object : BreadthFirstSearch<NFAEdge, NFAStatus>() {
             override fun testEdge(edge: NFAEdge): Boolean {
                 return edge.data.type === EdgeType.EPSILON
             }
         }
         /* 遍历所有有效状态 */
-        // 若为有效状态
-        /* 获取当前状态的Epsilon闭包 *//* 去除自身状态 *//* 遍历Epsilon闭包的状态 *//* 如果闭包中有终态，则当前状态为终态 *//* 遍历闭包中所有边 *//* 如果当前边不是Epsilon边，就将闭包中的有效边添加到当前状态 *//* 如果当前边不是Epsilon边，就将闭包中的有效边添加到当前状态 */
-        nfaStatusList.stream().filter { status -> !unaccessiableList.contains(status) }.forEach {// 若为有效状态
+        nfaStatusList.filter { status -> !unaccessiableList.contains(status) }.forEach {// 若为有效状态
             status ->
             /* 获取当前状态的Epsilon闭包 */
-            val epsilonClosure = getNFAStatusClosure(
-                    epsilonBFS, status)
+            val epsilonClosure = getNFAStatusClosure(epsilonBFS, status)
             /* 去除自身状态 */
             epsilonClosure.remove(status)
             /* 遍历Epsilon闭包的状态 */
-            for (epsilonStatus in epsilonClosure) {
+            epsilonClosure.forEach { epsilonStatus ->
                 if (epsilonStatus.data.bFinal) {
                     /* 如果闭包中有终态，则当前状态为终态 */
                     status.data.bFinal = true
                 }
                 /* 遍历闭包中所有边 */
                 /* 如果当前边不是Epsilon边，就将闭包中的有效边添加到当前状态 */
-                epsilonStatus.outEdges.stream().filter { (_, _, data) -> data.type !== EdgeType.EPSILON }.forEach { (_, end, data) ->
-                    /* 如果当前边不是Epsilon边，就将闭包中的有效边添加到当前状态 */
+                epsilonStatus.outEdges.filter { it.data.type !== EdgeType.EPSILON }.forEach { (_, end, data) ->
                     connect(status, end!!).data = data
                 }
             }
@@ -233,7 +216,6 @@ class DFA(exp: IRegexComponent, debug: Boolean) : NFA(exp, debug) {
             nfaStatusList.remove(status)// 删除无效状态
             disconnect(status)// 删除与状态有关的所有边
         }
-        unaccessiableList.clear()
         /* 删除重复边 */
         for (status in nfaStatusList) {
             var i = 0
@@ -275,16 +257,9 @@ class DFA(exp: IRegexComponent, debug: Boolean) : NFA(exp, debug) {
             val dfaStatus = dfaStatusList[i]
             val bags = ArrayList<DFAEdgeBag>()
             /* 遍历当前NFA状态集合的所有边 */
-            for (nfaStatus in dfaStatus.data.nfaStatus) {
-                for (nfaEdge in nfaStatus.outEdges) {
-                    var dfaBag: DFAEdgeBag? = null
-                    for (bag in bags) {
-                        /* 检查是否在表中 */
-                        if (nfaEdge.data.type === bag.type && nfaEdge.data.param == bag.param) {
-                            dfaBag = bag
-                            break
-                        }
-                    }
+            dfaStatus.data.nfaStatus.forEach { nfaStatus ->
+                nfaStatus.outEdges.forEach { nfaEdge ->
+                    var dfaBag = bags.firstOrNull { nfaEdge.data.type === it.type && nfaEdge.data.param == it.param }
                     /* 若不存在，则新建 */
                     if (dfaBag == null) {
                         dfaBag = DFAEdgeBag()
@@ -299,18 +274,16 @@ class DFA(exp: IRegexComponent, debug: Boolean) : NFA(exp, debug) {
                 }
             }
             /* 遍历当前的所有DFA边 */
-            for (bag in bags) {
+            bags.forEach { bag ->
                 /* 检测DFA指向的状态是否存在 */
                 val status: DFAStatus
                 /* 哈希字符串 */
                 val hash = bag.getStatusString(nfaStatusList)
-                if (dfaStatusListMap.containsKey(bag
-                                .getStatusString(nfaStatusList))) {
-                    status = dfaStatusList.get(dfaStatusListMap[hash]!!)
+                if (dfaStatusListMap.containsKey(bag.getStatusString(nfaStatusList))) {
+                    status = dfaStatusList[dfaStatusListMap[hash]!!]
                 } else {// 不存在DFA
                     status = DFAStatus()
-                    status.data.nfaStatus = ArrayList(
-                            bag.nfaStatus)
+                    status.data.nfaStatus = ArrayList(bag.nfaStatus)
                     /* 检查终态 */
                     for (nfaStatus in status.data.nfaStatus) {
                         if (nfaStatus.data.bFinal) {
@@ -404,7 +377,7 @@ class DFA(exp: IRegexComponent, debug: Boolean) : NFA(exp, debug) {
      */
     private fun mergeStatus(pat: MutableList<MutableList<Int>>, statusList: List<DFAStatus>): Boolean {
         /* 保存要处理的多状态合并的划分 */
-        val dealWith = pat.stream().filter { collection -> collection.size > 1 }.toList()
+        val dealWith = pat.filter { it.size > 1 }.toList()
         // 有多个状态
         /* 是否已经没有等价类，若没有，就返回false，这样算法就结束（收敛 ） */
         if (dealWith.isEmpty()) {
@@ -443,7 +416,7 @@ class DFA(exp: IRegexComponent, debug: Boolean) : NFA(exp, debug) {
      */
     private fun getStatusLineString(line: IntArray): String {
         val sb = StringBuilder()
-        for (i in line) {
+        line.forEach { i ->
             sb.append(i).append(",")
         }
         return sb.toString()

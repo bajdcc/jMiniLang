@@ -185,7 +185,7 @@ public class UIMainFrame extends JFrame {
 			RuntimeCodePage page = grammar.getCodePage();
 			//System.out.println(page.toString());
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			RuntimeCodePage.exportFromStream(page, baos);
+			RuntimeCodePage.Companion.exportFromStream(page, baos);
 			ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
 			interpreter.run("@main", bais);
 
@@ -214,12 +214,19 @@ public class UIMainFrame extends JFrame {
 		new Timer().schedule(new TimerTask() {
 			@Override
 			public void run() {
-				if (System.getProperty("os.desc").startsWith("Windows")) {
-					HWND hwnd = User32.INSTANCE.FindWindow("SunAwtFrame", mainWndTitle);
-					if (hwnd != null) {
-						User32.INSTANCE.SetForegroundWindow(hwnd);
-						User32.INSTANCE.SetFocus(hwnd);
-						return;
+				while (System.getProperty("os.desc") != null) {
+					if (System.getProperty("os.desc").startsWith("Windows")) {
+						HWND hwnd = User32.INSTANCE.FindWindow("SunAwtFrame", mainWndTitle);
+						if (hwnd != null) {
+							User32.INSTANCE.SetForegroundWindow(hwnd);
+							User32.INSTANCE.SetFocus(hwnd);
+							return;
+						}
+					}
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
 					}
 				}
 				setAlwaysOnTop(true);

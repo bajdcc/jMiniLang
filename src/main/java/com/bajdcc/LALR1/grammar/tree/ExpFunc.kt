@@ -49,7 +49,7 @@ class ExpFunc : ClosureScope(), IExp {
         if (closure == null) {
             codegen.genCode(RuntimeInst.ipushz)
         } else {
-            for (obj in closure!!) {
+            closure!!.forEach { obj ->
                 codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(obj))
                 if (obj is String && TokenTools.isExternalName(obj.toString()))
                     codegen.genCode(RuntimeInst.ipush, -1) // iloadx

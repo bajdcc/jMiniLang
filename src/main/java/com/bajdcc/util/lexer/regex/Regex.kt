@@ -526,7 +526,7 @@ class Regex @Throws(RegexException::class)
                     MetaType.LBRACE, MetaType.RBRACE, MetaType.COMMA,
                     MetaType.DOT, MetaType.NEW_LINE, MetaType.CARRIAGE_RETURN,
                     MetaType.BACKSPACE)
-            for (meta in metaTypes) {
+            metaTypes.forEach { meta ->
                 g_mapMeta[meta.char] = meta
             }
         }

@@ -680,7 +680,7 @@ public class ModuleProc implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) throws Exception {
-				return new RuntimeObject((long) (status.getRing3().exec_file(
+				return new RuntimeObject((long) (status.getRing3().execFile(
 						String.valueOf(args.get(0).getObj()),
 						String.valueOf(args.get(1).getObj()))));
 			}

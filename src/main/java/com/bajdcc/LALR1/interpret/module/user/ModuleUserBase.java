@@ -17,8 +17,6 @@ import java.util.stream.Collectors;
 
 import static com.bajdcc.LALR1.grammar.runtime.RuntimeMachine.Ring3Option.LOG_FILE;
 import static com.bajdcc.LALR1.grammar.runtime.RuntimeMachine.Ring3Option.LOG_PIPE;
-import static com.bajdcc.LALR1.grammar.runtime.RuntimeProcess.USER_PROC_FILE_PREFIX;
-import static com.bajdcc.LALR1.grammar.runtime.RuntimeProcess.USER_PROC_PIPE_PREFIX;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
@@ -251,7 +249,7 @@ public class ModuleUserBase implements IInterpreterModule {
 
 	private static void importFromBase(IRuntimeDebugInfo info, IRuntimeDebugInfo refer) {
 		String[] importValue = new String[]{
-				"g_null", "g_minus_1", "g_true", "g_false", "g_endl", "g_nullptr"
+				"g_null", "g_true", "g_false", "g_endl", "g_nullptr"
 		};
 		for (String key : importValue) {
 			info.addExternalValue(key, refer.getValueCallByName(key));
@@ -500,7 +498,7 @@ public class ModuleUserBase implements IInterpreterModule {
 						map.put("msg", new RuntimeObject("code null"));
 					} else {
 						try {
-							int pid = status.getRing3().exec_file(EXEC_PATH_PREFIX + id, code);
+							int pid = status.getRing3().execFile(EXEC_PATH_PREFIX + id, code);
 							status.getRing3(pid).setOptionsBool(LOG_PIPE, true);
 							map.put("pid", new RuntimeObject((long) (pid)));
 						} catch (RuntimeException e) {
@@ -537,9 +535,9 @@ public class ModuleUserBase implements IInterpreterModule {
 					map.put("msg", new RuntimeObject("id null"));
 				} else {
 					String id = String.valueOf(args.get(0).getObj());
-					String result = status.getService().getFileService().readAndDestroy("$" + USER_PROC_FILE_PREFIX + id);
+					String result = status.getService().getFileService().readAndDestroy("$" + RuntimeProcess.Companion.getUSER_PROC_FILE_PREFIX() + id);
 					if (result == null) { // 未结束
-						String data = status.getService().getPipeService().readAll(USER_PROC_PIPE_PREFIX + id);
+						String data = status.getService().getPipeService().readAll(RuntimeProcess.Companion.getUSER_PROC_PIPE_PREFIX() + id);
 						if (data != null) {
 							map.put("data", new RuntimeObject(data));
 						} else {
@@ -548,7 +546,7 @@ public class ModuleUserBase implements IInterpreterModule {
 						}
 					} else { // 结束
 						map.put("halt", new RuntimeObject(true));
-						map.put("data", new RuntimeObject(status.getService().getPipeService().readAndDestroy(USER_PROC_PIPE_PREFIX + id)));
+						map.put("data", new RuntimeObject(status.getService().getPipeService().readAndDestroy(RuntimeProcess.Companion.getUSER_PROC_PIPE_PREFIX() + id)));
 						map.put("result", new RuntimeObject(result));
 					}
 				}

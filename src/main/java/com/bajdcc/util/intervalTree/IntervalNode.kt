@@ -16,7 +16,7 @@ class IntervalNode<Type>(intervalList: List<Interval<Type>>) {
 
     init {
         val endpoints = TreeSet<Long>()
-        for (interval in intervalList) {
+        intervalList.forEach { interval ->
             endpoints.add(interval.start)
             endpoints.add(interval.end)
         }
@@ -90,22 +90,19 @@ class IntervalNode<Type>(intervalList: List<Interval<Type>>) {
      * @return the median of the set, not interpolated
      */
     private fun getMedian(set: SortedSet<Long>): Long? {
-        var i = 0
         val middle = set.size / 2
-        for (point in set) {
-            if (i == middle)
-                return point
-            i++
-        }
-        return null
+        return set
+                .asSequence()
+                .filterIndexed { i, point -> i == middle }
+                .firstOrNull()
     }
 
     override fun toString(): String {
         val sb = StringBuilder()
         sb.append(center).append(": ")
-        for ((key, value) in intervals) {
+        intervals.forEach { (key, value) ->
             sb.append("[").append(key.start).append(",").append(key.end).append("]:{")
-            for (interval in value) {
+            value.forEach { interval ->
                 sb.append("(").append(interval.start).append(",").append(interval.end).append(",").append(interval.data).append(")")
             }
             sb.append("} ")

@@ -20,11 +20,7 @@ class ExpMap : IExp {
     var params: MutableList<IExp> = ArrayList()
 
     override fun isConstant(): Boolean {
-        for (exp in params) {
-            if (!exp.isConstant())
-                return false
-        }
-        return true
+        return params.all { it.isConstant() }
     }
 
     override fun isEnumerable(): Boolean {
@@ -39,13 +35,13 @@ class ExpMap : IExp {
     }
 
     override fun analysis(recorder: ISemanticRecorder) {
-        for (exp in params) {
+        params.forEach { exp ->
             exp.analysis(recorder)
         }
     }
 
     override fun genCode(codegen: ICodegen) {
-        for (exp in params) {
+        params.forEach { exp ->
             exp.genCode(codegen)
         }
         codegen.genCode(RuntimeInst.imap, params.size)
@@ -60,7 +56,7 @@ class ExpMap : IExp {
         sb.append(OperatorType.LBRACE.desc)
         if (!params.isEmpty())
             sb.append(" ")
-        for (exp in params) {
+        params.forEach { exp ->
             sb.append(exp.print(sb))
             sb.append(", ")
         }

@@ -53,7 +53,7 @@ class ManageScopeSymbol : IQueryScopeSymbol, IQueryBlockSymbol, IManageDataSymbo
             sb.append("#### 符号表 ####")
             sb.append(System.lineSeparator())
             symbolList.toList().withIndex().forEach { (i, symbol) ->
-                sb.append(i).append(": ").append("[").append(RuntimeObject.fromObject(symbol).getName()).append("] ").append(symbol)
+                sb.append(i).append(": ").append("[").append(RuntimeObject.fromObject(symbol).desc).append("] ").append(symbol)
                 sb.append(System.lineSeparator())
             }
             return sb.toString()
@@ -130,7 +130,7 @@ class ManageScopeSymbol : IQueryScopeSymbol, IQueryBlockSymbol, IManageDataSymbo
     }
 
     override fun getFuncByName(name: String): Function? {
-        for (i in funcScope.indices.reversed()) {
+        funcScope.indices.reversed().forEach { i ->
             val f = funcScope[i]
             val f1 = f[name]
             if (f1 != null)
@@ -187,11 +187,7 @@ class ManageScopeSymbol : IQueryScopeSymbol, IQueryBlockSymbol, IManageDataSymbo
     }
 
     fun check(recorder: ISemanticRecorder) {
-        for (funcs in funcMap.toList()) {
-            for (func in funcs) {
-                func.analysis(recorder)
-            }
-        }
+        funcMap.toList().flatMap { it }.forEach { it.analysis(recorder) }
     }
 
     override fun toString(): String {
@@ -228,7 +224,7 @@ class ManageScopeSymbol : IQueryScopeSymbol, IQueryBlockSymbol, IManageDataSymbo
     }
 
     companion object {
-        private val ENTRY_NAME = "main"
-        private val LAMBDA_PREFIX = "~lambda#"
+        private const val ENTRY_NAME = "main"
+        private const val LAMBDA_PREFIX = "~lambda#"
     }
 }

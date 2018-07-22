@@ -28,11 +28,7 @@ class ExpArray : IExp {
     }
 
     override fun isConstant(): Boolean {
-        for (exp in params) {
-            if (!exp.isConstant())
-                return false
-        }
-        return true
+        return params.all { it.isConstant() }
     }
 
     override fun isEnumerable(): Boolean {
@@ -47,9 +43,7 @@ class ExpArray : IExp {
     }
 
     override fun analysis(recorder: ISemanticRecorder) {
-        for (exp in params) {
-            exp.analysis(recorder)
-        }
+        for (exp in params) exp.analysis(recorder)
     }
 
     override fun genCode(codegen: ICodegen) {
@@ -68,7 +62,7 @@ class ExpArray : IExp {
         sb.append(OperatorType.LSQUARE.desc)
         if (!params.isEmpty())
             sb.append(" ")
-        for (exp in params) {
+        params.forEach { exp ->
             sb.append(exp.print(prefix))
             sb.append(", ")
         }
@@ -83,9 +77,7 @@ class ExpArray : IExp {
     }
 
     override fun addClosure(scope: IClosureScope) {
-        for (exp in params) {
-            exp.addClosure(scope)
-        }
+        for (exp in params) exp.addClosure(scope)
     }
 
     override fun setYield() {

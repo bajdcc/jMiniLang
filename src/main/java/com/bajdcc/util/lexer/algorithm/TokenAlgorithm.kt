@@ -45,7 +45,7 @@ constructor(regex: String, filter: IRegexStringFilter?) : ITokenAlgorithm, IRege
         if (filter != null) {
             this.regex.filter = filter
             val metaTypes = filter.filterMeta.metaTypes
-            for (metaType in metaTypes) {
+            metaTypes.forEach { metaType ->
                 metaHash[metaType.char] = metaType
             }
         }

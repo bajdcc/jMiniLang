@@ -59,7 +59,7 @@ class SpringApiController {
     @RequestMapping(value = ["/exec"], method = [(RequestMethod.POST)], produces = [(MediaType.APPLICATION_JSON_UTF8_VALUE)])
     fun execCode(@RequestBody ctx: SpringBeanExec): Any {
         if (ctx.code != null) {
-            RuntimeProcess.writePipe(ModuleUserBase.EXEC_PREFIX + execId, ctx.code)
+            RuntimeProcess.writePipe(ModuleUserBase.EXEC_PREFIX + execId, ctx.code!!)
             return hashMapOf("code" to 200, "data" to ModuleNet.getInstance().webApi.sendRequest("exec/${execId++}"))
         } else {
             return hashMapOf("code" to 404)

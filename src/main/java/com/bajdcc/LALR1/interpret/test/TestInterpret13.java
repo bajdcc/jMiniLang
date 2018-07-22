@@ -203,7 +203,7 @@ public class TestInterpret13 {
 			RuntimeCodePage page = grammar.getCodePage();
 			//System.out.println(page.toString());
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			RuntimeCodePage.exportFromStream(page, baos);
+			RuntimeCodePage.Companion.exportFromStream(page, baos);
 			ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
 			interpreter.run("test_1", bais);
 

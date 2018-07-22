@@ -22,12 +22,12 @@ data class DFAStatusData(var bFinal: Boolean = false,
             return ""
         }
         val orders = IntArray(nfaStatus.size)
-        for (i in orders.indices) {
+        orders.indices.forEach { i ->
             orders[i] = dfaStatusList.indexOf(nfaStatus[i])
         }
         Arrays.sort(orders)
         val sb = StringBuilder()
-        for (order in orders) {
+        orders.forEach { order ->
             sb.append(order).append(",")
         }
         return sb.toString()

@@ -52,7 +52,7 @@ class Function(var name: Token) : IExp {
 
     val refName: String
         get() = if (name.toRealString() == realName) {
-            if (true) "$realName#$methodName" else realName
+            if (methodName.isNotEmpty()) "$realName#$methodName" else realName
         } else name.toRealString() + "$" + realName
 
     fun setMethodName(methodName: String) {
@@ -128,7 +128,8 @@ class Function(var name: Token) : IExp {
         sb.append(KeywordType.FUNCTION.desc)
         sb.append(" ")
         sb.append(realName)
-        sb.append(" [ ").append(methodName).append(" ] ")
+        if (methodName.isNotEmpty())
+            sb.append(" [ ").append(methodName).append(" ] ")
         sb.append("(")
         for (param in params) {
             sb.append(param.toRealString())

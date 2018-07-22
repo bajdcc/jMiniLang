@@ -76,9 +76,7 @@ class ExpInvoke : IExp {
                 recorder.add(SemanticError.WRONG_YIELD, name)
             }
         }
-        for (exp in params) {
-            exp.analysis(recorder)
-        }
+        for (exp in params) exp.analysis(recorder)
     }
 
     /**
@@ -101,7 +99,7 @@ class ExpInvoke : IExp {
             if (func != null) {
                 codegen.genCode(RuntimeInst.ipush, 1) // call本地地址，1
                 codegen.genCode(RuntimeInst.iyldi)
-                for (exp in params) {
+                params.forEach { exp ->
                     exp.genCode(codegen)
                     codegen.genCode(RuntimeInst.iyldi)
                 }
@@ -116,7 +114,7 @@ class ExpInvoke : IExp {
                     codegen.genCode(RuntimeInst.ipush, 3) // call外部模块，3
                     codegen.genCode(RuntimeInst.iyldi)
                 }
-                for (exp in params) {
+                params.forEach { exp ->
                     exp.genCode(codegen)
                     codegen.genCode(RuntimeInst.iyldi)
                 }
@@ -134,7 +132,7 @@ class ExpInvoke : IExp {
         } else if (invokeExp != null) {
             invokeExp!!.genCode(codegen)
             codegen.genCode(RuntimeInst.iopena)
-            for (exp in params) {
+            params.forEach { exp ->
                 exp.genCode(codegen)
                 codegen.genCode(RuntimeInst.ipusha)
             }
@@ -142,7 +140,7 @@ class ExpInvoke : IExp {
             codegen.genCode(RuntimeInst.ically)
         } else {
             codegen.genCode(RuntimeInst.iopena)
-            for (exp in params) {
+            params.forEach { exp ->
                 exp.genCode(codegen)
                 codegen.genCode(RuntimeInst.ipusha)
             }
@@ -210,7 +208,7 @@ class ExpInvoke : IExp {
             scope.addRef(extern!!.obj!!)
         }
         invokeExp?.addClosure(scope)
-        for (exp in params) {
+        params.forEach { exp ->
             exp.addClosure(scope)
         }
     }

@@ -63,7 +63,7 @@ class Token : Cloneable {
             else -> ""
         }
 
-        fun createFromObject(obj: Any): Token {
+        fun createFromObject(obj: Any?): Token {
             val token = Token()
             when (obj) {
                 is String -> token.type = TokenType.STRING

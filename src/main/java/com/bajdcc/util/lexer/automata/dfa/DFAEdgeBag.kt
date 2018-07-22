@@ -25,7 +25,7 @@ data class DFAEdgeBag(var type: EdgeType = EdgeType.EPSILON,
      */
     fun getStatusString(dfaStatusList: List<NFAStatus>): String {
         val sb = StringBuilder()
-        for (status in nfaStatus) {
+        nfaStatus.forEach { status ->
             sb.append(dfaStatusList.indexOf(status)).append(",")
         }
         return sb.toString()

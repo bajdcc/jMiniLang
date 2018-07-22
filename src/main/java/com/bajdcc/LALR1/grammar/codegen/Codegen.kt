@@ -73,7 +73,7 @@ class Codegen(symbol: SymbolTable) : ICodegen, ICodegenBlock, ICodegenByteWriter
      */
     fun genCodePage(): RuntimeCodePage {
         val objs = symbolList.toList()
-        for (unary in data.callsToWriteBack) {
+        data.callsToWriteBack.forEach { unary ->
             unary.op1 = data.funcEntriesMap[funcMap.get(unary.op1).refName]!!
         }
         for (inst in data.insts) {

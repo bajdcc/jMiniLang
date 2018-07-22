@@ -2,10 +2,6 @@ package com.bajdcc.util.lexer.regex
 
 import java.util.Comparator
 import kotlin.collections.ArrayList
-import kotlin.collections.forEach
-import kotlin.collections.indices
-import kotlin.collections.mutableListOf
-import kotlin.collections.sortWith
 
 /**
  * 字符集合，将字符范围按状态分组（Sigma集合）
@@ -72,13 +68,7 @@ class CharacterMap : IRegexComponentVisitor {
      * @return 序号，-1代表不存在
      */
     fun find(ch: Char): Int {
-        for (i in ranges.indices) {
-            val range = ranges[i]
-            if (range.include(ch)) {
-                return i
-            }
-        }
-        return -1
+        return ranges.indices.firstOrNull { ranges[it].include(ch) } ?: -1
     }
 
     /**
@@ -137,7 +127,7 @@ class CharacterMap : IRegexComponentVisitor {
         ranges.indices.forEach { i ->
             val lower = ranges[i].lowerBound.toInt()
             val upper = ranges[i].upperBound.toInt()
-            for (j in lower..upper) {
+            (lower..upper).forEach { j ->
                 status[j] = i// 将范围i中包括的所有元素置为i
             }
         }
@@ -294,14 +284,14 @@ class CharacterMap : IRegexComponentVisitor {
      * @param charset 字符集
      */
     private fun addRanges(charset: Charset) {
-        for (range in charset.arrPositiveBounds) {
+        charset.arrPositiveBounds.forEach { range ->
             addRange(CharacterRange(range.lowerBound, range.upperBound))
         }
     }
 
     override fun toString(): String {
         val sb = StringBuilder()
-        for (range in ranges) {
+        ranges.forEach { range ->
             sb.append(range).append(System.lineSeparator())
         }
         return sb.toString()

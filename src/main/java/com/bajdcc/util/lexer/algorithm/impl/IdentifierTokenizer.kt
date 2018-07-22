@@ -31,7 +31,8 @@ constructor() : TokenAlgorithm(regexString, null) {
      * 初始化关键字哈希表
      */
     private fun initKeywords() {
-        for (keyword in KeywordType.values()) {// 关键字
+        KeywordType.values().forEach { keyword ->
+            // 关键字
             mapKeywords[keyword.desc] = keyword
         }
     }

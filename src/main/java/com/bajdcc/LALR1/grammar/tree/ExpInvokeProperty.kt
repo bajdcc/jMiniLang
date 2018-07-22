@@ -51,9 +51,7 @@ class ExpInvokeProperty : IExp {
         if (params.size > 9) {
             recorder.add(SemanticError.TOO_MANY_ARGS, token)
         }
-        for (exp in params) {
-            exp.analysis(recorder)
-        }
+        for (exp in params) exp.analysis(recorder)
     }
 
     override fun genCode(codegen: ICodegen) {
@@ -66,7 +64,7 @@ class ExpInvokeProperty : IExp {
             codegen.genCode(RuntimeInst.ipush, codegen.genDataRef("g_invoke_method"))
             codegen.genCode(RuntimeInst.icallx)
         } else {
-            for (exp in params) {
+            params.forEach { exp ->
                 exp.genCode(codegen)
                 codegen.genCode(RuntimeInst.ipusha)
             }

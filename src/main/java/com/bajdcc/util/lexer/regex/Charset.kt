@@ -35,7 +35,7 @@ class Charset : IRegexComponent {
         if (begin > end) {
             return false
         }
-        for (range in arrPositiveBounds) {
+        arrPositiveBounds.forEach { range ->
             if (begin <= range.lowerBound && end >= range.upperBound)
                 return false
         }

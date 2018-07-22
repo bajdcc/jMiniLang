@@ -5,10 +5,10 @@ import com.bajdcc.util.lexer.automata.BreadthFirstSearch
 
 /**
  * NFA状态
- *
+ * [data] 数据
  * @author bajdcc
  */
-class NFAStatus {
+class NFAStatus(var data: NFAStatusData = NFAStatusData()) {
     /**
      * 出边集合
      */
@@ -18,11 +18,6 @@ class NFAStatus {
      * 入边集合
      */
     var inEdges = mutableListOf<NFAEdge>()
-
-    /**
-     * 数据
-     */
-    var data = NFAStatusData()
 
     /**
      * 用于遍历包括该状态在内的所有状态（连通），结果存放在PATH中

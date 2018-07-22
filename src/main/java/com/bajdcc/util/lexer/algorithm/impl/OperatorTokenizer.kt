@@ -32,7 +32,8 @@ constructor() : TokenAlgorithm(regexString, null) {
      * 初始化关键字哈希表
      */
     private fun initializeHashMap() {
-        for (operator in OperatorType.values()) {// 关键字
+        OperatorType.values().forEach { operator ->
+            // 关键字
             hashOperator[operator.desc] = operator
         }
     }
@@ -68,9 +69,9 @@ constructor() : TokenAlgorithm(regexString, null) {
                         MetaType.RSQUARE, MetaType.LBRACE, MetaType.RBRACE,
                         MetaType.DOT, MetaType.BAR, MetaType.QUERY)
                 val sb = StringBuilder()
-                for (type in OperatorType.values()) {
+                OperatorType.values().forEach { type ->
                     var op = type.desc
-                    for (meta in metaTypes) {
+                    metaTypes.forEach { meta ->
                         op = op.replace(meta.char + "", "\\" + meta.char)
                     }
                     if (type === OperatorType.ESCAPE)

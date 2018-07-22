@@ -163,7 +163,7 @@ open class NFA(protected var expression: IRegexComponent,
         // 若在当前结点范围内，则添加边
         // 连接两个状态
         // 字符类型
-        characterMap.ranges.stream().filter { range -> node.include(range.lowerBound) }.forEach {// 若在当前结点范围内，则添加边
+        characterMap.ranges.filter { range -> node.include(range.lowerBound) }.forEach {// 若在当前结点范围内，则添加边
             range ->
             val edge = connect(enfa.begin!!, enfa.end!!)// 连接两个状态
             edge.data.type = EdgeType.CHARSET// 字符类型
@@ -351,18 +351,13 @@ open class NFA(protected var expression: IRegexComponent,
      * @return 副本
      */
     private fun copyENFA(enfa: ENFA): ENFA {
-        val dstStatusList = mutableListOf<NFAStatus>()// 终态表
         // 获取状态闭包
         val srcStatusList = ArrayList(getNFAStatusClosure(
                 BreadthFirstSearch(), enfa.begin!!))
         /* 复制状态 */
-        for (status in srcStatusList) {
-            val newStatus = NFAStatus()
-            newStatus.data = status.data
-            dstStatusList.add(newStatus)
-        }
+        val dstStatusList = srcStatusList.map { NFAStatus(data = it.data) }
         /* 复制边 */
-        for (i in srcStatusList.indices) {
+        srcStatusList.indices.forEach { i ->
             val status = srcStatusList[i]
             for (edge in status.outEdges) {
                 val newEdge = connect(dstStatusList[i],

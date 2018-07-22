@@ -37,7 +37,7 @@ public class ModuleNetWebApi {
 	public Object sendRequest(String route, Map<String, String> params) {
 		ModuleNetWebApiContext ctx = new ModuleNetWebApiContext(route, params);
 		queue.add(ctx);
-		RuntimeProcess.writePipe("int#3", "A");
+		RuntimeProcess.Companion.writePipe("int#3", "A");
 		if (ctx.block()) {
 			return ModuleNetWebApiHelper.toJsonObject(new RuntimeObject(ctx.getResp()));
 		}
