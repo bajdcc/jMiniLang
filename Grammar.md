@@ -16,7 +16,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[21: `FOR`，关键字，FOR]&emsp;[54: `THROW`，关键字，THROW]&emsp;[41: `VARIABLE`，关键字，VARIABLE]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[23: `IF`，关键字，IF]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[45: `IMPORT`，关键字，IMPORT]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[47: `YIELD`，关键字，YIELD]&emsp;[0: `ID`，标识符，(null)]&emsp;[27: `RETURN`，关键字，RETURN]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[46: `EXPORT`，关键字，EXPORT]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[92: `SEMI`，操作符，SEMI]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[48: `FOREACH`，关键字，FOREACH]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[43: `LET`，关键字，LET]&emsp;[8: `BREAK`，关键字，BREAK]&emsp;[52: `TRY`，关键字，TRY]&emsp;[12: `CONTINUE`，关键字，CONTINUE]&emsp;[40: `WHILE`，关键字，WHILE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[8: `BREAK`，关键字，BREAK]&emsp;[12: `CONTINUE`，关键字，CONTINUE]&emsp;[21: `FOR`，关键字，FOR]&emsp;[23: `IF`，关键字，IF]&emsp;[27: `RETURN`，关键字，RETURN]&emsp;[40: `WHILE`，关键字，WHILE]&emsp;[41: `VARIABLE`，关键字，VARIABLE]&emsp;[43: `LET`，关键字，LET]&emsp;[44: `CALL`，关键字，CALL]&emsp;[45: `IMPORT`，关键字，IMPORT]&emsp;[46: `EXPORT`，关键字，EXPORT]&emsp;[47: `YIELD`，关键字，YIELD]&emsp;[48: `FOREACH`，关键字，FOREACH]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[52: `TRY`，关键字，TRY]&emsp;[54: `THROW`，关键字，THROW]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[92: `SEMI`，操作符，SEMI]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 
 
@@ -34,7 +34,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[21: `FOR`，关键字，FOR]&emsp;[54: `THROW`，关键字，THROW]&emsp;[41: `VARIABLE`，关键字，VARIABLE]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[23: `IF`，关键字，IF]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[45: `IMPORT`，关键字，IMPORT]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[47: `YIELD`，关键字，YIELD]&emsp;[0: `ID`，标识符，(null)]&emsp;[27: `RETURN`，关键字，RETURN]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[46: `EXPORT`，关键字，EXPORT]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[92: `SEMI`，操作符，SEMI]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[48: `FOREACH`，关键字，FOREACH]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[43: `LET`，关键字，LET]&emsp;[8: `BREAK`，关键字，BREAK]&emsp;[52: `TRY`，关键字，TRY]&emsp;[12: `CONTINUE`，关键字，CONTINUE]&emsp;[40: `WHILE`，关键字，WHILE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[8: `BREAK`，关键字，BREAK]&emsp;[12: `CONTINUE`，关键字，CONTINUE]&emsp;[21: `FOR`，关键字，FOR]&emsp;[23: `IF`，关键字，IF]&emsp;[27: `RETURN`，关键字，RETURN]&emsp;[40: `WHILE`，关键字，WHILE]&emsp;[41: `VARIABLE`，关键字，VARIABLE]&emsp;[43: `LET`，关键字，LET]&emsp;[44: `CALL`，关键字，CALL]&emsp;[45: `IMPORT`，关键字，IMPORT]&emsp;[46: `EXPORT`，关键字，EXPORT]&emsp;[47: `YIELD`，关键字，YIELD]&emsp;[48: `FOREACH`，关键字，FOREACH]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[52: `TRY`，关键字，TRY]&emsp;[54: `THROW`，关键字，THROW]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[92: `SEMI`，操作符，SEMI]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 
 
@@ -52,7 +52,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[41: `VARIABLE`，关键字，VARIABLE]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[92: `SEMI`，操作符，SEMI]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[43: `LET`，关键字，LET]&emsp;[8: `BREAK`，关键字，BREAK]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[12: `CONTINUE`，关键字，CONTINUE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[8: `BREAK`，关键字，BREAK]&emsp;[12: `CONTINUE`，关键字，CONTINUE]&emsp;[41: `VARIABLE`，关键字，VARIABLE]&emsp;[43: `LET`，关键字，LET]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[92: `SEMI`，操作符，SEMI]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 ----
 
@@ -62,7 +62,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[21: `FOR`，关键字，FOR]&emsp;[54: `THROW`，关键字，THROW]&emsp;[46: `EXPORT`，关键字，EXPORT]&emsp;[45: `IMPORT`，关键字，IMPORT]&emsp;[52: `TRY`，关键字，TRY]&emsp;[23: `IF`，关键字，IF]&emsp;[40: `WHILE`，关键字，WHILE]&emsp;[48: `FOREACH`，关键字，FOREACH]&emsp;[47: `YIELD`，关键字，YIELD]&emsp;[27: `RETURN`，关键字，RETURN]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[21: `FOR`，关键字，FOR]&emsp;[23: `IF`，关键字，IF]&emsp;[27: `RETURN`，关键字，RETURN]&emsp;[40: `WHILE`，关键字，WHILE]&emsp;[45: `IMPORT`，关键字，IMPORT]&emsp;[46: `EXPORT`，关键字，EXPORT]&emsp;[47: `YIELD`，关键字，YIELD]&emsp;[48: `FOREACH`，关键字，FOREACH]&emsp;[52: `TRY`，关键字，TRY]&emsp;[54: `THROW`，关键字，THROW]&emsp;
 
 ----
 
@@ -88,7 +88,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[41: `VARIABLE`，关键字，VARIABLE]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[43: `LET`，关键字，LET]&emsp;[8: `BREAK`，关键字，BREAK]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[12: `CONTINUE`，关键字，CONTINUE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[8: `BREAK`，关键字，BREAK]&emsp;[12: `CONTINUE`，关键字，CONTINUE]&emsp;[41: `VARIABLE`，关键字，VARIABLE]&emsp;[43: `LET`，关键字，LET]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 ----
 
@@ -114,7 +114,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[47: `YIELD`，关键字，YIELD]&emsp;[27: `RETURN`，关键字，RETURN]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[27: `RETURN`，关键字，RETURN]&emsp;[47: `YIELD`，关键字，YIELD]&emsp;
 
 ----
 
@@ -124,7 +124,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[46: `EXPORT`，关键字，EXPORT]&emsp;[45: `IMPORT`，关键字，IMPORT]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[45: `IMPORT`，关键字，IMPORT]&emsp;[46: `EXPORT`，关键字，EXPORT]&emsp;
 
 ----
 
@@ -250,7 +250,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 
 
@@ -508,7 +508,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 
 
@@ -542,7 +542,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 ----
 
@@ -666,7 +666,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 
 
@@ -684,7 +684,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[21: `FOR`，关键字，FOR]&emsp;[54: `THROW`，关键字，THROW]&emsp;[41: `VARIABLE`，关键字，VARIABLE]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[23: `IF`，关键字，IF]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[45: `IMPORT`，关键字，IMPORT]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[47: `YIELD`，关键字，YIELD]&emsp;[0: `ID`，标识符，(null)]&emsp;[27: `RETURN`，关键字，RETURN]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[46: `EXPORT`，关键字，EXPORT]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[92: `SEMI`，操作符，SEMI]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[48: `FOREACH`，关键字，FOREACH]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[43: `LET`，关键字，LET]&emsp;[8: `BREAK`，关键字，BREAK]&emsp;[52: `TRY`，关键字，TRY]&emsp;[12: `CONTINUE`，关键字，CONTINUE]&emsp;[40: `WHILE`，关键字，WHILE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[8: `BREAK`，关键字，BREAK]&emsp;[12: `CONTINUE`，关键字，CONTINUE]&emsp;[21: `FOR`，关键字，FOR]&emsp;[23: `IF`，关键字，IF]&emsp;[27: `RETURN`，关键字，RETURN]&emsp;[40: `WHILE`，关键字，WHILE]&emsp;[41: `VARIABLE`，关键字，VARIABLE]&emsp;[43: `LET`，关键字，LET]&emsp;[44: `CALL`，关键字，CALL]&emsp;[45: `IMPORT`，关键字，IMPORT]&emsp;[46: `EXPORT`，关键字，EXPORT]&emsp;[47: `YIELD`，关键字，YIELD]&emsp;[48: `FOREACH`，关键字，FOREACH]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[52: `TRY`，关键字，TRY]&emsp;[54: `THROW`，关键字，THROW]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[92: `SEMI`，操作符，SEMI]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 ----
 
@@ -766,7 +766,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 
 
@@ -784,7 +784,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[21: `FOR`，关键字，FOR]&emsp;[54: `THROW`，关键字，THROW]&emsp;[41: `VARIABLE`，关键字，VARIABLE]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[23: `IF`，关键字，IF]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[45: `IMPORT`，关键字，IMPORT]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[47: `YIELD`，关键字，YIELD]&emsp;[0: `ID`，标识符，(null)]&emsp;[27: `RETURN`，关键字，RETURN]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[46: `EXPORT`，关键字，EXPORT]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[92: `SEMI`，操作符，SEMI]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[48: `FOREACH`，关键字，FOREACH]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[43: `LET`，关键字，LET]&emsp;[8: `BREAK`，关键字，BREAK]&emsp;[52: `TRY`，关键字，TRY]&emsp;[12: `CONTINUE`，关键字，CONTINUE]&emsp;[40: `WHILE`，关键字，WHILE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[8: `BREAK`，关键字，BREAK]&emsp;[12: `CONTINUE`，关键字，CONTINUE]&emsp;[21: `FOR`，关键字，FOR]&emsp;[23: `IF`，关键字，IF]&emsp;[27: `RETURN`，关键字，RETURN]&emsp;[40: `WHILE`，关键字，WHILE]&emsp;[41: `VARIABLE`，关键字，VARIABLE]&emsp;[43: `LET`，关键字，LET]&emsp;[44: `CALL`，关键字，CALL]&emsp;[45: `IMPORT`，关键字，IMPORT]&emsp;[46: `EXPORT`，关键字，EXPORT]&emsp;[47: `YIELD`，关键字，YIELD]&emsp;[48: `FOREACH`，关键字，FOREACH]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[52: `TRY`，关键字，TRY]&emsp;[54: `THROW`，关键字，THROW]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[92: `SEMI`，操作符，SEMI]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 ----
 
@@ -858,7 +858,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 
 
@@ -918,7 +918,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 
 
@@ -1026,19 +1026,19 @@
 
 ----
 
-&emsp;&emsp;&emsp;&emsp;到达状态[65]: var[0] ->  ( `VARIABLE` [11] | `LET` [12] )  `ID` [0]  [ `ASSIGN`  * ( func [1] | exp [2] ) ] 
-
-&emsp;&emsp;&emsp;&emsp;类型：匹配	=> 94(94: `ASSIGN`，操作符，ASSIGN)
-
-&emsp;&emsp;&emsp;&emsp;指令：通过
-
-----
-
 &emsp;&emsp;&emsp;&emsp;到达状态[46]: stmt_exp[0] ->  ( var [0] | call [0] | cycle_ctrl [0] | exp [0] )  *
 
 &emsp;&emsp;&emsp;&emsp;类型：归约	=> stmt_exp[0] -> * ( var [0] | call [0] | cycle_ctrl [0] | exp [0] ) 
 
 &emsp;&emsp;&emsp;&emsp;指令：翻译	=> var 0
+
+----
+
+&emsp;&emsp;&emsp;&emsp;到达状态[65]: var[0] ->  ( `VARIABLE` [11] | `LET` [12] )  `ID` [0]  [ `ASSIGN`  * ( func [1] | exp [2] ) ] 
+
+&emsp;&emsp;&emsp;&emsp;类型：匹配	=> 94(94: `ASSIGN`，操作符，ASSIGN)
+
+&emsp;&emsp;&emsp;&emsp;指令：通过
 
 ----
 
@@ -1066,6 +1066,16 @@
 
 ----
 
+&emsp;&emsp;&emsp;&emsp;到达状态[20]: exp[0] -> * exp01 [0]  [ ( `INTEGER` [10] | `DECIMAL` [10] ) ] 
+
+&emsp;&emsp;&emsp;&emsp;类型：转移
+
+&emsp;&emsp;&emsp;&emsp;指令：移进
+
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
+
+----
+
 &emsp;&emsp;&emsp;&emsp;到达状态[68]: func[0] -> * ( `FUNCTION` [10] | `YIELD` )  [ `LSQ`  doc_list [0]  `RSQ` ]  ( `ID` [1] | `NOT` [1] )  `LPA`  [ var_list [2] ]  `RPA`  ( `PTR_OP`  scope [3] | block [4] ) 
 
 &emsp;&emsp;&emsp;&emsp;类型：转移
@@ -1073,16 +1083,6 @@
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
 &emsp;&emsp;&emsp;&emsp;预查：[42: `FUNCTION`，关键字，FUNCTION]&emsp;[47: `YIELD`，关键字，YIELD]&emsp;
-
-----
-
-&emsp;&emsp;&emsp;&emsp;到达状态[20]: exp[0] -> * exp01 [0]  [ ( `INTEGER` [10] | `DECIMAL` [10] ) ] 
-
-&emsp;&emsp;&emsp;&emsp;类型：转移
-
-&emsp;&emsp;&emsp;&emsp;指令：移进
-
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
 
 
 
@@ -1132,7 +1132,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 
 
@@ -1246,7 +1246,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 ----
 
@@ -1322,14 +1322,6 @@
 
 ----
 
-&emsp;&emsp;&emsp;&emsp;到达状态[77]: if[0] ->  `IF`  `LPA`  exp [0]  `RPA`  block [1]  [ `ELSE`  * ( block [2] | if [3] ) ] 
-
-&emsp;&emsp;&emsp;&emsp;类型：匹配	=> 16(16: `ELSE`，关键字，ELSE)
-
-&emsp;&emsp;&emsp;&emsp;指令：通过
-
-----
-
 &emsp;&emsp;&emsp;&emsp;到达状态[51]: stmt_ctrl[0] ->  ( ret [0] | port [0] | if [0] | for [0] | foreach [0] | while [0] | try [0] | throw [0] )  *
 
 &emsp;&emsp;&emsp;&emsp;类型：归约	=> stmt_ctrl[0] -> * ( ret [0] | port [0] | if [0] | for [0] | foreach [0] | while [0] | try [0] | throw [0] ) 
@@ -1343,6 +1335,14 @@
 &emsp;&emsp;&emsp;&emsp;类型：归约	=> if[0] ->  `IF`  `LPA`  exp [0]  `RPA`  block [1]  [ `ELSE`  * ( block [2] | if [3] ) ] 
 
 &emsp;&emsp;&emsp;&emsp;指令：翻译	=> if 3
+
+----
+
+&emsp;&emsp;&emsp;&emsp;到达状态[77]: if[0] ->  `IF`  `LPA`  exp [0]  `RPA`  block [1]  [ `ELSE`  * ( block [2] | if [3] ) ] 
+
+&emsp;&emsp;&emsp;&emsp;类型：匹配	=> 16(16: `ELSE`，关键字，ELSE)
+
+&emsp;&emsp;&emsp;&emsp;指令：通过
 
 
 
@@ -1474,6 +1474,16 @@
 
 ----
 
+&emsp;&emsp;&emsp;&emsp;到达状态[20]: exp[0] -> * exp01 [0]  [ ( `INTEGER` [10] | `DECIMAL` [10] ) ] 
+
+&emsp;&emsp;&emsp;&emsp;类型：转移
+
+&emsp;&emsp;&emsp;&emsp;指令：移进
+
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
+
+----
+
 &emsp;&emsp;&emsp;&emsp;到达状态[68]: func[0] -> * ( `FUNCTION` [10] | `YIELD` )  [ `LSQ`  doc_list [0]  `RSQ` ]  ( `ID` [1] | `NOT` [1] )  `LPA`  [ var_list [2] ]  `RPA`  ( `PTR_OP`  scope [3] | block [4] ) 
 
 &emsp;&emsp;&emsp;&emsp;类型：转移
@@ -1481,16 +1491,6 @@
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
 &emsp;&emsp;&emsp;&emsp;预查：[42: `FUNCTION`，关键字，FUNCTION]&emsp;[47: `YIELD`，关键字，YIELD]&emsp;
-
-----
-
-&emsp;&emsp;&emsp;&emsp;到达状态[20]: exp[0] -> * exp01 [0]  [ ( `INTEGER` [10] | `DECIMAL` [10] ) ] 
-
-&emsp;&emsp;&emsp;&emsp;类型：转移
-
-&emsp;&emsp;&emsp;&emsp;指令：移进
-
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
 
 
 
@@ -1564,7 +1564,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 ----
 
@@ -1606,7 +1606,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 
 
@@ -1618,16 +1618,6 @@
 
 ----
 
-&emsp;&emsp;&emsp;&emsp;到达状态[20]: exp[0] -> * exp01 [0]  [ ( `INTEGER` [10] | `DECIMAL` [10] ) ] 
-
-&emsp;&emsp;&emsp;&emsp;类型：转移
-
-&emsp;&emsp;&emsp;&emsp;指令：移进
-
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
-
-----
-
 &emsp;&emsp;&emsp;&emsp;到达状态[17]: var[0] -> * ( `VARIABLE` [11] | `LET` [12] )  `ID` [0]  [ `ASSIGN`  ( func [1] | exp [2] ) ] 
 
 &emsp;&emsp;&emsp;&emsp;类型：转移
@@ -1635,6 +1625,16 @@
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
 &emsp;&emsp;&emsp;&emsp;预查：[41: `VARIABLE`，关键字，VARIABLE]&emsp;[43: `LET`，关键字，LET]&emsp;
+
+----
+
+&emsp;&emsp;&emsp;&emsp;到达状态[20]: exp[0] -> * exp01 [0]  [ ( `INTEGER` [10] | `DECIMAL` [10] ) ] 
+
+&emsp;&emsp;&emsp;&emsp;类型：转移
+
+&emsp;&emsp;&emsp;&emsp;指令：移进
+
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 ----
 
@@ -1742,16 +1742,6 @@
 
 ----
 
-&emsp;&emsp;&emsp;&emsp;到达状态[16]: block[0] -> * `LBR`  [ stmt_list [0] ]  `RBR` 
-
-&emsp;&emsp;&emsp;&emsp;类型：转移
-
-&emsp;&emsp;&emsp;&emsp;指令：移进
-
-&emsp;&emsp;&emsp;&emsp;预查：[100: `LBR`，操作符，LBRACE]&emsp;
-
-----
-
 &emsp;&emsp;&emsp;&emsp;到达状态[10]: if[0] -> * `IF`  `LPA`  exp [0]  `RPA`  block [1]  [ `ELSE`  ( block [2] | if [3] ) ] 
 
 &emsp;&emsp;&emsp;&emsp;类型：转移
@@ -1759,6 +1749,16 @@
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
 &emsp;&emsp;&emsp;&emsp;预查：[23: `IF`，关键字，IF]&emsp;
+
+----
+
+&emsp;&emsp;&emsp;&emsp;到达状态[16]: block[0] -> * `LBR`  [ stmt_list [0] ]  `RBR` 
+
+&emsp;&emsp;&emsp;&emsp;类型：转移
+
+&emsp;&emsp;&emsp;&emsp;指令：移进
+
+&emsp;&emsp;&emsp;&emsp;预查：[100: `LBR`，操作符，LBRACE]&emsp;
 
 
 
@@ -1770,14 +1770,6 @@
 
 ----
 
-&emsp;&emsp;&emsp;&emsp;到达状态[86]: try[0] ->  `TRY`  block [1]  `CATCH`  [ `LPA`  * `ID` [0]  `RPA` ]  block [2] 
-
-&emsp;&emsp;&emsp;&emsp;类型：匹配	=> 96(96: `LPA`，操作符，LPARAN)
-
-&emsp;&emsp;&emsp;&emsp;指令：通过
-
-----
-
 &emsp;&emsp;&emsp;&emsp;到达状态[16]: block[0] -> * `LBR`  [ stmt_list [0] ]  `RBR` 
 
 &emsp;&emsp;&emsp;&emsp;类型：转移
@@ -1785,6 +1777,14 @@
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
 &emsp;&emsp;&emsp;&emsp;预查：[100: `LBR`，操作符，LBRACE]&emsp;
+
+----
+
+&emsp;&emsp;&emsp;&emsp;到达状态[86]: try[0] ->  `TRY`  block [1]  `CATCH`  [ `LPA`  * `ID` [0]  `RPA` ]  block [2] 
+
+&emsp;&emsp;&emsp;&emsp;类型：匹配	=> 96(96: `LPA`，操作符，LPARAN)
+
+&emsp;&emsp;&emsp;&emsp;指令：通过
 
 
 
@@ -1852,7 +1852,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 
 
@@ -1894,7 +1894,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 
 
@@ -1912,7 +1912,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 
 
@@ -2006,7 +2006,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 
 
@@ -2015,6 +2015,14 @@
 项目：exp9[0] ->  ( ( `INC_OP` [3] | `DEC_OP` [3] )  exp9 [1] | exp9 [1]  ( `INC_OP` [3] | `DEC_OP` [3] | `LSQ`  exp [5]  `RSQ` ) | exp10 [0] )  *
 
 规则：exp9
+
+----
+
+&emsp;&emsp;&emsp;&emsp;到达状态[90]: exp9[0] ->  ( ( `INC_OP` [3] | `DEC_OP` [3] )  exp9 [1] | exp9 [1]  ( `INC_OP` [3] | `DEC_OP` [3] | `LSQ`  exp [5]  `RSQ` ) | exp10 [0] )  *
+
+&emsp;&emsp;&emsp;&emsp;类型：归约	=> exp9[0] ->  ( ( `INC_OP` [3] | `DEC_OP` [3] )  * exp9 [1] | exp9 [1]  ( `INC_OP` [3] | `DEC_OP` [3] | `LSQ`  exp [5]  `RSQ` ) | exp10 [0] ) 
+
+&emsp;&emsp;&emsp;&emsp;指令：翻译	=> exp9 1
 
 ----
 
@@ -2033,14 +2041,6 @@
 &emsp;&emsp;&emsp;&emsp;指令：左递归	=> exp9 1
 
 &emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;
-
-----
-
-&emsp;&emsp;&emsp;&emsp;到达状态[90]: exp9[0] ->  ( ( `INC_OP` [3] | `DEC_OP` [3] )  exp9 [1] | exp9 [1]  ( `INC_OP` [3] | `DEC_OP` [3] | `LSQ`  exp [5]  `RSQ` ) | exp10 [0] )  *
-
-&emsp;&emsp;&emsp;&emsp;类型：归约	=> exp9[0] ->  ( ( `INC_OP` [3] | `DEC_OP` [3] )  * exp9 [1] | exp9 [1]  ( `INC_OP` [3] | `DEC_OP` [3] | `LSQ`  exp [5]  `RSQ` ) | exp10 [0] ) 
-
-&emsp;&emsp;&emsp;&emsp;指令：翻译	=> exp9 1
 
 
 
@@ -2132,7 +2132,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 
 
@@ -2141,6 +2141,14 @@
 项目：exp8[0] ->  ( ( `NOT_OP` [3] | `NOT` [3] )  exp8 [1] | exp9 [0] )  *
 
 规则：exp8
+
+----
+
+&emsp;&emsp;&emsp;&emsp;到达状态[96]: exp8[0] ->  ( ( `NOT_OP` [3] | `NOT` [3] )  exp8 [1] | exp9 [0] )  *
+
+&emsp;&emsp;&emsp;&emsp;类型：归约	=> exp8[0] ->  ( ( `NOT_OP` [3] | `NOT` [3] )  * exp8 [1] | exp9 [0] ) 
+
+&emsp;&emsp;&emsp;&emsp;指令：翻译	=> exp8 1
 
 ----
 
@@ -2157,14 +2165,6 @@
 &emsp;&emsp;&emsp;&emsp;类型：归约	=> exp7[0] ->  [ exp7 [1]  ( `MUL` [2] | `DIV` [2] | `MOD` [2] )  *]  exp8 [0] 
 
 &emsp;&emsp;&emsp;&emsp;指令：翻译	=> exp8 0
-
-----
-
-&emsp;&emsp;&emsp;&emsp;到达状态[96]: exp8[0] ->  ( ( `NOT_OP` [3] | `NOT` [3] )  exp8 [1] | exp9 [0] )  *
-
-&emsp;&emsp;&emsp;&emsp;类型：归约	=> exp8[0] ->  ( ( `NOT_OP` [3] | `NOT` [3] )  * exp8 [1] | exp9 [0] ) 
-
-&emsp;&emsp;&emsp;&emsp;指令：翻译	=> exp8 1
 
 
 
@@ -2214,7 +2214,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[4: `INTEGER`，整数，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 
 
@@ -2292,14 +2292,6 @@
 
 ----
 
-&emsp;&emsp;&emsp;&emsp;到达状态[112]: func[0] ->  ( `FUNCTION` [10] | `YIELD` )  [ `LSQ`  doc_list [0]  `RSQ` ]  ( `ID` [1] | `NOT` [1] )  `LPA`  [ var_list [2] ]  `RPA`  ( `PTR_OP`  * scope [3] | block [4] ) 
-
-&emsp;&emsp;&emsp;&emsp;类型：匹配	=> 56(56: `PTR_OP`，操作符，POINTER)
-
-&emsp;&emsp;&emsp;&emsp;指令：通过  [Action]
-
-----
-
 &emsp;&emsp;&emsp;&emsp;到达状态[16]: block[0] -> * `LBR`  [ stmt_list [0] ]  `RBR` 
 
 &emsp;&emsp;&emsp;&emsp;类型：转移
@@ -2307,6 +2299,14 @@
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
 &emsp;&emsp;&emsp;&emsp;预查：[100: `LBR`，操作符，LBRACE]&emsp;
+
+----
+
+&emsp;&emsp;&emsp;&emsp;到达状态[112]: func[0] ->  ( `FUNCTION` [10] | `YIELD` )  [ `LSQ`  doc_list [0]  `RSQ` ]  ( `ID` [1] | `NOT` [1] )  `LPA`  [ var_list [2] ]  `RPA`  ( `PTR_OP`  * scope [3] | block [4] ) 
+
+&emsp;&emsp;&emsp;&emsp;类型：匹配	=> 56(56: `PTR_OP`，操作符，POINTER)
+
+&emsp;&emsp;&emsp;&emsp;指令：通过  [Action]
 
 
 
@@ -2324,7 +2324,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 
 
@@ -2370,6 +2370,14 @@
 
 ----
 
+&emsp;&emsp;&emsp;&emsp;到达状态[90]: exp9[0] ->  ( ( `INC_OP` [3] | `DEC_OP` [3] )  exp9 [1] | exp9 [1]  ( `INC_OP` [3] | `DEC_OP` [3] | `LSQ`  exp [5]  `RSQ` ) | exp10 [0] )  *
+
+&emsp;&emsp;&emsp;&emsp;类型：归约	=> exp9[0] ->  ( ( `INC_OP` [3] | `DEC_OP` [3] )  * exp9 [1] | exp9 [1]  ( `INC_OP` [3] | `DEC_OP` [3] | `LSQ`  exp [5]  `RSQ` ) | exp10 [0] ) 
+
+&emsp;&emsp;&emsp;&emsp;指令：翻译	=> exp9 1
+
+----
+
 &emsp;&emsp;&emsp;&emsp;到达状态[96]: exp8[0] ->  ( ( `NOT_OP` [3] | `NOT` [3] )  exp8 [1] | exp9 [0] )  *
 
 &emsp;&emsp;&emsp;&emsp;类型：归约	=> exp8[0] -> * ( ( `NOT_OP` [3] | `NOT` [3] )  exp8 [1] | exp9 [0] ) 
@@ -2385,14 +2393,6 @@
 &emsp;&emsp;&emsp;&emsp;指令：左递归	=> exp9 1
 
 &emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;
-
-----
-
-&emsp;&emsp;&emsp;&emsp;到达状态[90]: exp9[0] ->  ( ( `INC_OP` [3] | `DEC_OP` [3] )  exp9 [1] | exp9 [1]  ( `INC_OP` [3] | `DEC_OP` [3] | `LSQ`  exp [5]  `RSQ` ) | exp10 [0] )  *
-
-&emsp;&emsp;&emsp;&emsp;类型：归约	=> exp9[0] ->  ( ( `INC_OP` [3] | `DEC_OP` [3] )  * exp9 [1] | exp9 [1]  ( `INC_OP` [3] | `DEC_OP` [3] | `LSQ`  exp [5]  `RSQ` ) | exp10 [0] ) 
-
-&emsp;&emsp;&emsp;&emsp;指令：翻译	=> exp9 1
 
 
 
@@ -2410,7 +2410,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 
 
@@ -2422,11 +2422,13 @@
 
 ----
 
-&emsp;&emsp;&emsp;&emsp;到达状态[116]: type[0] ->  ( `ID` [0]  * [ `LPA` [3]  [ exp_list [4] ]  `RPA` ] | `INTEGER` [0] | `DECIMAL` [0] | `LITERAL` [0]  [ `LPA` [3]  [ exp_list [4] ]  `RPA` ] | `CHARACTER` [0] | `BOOLEAN` [0] | `LPA`  exp [1]  `RPA` | call [1] | lambda [2] | set [1] | invoke [1] | array [1] | map [1] ) 
+&emsp;&emsp;&emsp;&emsp;到达状态[18]: call[0] -> * `CALL` [4]  ( `LPA`  ( func [0] | exp [3] )  `RPA` | `ID` [1] )  `LPA`  [ exp_list [2] ]  `RPA` 
 
-&emsp;&emsp;&emsp;&emsp;类型：匹配	=> 0(0: `ID`，标识符，(null))
+&emsp;&emsp;&emsp;&emsp;类型：转移
 
-&emsp;&emsp;&emsp;&emsp;指令：读入	=> 0
+&emsp;&emsp;&emsp;&emsp;指令：移进
+
+&emsp;&emsp;&emsp;&emsp;预查：[44: `CALL`，关键字，CALL]&emsp;
 
 ----
 
@@ -2441,14 +2443,6 @@
 &emsp;&emsp;&emsp;&emsp;到达状态[76]: type[0] ->  ( `ID` [0]  [ `LPA` [3]  [ exp_list [4] ]  `RPA` ] | `INTEGER` [0] | `DECIMAL` [0] | `LITERAL` [0]  [ `LPA` [3]  [ exp_list [4] ]  `RPA` ] | `CHARACTER` [0] | `BOOLEAN` [0] | `LPA`  exp [1]  `RPA` | call [1] | lambda [2] | set [1] | invoke [1] | array [1] | map [1] )  *
 
 &emsp;&emsp;&emsp;&emsp;类型：匹配	=> 5(5: `DECIMAL`，实数，(null))
-
-&emsp;&emsp;&emsp;&emsp;指令：读入	=> 0
-
-----
-
-&emsp;&emsp;&emsp;&emsp;到达状态[117]: type[0] ->  ( `ID` [0]  [ `LPA` [3]  [ exp_list [4] ]  `RPA` ] | `INTEGER` [0] | `DECIMAL` [0] | `LITERAL` [0]  * [ `LPA` [3]  [ exp_list [4] ]  `RPA` ] | `CHARACTER` [0] | `BOOLEAN` [0] | `LPA`  exp [1]  `RPA` | call [1] | lambda [2] | set [1] | invoke [1] | array [1] | map [1] ) 
-
-&emsp;&emsp;&emsp;&emsp;类型：匹配	=> 2(2: `LITERAL`，字符串，(null))
 
 &emsp;&emsp;&emsp;&emsp;指令：读入	=> 0
 
@@ -2470,21 +2464,27 @@
 
 ----
 
+&emsp;&emsp;&emsp;&emsp;到达状态[116]: type[0] ->  ( `ID` [0]  * [ `LPA` [3]  [ exp_list [4] ]  `RPA` ] | `INTEGER` [0] | `DECIMAL` [0] | `LITERAL` [0]  [ `LPA` [3]  [ exp_list [4] ]  `RPA` ] | `CHARACTER` [0] | `BOOLEAN` [0] | `LPA`  exp [1]  `RPA` | call [1] | lambda [2] | set [1] | invoke [1] | array [1] | map [1] ) 
+
+&emsp;&emsp;&emsp;&emsp;类型：匹配	=> 0(0: `ID`，标识符，(null))
+
+&emsp;&emsp;&emsp;&emsp;指令：读入	=> 0
+
+----
+
+&emsp;&emsp;&emsp;&emsp;到达状态[117]: type[0] ->  ( `ID` [0]  [ `LPA` [3]  [ exp_list [4] ]  `RPA` ] | `INTEGER` [0] | `DECIMAL` [0] | `LITERAL` [0]  * [ `LPA` [3]  [ exp_list [4] ]  `RPA` ] | `CHARACTER` [0] | `BOOLEAN` [0] | `LPA`  exp [1]  `RPA` | call [1] | lambda [2] | set [1] | invoke [1] | array [1] | map [1] ) 
+
+&emsp;&emsp;&emsp;&emsp;类型：匹配	=> 2(2: `LITERAL`，字符串，(null))
+
+&emsp;&emsp;&emsp;&emsp;指令：读入	=> 0
+
+----
+
 &emsp;&emsp;&emsp;&emsp;到达状态[118]: type[0] ->  ( `ID` [0]  [ `LPA` [3]  [ exp_list [4] ]  `RPA` ] | `INTEGER` [0] | `DECIMAL` [0] | `LITERAL` [0]  [ `LPA` [3]  [ exp_list [4] ]  `RPA` ] | `CHARACTER` [0] | `BOOLEAN` [0] | `LPA`  * exp [1]  `RPA` | call [1] | lambda [2] | set [1] | invoke [1] | array [1] | map [1] ) 
 
 &emsp;&emsp;&emsp;&emsp;类型：匹配	=> 96(96: `LPA`，操作符，LPARAN)
 
 &emsp;&emsp;&emsp;&emsp;指令：通过
-
-----
-
-&emsp;&emsp;&emsp;&emsp;到达状态[18]: call[0] -> * `CALL` [4]  ( `LPA`  ( func [0] | exp [3] )  `RPA` | `ID` [1] )  `LPA`  [ exp_list [2] ]  `RPA` 
-
-&emsp;&emsp;&emsp;&emsp;类型：转移
-
-&emsp;&emsp;&emsp;&emsp;指令：移进
-
-&emsp;&emsp;&emsp;&emsp;预查：[44: `CALL`，关键字，CALL]&emsp;
 
 ----
 
@@ -2650,7 +2650,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进  [Action]
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 
 
@@ -2668,7 +2668,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 
 
@@ -2746,14 +2746,6 @@
 
 ----
 
-&emsp;&emsp;&emsp;&emsp;到达状态[134]: type[0] ->  ( `ID` [0]  [ `LPA` [3]  * [ exp_list [4] ]  `RPA` ] | `INTEGER` [0] | `DECIMAL` [0] | `LITERAL` [0]  [ `LPA` [3]  [ exp_list [4] ]  `RPA` ] | `CHARACTER` [0] | `BOOLEAN` [0] | `LPA`  exp [1]  `RPA` | call [1] | lambda [2] | set [1] | invoke [1] | array [1] | map [1] ) 
-
-&emsp;&emsp;&emsp;&emsp;类型：匹配	=> 96(96: `LPA`，操作符，LPARAN)
-
-&emsp;&emsp;&emsp;&emsp;指令：读入	=> 3
-
-----
-
 &emsp;&emsp;&emsp;&emsp;到达状态[85]: exp10[0] ->  [ exp10 [1]  `DOT` [2] ]  type [0]  *
 
 &emsp;&emsp;&emsp;&emsp;类型：归约	=> exp10[0] -> * [ exp10 [1]  `DOT` [2] ]  type [0] 
@@ -2767,6 +2759,14 @@
 &emsp;&emsp;&emsp;&emsp;类型：归约	=> exp10[0] ->  [ exp10 [1]  `DOT` [2] ]  * type [0] 
 
 &emsp;&emsp;&emsp;&emsp;指令：翻译	=> type 0
+
+----
+
+&emsp;&emsp;&emsp;&emsp;到达状态[134]: type[0] ->  ( `ID` [0]  [ `LPA` [3]  * [ exp_list [4] ]  `RPA` ] | `INTEGER` [0] | `DECIMAL` [0] | `LITERAL` [0]  [ `LPA` [3]  [ exp_list [4] ]  `RPA` ] | `CHARACTER` [0] | `BOOLEAN` [0] | `LPA`  exp [1]  `RPA` | call [1] | lambda [2] | set [1] | invoke [1] | array [1] | map [1] ) 
+
+&emsp;&emsp;&emsp;&emsp;类型：匹配	=> 96(96: `LPA`，操作符，LPARAN)
+
+&emsp;&emsp;&emsp;&emsp;指令：读入	=> 3
 
 
 
@@ -2778,14 +2778,6 @@
 
 ----
 
-&emsp;&emsp;&emsp;&emsp;到达状态[135]: type[0] ->  ( `ID` [0]  [ `LPA` [3]  [ exp_list [4] ]  `RPA` ] | `INTEGER` [0] | `DECIMAL` [0] | `LITERAL` [0]  [ `LPA` [3]  * [ exp_list [4] ]  `RPA` ] | `CHARACTER` [0] | `BOOLEAN` [0] | `LPA`  exp [1]  `RPA` | call [1] | lambda [2] | set [1] | invoke [1] | array [1] | map [1] ) 
-
-&emsp;&emsp;&emsp;&emsp;类型：匹配	=> 96(96: `LPA`，操作符，LPARAN)
-
-&emsp;&emsp;&emsp;&emsp;指令：读入	=> 3
-
-----
-
 &emsp;&emsp;&emsp;&emsp;到达状态[85]: exp10[0] ->  [ exp10 [1]  `DOT` [2] ]  type [0]  *
 
 &emsp;&emsp;&emsp;&emsp;类型：归约	=> exp10[0] -> * [ exp10 [1]  `DOT` [2] ]  type [0] 
@@ -2799,6 +2791,14 @@
 &emsp;&emsp;&emsp;&emsp;类型：归约	=> exp10[0] ->  [ exp10 [1]  `DOT` [2] ]  * type [0] 
 
 &emsp;&emsp;&emsp;&emsp;指令：翻译	=> type 0
+
+----
+
+&emsp;&emsp;&emsp;&emsp;到达状态[135]: type[0] ->  ( `ID` [0]  [ `LPA` [3]  [ exp_list [4] ]  `RPA` ] | `INTEGER` [0] | `DECIMAL` [0] | `LITERAL` [0]  [ `LPA` [3]  * [ exp_list [4] ]  `RPA` ] | `CHARACTER` [0] | `BOOLEAN` [0] | `LPA`  exp [1]  `RPA` | call [1] | lambda [2] | set [1] | invoke [1] | array [1] | map [1] ) 
+
+&emsp;&emsp;&emsp;&emsp;类型：匹配	=> 96(96: `LPA`，操作符，LPARAN)
+
+&emsp;&emsp;&emsp;&emsp;指令：读入	=> 3
 
 
 
@@ -2816,7 +2816,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 
 
@@ -3020,7 +3020,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 
 
@@ -3038,7 +3038,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 
 
@@ -3114,7 +3114,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 
 
@@ -3126,21 +3126,21 @@
 
 ----
 
+&emsp;&emsp;&emsp;&emsp;到达状态[76]: type[0] ->  ( `ID` [0]  [ `LPA` [3]  [ exp_list [4] ]  `RPA` ] | `INTEGER` [0] | `DECIMAL` [0] | `LITERAL` [0]  [ `LPA` [3]  [ exp_list [4] ]  `RPA` ] | `CHARACTER` [0] | `BOOLEAN` [0] | `LPA`  exp [1]  `RPA` | call [1] | lambda [2] | set [1] | invoke [1] | array [1] | map [1] )  *
+
+&emsp;&emsp;&emsp;&emsp;类型：匹配	=> 97(97: `RPA`，操作符，RPARAN)
+
+&emsp;&emsp;&emsp;&emsp;指令：通过
+
+----
+
 &emsp;&emsp;&emsp;&emsp;到达状态[81]: exp_list[0] -> * exp [0]  [ `COMMA`  exp_list [1] ] 
 
 &emsp;&emsp;&emsp;&emsp;类型：转移
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
-
-----
-
-&emsp;&emsp;&emsp;&emsp;到达状态[76]: type[0] ->  ( `ID` [0]  [ `LPA` [3]  [ exp_list [4] ]  `RPA` ] | `INTEGER` [0] | `DECIMAL` [0] | `LITERAL` [0]  [ `LPA` [3]  [ exp_list [4] ]  `RPA` ] | `CHARACTER` [0] | `BOOLEAN` [0] | `LPA`  exp [1]  `RPA` | call [1] | lambda [2] | set [1] | invoke [1] | array [1] | map [1] )  *
-
-&emsp;&emsp;&emsp;&emsp;类型：匹配	=> 97(97: `RPA`，操作符，RPARAN)
-
-&emsp;&emsp;&emsp;&emsp;指令：通过
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 
 
@@ -3152,21 +3152,21 @@
 
 ----
 
+&emsp;&emsp;&emsp;&emsp;到达状态[76]: type[0] ->  ( `ID` [0]  [ `LPA` [3]  [ exp_list [4] ]  `RPA` ] | `INTEGER` [0] | `DECIMAL` [0] | `LITERAL` [0]  [ `LPA` [3]  [ exp_list [4] ]  `RPA` ] | `CHARACTER` [0] | `BOOLEAN` [0] | `LPA`  exp [1]  `RPA` | call [1] | lambda [2] | set [1] | invoke [1] | array [1] | map [1] )  *
+
+&emsp;&emsp;&emsp;&emsp;类型：匹配	=> 97(97: `RPA`，操作符，RPARAN)
+
+&emsp;&emsp;&emsp;&emsp;指令：通过
+
+----
+
 &emsp;&emsp;&emsp;&emsp;到达状态[81]: exp_list[0] -> * exp [0]  [ `COMMA`  exp_list [1] ] 
 
 &emsp;&emsp;&emsp;&emsp;类型：转移
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
-
-----
-
-&emsp;&emsp;&emsp;&emsp;到达状态[76]: type[0] ->  ( `ID` [0]  [ `LPA` [3]  [ exp_list [4] ]  `RPA` ] | `INTEGER` [0] | `DECIMAL` [0] | `LITERAL` [0]  [ `LPA` [3]  [ exp_list [4] ]  `RPA` ] | `CHARACTER` [0] | `BOOLEAN` [0] | `LPA`  exp [1]  `RPA` | call [1] | lambda [2] | set [1] | invoke [1] | array [1] | map [1] )  *
-
-&emsp;&emsp;&emsp;&emsp;类型：匹配	=> 97(97: `RPA`，操作符，RPARAN)
-
-&emsp;&emsp;&emsp;&emsp;指令：通过
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 
 
@@ -3200,7 +3200,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 
 
@@ -3218,7 +3218,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 
 
@@ -3236,7 +3236,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 ----
 
@@ -3282,14 +3282,6 @@
 
 ----
 
-&emsp;&emsp;&emsp;&emsp;到达状态[150]: lambda[0] ->  `LAMBDA` [1]  `LPA`  [ var_list [2] ]  `RPA`  ( `PTR_OP`  * scope [3] | block [4] ) 
-
-&emsp;&emsp;&emsp;&emsp;类型：匹配	=> 56(56: `PTR_OP`，操作符，POINTER)
-
-&emsp;&emsp;&emsp;&emsp;指令：通过  [Action]
-
-----
-
 &emsp;&emsp;&emsp;&emsp;到达状态[16]: block[0] -> * `LBR`  [ stmt_list [0] ]  `RBR` 
 
 &emsp;&emsp;&emsp;&emsp;类型：转移
@@ -3297,6 +3289,14 @@
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
 &emsp;&emsp;&emsp;&emsp;预查：[100: `LBR`，操作符，LBRACE]&emsp;
+
+----
+
+&emsp;&emsp;&emsp;&emsp;到达状态[150]: lambda[0] ->  `LAMBDA` [1]  `LPA`  [ var_list [2] ]  `RPA`  ( `PTR_OP`  * scope [3] | block [4] ) 
+
+&emsp;&emsp;&emsp;&emsp;类型：匹配	=> 56(56: `PTR_OP`，操作符，POINTER)
+
+&emsp;&emsp;&emsp;&emsp;指令：通过  [Action]
 
 
 
@@ -3314,7 +3314,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 ----
 
@@ -3364,7 +3364,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：左递归	=> exp4 1
 
-&emsp;&emsp;&emsp;&emsp;预查：[88: `LT`，操作符，LESS_THAN]&emsp;[89: `GT`，操作符，GREATER_THAN]&emsp;[61: `LE_OP`，操作符，LESS_THAN_OR_EQUAL]&emsp;[62: `GE_OP`，操作符，GREATER_THAN_OR_EQUAL]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[61: `LE_OP`，操作符，LESS_THAN_OR_EQUAL]&emsp;[62: `GE_OP`，操作符，GREATER_THAN_OR_EQUAL]&emsp;[88: `LT`，操作符，LESS_THAN]&emsp;[89: `GT`，操作符，GREATER_THAN]&emsp;
 
 
 
@@ -3406,7 +3406,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 
 
@@ -3498,7 +3498,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进  [Action]
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 
 
@@ -3516,7 +3516,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[4: `INTEGER`，整数，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 ----
 
@@ -3550,7 +3550,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 
 
@@ -3642,7 +3642,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 
 
@@ -3676,7 +3676,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[4: `INTEGER`，整数，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 
 
@@ -3694,7 +3694,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 
 
@@ -3728,7 +3728,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：左递归	=> exp2 1
 
-&emsp;&emsp;&emsp;&emsp;预查：[84: `OR`，操作符，BIT_OR]&emsp;[85: `XOR`，操作符，BIT_XOR]&emsp;[83: `AND`，操作符，BIT_AND]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[83: `AND`，操作符，BIT_AND]&emsp;[84: `OR`，操作符，BIT_OR]&emsp;[85: `XOR`，操作符，BIT_XOR]&emsp;
 
 
 
@@ -3770,7 +3770,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 
 
@@ -3788,7 +3788,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 
 
@@ -3864,7 +3864,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 
 
@@ -3954,7 +3954,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 
 
@@ -3972,7 +3972,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 
 
@@ -4054,7 +4054,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：左递归	=> exp01 1
 
-&emsp;&emsp;&emsp;&emsp;预查：[77: `EQ_ASSIGN`，操作符，EQ_ASSIGN]&emsp;[70: `ADD_ASSIGN`，操作符，PLUS_ASSIGN]&emsp;[71: `SUB_ASSIGN`，操作符，MINUS_ASSIGN]&emsp;[67: `MUL_ASSIGN`，操作符，TIMES_ASSIGN]&emsp;[68: `DIV_ASSIGN`，操作符，DIV_ASSIGN]&emsp;[74: `AND_ASSIGN`，操作符，AND_ASSIGN]&emsp;[76: `OR_ASSIGN`，操作符，OR_ASSIGN]&emsp;[75: `XOR_ASSIGN`，操作符，XOR_ASSIGN]&emsp;[69: `MOD_ASSIGN`，操作符，MOD_ASSIGN]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[67: `MUL_ASSIGN`，操作符，TIMES_ASSIGN]&emsp;[68: `DIV_ASSIGN`，操作符，DIV_ASSIGN]&emsp;[69: `MOD_ASSIGN`，操作符，MOD_ASSIGN]&emsp;[70: `ADD_ASSIGN`，操作符，PLUS_ASSIGN]&emsp;[71: `SUB_ASSIGN`，操作符，MINUS_ASSIGN]&emsp;[74: `AND_ASSIGN`，操作符，AND_ASSIGN]&emsp;[75: `XOR_ASSIGN`，操作符，XOR_ASSIGN]&emsp;[76: `OR_ASSIGN`，操作符，OR_ASSIGN]&emsp;[77: `EQ_ASSIGN`，操作符，EQ_ASSIGN]&emsp;
 
 
 
@@ -4072,7 +4072,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 
 
@@ -4090,7 +4090,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 
 
@@ -4099,6 +4099,38 @@
 项目：exp[0] ->  exp01 [0]  * [ ( `INTEGER` [10] | `DECIMAL` [10] ) ] 
 
 规则：exp
+
+----
+
+&emsp;&emsp;&emsp;&emsp;到达状态[46]: stmt_exp[0] ->  ( var [0] | call [0] | cycle_ctrl [0] | exp [0] )  *
+
+&emsp;&emsp;&emsp;&emsp;类型：归约	=> stmt_exp[0] -> * ( var [0] | call [0] | cycle_ctrl [0] | exp [0] ) 
+
+&emsp;&emsp;&emsp;&emsp;指令：翻译	=> exp 0
+
+----
+
+&emsp;&emsp;&emsp;&emsp;到达状态[67]: for[0] ->  `FOR`  `LPA`  [ var [0] ]  `SEMI`  [ exp [1] ]  `SEMI`  [ ( exp [2] | var [2] )  *]  `RPA`  block [3] 
+
+&emsp;&emsp;&emsp;&emsp;类型：归约	=> for[0] ->  `FOR`  `LPA`  [ var [0] ]  `SEMI`  [ exp [1] ]  `SEMI`  * [ ( exp [2] | var [2] ) ]  `RPA`  block [3] 
+
+&emsp;&emsp;&emsp;&emsp;指令：翻译	=> exp 2
+
+----
+
+&emsp;&emsp;&emsp;&emsp;到达状态[74]: var[0] ->  ( `VARIABLE` [11] | `LET` [12] )  `ID` [0]  [ `ASSIGN`  ( func [1] | exp [2] )  *] 
+
+&emsp;&emsp;&emsp;&emsp;类型：归约	=> var[0] ->  ( `VARIABLE` [11] | `LET` [12] )  `ID` [0]  [ `ASSIGN`  * ( func [1] | exp [2] ) ] 
+
+&emsp;&emsp;&emsp;&emsp;指令：翻译	=> exp 2
+
+----
+
+&emsp;&emsp;&emsp;&emsp;到达状态[75]: call[0] ->  `CALL` [4]  ( `LPA`  ( func [0] | exp [3] )  * `RPA` | `ID` [1] )  `LPA`  [ exp_list [2] ]  `RPA` 
+
+&emsp;&emsp;&emsp;&emsp;类型：归约	=> call[0] ->  `CALL` [4]  ( `LPA`  * ( func [0] | exp [3] )  `RPA` | `ID` [1] )  `LPA`  [ exp_list [2] ]  `RPA` 
+
+&emsp;&emsp;&emsp;&emsp;指令：翻译	=> exp 3
 
 ----
 
@@ -4115,22 +4147,6 @@
 &emsp;&emsp;&emsp;&emsp;类型：匹配	=> 5(5: `DECIMAL`，实数，(null))
 
 &emsp;&emsp;&emsp;&emsp;指令：读入	=> 10
-
-----
-
-&emsp;&emsp;&emsp;&emsp;到达状态[46]: stmt_exp[0] ->  ( var [0] | call [0] | cycle_ctrl [0] | exp [0] )  *
-
-&emsp;&emsp;&emsp;&emsp;类型：归约	=> stmt_exp[0] -> * ( var [0] | call [0] | cycle_ctrl [0] | exp [0] ) 
-
-&emsp;&emsp;&emsp;&emsp;指令：翻译	=> exp 0
-
-----
-
-&emsp;&emsp;&emsp;&emsp;到达状态[74]: var[0] ->  ( `VARIABLE` [11] | `LET` [12] )  `ID` [0]  [ `ASSIGN`  ( func [1] | exp [2] )  *] 
-
-&emsp;&emsp;&emsp;&emsp;类型：归约	=> var[0] ->  ( `VARIABLE` [11] | `LET` [12] )  `ID` [0]  [ `ASSIGN`  * ( func [1] | exp [2] ) ] 
-
-&emsp;&emsp;&emsp;&emsp;指令：翻译	=> exp 2
 
 ----
 
@@ -4158,14 +4174,6 @@
 
 ----
 
-&emsp;&emsp;&emsp;&emsp;到达状态[75]: call[0] ->  `CALL` [4]  ( `LPA`  ( func [0] | exp [3] )  * `RPA` | `ID` [1] )  `LPA`  [ exp_list [2] ]  `RPA` 
-
-&emsp;&emsp;&emsp;&emsp;类型：归约	=> call[0] ->  `CALL` [4]  ( `LPA`  * ( func [0] | exp [3] )  `RPA` | `ID` [1] )  `LPA`  [ exp_list [2] ]  `RPA` 
-
-&emsp;&emsp;&emsp;&emsp;指令：翻译	=> exp 3
-
-----
-
 &emsp;&emsp;&emsp;&emsp;到达状态[181]: ret[0] ->  ( `YIELD` [1] | `RETURN` )  [ exp [0] ]  * `SEMI` 
 
 &emsp;&emsp;&emsp;&emsp;类型：归约	=> ret[0] ->  ( `YIELD` [1] | `RETURN` )  * [ exp [0] ]  `SEMI` 
@@ -4187,14 +4195,6 @@
 &emsp;&emsp;&emsp;&emsp;类型：归约	=> for[0] ->  `FOR`  `LPA`  [ var [0] ]  `SEMI`  * [ exp [1] ]  `SEMI`  [ ( exp [2] | var [2] ) ]  `RPA`  block [3] 
 
 &emsp;&emsp;&emsp;&emsp;指令：翻译	=> exp 1
-
-----
-
-&emsp;&emsp;&emsp;&emsp;到达状态[67]: for[0] ->  `FOR`  `LPA`  [ var [0] ]  `SEMI`  [ exp [1] ]  `SEMI`  [ ( exp [2] | var [2] )  *]  `RPA`  block [3] 
-
-&emsp;&emsp;&emsp;&emsp;类型：归约	=> for[0] ->  `FOR`  `LPA`  [ var [0] ]  `SEMI`  [ exp [1] ]  `SEMI`  * [ ( exp [2] | var [2] ) ]  `RPA`  block [3] 
-
-&emsp;&emsp;&emsp;&emsp;指令：翻译	=> exp 2
 
 ----
 
@@ -4374,11 +4374,27 @@
 
 ----
 
+&emsp;&emsp;&emsp;&emsp;到达状态[67]: for[0] ->  `FOR`  `LPA`  [ var [0] ]  `SEMI`  [ exp [1] ]  `SEMI`  [ ( exp [2] | var [2] )  *]  `RPA`  block [3] 
+
+&emsp;&emsp;&emsp;&emsp;类型：归约	=> for[0] ->  `FOR`  `LPA`  [ var [0] ]  `SEMI`  [ exp [1] ]  `SEMI`  * [ ( exp [2] | var [2] ) ]  `RPA`  block [3] 
+
+&emsp;&emsp;&emsp;&emsp;指令：翻译	=> exp 2
+
+----
+
 &emsp;&emsp;&emsp;&emsp;到达状态[74]: var[0] ->  ( `VARIABLE` [11] | `LET` [12] )  `ID` [0]  [ `ASSIGN`  ( func [1] | exp [2] )  *] 
 
 &emsp;&emsp;&emsp;&emsp;类型：归约	=> var[0] ->  ( `VARIABLE` [11] | `LET` [12] )  `ID` [0]  [ `ASSIGN`  * ( func [1] | exp [2] ) ] 
 
 &emsp;&emsp;&emsp;&emsp;指令：翻译	=> exp 2
+
+----
+
+&emsp;&emsp;&emsp;&emsp;到达状态[75]: call[0] ->  `CALL` [4]  ( `LPA`  ( func [0] | exp [3] )  * `RPA` | `ID` [1] )  `LPA`  [ exp_list [2] ]  `RPA` 
+
+&emsp;&emsp;&emsp;&emsp;类型：归约	=> call[0] ->  `CALL` [4]  ( `LPA`  * ( func [0] | exp [3] )  `RPA` | `ID` [1] )  `LPA`  [ exp_list [2] ]  `RPA` 
+
+&emsp;&emsp;&emsp;&emsp;指令：翻译	=> exp 3
 
 ----
 
@@ -4406,14 +4422,6 @@
 
 ----
 
-&emsp;&emsp;&emsp;&emsp;到达状态[75]: call[0] ->  `CALL` [4]  ( `LPA`  ( func [0] | exp [3] )  * `RPA` | `ID` [1] )  `LPA`  [ exp_list [2] ]  `RPA` 
-
-&emsp;&emsp;&emsp;&emsp;类型：归约	=> call[0] ->  `CALL` [4]  ( `LPA`  * ( func [0] | exp [3] )  `RPA` | `ID` [1] )  `LPA`  [ exp_list [2] ]  `RPA` 
-
-&emsp;&emsp;&emsp;&emsp;指令：翻译	=> exp 3
-
-----
-
 &emsp;&emsp;&emsp;&emsp;到达状态[181]: ret[0] ->  ( `YIELD` [1] | `RETURN` )  [ exp [0] ]  * `SEMI` 
 
 &emsp;&emsp;&emsp;&emsp;类型：归约	=> ret[0] ->  ( `YIELD` [1] | `RETURN` )  * [ exp [0] ]  `SEMI` 
@@ -4435,14 +4443,6 @@
 &emsp;&emsp;&emsp;&emsp;类型：归约	=> for[0] ->  `FOR`  `LPA`  [ var [0] ]  `SEMI`  * [ exp [1] ]  `SEMI`  [ ( exp [2] | var [2] ) ]  `RPA`  block [3] 
 
 &emsp;&emsp;&emsp;&emsp;指令：翻译	=> exp 1
-
-----
-
-&emsp;&emsp;&emsp;&emsp;到达状态[67]: for[0] ->  `FOR`  `LPA`  [ var [0] ]  `SEMI`  [ exp [1] ]  `SEMI`  [ ( exp [2] | var [2] )  *]  `RPA`  block [3] 
-
-&emsp;&emsp;&emsp;&emsp;类型：归约	=> for[0] ->  `FOR`  `LPA`  [ var [0] ]  `SEMI`  [ exp [1] ]  `SEMI`  * [ ( exp [2] | var [2] ) ]  `RPA`  block [3] 
-
-&emsp;&emsp;&emsp;&emsp;指令：翻译	=> exp 2
 
 ----
 
@@ -4868,7 +4868,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 
 
@@ -4886,7 +4886,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 
 
@@ -5094,7 +5094,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 
 
@@ -5112,7 +5112,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 
 
@@ -5130,7 +5130,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 
 
@@ -5254,7 +5254,7 @@
 
 &emsp;&emsp;&emsp;&emsp;指令：移进
 
-&emsp;&emsp;&emsp;&emsp;预查：[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[50: `SET`，关键字，SET]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[0: `ID`，标识符，(null)]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;
+&emsp;&emsp;&emsp;&emsp;预查：[0: `ID`，标识符，(null)]&emsp;[1: `BOOLEAN`，布尔，(null)]&emsp;[2: `LITERAL`，字符串，(null)]&emsp;[3: `CHARACTER`，字符，(null)]&emsp;[4: `INTEGER`，整数，(null)]&emsp;[5: `DECIMAL`，实数，(null)]&emsp;[44: `CALL`，关键字，CALL]&emsp;[49: `LAMBDA`，关键字，LAMBDA]&emsp;[50: `SET`，关键字，SET]&emsp;[51: `INVOKE`，关键字，INVOKE]&emsp;[57: `INC_OP`，操作符，PLUS_PLUS]&emsp;[58: `DEC_OP`，操作符，MINUS_MINUS]&emsp;[86: `NOT`，操作符，BIT_NOT]&emsp;[87: `NOT_OP`，操作符，LOGICAL_NOT]&emsp;[96: `LPA`，操作符，LPARAN]&emsp;[98: `LSQ`，操作符，LSQUARE]&emsp;[100: `LBR`，操作符，LBRACE]&emsp;
 
 ----
 

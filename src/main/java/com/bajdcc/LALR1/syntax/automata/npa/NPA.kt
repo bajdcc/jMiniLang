@@ -158,7 +158,7 @@ open class NPA(nonterminals: List<RuleExp>,
                 sb.append(System.lineSeparator()).append(System.lineSeparator())
                 sb.append("规则：").append(arrRuleItems[status.data.rule].parent.nonTerminal.name)
                 sb.append(System.lineSeparator()).append(System.lineSeparator())
-                for (edge in status.outEdges) {
+                for (edge in status.outEdges.sortedBy { statusList.indexOf(it.end) }) {
                     sb.append("----")
                     sb.append(System.lineSeparator()).append(System.lineSeparator())
                     sb.append("&emsp;&emsp;&emsp;&emsp;到达状态[").append(statusList.indexOf(edge.end)).append("]: ").append(edge.end!!.data.label)
@@ -190,7 +190,7 @@ open class NPA(nonterminals: List<RuleExp>,
                     sb.append(System.lineSeparator()).append(System.lineSeparator())
                     if (edge.data.lookaheads.isNotEmpty()) {
                         sb.append("&emsp;&emsp;&emsp;&emsp;预查：")
-                        for (id in edge.data.lookaheads) {
+                        for (id in edge.data.lookaheads.sorted()) {
                             sb.append("[").append(arrTerminals[id]).append("]&emsp;")
                         }
                         sb.append(System.lineSeparator()).append(System.lineSeparator())

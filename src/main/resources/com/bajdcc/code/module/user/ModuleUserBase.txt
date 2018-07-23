@@ -1,6 +1,6 @@
 var g_author = func ["用户态模块的作者：bajdcc"] ~() -> "bajdcc";
 export "g_author";
-var g_version = func ~() -> "v2.3.4";
+var g_version = func ~() -> "v2.3.5";
 export "g_version";
 var g_github_repo = func ~() -> "https://github.com/bajdcc/jMiniLang";
 export "g_github_repo";
