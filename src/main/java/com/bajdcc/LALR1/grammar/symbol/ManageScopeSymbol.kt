@@ -47,7 +47,7 @@ class ManageScopeSymbol : IQueryScopeSymbol, IQueryBlockSymbol, IManageDataSymbo
             return funcMap["$LAMBDA_PREFIX$lambdaId!$lambdaLine"][0]
         }
 
-    val symbolString: String
+    private val symbolString: String
         get() {
             val sb = StringBuilder()
             sb.append("#### 符号表 ####")
@@ -59,7 +59,7 @@ class ManageScopeSymbol : IQueryScopeSymbol, IQueryBlockSymbol, IManageDataSymbo
             return sb.toString()
         }
 
-    val funcString: String
+    private val funcString: String
         get() {
             val sb = StringBuilder()
             sb.append("#### 过程表 ####")
@@ -88,15 +88,21 @@ class ManageScopeSymbol : IQueryScopeSymbol, IQueryBlockSymbol, IManageDataSymbo
         }
     }
 
+    private val currentScope: MutableSet<String>
+        get() = stkScope[stkScope.size - 1]
+
+    private val currentFuncScope: MutableMap<String, Function>
+        get() = funcScope[funcScope.size - 1]
+
     override fun enterScope() {
-        stkScope.add(0, HashSet())
-        funcScope.add(HashMap())
+        stkScope.add(mutableSetOf())
+        funcScope.add(mutableMapOf())
         symbolsInFutureBlock.forEach { this.registerSymbol(it) }
         clearFutureArgs()
     }
 
     override fun leaveScope() {
-        stkScope.removeAt(0)
+        stkScope.removeAt(stkScope.size - 1)
         funcScope.removeAt(funcScope.size - 1)
         clearFutureArgs()
     }
@@ -109,11 +115,8 @@ class ManageScopeSymbol : IQueryScopeSymbol, IQueryBlockSymbol, IManageDataSymbo
         if (symbolsInFutureBlock.contains(name)) {
             return true
         }
-        for (hashSet in stkScope) {
-            if (hashSet.contains(name)) {
-                return true
-            }
-        }
+        if (stkScope.reversed().any { it.contains(name) })
+            return true
         if (TokenTools.isExternalName(name)) {
             registerSymbol(name)
             return true
@@ -122,11 +125,11 @@ class ManageScopeSymbol : IQueryScopeSymbol, IQueryBlockSymbol, IManageDataSymbo
     }
 
     override fun findDeclaredSymbolDirect(name: String): Boolean {
-        return symbolsInFutureBlock.contains(name) || stkScope[0].contains(name)
+        return symbolsInFutureBlock.contains(name) || currentScope.contains(name)
     }
 
     override fun isUniqueSymbolOfBlock(name: String): Boolean {
-        return stkScope[0].contains(name)
+        return currentScope.contains(name)
     }
 
     override fun getFuncByName(name: String): Function? {
@@ -150,7 +153,7 @@ class ManageScopeSymbol : IQueryScopeSymbol, IQueryBlockSymbol, IManageDataSymbo
     }
 
     override fun registerSymbol(name: String) {
-        stkScope[0].add(name)
+        currentScope.add(name)
         symbolList.add(name)
     }
 
@@ -164,7 +167,7 @@ class ManageScopeSymbol : IQueryScopeSymbol, IQueryBlockSymbol, IManageDataSymbo
         val f = ArrayList<Function>()
         f.add(func)
         funcMap.add(func.realName, f)
-        funcScope[funcScope.size - 1][func.realName] = func
+        currentFuncScope[func.realName] = func
     }
 
     override fun registerLambda(func: Function) {
@@ -172,7 +175,7 @@ class ManageScopeSymbol : IQueryScopeSymbol, IQueryBlockSymbol, IManageDataSymbo
         stkLambdaLine.push(func.name.position.line)
         func.name.type = TokenType.ID
         func.realName = LAMBDA_PREFIX + lambdaId++ + "!" + stkLambdaLine.peek()
-        funcScope[funcScope.size - 1].put(func.realName, func)
+        currentFuncScope[func.realName] = func
         val f = ArrayList<Function>()
         f.add(func)
         funcMap.add(func.realName, f)

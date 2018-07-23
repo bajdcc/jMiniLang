@@ -4,6 +4,37 @@
 
 视频演示：https://www.bilibili.com/video/av13294962/
 
+*一言以蔽之，本项目涉及的思想包括：*
+
+- 编译原理（涵盖正则文法(com.bajdcc.util.lexer)、LR1文法(com.bajdcc.LALR1)、LL1文法(com.bajdcc.LL1)），重点：**语法制导翻译、自定义语义动作**，包含自动机的生成(非确定性有限自动机-NFA、确定性有限自动机-DFA、非确定性下推自动机-NPDA、确定性下推自动机-PDA)、LR或LL表的生成(com.bajdcc.LALR1/LL1.syntax)、语法分析(com.bajdcc.LALR1.grammar)、语义分析(com.bajdcc.LALR1.semantic)、语法树的生成(com.bajdcc.LALR1.grammar.tree)、中间代码的生成(com.bajdcc.LALR1.grammar.codegen)，其中LR分析部分要感谢vczh大牛提供的C++源码
+- 虚拟机(com.bajdcc.LALR1.interpret)，包含基于栈的虚拟机指令的设计(com.bajdcc.LALR1.grammar.runtime)（**没有指针，只有引用**）、外部方法导入、二进制码生成、隐性类型转换、实现N元运算
+- 语法特性(com.bajdcc.LALR1.grammar.Grammar)，包含foreach/yield的实现、Lambda的实现、管道的实现、import导入代码页的实现、实现try/catch，及一些语法糖
+- 操作系统，包含多进程的实现(RuntimeProcess)、微服务架构（`ModuleTask`）、基于管道的进程同步机制的实现（`ModuleProc`）、用户进程的实现（`ModuleUserBase`意思是可以挂掉而不影响系统）
+- Web网页服务器的实现(com.bajdcc.web)，包含REST接口的实现、REST服务与jMiniLang用户进程的消息传递机制、Spring-boot的使用
+- UI(com.bajdcc.LALR1.ui)，包含部分SVG指令的绘制、操作系统层面的UI服务设计、控制台的实现、Ctrl-C指令的实现、对话框Dialog的实现、支持中文宽字符的显示、支持RGB24位彩色字符的显示、支持背景颜色的设置
+- 基于jMiniLang语言实现的面向对象特性（`ModuleClass`参照JS的原型链）
+- 函数式编程接口的实现（`ModuleFunction`）
+- LISP的jMiniLang实现（`ModuleLisp`），[B站视频链接](https://www.bilibili.com/video/av13294962/?p=2)
+- 语言集成查询（LINQ）的jMiniLang实现（`ModuleStdBase`，参考Vlpp），类似Java 8 Stream链式/流式操作
+
+*一言以蔽之，本项目涉及的玩法包括：*
+
+- Spring-boot与layui制作的管理后台，包括资源查看、文档查看、**在线编译**！
+- `UserService` RING3级用户服务，实现**FORK**、**管道**、**互斥**。
+- **开发中** 【C语言解释器】类似[CParser](https://github.com/bajdcc/CParser)的类设计，参考GO语言库，[代码](https://github.com/bajdcc/jMiniLang/blob/master/src/main/resources/com/bajdcc/code/module/user/ModuleUserCParser.txt)
+- Shell层面的管道机制，类似`echo a | > b.txt`等，语法层面有Bash接口的实现
+- 基于Map数据的原型链实现面向对象特性（`ModuleClass`），应用有：状态机实例--百度新闻（URNews）、行为树实例-AI（URAI）、状态机实例-歌词动画（URMusic）、图论-路由距离算法-PC（URPC）
+- BadApple黑白动画播放（`test badapple`），测试IO性能
+- SSH机制（`ModuleNet`），采用netty实现远程命令
+- Spring-boot制作而成的网页服务器(localhost:8080)，与我们的jMiniLang语言进行交互，可以查看jMiniLang虚拟机的各项指标
+- 哲学家进餐问题（`test philo`、`test philo2`）
+- LISP的实现（`test lisp`）
+- LINQ的实现（`test linq`）
+- 一个自制的基于NIO的简易HTTP服务器（`test web`）
+- *还有一些其他的好玩的但不想费力介绍的冷门内容，上面的部分内容我懒得截图了*
+
+----
+
 ***jMiniLang*** is a simplified compiler framework. Developed by ***bajdcc***.
 *PS.* ***LR Analysis*** refers to ***VFS*** developed by [*vczh*](https://github.com/vczh "Github page of vczh").
 
@@ -33,8 +64,9 @@
 22. Array/Map initialize list.
 23. **Try/Catch/Throw**.
 24. **Behavior Tree**, including PC network simulator.
-25. **RING 3 Process**.
-26. **Web Server**.
+25. **RING 3 Process**, including User Service, `fork`.
+26. **Web Server**, including Online Compiler and Runner.
+27. **CParser** class on `ModuleUser`.
 
 #### What it generates
 
@@ -164,24 +196,362 @@ TASK PROC:
 **1. Spring Boot API**
 
 > Front-end: LayUI + Vue.js
+>
 > API: Json + RestController
+>
 > Back-end: jMiniLang API Handler (RING 3 Process)
 
-![Screenshot 102](https://raw.githubusercontent.com/bajdcc/jMiniLang/master/screenshots/web-2.png)
+**Run on Server**
+
+** Online Compiler Example IV: Mutex **
+
+```javascript
+import "user.base";
+var channel = g_pipe("TEST-MUTEX");
+var goods = g_share("TEST-MUTEX#GOOD", g_from([]));
+var index = g_share("TEST-MUTEX#INDEX", 0);
+var new_id = func ~() -> index."set!"(lambda(a) -> a++);
+var enqueue = func ~(id) -> goods."get!"(lambda(a) -> a."push"(id));
+var dequeue = func ~() -> goods."get!"(lambda(a) -> a."pop"());
+var consumer = func ~(id) {
+    var obj = g_null;
+    channel."writeln"("消费者 #" + id + " 已启动");
+    foreach (var i : g_range(1, 5)) {
+        while (g_is_null(obj := dequeue())) {}
+        channel."writeln"("消费者 #" + id + " 收到：" + obj);
+    }
+    channel."writeln"("消费者 #" + id + " 已退出");
+};
+var producer = func ~(id) {
+    var obj = g_null;
+    channel."writeln"("生产者 #" + id + " 已启动");
+    foreach (var i : g_range(1, 5)) {
+        enqueue(obj := new_id());
+        channel."writeln"("生产者 #" + id + " 发送：" + obj);
+    }
+    channel."writeln"("生产者 #" + id + " 已退出");
+};
+var child = false;
+foreach (var i : g_range(1, 5)) {
+    if (g_fork() == -1) {
+        consumer(i);
+        child := true;
+        break;
+    }
+    if (g_fork() == -1) {
+        producer(i);
+        child := true;
+        break;
+    }
+}
+if (child) { return; }
+channel."pipe"(g_system_output());
+```
+
+**Output:**
+
+```
+运行成功！PID：54
+消费者 #1 已启动
+生产者 #1 已启动
+消费者 #2 已启动
+生产者 #2 已启动
+消费者 #3 已启动
+生产者 #3 已启动
+消费者 #4 已启动
+生产者 #4 已启动
+消费者 #5 已启动
+生产者 #5 已启动
+生产者 #1 发送：1
+消费者 #2 收到：1
+生产者 #2 发送：2
+消费者 #3 收到：2
+生产者 #3 发送：3
+消费者 #4 收到：3
+生产者 #4 发送：4
+消费者 #5 收到：4
+生产者 #5 发送：5
+消费者 #1 收到：5
+生产者 #1 发送：6
+消费者 #3 收到：6
+生产者 #2 发送：7
+消费者 #4 收到：7
+生产者 #3 发送：8
+消费者 #5 收到：8
+生产者 #4 发送：9
+消费者 #1 收到：9
+生产者 #5 发送：10
+消费者 #3 收到：10
+生产者 #1 发送：11
+消费者 #4 收到：11
+生产者 #2 发送：12
+消费者 #5 收到：12
+生产者 #3 发送：13
+消费者 #1 收到：13
+生产者 #4 发送：14
+消费者 #3 收到：14
+生产者 #5 发送：15
+消费者 #4 收到：15
+生产者 #1 发送：16
+消费者 #5 收到：16
+生产者 #2 发送：17
+消费者 #1 收到：17
+生产者 #3 发送：18
+消费者 #3 收到：18
+消费者 #3 已退出
+生产者 #4 发送：19
+消费者 #4 收到：19
+消费者 #4 已退出
+生产者 #5 发送：20
+消费者 #5 收到：20
+消费者 #5 已退出
+生产者 #1 发送：21
+生产者 #1 已退出
+消费者 #1 收到：21
+消费者 #1 已退出
+生产者 #2 发送：22
+生产者 #2 已退出
+生产者 #3 发送：23
+生产者 #3 已退出
+生产者 #4 发送：24
+生产者 #4 已退出
+生产者 #5 发送：25
+生产者 #5 已退出
+消费者 #2 收到：22
+消费者 #2 收到：23
+消费者 #2 收到：24
+消费者 #2 收到：25
+消费者 #2 已退出
+
+远程中止
+```
+
+** Online Compiler Example III: Fork **
+
+*`Fork` support `yield`*
+
+```javascript
+import "user.base";
+
+var channel = g_pipe("TEST-FORK");
+
+var pid = g_null;
+if ((pid := g_fork()) != -1) { // 父进程读取管道
+    g_puts("父进程 PID：" + g_pid());
+    g_puts("父进程 FORK 返回：" + pid);
+    g_puts(channel, "读取管道：");
+    channel."pipe"(g_system_output());
+} else { // 子进程写入管道
+    channel."writeln"("子进程 FORK 返回：" + pid);
+    var range = yield ~() { // 枚举器
+        for (var i = 0; i < 3; i++) {
+            yield g_fork(); // 枚举返回值
+        }
+    };
+    foreach (var i : range()) {
+        var txt = "这是一条测试消息！ PID：" + g_pid() + " 编号：" + i;
+        channel."writeln"(txt);//写管道
+        g_sleep_s(1);
+    }
+    channel."write"(g_noop_true);//发送管道关闭信号
+}
+
+```
+
+**Output:**
+
+```
+运行成功！PID：24
+父进程 PID：24
+父进程 FORK 返回：25
+class= system::pipe 字符串(system::pipe)
+读取管道：
+子进程 FORK 返回：-1
+这是一条测试消息！ PID：25 编号：26
+这是一条测试消息！ PID：26 编号：-1
+这是一条测试消息！ PID：32 编号：-1
+这是一条测试消息！ PID：33 编号：-1
+这是一条测试消息！ PID：25 编号：32
+这是一条测试消息！ PID：26 编号：33
+这是一条测试消息！ PID：32 编号：38
+这是一条测试消息！ PID：33 编号：39
+这是一条测试消息！ PID：38 编号：-1
+这是一条测试消息！ PID：39 编号：-1
+这是一条测试消息！ PID：40 编号：-1
+这是一条测试消息！ PID：41 编号：-1
+这是一条测试消息！ PID：25 编号：40
+这是一条测试消息！ PID：26 编号：41
+
+正常退出
+```
+
+** Online Compiler Example II: Pipe **
+
+**Reader**
+
+```javascript
+import "user.base";
+
+var channel = g_pipe("TEST");
+g_puts(channel, "读取管道：");
+channel."pipe"(g_system_output());//将管道重定向至输出流
+```
+
+**Writer**
+
+```javascript
+import "user.base";
+
+var channel = g_pipe("TEST");
+g_puts(channel, "写入管道：");
+for (var i = 0; i < 10; i++) {
+    var txt = "这是一条测试消息！ 编号：" + i;
+    channel."write"(txt + g_endl);//写管道
+    g_puts(txt);
+    g_sleep_s(1);
+}
+g_puts();
+channel."write"(g_noop_true);//发送管道关闭信号
+```
+
+![Screenshot 108](https://raw.githubusercontent.com/bajdcc/jMiniLang/master/screenshots/web-8.gif)
+
+----
+
+![Screenshot 107](https://raw.githubusercontent.com/bajdcc/jMiniLang/master/screenshots/web-7.gif)
+
+![Screenshot 106](https://raw.githubusercontent.com/bajdcc/jMiniLang/master/screenshots/web-6.png)
+
+![Screenshot 107](https://raw.githubusercontent.com/bajdcc/jMiniLang/master/screenshots/web-7.gif)
+
+** Online Compiler Example I: Hanoi **
+
+```javascript
+import "user.base";
+var move = func ~(i, x, y) ->
+    g_puts(g_to_string(i) + ": " + g_to_string(x) + " -> " + g_to_string(y));
+var h = call (func ~(f) ->
+    call (func [
+    "实现Y Combinator",
+    "Y = f -> (x -> f x x) (x -> f x x)",
+    "相关网页——https://www.cnblogs.com/bajdcc/p/5757410.html"
+    ] ~(h) -> h(h))(
+        lambda(x) -> lambda(i, a, b, c) ->
+            call (f(x(x)))(i, a, b, c)))
+(lambda(f) -> lambda(i, a, b, c) {
+    if (i == 1) {
+        move(i, a, c);
+    } else {
+        f(i - 1, a, c, b);
+        move(i, a, c);
+        f(i - 1, b, a, c);
+    }
+});
+h(3, 'A', 'B', 'C');
+```
+
+**Online Documentation**
+
+![Screenshot 105](https://raw.githubusercontent.com/bajdcc/jMiniLang/master/screenshots/web-5.png)
+
+![Screenshot 102](https://raw.githubusercontent.com/bajdcc/jMiniLang/master/screenshots/web-4.png)
+
+![Screenshot 103](https://raw.githubusercontent.com/bajdcc/jMiniLang/master/screenshots/web-3.gif)
 
 **Back-end**
 
 ```javascript
 import "user.base";
 import "user.web";
+g_disable_result();
 var ctx = g_web_get_api();
 if (g_is_null(ctx)) { return; }
-ctx["resp"] := [
-    [ "唯一标识", g_env_get_guid() ],
-    [ "作者", g_author() ],
-    [ "当前版本", g_version() ],
-    [ "仓库地址", g_github_repo() ]
-];
+var route = g_string_split(ctx["route"], "/");
+
+g_printn("API Request: " + ctx["route"]);
+
+// QUERY
+if (route[0] == "query") {
+if (route[1] == "info") {
+    ctx["resp"] := [
+        [ "主机名", g_info_get_hostname() ],
+        [ "IP地址", g_info_get_ip() ],
+        [ "Java 运行时环境版本", g_env_get("java.version") ],
+        [ "Java 运行时环境供应商", g_env_get("java.vendor") ],
+        [ "Java 供应商的 URL", g_env_get("java.vendor.url") ],
+        [ "Java 安装目录", g_env_get("java.home") ],
+        [ "Java 虚拟机规范版本", g_env_get("java.vm.specification.version") ],
+        [ "Java 虚拟机规范供应商", g_env_get("java.vm.specification.vendor") ],
+        [ "Java 虚拟机规范名称", g_env_get("java.vm.specification.name") ],
+        [ "Java 虚拟机实现版本", g_env_get("java.vm.version") ],
+        [ "Java 虚拟机实现供应商", g_env_get("java.vm.vendor") ],
+        [ "Java 虚拟机实现名称", g_env_get("java.vm.name") ],
+        [ "Java 运行时环境规范版本", g_env_get("java.specification.version") ],
+        [ "Java 运行时环境规范供应商", g_env_get("java.specification.vendor") ],
+        [ "Java 运行时环境规范名称", g_env_get("java.specification.name") ],
+        [ "Java 类格式版本号", g_env_get("java.class.version") ],
+        //[ "Java 类路径", g_env_get("java.class.path") ],
+        //[ "加载库时搜索的路径列表", g_env_get("java.library.path") ],
+        //[ "默认的临时文件路径", g_env_get("java.io.tmpdir") ],
+        //[ "要使用的 JIT 编译器的名称", g_env_get("java.compiler") ],
+        //[ "一个或多个扩展目录的路径", g_env_get("java.ext.dirs") ],
+        [ "操作系统的名称", g_env_get("os.name") ],
+        [ "操作系统的架构", g_env_get("os.arch") ],
+        [ "操作系统的版本", g_env_get("os.version") ],
+        //[ "文件分隔符(在 UNIX 系统中是\"/\")", g_env_get("file.separator") ],
+        //[ "路径分隔符(在 UNIX 系统中是\":\")", g_env_get("path.separator") ],
+        //[ "行分隔符(在 UNIX 系统中是\"/n\")", g_env_get("line.separator") ],
+        [ "用户的账户名称", g_env_get("user.name") ],
+        [ "用户的主目录", g_env_get("user.home") ],
+        [ "用户的当前工作目录", g_env_get("user.dir") ]
+    ];
+} else if (route[1] == "env") {
+    ctx["resp"] := [
+        [ "唯一标识", g_env_get_guid() ],
+        [ "作者", g_author() ],
+        [ "当前版本", g_version() ],
+        [ "仓库地址", g_github_repo() ]
+    ];
+} else if (route[1] == "resource") {
+    ctx["resp"] := [
+        [ "速度", g_res_get_speed() ],
+        [ "进程数", g_res_get_proc_size() ],
+        [ "管道数", g_res_get_pipe_size() ],
+        [ "共享数", g_res_get_share_size() ],
+        [ "文件数", g_res_get_file_size() ],
+        [ "虚拟文件数", g_res_get_vfs_size() ]
+    ];
+} else if (route[1] == "proc") {
+    ctx["resp"] := g_res_get_proc();
+} else if (route[1] == "pipe") {
+    ctx["resp"] := g_res_get_pipe();
+} else if (route[1] == "share") {
+    ctx["resp"] := g_res_get_share();
+} else if (route[1] == "file") {
+    ctx["resp"] := g_res_get_file();
+} else if (route[1] == "vfs") {
+    ctx["resp"] := g_res_get_vfs_list();
+}
+// MARKDOWN
+} else if (route[0] == "md") {
+    if (route[1] == "readme") {
+        ctx["resp"] := g_web_markdown(g_load_resource("/com/bajdcc/code/fs/md/readme.md"));
+    } else if (route[1] == "api") {
+        //....
+    }
+} else if (route[0] == "vfs") { // VFS
+    var url = route[1];
+    url := g_string_replace(url, "_", "/");
+    var file = g_res_get_vfs(url);
+    var txt = "";
+    if (g_not_null(file)) {
+        txt := "# File: " + url + g_endl + "```" + g_endl + file + g_endl + "```";
+        ctx["resp"] := g_web_markdown(txt);
+    } else {
+        txt := "# File not exists";
+        ctx["resp"] := g_web_markdown(txt);
+    }
+}
 g_web_set_api(ctx);
 ```
 
@@ -604,50 +974,7 @@ g_hook_remove_before(square, "get_index", before_1);
 
 **1. Lambda: Y Combinator of Hanoi**
 
-*Code:*
-
-```javascript
-import "sys.base";
-var move = func ~(i, x, y) {
-    call g_printn(call g_to_string(i) + ": " + 
-        call g_to_string(x) + " -> " + call g_to_string(y));
-};
-var hanoi = func ~(f) {
-    var fk = func ~(i, a, b, c) {
-        if (i == 1) {
-            call move(i, a, c);
-        } else {
-            call f(i - 1, a, c, b);
-            call move(i, a, c);
-            call f(i - 1, b, a, c);
-        }
-    };
-    return fk;
-};
-var h = call (func ~(f) {
-    var fx = func ~(x) {
-        var fn = func ~(i, a, b, c) {
-            var vf = call f(call x(x));
-            return call vf(i, a, b, c);
-        };
-        return fn;
-    };
-    return call (func ~(h) -> call h(h))(fx);
-})(hanoi);
-call h(3, 'A', 'B', 'C');
-```
-
-*Result:*
-
-```c
-1: A -> C
-2: A -> B
-1: C -> B
-3: A -> C
-1: B -> A
-2: B -> C
-1: A -> C
-```
+Hidden, see *Online Compiler Example I: Hanoi* above. 
 
 **2. Lambda: Trampoline**
 
@@ -776,137 +1103,7 @@ call proc();
 
 **5. Multi-Process: Consumer-Producer Model**
 
-*Code:*
-
-```javascript
-import "sys.base";
-import "sys.list";
-import "sys.proc";
-
-var goods = [];
-call g_start_share("goods", goods);
-var index = 1;
-call g_start_share("index", index);
-var consumer = func ~() {
-    for (;;) {
-        var goods = call g_query_share("goods");
-        if (call g_is_null(goods)) {
-            break;
-        }
-        var g = call g_array_pop(goods);
-        if (!call g_is_null(g)) {
-            call g_printn("Consumer#" + call g_get_pid() + " ---- get " + g);
-        }
-    }
-    call g_printn("Consumer#" + call g_get_pid() + " exit");
-};
-var producer = func ~() {
-    foreach (var i : call g_range(1, 5)) {
-        var goods = call g_reference_share("goods");
-        call g_lock_share("index");
-        var index = call g_reference_share("index");
-        call g_printn("Producer#" + call g_get_pid() + " ++++ put " + index);
-        call g_array_add(goods, index);
-        index++;
-        call g_stop_share("index");
-        call g_unlock_share("index");
-        call g_stop_share("goods");
-    }
-    call g_printn("Producer#" + call g_get_pid() + " exit");
-};
-var create_consumer = func ~(n) {
-    var handles = [];
-    foreach (var i : call g_range(1, n)) {
-        var h = call g_create_process(consumer);
-        call g_array_add(handles, h);
-        call g_printn("[" + i + "] Create consumer: #" + h);
-    }
-    return handles;
-};
-var create_producer = func ~(n) {
-    var handles = [];
-    foreach (var i : call g_range(1, n)) {
-        var h = call g_create_process(producer);
-        call g_array_add(handles, h);
-        call g_printn("[" + i + "] Create producer: #" + h);
-    }
-    return handles;
-};
-
-var consumers = call create_consumer(3);
-var producers = call create_producer(4);
-call g_printn("Waiting for producers to exit...");
-call g_join_process_array(producers);
-call g_printn("Producers exit");
-call g_printn("Waiting for consumers to exit...");
-call g_stop_share("index");
-call g_stop_share("goods");
-call g_join_process_array(consumers);
-call g_printn("Consumers exit");
-```
-
-*Result:*
-
-```c
-[1] Create consumer: #1
-[2] Create consumer: #2
-[3] Create consumer: #3
-[1] Create producer: #4
-[2] Create producer: #5
-Producer#4 ++++ put 1
-Consumer#3 ---- get 1
-[3] Create producer: #6
-Producer#5 ++++ put 2
-[4] Create producer: #7
-Consumer#2 ---- get 2
-Producer#4 ++++ put 3
-Waiting for producers to exit...
-Consumer#1 ---- get 3
-Producer#7 ++++ put 4
-Consumer#2 ---- get 4
-Producer#7 ++++ put 5
-Consumer#3 ---- get 5
-Producer#5 ++++ put 6
-Consumer#2 ---- get 6
-Producer#5 ++++ put 7
-Consumer#1 ---- get 7
-Producer#7 ++++ put 8
-Consumer#3 ---- get 8
-Producer#6 ++++ put 9
-Consumer#3 ---- get 9
-Producer#5 ++++ put 10
-Consumer#2 ---- get 10
-Producer#7 ++++ put 11
-Consumer#1 ---- get 11
-Producer#4 ++++ put 12
-Consumer#3 ---- get 12
-Producer#5 ++++ put 13
-Consumer#1 ---- get 13
-Producer#5 exit
-Producer#6 ++++ put 14
-Consumer#2 ---- get 14
-Producer#4 ++++ put 15
-Consumer#3 ---- get 15
-Producer#7 ++++ put 16
-Consumer#2 ---- get 16
-Producer#7 exit
-Producer#6 ++++ put 17
-Consumer#1 ---- get 17
-Producer#4 ++++ put 18
-Consumer#1 ---- get 18
-Producer#4 exit
-Producer#6 ++++ put 19
-Consumer#1 ---- get 19
-Producer#6 ++++ put 20
-Consumer#3 ---- get 20
-Producer#6 exit
-Producers exit
-Waiting for consumers to exit...
-Consumer#3 exit
-Consumer#1 exit
-Consumer#2 exit
-Consumers exit
-```
+*See online compiler example above.*
 
 **6. Multi-Process: PC and Router**
 

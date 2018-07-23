@@ -20,5 +20,6 @@ enum class TokenType constructor(var desc: String) {
     OPERATOR("操作符"),
     MACRO("宏"),
     ERROR("错误"),
-    RESERVE("保留")
+    RESERVE("保留"),
+    EPSILON("空")
 }

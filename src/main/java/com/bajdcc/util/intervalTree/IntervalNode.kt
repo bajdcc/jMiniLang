@@ -93,7 +93,7 @@ class IntervalNode<Type>(intervalList: List<Interval<Type>>) {
         val middle = set.size / 2
         return set
                 .asSequence()
-                .filterIndexed { i, point -> i == middle }
+                .filterIndexed { i, _ -> i == middle }
                 .firstOrNull()
     }
 

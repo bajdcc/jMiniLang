@@ -70,6 +70,8 @@ public class NGAToString extends BreadthFirstSearch<NGAEdge, NGAStatus> {
 				default:
 					break;
 			}
+			if (edge.data.action != null)
+				context.append("  ").append("[Action]");
 			appendLine();
 		}
 	}

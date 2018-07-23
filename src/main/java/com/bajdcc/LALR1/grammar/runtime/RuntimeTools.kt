@@ -19,7 +19,7 @@ object RuntimeTools {
                     stk.store(obj)
                     return true
                 }
-                val tk = Token.createFromObject(obj.obj!!)
+                val tk = Token.createFromObject(obj.obj)
                 if (TokenTools.sin(TokenTools.ins2op(inst), tk)) {
                     stk.store(RuntimeObject(tk.obj))
                 } else {
@@ -37,9 +37,9 @@ object RuntimeTools {
                     stk.store(obj2)
                     return true
                 }
-                val tk = Token.createFromObject(obj.obj!!)
+                val tk = Token.createFromObject(obj.obj)
                 if (TokenTools.bin(TokenTools.ins2op(inst), tk,
-                                Token.createFromObject(obj2.obj!!))) {
+                                Token.createFromObject(obj2.obj))) {
                     stk.store(RuntimeObject(tk.obj))
                 } else {
                     return false

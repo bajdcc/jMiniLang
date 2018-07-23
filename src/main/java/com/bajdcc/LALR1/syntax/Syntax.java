@@ -313,11 +313,10 @@ public class Syntax {
 	/**
 	 * 取下一个单词
 	 */
-	private Token next() {
+	private void next() {
 		do {
 			token = syntaxLexer.nextToken();
 		} while (token == null);
-		return token;
 	}
 
 	/**
@@ -461,6 +460,7 @@ public class Syntax {
 					next();
 					PropertyExp property2 = matchStorage(exp, token.object);
 					exp = property2;
+					// 注意：下面的设置是无效的
 					if (token.kToken == TokenType.ACTION) {
 						property2.actionHandler = matchAction();
 						next();

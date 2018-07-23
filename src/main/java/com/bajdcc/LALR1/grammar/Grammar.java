@@ -66,6 +66,8 @@ public class Grammar extends Semantic {
 			declareErrorHandler();
 			declareActionHandler();
 			infer();
+			System.out.println(getNGAString());
+			System.out.println(getNPAString());
 		}
 		parse();
 		check();
@@ -153,7 +155,7 @@ public class Grammar extends Semantic {
 				"exp4", "exp5", "exp6", "exp7", "exp8", "exp9", "exp10", "type",
 				"block", "call_exp", "call", "ret", "doc_list", "port", "if",
 				"for", "while", "foreach", "cycle_ctrl", "block_stmt", "array", "map", "set", "invoke",
-				"exp01", "try", "throw", "map_list"};
+				"exp01", "try", "throw", "map_list", "scope"};
 		for (String string : nonTerminals) {
 			addNonTerminal(string);
 		}
@@ -202,6 +204,7 @@ public class Grammar extends Semantic {
 				"port -> (@IMPORT[1] | @EXPORT[2]) @LITERAL[0]{lost_string} @SEMI{lost_semi}");
 		/* 表达式（算符文法） */
 		ISemanticAnalyzer exp_handler = handler.getSemanticHandler("exp");
+		infer(handler.getSemanticHandler("scope"), "scope -> exp[0]");
 		infer(exp_handler, "exp -> exp01[0] [@INTEGER[10] | @DECIMAL[10]]");
 		infer(exp_handler,
 				"exp01 -> [exp01[1] (@EQ_ASSIGN[2] | @ADD_ASSIGN[2] | @SUB_ASSIGN[2] | @MUL_ASSIGN[2] | @DIV_ASSIGN[2] | @AND_ASSIGN[2] | @OR_ASSIGN[2] | @XOR_ASSIGN[2] | @MOD_ASSIGN[2])] exp0[0]");
@@ -234,10 +237,10 @@ public class Grammar extends Semantic {
 				"doc_list -> @LITERAL[0] [@COMMA doc_list[1]]");
 		/* 函数主体 */
 		infer(handler.getSemanticHandler("func"),
-				"func -> (@FUNCTION[10]#func_clearargs# | @YIELD#func_clearargs#) [@LSQ doc_list[0]{lost_doc} @RSQ] (@ID[1]#predeclear_funcname#{lost_func_name} | @NOT[1]#predeclear_funcname#{lost_func_name}) @LPA{lost_lpa} [var_list[2]] @RPA{lost_rpa} (@PTR_OP#do_enter_scope#{lost_func_body} exp[3]#do_leave_scope#{lost_exp} | block[4]{lost_func_body})");
+				"func -> (@FUNCTION[10]#func_clearargs# | @YIELD#func_clearargs#) [@LSQ doc_list[0]{lost_doc} @RSQ] (@ID[1]#predeclear_funcname#{lost_func_name} | @NOT[1]#predeclear_funcname#{lost_func_name}) @LPA{lost_lpa} [var_list[2]] @RPA{lost_rpa} (@PTR_OP#do_enter_scope#{lost_func_body} scope[3]#do_leave_scope#{lost_exp} | block[4]{lost_func_body})");
 		/* 匿名主体 */
 		infer(handler.getSemanticHandler("lambda"),
-				"lambda -> @LAMBDA[1]#lambda# @LPA{lost_lpa} [var_list[2]] @RPA{lost_rpa} (@PTR_OP{lost_func_body} exp[3]{lost_exp} | block[4]{lost_func_body})");
+				"lambda -> @LAMBDA[1]#lambda# @LPA{lost_lpa} [var_list[2]] @RPA{lost_rpa} (@PTR_OP#do_enter_scope#{lost_func_body} scope[3]#do_leave_scope#{lost_exp} | block[4]{lost_func_body})");
 		/* 基本数据类型 */
 		infer(handler.getSemanticHandler("type"),
 				"type -> @ID[0] [@LPA[3] [exp_list[4]] @RPA{lost_rpa}] | @INTEGER[0] | @DECIMAL[0] | @LITERAL[0] [@LPA[3] [exp_list[4]] @RPA{lost_rpa}] | @CHARACTER[0] | @BOOLEAN[0] | @LPA exp[1]{lost_exp} @RPA{lost_rpa} | call[1] | lambda[2] | set[1] | invoke[1] | array[1] | map[1]");
@@ -265,7 +268,7 @@ public class Grammar extends Semantic {
 				"map -> @LBR [map_list[0]] @RBR{lost_rbr}");
 		/* 异常处理 */
 		infer(handler.getSemanticHandler("try"),
-				"try -> @TRY block[1]{lost_block} @CATCH{lost_catch} [@LPA{lost_lpa} @ID[0]#declear_param#{lost_token} @RPA{lost_rpa}] block[2]#clear_catch#{lost_block}");
+				"try -> @TRY block[1]{lost_block} @CATCH{lost_catch} [@LPA{lost_lpa} @ID[0]#declear_param#{lost_token} @RPA{lost_rpa}] block[2]{lost_block}");
 		infer(handler.getSemanticHandler("throw"),
 				"throw -> @THROW exp[0]{lost_exp} @SEMI{lost_semi}");
 		initialize("program");

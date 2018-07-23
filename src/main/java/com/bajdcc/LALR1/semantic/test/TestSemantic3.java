@@ -1,6 +1,7 @@
 package com.bajdcc.LALR1.semantic.test;
 
 import com.bajdcc.LALR1.semantic.Semantic;
+import com.bajdcc.LALR1.semantic.token.ISemanticAction;
 import com.bajdcc.LALR1.semantic.token.ISemanticAnalyzer;
 import com.bajdcc.LALR1.syntax.handler.SyntaxException;
 import com.bajdcc.util.lexer.error.RegexException;
@@ -17,6 +18,7 @@ public class TestSemantic3 {
 			String expr = "a a a a";
 			Semantic semantic = new Semantic(expr);
 			semantic.addTerminal("a", TokenType.ID, "a");
+			semantic.addTerminal("b", TokenType.EPSILON, null);
 			semantic.addNonTerminal("START");
 			semantic.addNonTerminal("Z");
 			semantic.addErrorHandler("sample", null);
@@ -27,16 +29,21 @@ public class TestSemantic3 {
 						.parseInt(indexed.get(0).getObject().toString());
 				return lop + 1;
 			};
+			ISemanticAction action = (indexed, manage, access, recorder) -> {
+				System.out.println("ok");
+			};
 			// syntax.infer("E -> T `PLUS`<+> E | T `MINUS`<-> E | T");
 			// syntax.infer("T -> F `TIMES`<*> T | F `DIVIDE`</> T | F");
 			// syntax.infer("F -> `LPA`<(> E `RPA`<)>  | `SYMBOL`<i>");
+			semantic.addActionHandler("Action", action);
 			semantic.infer(handleCopy, "START -> Z[0]");
-			semantic.infer(handleRec, "Z -> Z[0] @a[1]");
+			semantic.infer(handleRec, "Z -> @a[1] Z[0]#Action# @b");
 			semantic.infer(handleValue, "Z -> @a[0]");
 			semantic.initialize("START");
 			System.out.println(semantic.toString());
 			System.out.println(semantic.getNGAString());
 			System.out.println(semantic.getNPAString());
+			semantic.parse();
 			System.out.println(semantic.getInst());
 			System.out.println(semantic.getTrackerError());
 			System.out.println(semantic.getTokenList());

@@ -98,11 +98,8 @@ public class NGA implements ISyntaxComponentVisitor {
 	 * 产生NGA映射表
 	 */
 	private void generateNGAMap() {
-		int j = 0;
 		for (RuleExp exp : arrNonTerminals) {
-			j++;
 			int i = 0;
-			j = j + i - i;
 			for (RuleItem item : exp.rule.arrRules) {
 				/* 表达式转换成NGA */
 				bag = new NGABag();

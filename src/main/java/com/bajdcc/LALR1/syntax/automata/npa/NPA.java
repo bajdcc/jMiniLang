@@ -445,6 +445,8 @@ public class NPA extends NGA {
 					default:
 						break;
 				}
+				if (edge.data.action != null)
+					sb.append("  ").append("[Action]");
 				sb.append(System.lineSeparator());
 				/* 输出Lookahead表 */
 				if (edge.data.arrLookAhead != null) {

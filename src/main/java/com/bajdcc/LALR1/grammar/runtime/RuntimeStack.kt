@@ -100,7 +100,7 @@ class RuntimeStack {
     }
 
     internal fun findVariable(codePage: String, idx: Int): RuntimeObject {
-        stkCall.reversed().forEach { func ->
+        for (func in stkCall.reversed()) {
             if (func.currentPage == codePage) {
                 val tmp = func.getTmp()
                 var obj = tmp.map { it[idx] }.firstOrNull { it != null }

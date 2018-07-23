@@ -566,9 +566,50 @@ var import_scanner = func ~() {
 // ---- CODE END ----
 // -----------------------------------------------------------------------------------------
 // CLASS [clib::c::ast]
+// 抽象语法树
 // ---- CODE BEGIN ----
 
 var import_ast = func ~() {
+    g_class("clib::c::ast::factory", "object", lambda(this) {
+        this."new" := lambda(this, type, args) -> g_new_class("clib::c::ast::" + type, args, []);
+        this."stringify" := lambda(this, obj) -> g_is_null(obj) ? "#NULL" : obj."to_string"();
+        this."walk_switch" := {
+            "prog": lambda(this, node) {
+                var s = "PROG {" + g_endl;
+                node."decls"."stream"()."for_each"(lambda(i, n) ->
+                    n."stream"()."for_each"(lambda(i_, n_) ->
+                        s += this."walk"(n_) + g_endl));
+                s += "}";
+                return s;
+            },
+            "var": lambda(this, node) {
+                var s = "VAR { ";
+                s += this."stringify"(node."type");
+                s += ", " + this."stringify"(node."id");
+                if (g_not_null(node."size")) {
+                    s += ", " + this."stringify"(node."size");
+                }
+                s += " }";
+                return s;
+            }
+        };
+        this."walk" := lambda(this, node) {
+            var f = this."walk_switch"[node."get_name"()];
+            return f(this, node);
+        };
+    });
+    g_class("clib::c::ast::base", "object", lambda(this) {
+        this."to_string" := lambda(this) -> "AST= " + this."__type__";
+        this."get_name" := lambda(this) -> g_string_right(this."__type__", 14);
+    });
+    g_class("clib::c::ast::prog", "clib::c::ast::base", lambda(this) {
+        this."decls" := _;
+    });
+    g_class("clib::c::ast::var", "clib::c::ast::base", lambda(this) {
+        this."type" := _;
+        this."id" := _;
+        this."size" := _;
+    });
 };
 
 // ---- CODE END ----
@@ -591,18 +632,19 @@ var import_parser = func ~() {
             this."scanner" := g_new_class("clib::c::scanner", [], [["init", str]]);
         };
         // ---------------- Main Data ----------------
+        this."factory" := g_new_class("clib::c::ast::factory", [], []); // AST工厂
         this."decls" := g_from([]); // 函数声明
         this."scopes" := g_from([]); // 块环境
         this."ast" := _; // 抽象语法树
         // ---------------- Public Method ----------------
-        this."expect" := lambda(this, token, msg) {
-            this."err"(token, "expected " + msg);
+        this."expect" := lambda(this, msg) {
+            this."err"(this."token", "expected " + msg + g_endl);
         };
         this."expect_token" := lambda(this, token) {
             if (this."token"."equals"(token)) {
                 this."next"();
             } else {
-                this."expect"(token, token."to_string"());
+                this."expect"(token);
             }
         };
         this."consume_until" := lambda(this, skip) {
@@ -611,7 +653,7 @@ var import_parser = func ~() {
         };
         this."assert" := lambda(this, token) {
             if (!this."token"."equals"(token)) {
-                this."expect"(token, token);
+                this."expect"(token);
                 this."consume_until"(["SEMI", "RBR"]);
                 return false;
             }
@@ -619,7 +661,7 @@ var import_parser = func ~() {
         };
         this."assert_type" := lambda(this) {
             if (!this."of"(["INT", "FLOAT", "CHAR"])) {
-                this."expect"(this."token", "type");
+                this."expect"("type");
                 this."consume_until"(["SEMI", "RBR"]);
                 return false;
             }
@@ -647,51 +689,38 @@ var import_parser = func ~() {
             this."next"();
             return token;
         };
-        this."walk_switch" := {
-            "prog": lambda(this, node) {
-                var s = "PROG {" + g_endl;
-                node."decls"."stream"()."for_each"(lambda(i, n) ->
-                    n."stream"()."for_each"(lambda(i_, n_) ->
-                        s += this."walk"(n_) + g_endl));
-                s += "}";
-                return s;
-            },
-            "var": lambda(this, node) {
-                var s = "VAR { ";
-                s += (node["type"])."to_string"();
-                s += ", " + (node["id"])."to_string"();
-                if (g_not_null(node["size"])) {
-                    s += ", " + (node["size"])."to_string"();
-                }
-                s += " }";
-                return s;
+        this."add" := lambda(this, src, obj) {
+            if (g_not_null(obj)) {
+                src."add"(obj);
             }
         };
-        this."walk" := lambda(this, node) {
-            var f = this."walk_switch"[node[0]];
-            return f(this, node[1]);
+        this."add_ast" := lambda(this, src, type, args) {
+            src."add"(this."factory"."new"(type, args));
         };
+        this."ast" := lambda(this, type, args) -> this."factory"."new"(type, args);
         this."parse" := lambda(this) {
             this."ast" := this."#prog"();
-            return this."walk"(this."ast");
+            return this."factory"."walk"(this."ast");
         };
         // LL Parser Refer: https://github.com/bajdcc/C-Compiler/blob/master/MainLogic/Grammar.cpp
         this."#prog" := lambda(this) { // 程序
             var decls = this."#decls"();
-            return ["prog", { "decls": decls }];
+            return this."factory"."new"("prog", [["decls", decls]]);
         };
         this."#decls" := lambda(this) { // 声明列表
             var token;
             var decls = g_from([]);
             while (this."next"()) {
                 if (!this."assert_type"()) { continue; }
-                decls."add"(this."#decl"());
+                this."add"(decls, this."#decl"());
             }
             return decls;
         };
         this."#decl" := lambda(this) { // 声明
             var type = this."advance"();
-            if (!this."assert"("#ID")) { return; }
+            if (!this."assert"("#ID")) {
+                return g_from([this."ast"("var", [["type", type], ["id", _]])]);
+            }
             var id = this."advance"();
             if (this."is"("LPA")) {
                 return this."#decl!fun"(type, id);
@@ -715,22 +744,23 @@ var import_parser = func ~() {
         };
         this."#decl!var" := lambda(this, type, id, vars) { // 变量声明
             if (this."is"("COMMA")) {
-                vars."add"(["var", { "type": type, "id": id }]);
+                this."add_ast"(vars, "var", [["type", type], ["id", id]]);
                 this."next"();
                 return this."#decl!var~rec"(type, vars);
             } else if (this."is"("LSQ")) {
                 this."next"();
-                var idx = this."advance"();
+                var idx = this."token";
                 if (!this."assert"("#INT")) {
-                    vars."add"(["var", { "type": type, "id": id }]);
+                    this."add_ast"(vars, "var", [["type", type], ["id", id]]);
                     return vars;
                 }
+                this."next"();
                 if (this."assert"("RSQ")) {
-                    vars."add"(["var", { "type": type, "id": id, "size": idx }]);
+                    this."add_ast"(vars, "var", [["type", type], ["id", id], ["size", idx]]);
                     return this."#decl!var~rec"(type, vars);
                 }
             }
-            vars."add"(["var", { "type": type, "id": id }]);
+            this."add_ast"(vars, "var", [["type", type], ["id", id]]);
             return vars;
         };
     });

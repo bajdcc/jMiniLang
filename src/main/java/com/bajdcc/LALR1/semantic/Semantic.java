@@ -562,7 +562,7 @@ public class Semantic extends Syntax implements IErrorHandler {
 		/* 遍历所有指令 */
 		arrInsts.forEach(machine::run);
 		object = machine.getObject();
-		if (object != null) {
+		if (object instanceof Function) {
 			Function entry = (Function) object;
 			manage.getManageScopeService().registerFunc(entry);
 		}

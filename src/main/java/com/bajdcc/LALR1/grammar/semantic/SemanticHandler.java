@@ -129,6 +129,10 @@ public class SemanticHandler {
 	private void initializeHandler() {
 		/* 复制 */
 		mapSemanticAnalyzier.put("copy", (indexed, query, recorder) -> indexed.get(0).getObject());
+		mapSemanticAnalyzier.put("scope", (indexed, query, recorder) -> {
+			query.getManageService().getManageScopeService().leaveScope();
+			return indexed.get(0).getObject();
+		});
 		/* 表达式 */
 		mapSemanticAnalyzier.put("exp", (indexed, query, recorder) -> {
 			if (indexed.exists(2)) {// 双目运算

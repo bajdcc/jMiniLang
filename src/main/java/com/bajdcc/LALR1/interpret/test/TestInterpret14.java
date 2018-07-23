@@ -41,8 +41,10 @@ public class TestInterpret14 {
 							"import \\\"user.base\\\";\n" +
 							"import \\\"user.cparser\\\";\n" +
 							"var code = \\\"" +
-							"int a,b,c;" +
-							"float d,e,f;\\\";\n" +
+							"int a,b,c[5];\n" +
+							"float d,e,f[5];\n" +
+							"char d;\n" +
+							"int; int char; char a [ ]; 5 [5];\\\";\n" +
 							"var s = g_new_class(\\\"clib::c::parser\\\", [], [[\\\"init\\\", code]]);\n" +
 							"g_printn(s.\\\"parse\\\"());\n" +
 							"g_printn(\\\"Errors: \\\" + s.\\\"ERROR\\\"());\n" +

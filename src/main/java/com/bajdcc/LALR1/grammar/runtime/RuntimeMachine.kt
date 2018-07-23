@@ -779,8 +779,7 @@ class RuntimeMachine @Throws(Exception::class)
         val idx = current()
         next()
         if (idx < 0 || idx >= currentStack.funcArgsCount) {
-            err(RuntimeError.WRONG_ARGINVALID, currentStack.funcSimpleName + " has " +
-                    (currentStack.funcArgsCount - 1) + " args but got " + idx.toString())
+            err(RuntimeError.WRONG_ARGINVALID, "${currentStack.funcSimpleName} has >= $idx args bug only got ${currentStack.funcArgsCount} args")
         }
         store(currentStack.loadFuncArgs(idx))
     }
@@ -1263,6 +1262,7 @@ class RuntimeMachine @Throws(Exception::class)
     override fun opThrow() {
         val obj = load()
         if (triesCount <= 0) {
+            currentStack.reg.execId--
             if (obj.type != RuntimeObjectType.kNull) {
                 err(RuntimeError.THROWS_EXCEPTION, obj.obj.toString())
             } else {

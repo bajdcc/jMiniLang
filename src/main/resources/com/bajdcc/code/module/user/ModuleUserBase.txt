@@ -325,10 +325,7 @@ var g_set_property_rec = func ~(class, name, property) {
     if (g_is_null(base)) {
         return false;
     }
-    if (!g_set_property_rec(base, name, property)) {
-        g_map_put(class, name, property);
-    }
-    return true;
+    return g_set_property_rec(base, name, property);
 };
 export "g_set_property_rec";
 var g_set_property = func ~(class, name, property) {
@@ -1454,6 +1451,9 @@ var import_list_class = func ~() {
         if (g_get_type_ordinal(exp) == 9) {
             return "[" + g_string_join_array(g_func_map(exp, to_string), ", ") + "]";
         } else {
+            if (g_get_type_ordinal(exp) == 10 && g_map_contains(exp, "__type__")) {
+                return exp."to_string"();
+            }
             return g_to_string(exp);
         }
     };
