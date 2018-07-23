@@ -1,8 +1,10 @@
-# jMiniLang - GLR Compiler and Virtual Machine (*Java*)
+# jMiniLang - GLR Compiler and Virtual Machine (*Java* and *Kotlin*)
 
 设计思路：https://zhuanlan.zhihu.com/p/28540783
 
 视频演示：https://www.bilibili.com/video/av13294962/
+
+[语法参考（LR状态转移表）](https://github.com/bajdcc/jMiniLang/blob/master/Grammar.md)
 
 *一言以蔽之，本项目涉及的思想包括：*
 
@@ -35,7 +37,7 @@
 
 ----
 
-***jMiniLang*** is a simplified compiler framework. Developed by ***bajdcc***.
+***jMiniLang*** is a simplified compiler/vm framework. Developed by ***bajdcc***.
 *PS.* ***LR Analysis*** refers to ***VFS*** developed by [*vczh*](https://github.com/vczh "Github page of vczh").
 
 #### Features

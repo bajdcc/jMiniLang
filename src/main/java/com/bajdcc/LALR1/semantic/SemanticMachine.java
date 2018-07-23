@@ -109,7 +109,7 @@ public class SemanticMachine implements IRandomAccessOfTokens {
 					action = actions.get(inst.iHandler);
 					break;
 				default:
-					handler = items.get(inst.iHandler).handler;
+					handler = items.get(inst.iHandler).getHandler();
 					break;
 			}
 		}

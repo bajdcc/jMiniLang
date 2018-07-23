@@ -219,7 +219,7 @@ open class NFA(protected var expression: IRegexComponent,
         // 由于正则表达式的语法树结构使然，循环语句的子结点必定只有一个，
         // 为字符集、并联或串联。
         /* 构造子图副本 */
-        val subENFAList = ArrayList<ENFA>()
+        val subENFAList = mutableListOf<ENFA>()
         var enfa = ENFA()
         enfa.begin = childNFA!![0].begin
         enfa.end = childNFA!![0].end
@@ -322,7 +322,7 @@ open class NFA(protected var expression: IRegexComponent,
      * 进入子结点
      */
     private fun enterChildren() {
-        stkNFA.push(ArrayList())// 新建ENFA表
+        stkNFA.push(mutableListOf())// 新建ENFA表
         childNFA = null
     }
 

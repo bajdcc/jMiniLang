@@ -5,7 +5,6 @@ import com.bajdcc.LALR1.grammar.runtime.RuntimeInst
 import com.bajdcc.LALR1.grammar.semantic.ISemanticRecorder
 import com.bajdcc.LALR1.grammar.tree.closure.IClosureScope
 import com.bajdcc.util.lexer.token.OperatorType
-import java.util.*
 
 /**
  * 【语义分析】数组
@@ -17,7 +16,7 @@ class ExpArray : IExp {
     /**
      * 参数
      */
-    private var params: MutableList<IExp> = ArrayList()
+    private var params: MutableList<IExp> = mutableListOf()
 
     fun getParams(): List<IExp> {
         return params

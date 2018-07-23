@@ -7,8 +7,8 @@ package com.bajdcc.LALR1.grammar.tree.closure
  */
 open class ClosureScope : IClosureScope {
 
-    private val ref = HashSet<Any>()
-    private val decl = HashSet<Any>()
+    private val ref = mutableSetOf<Any>()
+    private val decl = mutableSetOf<Any>()
 
     protected val closures: Set<Any>?
         get() {

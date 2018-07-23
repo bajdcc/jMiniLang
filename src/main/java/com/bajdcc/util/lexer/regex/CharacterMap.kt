@@ -1,7 +1,6 @@
 package com.bajdcc.util.lexer.regex
 
-import java.util.Comparator
-import kotlin.collections.ArrayList
+import java.util.*
 
 /**
  * 字符集合，将字符范围按状态分组（Sigma集合）
@@ -79,7 +78,7 @@ class CharacterMap : IRegexComponentVisitor {
     private fun preceedReverse(charset: Charset) {
         charset.bReverse = false
         charset.arrPositiveBounds.sortWith(comparator)
-        val ranges = ArrayList<CharacterRange>()
+        val ranges = mutableListOf<CharacterRange>()
         var oldRange = CharacterRange()
         charset.arrPositiveBounds.forEach { range ->
             if (range.lowerBound.toInt() > oldRange.upperBound.toInt() + 1) {// 当前下界大于之前上界，故添加

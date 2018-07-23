@@ -110,7 +110,7 @@ class RuntimeFunc {
     }
 
     fun enterScope() {
-        tmp.add(0, HashMap())
+        tmp.add(0, mutableMapOf())
     }
 
     fun leaveScope() {

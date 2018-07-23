@@ -2,9 +2,7 @@ package com.bajdcc.LALR1.grammar.runtime
 
 import com.bajdcc.LALR1.grammar.codegen.CodegenFuncDoc
 import com.bajdcc.LALR1.grammar.runtime.data.RuntimeArray
-
 import java.io.Serializable
-import java.util.*
 
 /**
  * 【扩展】调试与开发
@@ -20,7 +18,7 @@ class RuntimeDebugInfo : IRuntimeDebugInfo, Serializable {
 
     override val externFuncList: List<RuntimeArray>
         get() {
-            val array = ArrayList<RuntimeArray>()
+            val array = mutableListOf<RuntimeArray>()
             externalExec.entries.sortedBy { it.key }.forEach { a ->
                 val arr = RuntimeArray()
                 arr.add(RuntimeObject(a.key))

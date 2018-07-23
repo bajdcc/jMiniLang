@@ -124,7 +124,7 @@ public class Semantic extends Syntax implements IErrorHandler {
 
 	@Override
 	protected void onAddRuleItem(RuleItem item) {
-		item.handler = semanticHandler;
+		item.setHandler(semanticHandler);
 	}
 
 	/**
@@ -146,7 +146,7 @@ public class Semantic extends Syntax implements IErrorHandler {
 		/* 结束边 */
 		NPAEdge finalEdge;
 		/* 初始PDA状态集合 */
-		List<NPAStatus> initStatusList = npa.getInitStatusList();
+		List<NPAStatus> initStatusList = Companion.getNpa().getInitStatusList();
 		/* 清空结果 */
 		arrInsts.clear();
 		arrErrors.clear();
@@ -179,16 +179,15 @@ public class Semantic extends Syntax implements IErrorHandler {
 				aliveEdgeList.clear();
 				finalEdge = null;
 				/* 遍历出边 */
-				for (NPAEdge npaEdge : tracker.npaStatus.outEdges) {
+				for (NPAEdge npaEdge : tracker.npaStatus.getOutEdges()) {
 					int sublevel = -1;
 					/* 若当前边使用了LA表，则输入不满足LA表时会被丢弃 */
-					if (npaEdge.data.arrLookAhead != null) {
-						if (!npaEdge.data.arrLookAhead
-								.contains(getTokenId(tracker))) {
+					if (!npaEdge.getData().getLookaheads().isEmpty()) {
+						if (!npaEdge.getData().getLookaheads().contains(getTokenId(tracker))) {
 							continue;
 						}
 					}
-					switch (npaEdge.data.kAction) {
+					switch (npaEdge.getData().getType()) {
 						case FINISH:
 							/* 检查状态堆栈是否为空 */
 							if (tracker.stkStatus.isEmpty()) {
@@ -200,7 +199,7 @@ public class Semantic extends Syntax implements IErrorHandler {
 							break;
 						case MOVE:
 							/* 检查Move所需要的记号跟输入是否一致（匹配） */
-							if (npaEdge.data.iToken != getTokenId(tracker)) {
+							if (npaEdge.getData().getToken() != getTokenId(tracker)) {
 								continue;// 失败
 							} else {
 								sublevel = 0;
@@ -209,7 +208,7 @@ public class Semantic extends Syntax implements IErrorHandler {
 						case REDUCE:
 							/* 检查Reduce所需要的栈状态跟状态堆栈的栈顶元素是否一致 */
 							if (tracker.stkStatus.isEmpty()
-									|| npaEdge.data.status != tracker.stkStatus
+									|| npaEdge.getData().getStatus() != tracker.stkStatus
 									.peek()) {
 								continue;// 失败
 							} else {
@@ -281,7 +280,7 @@ public class Semantic extends Syntax implements IErrorHandler {
 								}
 							}
 						}
-						switch (edge.data.kAction) {
+						switch (edge.getData().getType()) {
 							case FINISH:
 								break;
 							case LEFT_RECURSION:
@@ -300,9 +299,9 @@ public class Semantic extends Syntax implements IErrorHandler {
 								break;
 						}
 						newTracker.rcdInst.arrInsts.add(new Instruction(
-								edge.data.inst, edge.data.iIndex,
-								edge.data.iHandler));// 添加指令和参数
-						newTracker.npaStatus = edge.end;// 通过这条边
+								edge.getData().getInst(), edge.getData().getIndex(),
+								edge.getData().getHandler()));// 添加指令和参数
+						newTracker.npaStatus = edge.getEnd();// 通过这条边
 					}
 				} else {// 无可用边
 					/* 检查当前输入时候否到结尾 */
@@ -329,8 +328,8 @@ public class Semantic extends Syntax implements IErrorHandler {
 						if (finalEdge != null)// 最终边
 						{
 							tracker.rcdInst.arrInsts.add(new Instruction(
-									finalEdge.data.inst, finalEdge.data.iIndex,
-									finalEdge.data.iHandler));
+									finalEdge.getData().getInst(), finalEdge.getData().getIndex(),
+									finalEdge.getData().getHandler()));
 							/* 判断是否分析成功 */
 							if (!tracker.bRaiseError) {
 								/* 记录一个分析结果 */
@@ -444,10 +443,10 @@ public class Semantic extends Syntax implements IErrorHandler {
 			if (!processed) {
 				if (!fatal) {
 					error.message = String.format("类型[%s]，状态[%s]", tracker.iter
-							.ex().token(), tracker.npaStatus.data.label);
+							.ex().token(), tracker.npaStatus.getData().getLabel());
 				} else {
 					error.message = String.format("状态[%s]",
-							tracker.npaStatus.data.label);
+							tracker.npaStatus.getData().getLabel());
 				}
 				tracker.iter.scan();// 跳过
 			}
@@ -467,8 +466,8 @@ public class Semantic extends Syntax implements IErrorHandler {
 	 */
 	private boolean findCorrectHandler(Tracker tracker, TrackerError error, Position position) {
 		/* 遍历当前状态的所有出边 */
-		for (NPAEdge edge : tracker.npaStatus.outEdges) {
-			IErrorHandler handler = edge.data.handler;
+		for (NPAEdge edge : tracker.npaStatus.getOutEdges()) {
+			IErrorHandler handler = edge.getData().getError();
 			/* 如果找到了一个错误处理器则进行处理 */
 			if (handler != null) {
 				TrackerErrorBag bag = new TrackerErrorBag(position);
@@ -476,10 +475,10 @@ public class Semantic extends Syntax implements IErrorHandler {
 				/* 如果没有放弃则进行处理 */
 				if (!bag.getGiveUp()) {
 					if (bag.getPass()) {// 通过
-						if (edge.data.errorJump != null) {// 有自定义错误处理器
-							tracker.npaStatus = edge.data.errorJump;
+						if (edge.getData().getErrorJump() != null) {// 有自定义错误处理器
+							tracker.npaStatus = edge.getData().getErrorJump();
 						} else {
-							tracker.npaStatus = edge.end;// 通过
+							tracker.npaStatus = edge.getEnd();// 通过
 						}
 					}
 					if (bag.getRead()) {// 跳过当前记号
@@ -527,10 +526,10 @@ public class Semantic extends Syntax implements IErrorHandler {
 	 */
 	private int getTokenId(Tracker tracker) {
 		Token token = tracker.iter.ex().token();
-		for (TokenExp exp : arrTerminals) {
-			if (exp.kType == token.getType()
-					&& (exp.object == null || exp.object.equals(token.getObj()))) {
-				return exp.id;
+		for (TokenExp exp : Companion.getArrTerminals()) {
+			if (exp.getType() == token.getType()
+					&& (exp.getObj() == null || exp.getObj().equals(token.getObj()))) {
+				return exp.getId();
 			}
 		}
 		return -1;
@@ -547,7 +546,7 @@ public class Semantic extends Syntax implements IErrorHandler {
 					arrErrors.get(0).position, error);
 		}
 		/* 规则集合 */
-		List<RuleItem> items = npa.getRuleItems();
+		List<RuleItem> items = Companion.getNpa().getRuleItems();
 		/* 符号表查询接口 */
 		IQuerySymbol query = getQuerySymbolService();
 		/* 符号表管理接口 */
@@ -557,7 +556,7 @@ public class Semantic extends Syntax implements IErrorHandler {
 		/* 复制单词流 */
 		List<Token> tokens = arrTokens.stream().map(Token::copy).collect(Collectors.toCollection(ArrayList::new));
 		/* 运行时自动机 */
-		SemanticMachine machine = new SemanticMachine(items, arrActions,
+		SemanticMachine machine = new SemanticMachine(items, Companion.getArrActions(),
 				tokens, query, manage, recorder, debug);
 		/* 遍历所有指令 */
 		arrInsts.forEach(machine::run);
@@ -617,8 +616,8 @@ public class Semantic extends Syntax implements IErrorHandler {
 		System.err.println("#### #### ####");
 		System.err.println(tracker.iter.index());
 		System.err.println(tracker.iter.position());
-		System.err.println(tracker.npaStatus.data.label);
-		List<RuleItem> items = npa.getRuleItems();
+		System.err.println(tracker.npaStatus.getData().getLabel());
+		List<RuleItem> items = Companion.getNpa().getRuleItems();
 		StringBuilder sb = new StringBuilder();
 		sb.append(System.lineSeparator());
 		InstructionRecord rcd = tracker.rcdInst;
@@ -627,8 +626,8 @@ public class Semantic extends Syntax implements IErrorHandler {
 				sb.append(inst.toString());
 				if (inst.iHandler != -1) {
 					RuleItem item = items.get(inst.iHandler);
-					sb.append("\t").append(getSingleString(item.parent.nonTerminal.name,
-							item.expression));
+					sb.append("\t").append(Companion.getSingleString(item.getParent().getNonTerminal().getName(),
+							item.getExpression()));
 				}
 				sb.append(System.lineSeparator());
 			}
@@ -676,7 +675,7 @@ public class Semantic extends Syntax implements IErrorHandler {
 	 * @return 指令集描述
 	 */
 	public String getInst() {
-		List<RuleItem> items = npa.getRuleItems();
+		List<RuleItem> items = Companion.getNpa().getRuleItems();
 		StringBuilder sb = new StringBuilder();
 		sb.append("#### 指令集 ####");
 		sb.append(System.lineSeparator());
@@ -684,8 +683,8 @@ public class Semantic extends Syntax implements IErrorHandler {
 			sb.append(inst.toString());
 			if (inst.iHandler != -1) {
 				RuleItem item = items.get(inst.iHandler);
-				sb.append("\t\t").append(getSingleString(item.parent.nonTerminal.name,
-						item.expression));
+				sb.append("\t\t").append(Companion.getSingleString(item.getParent().getNonTerminal().getName(),
+						item.getExpression()));
 			}
 			sb.append(System.lineSeparator());
 		}

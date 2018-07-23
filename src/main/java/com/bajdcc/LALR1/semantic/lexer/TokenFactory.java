@@ -25,13 +25,8 @@ public class TokenFactory extends Lexer {
 
 	@Override
 	public IRegexStringIterator copy() {
-		TokenFactory o = null;
-		try {
-			o = (TokenFactory) super.clone();
-			o.arrTokens = new ArrayList<>(arrTokens);
-		} catch (CloneNotSupportedException e) {
-			e.printStackTrace();
-		}
+		TokenFactory o = (TokenFactory) super.clone();
+		o.arrTokens = new ArrayList<>(arrTokens);
 		return o;
 	}
 
@@ -42,6 +37,6 @@ public class TokenFactory extends Lexer {
 
 	@Override
 	public void saveToken() {
-		arrTokens.add(token);
+		arrTokens.add(getToken());
 	}
 }

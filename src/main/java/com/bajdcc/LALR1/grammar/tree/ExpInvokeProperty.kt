@@ -7,7 +7,6 @@ import com.bajdcc.LALR1.grammar.semantic.ISemanticRecorder
 import com.bajdcc.LALR1.grammar.tree.closure.IClosureScope
 import com.bajdcc.util.lexer.token.OperatorType
 import com.bajdcc.util.lexer.token.Token
-import java.util.*
 
 /**
  * 【语义分析】类方法调用表达式
@@ -31,7 +30,7 @@ class ExpInvokeProperty : IExp {
     /**
      * 参数
      */
-    var params: List<IExp> = ArrayList()
+    var params: List<IExp> = mutableListOf()
 
     override fun isConstant(): Boolean {
         return false

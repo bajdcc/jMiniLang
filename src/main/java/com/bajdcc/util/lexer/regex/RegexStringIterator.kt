@@ -4,7 +4,6 @@ import com.bajdcc.util.Position
 import com.bajdcc.util.lexer.error.RegexException
 import com.bajdcc.util.lexer.error.RegexException.RegexError
 import com.bajdcc.util.lexer.token.MetaType
-import com.bajdcc.util.lexer.token.Token
 import java.util.*
 
 /**
@@ -79,7 +78,7 @@ open class RegexStringIterator() : IRegexStringIterator, Cloneable {
         }
     }
 
-    override fun scan(): Token {
+    override fun scan() {
         throw NotImplementedError()
     }
 
@@ -161,11 +160,11 @@ open class RegexStringIterator() : IRegexStringIterator, Cloneable {
         throw NotImplementedError()
     }
 
-    @Throws(CloneNotSupportedException::class)
     override fun clone(): Any {
         val o = super.clone() as RegexStringIterator
         o.position = o.position.clone() as Position
         o.data = o.data.clone()
+        o.utility = RegexStringUtility(o)
         return o
     }
 

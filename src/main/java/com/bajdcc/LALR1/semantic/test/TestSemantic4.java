@@ -25,8 +25,8 @@ public class TestSemantic4 {
 			semantic.infer("START -> @a [@b] [@c] @a");
 			semantic.initialize("START");
 			System.out.println(semantic.toString());
-			System.out.println(semantic.getNGAString());
-			System.out.println(semantic.getNPAString());
+			System.out.println(semantic.getNgaString());
+			System.out.println(semantic.getNpaString());
 			System.out.println(semantic.getInst());
 			System.out.println(semantic.getTrackerError());
 			System.out.println(semantic.getTokenList());

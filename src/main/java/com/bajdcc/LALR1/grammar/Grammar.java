@@ -28,6 +28,8 @@ import com.bajdcc.util.lexer.token.TokenType;
  */
 public class Grammar extends Semantic {
 
+	public static String npaDesc = null;
+
 	/**
 	 * 语义处理
 	 */
@@ -59,15 +61,14 @@ public class Grammar extends Semantic {
 	 * @throws SyntaxException 词法错误
 	 */
 	private void initialize() throws SyntaxException {
-		if (npa == null) {
+		if (Companion.getNpa() == null) {
 			// 为避免多次构造NPA，这里采用单例模式
 			declareTerminal();
 			declareNonTerminal();
 			declareErrorHandler();
 			declareActionHandler();
 			infer();
-			System.out.println(getNGAString());
-			System.out.println(getNPAString());
+			npaDesc = getNpaMarkdownString();
 		}
 		parse();
 		check();

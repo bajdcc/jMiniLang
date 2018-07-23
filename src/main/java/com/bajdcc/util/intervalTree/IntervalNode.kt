@@ -22,14 +22,14 @@ class IntervalNode<Type>(intervalList: List<Interval<Type>>) {
         }
         val median = getMedian(endpoints)!!
         center = median
-        val left = ArrayList<Interval<Type>>()
-        val right = ArrayList<Interval<Type>>()
+        val left = mutableListOf<Interval<Type>>()
+        val right = mutableListOf<Interval<Type>>()
         intervalList.forEach { interval ->
             when {
                 interval.end < median -> left.add(interval)
                 interval.start > median -> right.add(interval)
                 else -> {
-                    val posting = intervals.computeIfAbsent(interval) { _ -> ArrayList() }
+                    val posting = intervals.computeIfAbsent(interval) { _ -> mutableListOf() }
                     posting.add(interval)
                 }
             }
@@ -47,7 +47,7 @@ class IntervalNode<Type>(intervalList: List<Interval<Type>>) {
      * @return all intervals containing time
      */
     fun stab(time: Long): List<Interval<Type>> {
-        val result = ArrayList<Interval<Type>>()
+        val result = mutableListOf<Interval<Type>>()
         for ((key, value) in intervals) {
             if (key.contains(time))
                 result.addAll(value)
@@ -69,7 +69,7 @@ class IntervalNode<Type>(intervalList: List<Interval<Type>>) {
      * @return all intervals containing time
      */
     fun query(target: Interval<*>): List<Interval<Type>> {
-        val result = ArrayList<Interval<Type>>()
+        val result = mutableListOf<Interval<Type>>()
 
         for ((key, value) in intervals) {
             if (key.intersects(target))

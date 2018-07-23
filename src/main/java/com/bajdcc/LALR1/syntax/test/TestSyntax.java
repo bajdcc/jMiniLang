@@ -38,8 +38,8 @@ public class TestSyntax {
 			syntax.infer("F -> @SYMBOL<i>");
 			syntax.initialize("E");
 			System.out.println(syntax.toString());
-			System.out.println(syntax.getNGAString());
-			System.out.println(syntax.getNPAString());
+			System.out.println(syntax.getNgaString());
+			System.out.println(syntax.getNpaString());
 			//scanner.close();
 		} catch (RegexException e) {
 			System.err.println(e.getPosition() + "," + e.getMessage());

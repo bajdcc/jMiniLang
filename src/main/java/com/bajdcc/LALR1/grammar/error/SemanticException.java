@@ -42,7 +42,7 @@ public class SemanticException extends Exception {
 
 	public String toString(IRegexStringIterator iter) {
 		String snapshot = iter.ex().getErrorSnapshot(token.getPosition());
-		if (snapshot == null) {
+		if (snapshot.isEmpty()) {
 			return toString();
 		}
 		return getMessage() + ": " + token + System.lineSeparator() +

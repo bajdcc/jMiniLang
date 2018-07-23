@@ -23,8 +23,8 @@ public class TestGrammar {
 			}
 			br.close();
 			Grammar grammar = new Grammar(sb.toString());
-			//System.out.println(grammar.getNGAString());
-			System.out.println(grammar.getNPAString());
+			//System.out.println(grammar.getNgaString());
+			System.out.println(grammar.getNpaString());
 			System.out.println(grammar.getInst());
 			System.out.println(grammar.getTrackerError());
 			System.out.println(grammar.getTokenList());

@@ -17,7 +17,8 @@ public class TestLexer {
 			Lexer lexer = new Lexer(str);
 			Token token;
 			for (; ; ) {
-				token = lexer.scan();
+				lexer.scan();
+				token = lexer.token();
 				if (token.getType() == TokenType.EOF) {
 					break;
 				}

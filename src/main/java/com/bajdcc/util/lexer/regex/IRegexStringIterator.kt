@@ -4,7 +4,6 @@ import com.bajdcc.util.Position
 import com.bajdcc.util.lexer.error.RegexException
 import com.bajdcc.util.lexer.error.RegexException.RegexError
 import com.bajdcc.util.lexer.token.MetaType
-import com.bajdcc.util.lexer.token.Token
 
 /**
  * 字符串迭代器接口
@@ -36,10 +35,8 @@ interface IRegexStringIterator {
 
     /**
      * 处理下一个字符（会丢弃字符直到获得合法字符）
-     *
-     * @return 处理的字符
      */
-    fun scan(): Token
+    fun scan()
 
     /**
      * 翻译当前字符

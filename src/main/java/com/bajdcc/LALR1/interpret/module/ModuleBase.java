@@ -577,6 +577,23 @@ public class ModuleBase implements IInterpreterModule {
 				return new RuntimeObject(System.currentTimeMillis());
 			}
 		});
+		info.addExternalFunc("g_doc_grammar", new IRuntimeDebugExec() {
+			@Override
+			public String getDoc() {
+				return "语法参考";
+			}
+
+			@Override
+			public RuntimeObjectType[] getArgsType() {
+				return null;
+			}
+
+			@Override
+			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
+			                                      IRuntimeStatus status) {
+				return new RuntimeObject(Grammar.npaDesc);
+			}
+		});
 		buildIORead(info);
 
 		return runtimeCodePage = page;

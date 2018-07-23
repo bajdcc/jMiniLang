@@ -76,7 +76,7 @@ class DFA(exp: IRegexComponent, debug: Boolean) : NFA(exp, debug) {
      */
     val dfaTableString: String
         get() {
-            val transition = buildTransition(ArrayList())
+            val transition = buildTransition(mutableListOf())
             val sb = StringBuilder()
             for (aTransition in transition) {
                 for (anATransition in aTransition) {
@@ -243,9 +243,9 @@ class DFA(exp: IRegexComponent, debug: Boolean) : NFA(exp, debug) {
         /* 取得NFA所有状态 */
         val nfaStatusList = getNFAStatusClosure(
                 BreadthFirstSearch(), nfa!!.begin!!)
-        val dfaStatusList = ArrayList<DFAStatus>()
+        val dfaStatusList = mutableListOf<DFAStatus>()
         /* 哈希表用来进行DFA状态表的查找 */
-        val dfaStatusListMap = HashMap<String, Int>()
+        val dfaStatusListMap = mutableMapOf<String, Int>()
         val initStatus = DFAStatus()
         initStatus.data.bFinal = nfa!!.begin!!.data.bFinal// 是否终态
         initStatus.data.nfaStatus.add(nfa!!.begin!!)// DFA[0]=NFA初态集合
@@ -255,7 +255,7 @@ class DFA(exp: IRegexComponent, debug: Boolean) : NFA(exp, debug) {
         var i = 0
         while (i < dfaStatusList.size) {
             val dfaStatus = dfaStatusList[i]
-            val bags = ArrayList<DFAEdgeBag>()
+            val bags = mutableListOf<DFAEdgeBag>()
             /* 遍历当前NFA状态集合的所有边 */
             dfaStatus.data.nfaStatus.forEach { nfaStatus ->
                 nfaStatus.outEdges.forEach { nfaEdge ->
@@ -360,7 +360,7 @@ class DFA(exp: IRegexComponent, debug: Boolean) : NFA(exp, debug) {
                     map[hash]!!.add(status)
                 } else {
                     /* 前次出现，创建数组保存它 */
-                    val set = ArrayList<Int>()
+                    val set = mutableListOf<Int>()
                     set.add(status)
                     map[hash] = set
                 }

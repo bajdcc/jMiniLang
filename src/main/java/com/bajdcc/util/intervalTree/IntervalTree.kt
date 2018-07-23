@@ -1,7 +1,5 @@
 package com.bajdcc.util.intervalTree
 
-import java.util.*
-
 /**
  * An Interval Tree is essentially a map from intervals to objects, which
  * can be queried for all data associated with a particular interval of
@@ -13,7 +11,7 @@ import java.util.*
 class IntervalTree<Type>(intervalList: List<Interval<Type>>) {
 
     private var head: IntervalNode<Type>
-    private var intervalList: MutableList<Interval<Type>> = ArrayList()
+    private var intervalList: MutableList<Interval<Type>> = mutableListOf()
     private var inSync: Boolean = true
     private var size: Int = 0
 
@@ -32,7 +30,7 @@ class IntervalTree<Type>(intervalList: List<Interval<Type>>) {
      */
     operator fun get(time: Long): List<Type> {
         val intervals = getIntervals(time)
-        val result = ArrayList<Type>()
+        val result = mutableListOf<Type>()
         for (interval in intervals)
             result.add(interval.data!!)
         return result
@@ -60,7 +58,7 @@ class IntervalTree<Type>(intervalList: List<Interval<Type>>) {
      */
     operator fun get(start: Long, end: Long): List<Type> {
         val intervals = getIntervals(start, end)
-        val result = ArrayList<Type>()
+        val result = mutableListOf<Type>()
         for (interval in intervals)
             result.add(interval.data!!)
         return result

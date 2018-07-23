@@ -113,7 +113,11 @@ if (route[1] == "info") {
     var file = g_res_get_vfs(url);
     var txt = "";
     if (g_not_null(file)) {
-        txt := "# File: " + url + g_endl + "```" + g_endl + file + g_endl + "```";
+        if (g_string_start_with(url, "$/md/")) {
+            txt := "# Markdown: " + url + g_endl + g_endl + file + g_endl;
+        } else {
+            txt := "# File: " + url + g_endl + "```" + g_endl + file + g_endl + "```";
+        }
         ctx["resp"] := g_web_markdown(txt);
     } else {
         txt := "# File not exists";

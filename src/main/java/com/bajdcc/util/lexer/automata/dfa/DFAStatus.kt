@@ -12,12 +12,12 @@ class DFAStatus {
     /**
      * 出边集合
      */
-    var outEdges = HashSet<DFAEdge>()
+    var outEdges = mutableListOf<DFAEdge>()
 
     /**
      * 入边集合
      */
-    var inEdges = HashSet<DFAEdge>()
+    var inEdges = mutableListOf<DFAEdge>()
 
     /**
      * 数据
@@ -31,7 +31,7 @@ class DFAStatus {
      */
     fun visit(bfs: BreadthFirstSearch<DFAEdge, DFAStatus>) {
         val stack = bfs.arrStatus
-        val set = HashSet<DFAStatus>()
+        val set = mutableSetOf<DFAStatus>()
         stack.clear()
         set.add(this)
         stack.add(this)

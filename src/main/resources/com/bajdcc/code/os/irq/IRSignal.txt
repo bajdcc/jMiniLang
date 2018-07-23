@@ -51,6 +51,7 @@ if (!g_query_file("$/web/api")) {
         g_write_file_s_utf8("$/example/" + example,
             g_read_file_utf8_all("!/com/bajdcc/code/fs/example/" + example + ".txt"));
     }
+    g_write_file_s_utf8("$/md/grammar", g_doc_grammar());
 }
 
 var handler = func ~(ch) {

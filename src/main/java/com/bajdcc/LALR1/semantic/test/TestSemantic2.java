@@ -41,8 +41,8 @@ public class TestSemantic2 {
 			semantic.infer("F -> @LPA@<(> E @RPA<)>");
 			semantic.initialize("S");
 			System.out.println(semantic.toString());
-			System.out.println(semantic.getNGAString());
-			System.out.println(semantic.getNPAString());
+			System.out.println(semantic.getNgaString());
+			System.out.println(semantic.getNpaString());
 			System.out.println(semantic.getInst());
 			System.out.println(semantic.getTrackerError());
 			System.out.println(semantic.getTokenList());

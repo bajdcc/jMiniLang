@@ -32,10 +32,8 @@ public class Main {
 			PrintStream ps = new PrintStream(new FileOutputStream(
 					"E:\\output.txt"));
 			for (; ; ) {
-				token = lexer.scan();
-				if (token == null) {
-					continue;
-				}
+				lexer.scan();
+				token = lexer.token();
 				if (token.getType() == TokenType.EOF) {
 					break;
 				}

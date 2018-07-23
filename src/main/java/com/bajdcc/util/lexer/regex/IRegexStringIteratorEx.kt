@@ -2,7 +2,6 @@ package com.bajdcc.util.lexer.regex
 
 import com.bajdcc.util.Position
 import com.bajdcc.util.lexer.token.Token
-import java.util.*
 
 /**
  * 字符串迭代器附加接口
@@ -43,7 +42,7 @@ interface IRegexStringIteratorEx {
      *
      * @return 所有单词
      */
-    fun tokenList(): ArrayList<Token>
+    fun tokenList(): List<Token>
 
     /**
      * 获取错误现场

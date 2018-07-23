@@ -4,7 +4,6 @@ import com.bajdcc.LALR1.grammar.codegen.ICodegen
 import com.bajdcc.LALR1.grammar.runtime.RuntimeInst
 import com.bajdcc.LALR1.grammar.semantic.ISemanticRecorder
 import com.bajdcc.LALR1.grammar.tree.closure.IClosureScope
-import java.util.*
 
 /**
  * 【语义分析】块
@@ -19,7 +18,7 @@ class Block : ICommon {
     val stmts: List<IStmt>
 
     constructor() {
-        stmts = ArrayList()
+        stmts = mutableListOf()
     }
 
     constructor(stmts: List<IStmt>) {

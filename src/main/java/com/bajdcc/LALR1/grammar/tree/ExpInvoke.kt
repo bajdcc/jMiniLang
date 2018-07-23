@@ -7,7 +7,6 @@ import com.bajdcc.LALR1.grammar.semantic.ISemanticRecorder
 import com.bajdcc.LALR1.grammar.tree.closure.IClosureScope
 import com.bajdcc.util.lexer.token.KeywordType
 import com.bajdcc.util.lexer.token.Token
-import java.util.*
 
 /**
  * 【语义分析】函数调用表达式
@@ -34,7 +33,7 @@ class ExpInvoke : IExp {
     /**
      * 参数
      */
-    var params: MutableList<IExp> = ArrayList()
+    var params: MutableList<IExp> = mutableListOf()
 
     /**
      * 是否为函数指针调用

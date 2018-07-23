@@ -147,7 +147,7 @@ class RuntimeMachine @Throws(Exception::class)
             putHandle = -1
             bSaveLogFile = true
             bSavePipeFile = false
-            handles = HashSet()
+            handles = mutableSetOf()
             blockHandle = -1
         }
 
@@ -309,7 +309,7 @@ class RuntimeMachine @Throws(Exception::class)
             warn(RuntimeError.DUP_PAGENAME, "代码页 $pageName 加载 $name")
         }
         pageMap.add(name, page)
-        pageRefer[name] = ArrayList()
+        pageRefer[name] = mutableListOf()
         pageRefer[name]!!.add(page)
         page.info.dataMap["desc"] = name
     }
@@ -966,7 +966,7 @@ class RuntimeMachine @Throws(Exception::class)
                 null == obj?.type -> err(RuntimeError.WRONG_LOAD_EXTERN, idx.toString())
                 obj.type == RuntimeObjectType.kFunc -> {
                     val func = obj.obj as RuntimeFuncObject
-                    val env = func.getEnv()
+                    val env = func.env
                     for ((id, o) in env) {
                         currentStack.storeClosure(id, o)
                     }
@@ -1008,7 +1008,7 @@ class RuntimeMachine @Throws(Exception::class)
             if (types == null && argsCount != 0 || types != null && types.size != argsCount) {
                 err(RuntimeError.WRONG_ARGCOUNT, name + " " + argsCount.toString())
             }
-            val args = ArrayList<RuntimeObject>()
+            val args = mutableListOf<RuntimeObject>()
             for (i in 0 until argsCount) {
                 val type = if (types == null) RuntimeObjectType.kObject else if (types.size > i) types[i] else RuntimeObjectType.kObject
                 val objParam = currentStack.loadFuncArgs(i)

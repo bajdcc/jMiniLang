@@ -5,7 +5,6 @@ import com.bajdcc.LALR1.grammar.runtime.RuntimeInst
 import com.bajdcc.LALR1.grammar.semantic.ISemanticRecorder
 import com.bajdcc.LALR1.grammar.tree.closure.IClosureScope
 import com.bajdcc.util.lexer.token.OperatorType
-import java.util.*
 
 /**
  * 【语义分析】字典
@@ -17,7 +16,7 @@ class ExpMap : IExp {
     /**
      * 参数
      */
-    var params: MutableList<IExp> = ArrayList()
+    var params: MutableList<IExp> = mutableListOf()
 
     override fun isConstant(): Boolean {
         return params.all { it.isConstant() }

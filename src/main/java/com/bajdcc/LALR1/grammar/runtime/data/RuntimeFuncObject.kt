@@ -1,7 +1,6 @@
 package com.bajdcc.LALR1.grammar.runtime.data
 
 import com.bajdcc.LALR1.grammar.runtime.RuntimeObject
-import java.util.*
 
 /**
  * 【运行时】函数调用
@@ -9,11 +8,7 @@ import java.util.*
  * @author bajdcc
  */
 class RuntimeFuncObject(val page: String, val addr: Int) {
-    val env = HashMap<Int, RuntimeObject>()
-
-    fun getEnv(): Map<Int, RuntimeObject> {
-        return env
-    }
+    val env = mutableMapOf<Int, RuntimeObject>()
 
     fun addEnv(id: Int, obj: RuntimeObject) {
         env[id] = obj

@@ -41,8 +41,8 @@ public class TestSemantic3 {
 			semantic.infer(handleValue, "Z -> @a[0]");
 			semantic.initialize("START");
 			System.out.println(semantic.toString());
-			System.out.println(semantic.getNGAString());
-			System.out.println(semantic.getNPAString());
+			System.out.println(semantic.getNgaString());
+			System.out.println(semantic.getNpaString());
 			semantic.parse();
 			System.out.println(semantic.getInst());
 			System.out.println(semantic.getTrackerError());

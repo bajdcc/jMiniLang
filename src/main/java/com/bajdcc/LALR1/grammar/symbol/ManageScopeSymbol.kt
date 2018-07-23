@@ -80,7 +80,7 @@ class ManageScopeSymbol : IQueryScopeSymbol, IQueryBlockSymbol, IManageDataSymbo
 
     init {
         enterScope()
-        val entry = ArrayList<Function>()
+        val entry = mutableListOf<Function>()
         entry.add(Function(Token()))
         funcMap.add(ENTRY_NAME, entry)
         for (type in BlockType.values()) {
@@ -164,7 +164,7 @@ class ManageScopeSymbol : IQueryScopeSymbol, IQueryBlockSymbol, IManageDataSymbo
         } else {
             func.realName = LAMBDA_PREFIX + lambdaId++
         }
-        val f = ArrayList<Function>()
+        val f = mutableListOf<Function>()
         f.add(func)
         funcMap.add(func.realName, f)
         currentFuncScope[func.realName] = func
@@ -176,7 +176,7 @@ class ManageScopeSymbol : IQueryScopeSymbol, IQueryBlockSymbol, IManageDataSymbo
         func.name.type = TokenType.ID
         func.realName = LAMBDA_PREFIX + lambdaId++ + "!" + stkLambdaLine.peek()
         currentFuncScope[func.realName] = func
-        val f = ArrayList<Function>()
+        val f = mutableListOf<Function>()
         f.add(func)
         funcMap.add(func.realName, f)
     }
