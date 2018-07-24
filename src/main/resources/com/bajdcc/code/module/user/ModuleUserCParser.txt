@@ -488,8 +488,8 @@ var import_scanner = func ~() {
                 ["end", this."offset"], ["line", this."lines"."size"()],
                 ["value", this."str"."substr"(i, this."offset")]],
                 [["set_op", ch]]);
-        this."op1" := lambda(this, op) {
-            return lambda(this, i, ch) {
+        this."op1" := lambda(this, op) ->
+            lambda(this, i, ch) {
                 foreach (var o : g_range_string(op)) {
                     if (this."ch" == o) {
                         this."next"();
@@ -498,7 +498,6 @@ var import_scanner = func ~() {
                 }
                 return this."op"(i, ch);
             };
-        };
         this."scan_switch" := g_from({
             "/": lambda(this, i, ch) {
                 if (this."ch" == '/' || this."ch" == '*') { // 注释
@@ -591,6 +590,24 @@ var import_ast = func ~() {
                 }
                 s += " }";
                 return s;
+            },
+            "fun": lambda(this, node) {
+                var s = "";
+                if (node."suc") {
+                    s := "FUN { ";
+                } else {
+                    s := "FUN-ERR { ";
+                }
+                s += this."stringify"(node."type");
+                s += ", " + this."stringify"(node."id");
+                if (g_not_null(node."params") && !node."params"."empty"()) {
+                    s += g_endl;
+                    s += "    [ ARGS ]" + g_endl;
+                    node."params"."stream"()."for_each"(lambda(i_, n_) ->
+                        s += "    " + this."walk"(n_) + g_endl);
+                }
+                s += "}";
+                return s;
             }
         };
         this."walk" := lambda(this, node) {
@@ -609,6 +626,12 @@ var import_ast = func ~() {
         this."type" := _;
         this."id" := _;
         this."size" := _;
+    });
+    g_class("clib::c::ast::fun", "clib::c::ast::base", lambda(this) {
+        this."suc" := false;
+        this."type" := _;
+        this."id" := _;
+        this."params" := _;
     });
 };
 
@@ -659,14 +682,23 @@ var import_parser = func ~() {
             }
             return true;
         };
+        this."assert_until" := lambda(this, token, skip) {
+            if (!this."token"."equals"(token)) {
+                this."expect"(token);
+                this."consume_until"(skip);
+                return false;
+            }
+            return true;
+        };
         this."assert_type" := lambda(this) {
-            if (!this."of"(["INT", "FLOAT", "CHAR"])) {
+            if (!this."is_type"()) {
                 this."expect"("type");
                 this."consume_until"(["SEMI", "RBR"]);
                 return false;
             }
             return true;
         };
+        this."is_type" := lambda(this) -> this."of"(["INT", "FLOAT", "CHAR", "VOID"]);
         this."skip" := lambda(this, tokens) {
             this."consume_until"(tokens);
         };
@@ -679,7 +711,7 @@ var import_parser = func ~() {
             }
             return false;
         };
-        this."enter_block" := lambda(this) -> this."scopes"."add"([]);
+        this."enter_block" := lambda(this) -> this."scopes"."add"(g_from({}));
         this."leave_block" := lambda(this) -> this."scopes"."pop"();
         this."this_block" := lambda(this) -> this."scopes"."last"();
         this."next" := lambda(this) ->
@@ -719,18 +751,76 @@ var import_parser = func ~() {
         this."#decl" := lambda(this) { // 声明
             var type = this."advance"();
             if (!this."assert"("#ID")) {
-                return g_from([this."ast"("var", [["type", type], ["id", _]])]);
+                return g_from([this."ast"("var", [["type", type]])]);
             }
             var id = this."advance"();
             if (this."is"("LPA")) {
-                return this."#decl!fun"(type, id);
+                return this."#decl!fun"(type, id, g_from([]));
             } else if (this."of"(["SEMI", "COMMA", "LSQ"])) {
                 return this."#decl!var"(type, id, g_from([]));
             }
             this."skip"(["SEMI", "RBR"]);
         };
-        this."#decl!fun" := lambda(this, type, id) { // 函数声明
-
+        this."#decl!fun~args.rec" := lambda(this, params) { // 函数形参
+            if (this."is"("COMMA")) {
+                return this."#decl!fun~args"(params);
+            } else if (this."is"("RPA")) {
+                return params;
+            }
+            this."skip"(["COMMA", "RPA", "SEMI", "RBR"]);
+            return params;
+        };
+        this."#decl!fun~args" := lambda(this, params) { // 函数形参
+            var type = this."advance"();
+            if (this."is"("RPA")) {
+                this."add_ast"(params, "var", [["type", type]]);
+                return params;
+            }
+            if (this."is"("VOID")) {
+                this."assert"("RPA");
+                this."add_ast"(params, "var", [["type", type]]);
+                return params;
+            }
+            while (this."assert_type"()) {
+                var type = this."advance"();
+                if (!this."assert_until"("#ID", ["COMMA", "RPA", "SEMI", "RBR"])) {
+                    this."add_ast"(params, "var", [["type", type]]);
+                    return params;
+                }
+                var id = this."advance"();
+                if (this."is"("COMMA")) {
+                    this."add_ast"(params, "var", [["type", type], ["id", id]]);
+                    return this."#decl!fun~args.rec"(params);
+                } else if (this."is"("LSQ")) {
+                    this."next"();
+                    var idx = this."token";
+                    if (!this."assert_until"("#INT", ["COMMA", "RPA", "SEMI", "RBR"])) {
+                        this."add_ast"(params, "var", [["type", type], ["id", id]]);
+                        break;
+                    }
+                    this."next"();
+                    if (this."assert"("RSQ")) {
+                        this."add_ast"(params, "var", [["type", type], ["id", id], ["size", idx]]);
+                        return this."#decl!fun~args.rec"(params);
+                    }
+                } else if (this."is"("RPA")) {
+                    this."add_ast"(params, "var", [["type", type], ["id", id]]);
+                    break;
+                } else {
+                    this."add_ast"(params, "var", [["type", type], ["id", id]]);
+                    break;
+                }
+            }
+            return params;
+        };
+        this."#decl!fun" := lambda(this, type, id, funs) { // 函数声明
+            this."enter_block"();
+            this."this_block"()."put"("fun", id);
+            var params = this."#decl!fun~args"(g_from([]));
+            var suc = this."assert"("RPA");
+            this."add_ast"(funs, "fun", [["suc", suc], ["type", type], ["id", id], ["params", params]]);
+            this."leave_block"();
+            return funs;
         };
         this."#decl!var~rec" := lambda(this, type, vars) { // 变量声明
             if (this."is"("#ID")) {

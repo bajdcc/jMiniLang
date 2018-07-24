@@ -26,7 +26,7 @@ public class LostHandler implements IErrorHandler {
 		bag.setPass(true);
 		String def = "缺少：" + message + System.lineSeparator();
 		String snapshot = iterator.ex().getErrorSnapshot(bag.getPosition());
-		if (snapshot.isEmpty()) {
+		if (!snapshot.isEmpty()) {
 			return def + snapshot;
 		}
 		return def;
