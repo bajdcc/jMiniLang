@@ -1,6 +1,6 @@
 package com.bajdcc.LALR1.syntax.rule
 
-import com.bajdcc.LALR1.semantic.token.ISemanticAnalyzer
+import com.bajdcc.LALR1.grammar.semantic.ISemanticAnalyzer
 import com.bajdcc.LALR1.syntax.ISyntaxComponent
 import com.bajdcc.LALR1.syntax.exp.RuleExp
 import com.bajdcc.LALR1.syntax.exp.TokenExp

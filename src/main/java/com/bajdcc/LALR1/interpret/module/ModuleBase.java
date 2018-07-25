@@ -591,7 +591,7 @@ public class ModuleBase implements IInterpreterModule {
 			@Override
 			public RuntimeObject ExternalProcCall(List<RuntimeObject> args,
 			                                      IRuntimeStatus status) {
-				return new RuntimeObject(Grammar.npaDesc);
+				return new RuntimeObject(Grammar.Companion.getNpaDesc());
 			}
 		});
 		buildIORead(info);

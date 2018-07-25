@@ -1,6 +1,6 @@
 package com.bajdcc.LALR1.grammar.symbol
 
-import com.bajdcc.LALR1.grammar.tree.Function
+import com.bajdcc.LALR1.grammar.tree.Func
 
 /**
  * 命名空间管理接口
@@ -36,14 +36,14 @@ interface IManageScopeSymbol {
      *
      * @param func 过程
      */
-    fun registerFunc(func: Function)
+    fun registerFunc(func: Func)
 
     /**
      * 注册函数过程
      *
      * @param func 过程
      */
-    fun registerLambda(func: Function)
+    fun registerLambda(func: Func)
 
     /**
      * 注册下个块的参数表

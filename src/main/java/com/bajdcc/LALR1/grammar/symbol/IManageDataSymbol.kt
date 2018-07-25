@@ -1,6 +1,6 @@
 package com.bajdcc.LALR1.grammar.symbol
 
-import com.bajdcc.LALR1.grammar.tree.Function
+import com.bajdcc.LALR1.grammar.tree.Func
 import com.bajdcc.util.HashListMap
 import com.bajdcc.util.HashListMapEx
 
@@ -19,5 +19,5 @@ interface IManageDataSymbol {
     /**
      * @return 过程表
      */
-    val funcMap: HashListMapEx<String, MutableList<Function>>
+    val funcMap: HashListMapEx<String, MutableList<Func>>
 }

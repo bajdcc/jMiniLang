@@ -10,20 +10,7 @@ import com.bajdcc.LALR1.grammar.tree.closure.IClosureScope
  *
  * @author bajdcc
  */
-class Block : ICommon {
-
-    /**
-     * 语句集合
-     */
-    val stmts: List<IStmt>
-
-    constructor() {
-        stmts = mutableListOf()
-    }
-
-    constructor(stmts: List<IStmt>) {
-        this.stmts = stmts
-    }
+class Block(var stmts: MutableList<IStmt> = mutableListOf()) : ICommon {
 
     override fun analysis(recorder: ISemanticRecorder) {
         stmts.forEach { stmt ->

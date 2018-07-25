@@ -70,7 +70,7 @@ public class Grammar extends Syntax {
 	 */
 	public void run() throws GrammarException {
 		table.run();
-		arrTokens = tokenFactory.tokenList();
+		arrTokens = new ArrayList<>(tokenFactory.tokenList());
 	}
 
 	/**

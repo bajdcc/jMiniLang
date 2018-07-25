@@ -38,7 +38,7 @@ class NFAStatus(var data: NFAStatusData = NFAStatusData()) {
             if (bag.visitChildren) {
                 // 遍历状态的出边
                 // 边未被访问，且边类型符合要求
-                status.outEdges.stream().filter { edge -> !set.contains(edge.end) && bfs.testEdge(edge) }.forEach {// 边未被访问，且边类型符合要求
+                status.outEdges.asSequence().filter { edge -> !set.contains(edge.end) && bfs.testEdge(edge) }.forEach {// 边未被访问，且边类型符合要求
                     edge ->
                     stack.add(edge.end!!)
                     set.add(edge.end!!)

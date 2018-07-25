@@ -4,7 +4,7 @@ import com.bajdcc.LALR1.grammar.runtime.RuntimeInst
 import com.bajdcc.LALR1.grammar.runtime.RuntimeInstBinary
 import com.bajdcc.LALR1.grammar.runtime.RuntimeInstNon
 import com.bajdcc.LALR1.grammar.runtime.RuntimeInstUnary
-import com.bajdcc.LALR1.grammar.tree.Function
+import com.bajdcc.LALR1.grammar.tree.Func
 
 /**
  * 【目标代码生成】接口
@@ -29,7 +29,7 @@ interface ICodegen {
 
     fun genDataRef(obj: Any): Int
 
-    fun getFuncIndex(func: Function): Int
+    fun getFuncIndex(func: Func): Int
 
     fun genDebugInfo(start: Int, end: Int, info: Any)
 }

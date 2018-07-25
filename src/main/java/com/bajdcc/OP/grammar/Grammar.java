@@ -92,7 +92,7 @@ public class Grammar extends Syntax {
 	 */
 	public Object run() throws GrammarException {
 		Object obj = table.run();
-		arrTokens = tokenFactory.tokenList();
+		arrTokens = new ArrayList<>(tokenFactory.tokenList());
 		return obj;
 	}
 

@@ -12,32 +12,23 @@ import com.bajdcc.util.lexer.token.Token
  *
  * @author bajdcc
  */
-class StmtTry : IStmt {
+class StmtTry(var tryBlock: Block,
+              var catchBlock: Block) : IStmt {
 
     /**
      * 异常名
      */
     var token: Token? = null
 
-    /**
-     * try块
-     */
-    var tryBlock: Block? = null
-
-    /**
-     * catch块
-     */
-    var catchBlock: Block? = null
-
 
     override fun analysis(recorder: ISemanticRecorder) {
-        tryBlock!!.analysis(recorder)
-        catchBlock!!.analysis(recorder)
+        tryBlock.analysis(recorder)
+        catchBlock.analysis(recorder)
     }
 
     override fun genCode(codegen: ICodegen) {
         val t = codegen.genCode(RuntimeInst.itry, -1)
-        tryBlock!!.genCode(codegen)
+        tryBlock.genCode(codegen)
         val jmp = codegen.genCode(RuntimeInst.ijmp, -1)
         t.op1 = codegen.codeIndex
         codegen.genCode(RuntimeInst.iscpi)
@@ -46,7 +37,7 @@ class StmtTry : IStmt {
             codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(token!!.obj!!))
             codegen.genCode(RuntimeInst.ialloc)
         }
-        catchBlock!!.genCode(codegen)
+        catchBlock.genCode(codegen)
         if (token != null) {
             codegen.genCode(RuntimeInst.ipop)
         }
@@ -64,7 +55,7 @@ class StmtTry : IStmt {
         sb.append(prefix.toString())
         sb.append(KeywordType.TRY.desc)
         sb.append(" ")
-        sb.append(tryBlock!!.print(prefix))
+        sb.append(tryBlock.print(prefix))
         sb.append(" ")
         sb.append(KeywordType.CATCH.desc)
         sb.append(" ")
@@ -73,14 +64,14 @@ class StmtTry : IStmt {
             sb.append(token!!.toRealString())
             sb.append(" ) ")
         }
-        sb.append(catchBlock!!.print(prefix))
+        sb.append(catchBlock.print(prefix))
         return sb.toString()
     }
 
     override fun addClosure(scope: IClosureScope) {
         if (token != null)
             scope.addRef(token!!.obj!!)
-        tryBlock!!.addClosure(scope)
-        catchBlock!!.addClosure(scope)
+        tryBlock.addClosure(scope)
+        catchBlock.addClosure(scope)
     }
 }

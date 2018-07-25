@@ -2,7 +2,7 @@ package com.bajdcc.LALR1.grammar.codegen
 
 import com.bajdcc.LALR1.grammar.runtime.*
 import com.bajdcc.LALR1.grammar.symbol.SymbolTable
-import com.bajdcc.LALR1.grammar.tree.Function
+import com.bajdcc.LALR1.grammar.tree.Func
 import com.bajdcc.util.HashListMap
 import com.bajdcc.util.intervalTree.Interval
 
@@ -14,7 +14,7 @@ import com.bajdcc.util.intervalTree.Interval
 class Codegen(symbol: SymbolTable) : ICodegen, ICodegenBlock, ICodegenByteWriter {
 
     private val symbolList = symbol.manageDataService.symbolList
-    private val funcMap = HashListMap<Function>()
+    private val funcMap = HashListMap<Func>()
     private val data = CodegenData()
     private val info = RuntimeDebugInfo()
     private val insts = mutableListOf<Byte>()
@@ -42,7 +42,7 @@ class Codegen(symbol: SymbolTable) : ICodegen, ICodegenBlock, ICodegenByteWriter
         }
     }
 
-    override fun getFuncIndex(func: Function): Int {
+    override fun getFuncIndex(func: Func): Int {
         return funcMap.indexOf(func)
     }
 

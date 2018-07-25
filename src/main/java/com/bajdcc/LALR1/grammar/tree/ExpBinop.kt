@@ -16,12 +16,7 @@ import com.bajdcc.util.lexer.token.TokenType
  *
  * @author bajdcc
  */
-class ExpBinop : IExp {
-
-    /**
-     * 操作符
-     */
-    var token: Token? = null
+class ExpBinop(var token: Token) : IExp {
 
     /**
      * 左操作数
@@ -46,8 +41,8 @@ class ExpBinop : IExp {
             return this
         }
         if (leftOperand is ExpValue && rightOperand is ExpValue) {
-            if (token!!.type === TokenType.OPERATOR) {
-                val op = token!!.obj as OperatorType?
+            if (token.type === TokenType.OPERATOR) {
+                val op = token.obj as OperatorType?
                 if (op === OperatorType.COLON)
                     return this
                 if (TokenTools.binop(recorder, this)) {
@@ -59,8 +54,8 @@ class ExpBinop : IExp {
     }
 
     override fun analysis(recorder: ISemanticRecorder) {
-        if (token!!.type === TokenType.OPERATOR) {
-            val op = token!!.obj as OperatorType?
+        if (token.type === TokenType.OPERATOR) {
+            val op = token.obj as OperatorType?
             if (TokenTools.isAssignment(op!!)) {
                 if (leftOperand !is ExpValue) {
                     recorder.add(SemanticException.SemanticError.INVALID_ASSIGNMENT, token)
@@ -72,7 +67,7 @@ class ExpBinop : IExp {
     }
 
     override fun genCode(codegen: ICodegen) {
-        if (token!!.type === TokenType.OPERATOR && token!!.obj === OperatorType.DOT) {
+        if (token.type === TokenType.OPERATOR && token.obj === OperatorType.DOT) {
             codegen.genCode(RuntimeInst.iopena)
             leftOperand!!.genCode(codegen)
             codegen.genCode(RuntimeInst.ipusha)
@@ -82,21 +77,21 @@ class ExpBinop : IExp {
             codegen.genCode(RuntimeInst.icallx)
             return
         }
-        if (token!!.type === TokenType.OPERATOR) {
-            val op = token!!.obj as OperatorType?
+        if (token.type === TokenType.OPERATOR) {
+            val op = token.obj as OperatorType?
             if (TokenTools.isAssignment(op!!)) {
-                val ins = TokenTools.op2ins(token!!)
+                val ins = TokenTools.op2ins(token)
                 val left = leftOperand as ExpValue?
                 if (ins == RuntimeInst.ice) {
                     rightOperand!!.genCode(codegen)
-                    codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(left!!.token!!.obj!!))
+                    codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(left!!.token.obj!!))
                     codegen.genCode(RuntimeInst.istore)
                     return
                 }
                 leftOperand!!.genCode(codegen)
                 rightOperand!!.genCode(codegen)
                 codegen.genCode(ins)
-                codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(left!!.token!!.obj!!))
+                codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(left!!.token.obj!!))
                 codegen.genCode(RuntimeInst.istore)
                 return
             } else if (op === OperatorType.COLON) {
@@ -105,7 +100,7 @@ class ExpBinop : IExp {
                 return
             }
         }
-        val inst = TokenTools.op2ins(token!!)
+        val inst = TokenTools.op2ins(token)
         leftOperand!!.genCode(codegen)
         var jmp: RuntimeInstUnary? = null
         when (inst) {
@@ -126,10 +121,10 @@ class ExpBinop : IExp {
     }
 
     override fun print(prefix: StringBuilder): String {
-        return if (token!!.type === TokenType.OPERATOR && token!!.obj === OperatorType.COLON) {
-            (leftOperand!!.print(prefix) + " " + token!!.toRealString() + " "
+        return if (token.type === TokenType.OPERATOR && token.obj === OperatorType.COLON) {
+            (leftOperand!!.print(prefix) + " " + token.toRealString() + " "
                     + rightOperand!!.print(prefix))
-        } else "( " + leftOperand!!.print(prefix) + " " + token!!.toRealString() + " " + rightOperand!!.print(prefix) + " )"
+        } else "( " + leftOperand!!.print(prefix) + " " + token.toRealString() + " " + rightOperand!!.print(prefix) + " )"
     }
 
     override fun addClosure(scope: IClosureScope) {

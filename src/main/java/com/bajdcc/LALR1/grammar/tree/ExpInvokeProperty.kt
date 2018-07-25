@@ -13,9 +13,7 @@ import com.bajdcc.util.lexer.token.Token
  *
  * @author bajdcc
  */
-class ExpInvokeProperty : IExp {
-
-    var token: Token? = null
+class ExpInvokeProperty(var token: Token) : IExp {
 
     /**
      * 对象
@@ -30,7 +28,7 @@ class ExpInvokeProperty : IExp {
     /**
      * 参数
      */
-    var params: List<IExp> = mutableListOf()
+    var params: List<IExp> = listOf()
 
     override fun isConstant(): Boolean {
         return false

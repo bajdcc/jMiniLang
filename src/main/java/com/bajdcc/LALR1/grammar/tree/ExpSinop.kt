@@ -15,24 +15,15 @@ import com.bajdcc.util.lexer.token.TokenType
  *
  * @author bajdcc
  */
-class ExpSinop : IExp {
-
-    /**
-     * 操作符
-     */
-    var token: Token? = null
-
-    /**
-     * 操作数
-     */
-    var operand: IExp? = null
+class ExpSinop(var token: Token,
+               var operand: IExp) : IExp {
 
     override fun isConstant(): Boolean {
-        return operand!!.isConstant()
+        return operand.isConstant()
     }
 
     override fun isEnumerable(): Boolean {
-        return operand!!.isEnumerable()
+        return operand.isEnumerable()
     }
 
     override fun simplify(recorder: ISemanticRecorder): IExp {
@@ -40,9 +31,9 @@ class ExpSinop : IExp {
             return this
         }
         if (operand is ExpValue) {
-            if (token!!.type === TokenType.OPERATOR) {
+            if (token.type === TokenType.OPERATOR) {
                 if (TokenTools.sinop(recorder, this)) {
-                    return operand!!
+                    return operand
                 }
             }
         }
@@ -50,24 +41,24 @@ class ExpSinop : IExp {
     }
 
     override fun analysis(recorder: ISemanticRecorder) {
-        val type = token!!.obj as OperatorType?
+        val type = token.obj as OperatorType?
         if (type === OperatorType.PLUS_PLUS || type === OperatorType.MINUS_MINUS) {
             if (operand !is ExpValue) {
                 recorder.add(SemanticError.INVALID_OPERATOR, token)
             }
         } else {
-            operand!!.analysis(recorder)
+            operand.analysis(recorder)
         }
     }
 
     override fun genCode(codegen: ICodegen) {
-        operand!!.genCode(codegen)
-        codegen.genCode(TokenTools.op2ins(token!!))
-        val type = token!!.obj as OperatorType?
+        operand.genCode(codegen)
+        codegen.genCode(TokenTools.op2ins(token))
+        val type = token.obj as OperatorType?
         if (type == OperatorType.PLUS_PLUS || type == OperatorType.MINUS_MINUS) {
             val value = operand as ExpValue?
             codegen.genCode(RuntimeInst.ipush,
-                    codegen.genDataRef(value!!.token!!.obj!!))
+                    codegen.genDataRef(value!!.token.obj!!))
             codegen.genCode(RuntimeInst.icopy)
         }
     }
@@ -77,14 +68,14 @@ class ExpSinop : IExp {
     }
 
     override fun print(prefix: StringBuilder): String {
-        return "( " + token!!.toRealString() + " " + operand!!.print(prefix) + " )"
+        return "( " + token.toRealString() + " " + operand.print(prefix) + " )"
     }
 
     override fun addClosure(scope: IClosureScope) {
-        operand!!.addClosure(scope)
+        operand.addClosure(scope)
     }
 
     override fun setYield() {
-        operand!!.setYield()
+        operand.setYield()
     }
 }

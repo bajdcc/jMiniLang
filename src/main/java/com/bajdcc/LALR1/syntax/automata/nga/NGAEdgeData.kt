@@ -1,6 +1,6 @@
 package com.bajdcc.LALR1.syntax.automata.nga
 
-import com.bajdcc.LALR1.semantic.token.ISemanticAction
+import com.bajdcc.LALR1.grammar.semantic.ISemanticAction
 import com.bajdcc.LALR1.syntax.exp.RuleExp
 import com.bajdcc.LALR1.syntax.exp.TokenExp
 import com.bajdcc.LALR1.syntax.handler.IErrorHandler

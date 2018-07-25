@@ -23,7 +23,7 @@ class ExpInvoke : IExp {
     /**
      * 调用函数
      */
-    var func: Function? = null
+    var func: Func? = null
 
     /**
      * 外部函数名
@@ -72,7 +72,7 @@ class ExpInvoke : IExp {
                 func!!.analysis(recorder)
             }
             if (func!!.isYield xor isYield) {
-                recorder.add(SemanticError.WRONG_YIELD, name)
+                recorder.add(SemanticError.WRONG_YIELD, name!!)
             }
         }
         for (exp in params) exp.analysis(recorder)
@@ -87,7 +87,7 @@ class ExpInvoke : IExp {
         val invokeArgsCount = params.size
         val funcArgsCount = func!!.params.size
         if (invokeArgsCount != funcArgsCount) {
-            recorder.add(SemanticError.MISMATCH_ARGS, name)
+            recorder.add(SemanticError.MISMATCH_ARGS, name!!)
         }
     }
 

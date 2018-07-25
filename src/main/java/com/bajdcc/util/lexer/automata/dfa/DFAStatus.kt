@@ -43,8 +43,7 @@ class DFAStatus {
             if (bag.visitChildren) {
                 // 遍历状态的出边
                 // 边未被访问，且边类型符合要求
-                // 注：这里有坑，如果去掉stream()，使用kotlin遍历时，会先filter到一个list中，没有达到流的效果！
-                status.outEdges.stream().filter { edge -> !set.contains(edge.end) && bfs.testEdge(edge) }.forEach {// 边未被访问，且边类型符合要求
+                status.outEdges.asSequence().filter { edge -> !set.contains(edge.end) && bfs.testEdge(edge) }.forEach {// 边未被访问，且边类型符合要求
                     edge ->
                     stack.add(edge.end!!)
                     set.add(edge.end!!)

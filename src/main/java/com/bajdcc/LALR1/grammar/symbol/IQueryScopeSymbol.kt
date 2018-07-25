@@ -1,6 +1,6 @@
 package com.bajdcc.LALR1.grammar.symbol
 
-import com.bajdcc.LALR1.grammar.tree.Function
+import com.bajdcc.LALR1.grammar.tree.Func
 import com.bajdcc.util.lexer.token.Token
 
 /**
@@ -29,7 +29,7 @@ interface IQueryScopeSymbol {
      *
      * @return 过程对象
      */
-    val lambda: Function
+    val lambda: Func
 
     /**
      * 查找变量名
@@ -61,7 +61,7 @@ interface IQueryScopeSymbol {
      * @param name 查询的过程名
      * @return 过程对象
      */
-    fun getFuncByName(name: String): Function?
+    fun getFuncByName(name: String): Func?
 
     /**
      * 判断是否为lambda函数

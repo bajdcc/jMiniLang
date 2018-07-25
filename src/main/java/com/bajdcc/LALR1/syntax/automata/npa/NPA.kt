@@ -1,6 +1,6 @@
 package com.bajdcc.LALR1.syntax.automata.npa
 
-import com.bajdcc.LALR1.semantic.token.ISemanticAction
+import com.bajdcc.LALR1.grammar.semantic.ISemanticAction
 import com.bajdcc.LALR1.syntax.automata.nga.NGA
 import com.bajdcc.LALR1.syntax.automata.nga.NGAEdge
 import com.bajdcc.LALR1.syntax.automata.nga.NGAEdgeType

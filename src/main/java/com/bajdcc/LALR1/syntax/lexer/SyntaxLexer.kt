@@ -107,13 +107,15 @@ constructor() : RegexStringIterator(), IRegexStringFilterHost {
         // 若某一组件解析成功，即返回匹配结果
         // 若全部解析失败，则调用出错处理（默认为前进一字符）
         //
-        algorithmCollections.attach(WhitespaceTokenizer())// 空白字符解析组件
-        algorithmCollections.attach(CommentTokenizer())// 注释解析组件
-        algorithmCollections.attach(PropertyTokenizer())// 属性解析组件
-        algorithmCollections.attach(ActionTokenizer())// 语义动作解析组件
-        algorithmCollections.attach(TerminalTokenizer())// 终结符解析组件
-        algorithmCollections.attach(NonTerminalTokenizer())// 非终结符解析组件
-        algorithmCollections.attach(NumberTokenizer())// 存储序号解析组件
-        algorithmCollections.attach(OperatorTokenizer())// 操作符解析组件
+        with(algorithmCollections) {
+            attach(WhitespaceTokenizer())// 空白字符解析组件
+            attach(CommentTokenizer())// 注释解析组件
+            attach(PropertyTokenizer())// 属性解析组件
+            attach(ActionTokenizer())// 语义动作解析组件
+            attach(TerminalTokenizer())// 终结符解析组件
+            attach(NonTerminalTokenizer())// 非终结符解析组件
+            attach(NumberTokenizer())// 存储序号解析组件
+            attach(OperatorTokenizer())// 操作符解析组件
+        }
     }
 }

@@ -13,15 +13,10 @@ import com.bajdcc.util.lexer.token.TokenType
  *
  * @author bajdcc
  */
-class ExpValue : IExp {
-
-    /**
-     * 单词
-     */
-    var token: Token? = null
+class ExpValue(var token: Token) : IExp {
 
     override fun isConstant(): Boolean {
-        return token!!.type !== TokenType.ID
+        return token.type !== TokenType.ID
     }
 
     override fun isEnumerable(): Boolean {
@@ -37,11 +32,11 @@ class ExpValue : IExp {
     }
 
     override fun genCode(codegen: ICodegen) {
-        codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(token!!.obj!!))
-        if (token!!.type !== TokenType.ID) {
+        codegen.genCode(RuntimeInst.ipush, codegen.genDataRef(token.obj!!))
+        if (token.type !== TokenType.ID) {
             codegen.genCode(RuntimeInst.iload)
         } else {
-            if (TokenTools.isExternalName(token!!)) {
+            if (TokenTools.isExternalName(token)) {
                 codegen.genCode(RuntimeInst.iloadx)
             } else {
                 codegen.genCode(RuntimeInst.iloadv)
@@ -50,7 +45,7 @@ class ExpValue : IExp {
     }
 
     override fun toString(): String {
-        return token!!.toRealString()
+        return token.toRealString()
     }
 
     override fun print(prefix: StringBuilder): String {
@@ -58,8 +53,8 @@ class ExpValue : IExp {
     }
 
     override fun addClosure(scope: IClosureScope) {
-        if (token!!.type === TokenType.ID) {
-            scope.addRef(token!!.obj!!)
+        if (token.type === TokenType.ID) {
+            scope.addRef(token.obj!!)
         }
     }
 

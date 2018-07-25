@@ -17,7 +17,7 @@ class ExpFunc : ClosureScope(), IExp {
     /**
      * 调用函数
      */
-    var func: Function? = null
+    var func: Func? = null
 
     /**
      * 闭包

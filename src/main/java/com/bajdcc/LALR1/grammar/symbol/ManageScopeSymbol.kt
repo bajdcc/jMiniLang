@@ -2,7 +2,7 @@ package com.bajdcc.LALR1.grammar.symbol
 
 import com.bajdcc.LALR1.grammar.runtime.RuntimeObject
 import com.bajdcc.LALR1.grammar.semantic.ISemanticRecorder
-import com.bajdcc.LALR1.grammar.tree.Function
+import com.bajdcc.LALR1.grammar.tree.Func
 import com.bajdcc.LALR1.grammar.type.TokenTools
 import com.bajdcc.util.HashListMap
 import com.bajdcc.util.HashListMapEx
@@ -19,8 +19,8 @@ import java.util.*
 class ManageScopeSymbol : IQueryScopeSymbol, IQueryBlockSymbol, IManageDataSymbol, IManageScopeSymbol {
     private var lambdaId = 0
     override val symbolList = HashListMap<Any>()
-    override val funcMap = HashListMapEx<String, MutableList<Function>>()
-    private val funcScope = mutableListOf<MutableMap<String, Function>>()
+    override val funcMap = HashListMapEx<String, MutableList<Func>>()
+    private val funcScope = mutableListOf<MutableMap<String, Func>>()
     private val stkScope = mutableListOf<MutableSet<String>>()
     private val stkLambdaId = Stack<Int>()
     private val stkLambdaLine = Stack<Int>()
@@ -40,7 +40,7 @@ class ManageScopeSymbol : IQueryScopeSymbol, IQueryBlockSymbol, IManageDataSymbo
             return token
         }
 
-    override val lambda: Function
+    override val lambda: Func
         get() {
             val lambdaId = stkLambdaId.pop()
             val lambdaLine = stkLambdaLine.pop()
@@ -80,8 +80,8 @@ class ManageScopeSymbol : IQueryScopeSymbol, IQueryBlockSymbol, IManageDataSymbo
 
     init {
         enterScope()
-        val entry = mutableListOf<Function>()
-        entry.add(Function(Token()))
+        val entry = mutableListOf<Func>()
+        entry.add(Func(Token()))
         funcMap.add(ENTRY_NAME, entry)
         for (type in BlockType.values()) {
             blockLevel[type] = 0
@@ -91,7 +91,7 @@ class ManageScopeSymbol : IQueryScopeSymbol, IQueryBlockSymbol, IManageDataSymbo
     private val currentScope: MutableSet<String>
         get() = stkScope[stkScope.size - 1]
 
-    private val currentFuncScope: MutableMap<String, Function>
+    private val currentFuncScope: MutableMap<String, Func>
         get() = funcScope[funcScope.size - 1]
 
     override fun enterScope() {
@@ -115,7 +115,7 @@ class ManageScopeSymbol : IQueryScopeSymbol, IQueryBlockSymbol, IManageDataSymbo
         if (symbolsInFutureBlock.contains(name)) {
             return true
         }
-        if (stkScope.reversed().any { it.contains(name) })
+        if (stkScope.isNotEmpty() && stkScope.reversed().any { it.contains(name) })
             return true
         if (TokenTools.isExternalName(name)) {
             registerSymbol(name)
@@ -132,7 +132,7 @@ class ManageScopeSymbol : IQueryScopeSymbol, IQueryBlockSymbol, IManageDataSymbo
         return currentScope.contains(name)
     }
 
-    override fun getFuncByName(name: String): Function? {
+    override fun getFuncByName(name: String): Func? {
         funcScope.indices.reversed().forEach { i ->
             val f = funcScope[i]
             val f1 = f[name]
@@ -157,26 +157,26 @@ class ManageScopeSymbol : IQueryScopeSymbol, IQueryBlockSymbol, IManageDataSymbo
         symbolList.add(name)
     }
 
-    override fun registerFunc(func: Function) {
+    override fun registerFunc(func: Func) {
         if (func.name.type === TokenType.ID) {
             func.realName = func.name.toRealString()
             symbolList.add(func.realName)
         } else {
             func.realName = LAMBDA_PREFIX + lambdaId++
         }
-        val f = mutableListOf<Function>()
+        val f = mutableListOf<Func>()
         f.add(func)
         funcMap.add(func.realName, f)
         currentFuncScope[func.realName] = func
     }
 
-    override fun registerLambda(func: Function) {
+    override fun registerLambda(func: Func) {
         stkLambdaId.push(lambdaId)
         stkLambdaLine.push(func.name.position.line)
         func.name.type = TokenType.ID
         func.realName = LAMBDA_PREFIX + lambdaId++ + "!" + stkLambdaLine.peek()
         currentFuncScope[func.realName] = func
-        val f = mutableListOf<Function>()
+        val f = mutableListOf<Func>()
         f.add(func)
         funcMap.add(func.realName, f)
     }

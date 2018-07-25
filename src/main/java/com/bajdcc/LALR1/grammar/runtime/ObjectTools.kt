@@ -3,6 +3,7 @@ package com.bajdcc.LALR1.grammar.runtime
 import java.io.*
 
 object ObjectTools {
+    @Suppress("UNCHECKED_CAST")
     fun <T> deserialize(input: InputStream): T? {
         try {
             val objectInputStream = ObjectInputStream(input)

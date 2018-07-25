@@ -12,19 +12,14 @@ import com.bajdcc.util.lexer.token.OperatorType
  *
  * @author bajdcc
  */
-class StmtThrow : IStmt {
-
-    /**
-     * 异常表达式
-     */
-    var exp: IExp? = null
+class StmtThrow(var exp: IExp) : IStmt {
 
     override fun analysis(recorder: ISemanticRecorder) {
-        exp!!.analysis(recorder)
+        exp.analysis(recorder)
     }
 
     override fun genCode(codegen: ICodegen) {
-        exp!!.genCode(codegen)
+        exp.genCode(codegen)
         codegen.genCode(RuntimeInst.ithrow)
     }
 
@@ -36,11 +31,11 @@ class StmtThrow : IStmt {
         return prefix.toString() +
                 KeywordType.THROW.desc +
                 " " +
-                exp!!.print(prefix) +
+                exp.print(prefix) +
                 OperatorType.SEMI.desc
     }
 
     override fun addClosure(scope: IClosureScope) {
-        exp!!.addClosure(scope)
+        exp.addClosure(scope)
     }
 }
