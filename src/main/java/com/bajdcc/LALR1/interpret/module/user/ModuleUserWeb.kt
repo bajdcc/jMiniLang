@@ -14,6 +14,7 @@ import com.vladsch.flexmark.parser.Parser
 import com.vladsch.flexmark.parser.ParserEmulationProfile
 import com.vladsch.flexmark.util.options.MutableDataSet
 
+@Suppress("UNUSED_ANONYMOUS_PARAMETER")
 /**
  * 【模块】用户态-网页服务器
  *

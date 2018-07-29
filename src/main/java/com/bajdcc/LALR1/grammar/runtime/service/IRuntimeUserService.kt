@@ -88,9 +88,10 @@ interface IRuntimeUserService {
         /**
          * 创建文件
          * @param id 句柄
+         * @param file 是否创建文件
          * @return 是否成功
          */
-        fun createFile(id: Int): Boolean
+        fun createFile(id: Int, file: Boolean): Boolean
 
         /**
          * 删除文件

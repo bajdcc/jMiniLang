@@ -7,6 +7,7 @@ import com.bajdcc.LALR1.ui.UIRemoteWindow
 import com.bajdcc.LALR1.ui.drawing.UIRemoteGraphics
 import com.bajdcc.util.ResourceLoader
 
+@Suppress("UNUSED_ANONYMOUS_PARAMETER")
 /**
  * 【模块】远程用户界面
  *

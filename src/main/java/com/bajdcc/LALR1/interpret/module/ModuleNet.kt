@@ -26,6 +26,7 @@ import java.net.URL
 import java.net.UnknownHostException
 import java.util.regex.Pattern
 
+@Suppress("UNUSED_ANONYMOUS_PARAMETER")
 /**
  * 【模块】网络
  *

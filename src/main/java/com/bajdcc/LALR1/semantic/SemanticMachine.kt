@@ -28,7 +28,7 @@ class SemanticMachine(private val items: List<RuleItem>,
                       private val query: IQuerySymbol,
                       private val manage: IManageSymbol,
                       private val recorder: ISemanticRecorder,
-                      debug: Boolean) : IRandomAccessOfTokens {
+                      val debug: Boolean = false) : IRandomAccessOfTokens {
 
     /**
      * 单词索引
@@ -49,11 +49,6 @@ class SemanticMachine(private val items: List<RuleItem>,
      * 数据处理堆栈
      */
     private val ps = ParsingStack()
-
-    /**
-     * 调试
-     */
-    private val debug = false
 
     /**
      * 结果

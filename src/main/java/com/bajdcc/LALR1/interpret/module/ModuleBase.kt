@@ -8,6 +8,7 @@ import org.apache.log4j.Logger
 import java.io.File
 import java.util.*
 
+@Suppress("UNUSED_ANONYMOUS_PARAMETER")
 /**
  * 【模块】基本模块
  *

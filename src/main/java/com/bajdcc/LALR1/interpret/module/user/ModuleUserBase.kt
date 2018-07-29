@@ -408,21 +408,21 @@ class ModuleUserBase : IInterpreterModule {
             info.addExternalFunc("g_res_get_vfs_size",
                     RuntimeDebugExec("VFS列表数量")
                     { args: List<RuntimeObject>, status: IRuntimeStatus -> RuntimeObject(status.service.fileService.vfsListSize) })
-            info.addExternalFunc("g_query_file",
-                    RuntimeDebugExec("查询文件状态")
+            info.addExternalFunc("g_query_file_internal",
+                    RuntimeDebugExec("查询文件状态", arrayOf(RuntimeObjectType.kPtr))
                     { args: List<RuntimeObject>, status: IRuntimeStatus -> RuntimeObject(status.service.userService.file.queryFile(args[0].int)) })
-            info.addExternalFunc("g_create_file",
-                    RuntimeDebugExec("创建文件")
-                    { args: List<RuntimeObject>, status: IRuntimeStatus -> RuntimeObject(status.service.userService.file.createFile(args[0].int)) })
-            info.addExternalFunc("g_delete_file",
-                    RuntimeDebugExec("，删除文件")
+            info.addExternalFunc("g_create_file_internal",
+                    RuntimeDebugExec("创建文件", arrayOf(RuntimeObjectType.kPtr, RuntimeObjectType.kBool))
+                    { args: List<RuntimeObject>, status: IRuntimeStatus -> RuntimeObject(status.service.userService.file.createFile(args[0].int, args[1].bool)) })
+            info.addExternalFunc("g_delete_file_internal",
+                    RuntimeDebugExec("删除文件", arrayOf(RuntimeObjectType.kPtr))
                     { args: List<RuntimeObject>, status: IRuntimeStatus -> RuntimeObject(status.service.userService.file.deleteFile(args[0].int)) })
-            info.addExternalFunc("g_read_file",
-                    RuntimeDebugExec("读取文件")
-                    { args: List<RuntimeObject>, status: IRuntimeStatus -> RuntimeObject(status.service.userService.file.readFile(args[0].int)) })
-            info.addExternalFunc("g_write_file",
-                    RuntimeDebugExec("写入文件")
-                    { args: List<RuntimeObject>, status: IRuntimeStatus -> RuntimeObject(status.service.userService.file.writeFile(args[0].int, args[1].obj as ByteArray, args[2].bool, args[3].bool)) })
+            info.addExternalFunc("g_read_file_internal",
+                    RuntimeDebugExec("读取文件", arrayOf(RuntimeObjectType.kPtr))
+                    { args: List<RuntimeObject>, status: IRuntimeStatus -> RuntimeObject(String(status.service.userService.file.readFile(args[0].int) ?: ByteArray(0), Charsets.UTF_8)) })
+            info.addExternalFunc("g_write_file_internal",
+                    RuntimeDebugExec("写入文件", arrayOf(RuntimeObjectType.kPtr, RuntimeObjectType.kString, RuntimeObjectType.kBool, RuntimeObjectType.kBool))
+                    { args: List<RuntimeObject>, status: IRuntimeStatus -> RuntimeObject(status.service.userService.file.writeFile(args[0].int, args[1].string.toByteArray(Charsets.UTF_8), args[2].bool, args[3].bool)) })
         }
 
         private fun importFromMath(info: IRuntimeDebugInfo, refer: IRuntimeDebugInfo) {

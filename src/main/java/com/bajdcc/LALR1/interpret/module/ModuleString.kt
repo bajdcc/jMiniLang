@@ -6,6 +6,7 @@ import com.bajdcc.LALR1.grammar.runtime.data.RuntimeArray
 import com.bajdcc.util.ResourceLoader
 import java.util.regex.Pattern
 
+@Suppress("UNUSED_ANONYMOUS_PARAMETER")
 /**
  * 【模块】字符串模块
  *

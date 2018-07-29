@@ -88,9 +88,10 @@ class RuntimeUserService(private val service: RuntimeService) : IRuntimeUserServ
 
         /**
          * 创建文件
+         * @param file 是否创建文件
          * @return 是否成功
          */
-        fun create(): Boolean
+        fun create(file: Boolean): Boolean
 
         /**
          * 删除文件
@@ -251,11 +252,11 @@ class RuntimeUserService(private val service: RuntimeService) : IRuntimeUserServ
     internal inner class UserFileHandler(id: Int) : UserHandler(id), IUserFileHandler {
 
         private val path: String
-            get() = arrUsers[id]?.name ?: "UNKNOWN"
+            get() = arrUsers[id]?.name?.trimEnd('/') ?: "UNKNOWN"
 
         override fun query() = fsNodeRoot.query(path)
 
-        override fun create() = fsNodeRoot.createNode(path) != null
+        override fun create(file: Boolean) = fsNodeRoot.createNode(path, file) != null
 
         override fun delete() = fsNodeRoot.deleteNode(path)
 
@@ -363,12 +364,12 @@ class RuntimeUserService(private val service: RuntimeService) : IRuntimeUserServ
         return user.handler.file.query()
     }
 
-    override fun createFile(id: Int): Boolean {
+    override fun createFile(id: Int, file: Boolean): Boolean {
         if (arrUsers[id] == null) {
             return false
         }
         val user = arrUsers[id]!!
-        return user.handler.file.create()
+        return user.handler.file.create(file)
     }
 
     override fun deleteFile(id: Int): Boolean {

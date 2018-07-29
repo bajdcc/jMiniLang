@@ -14,6 +14,7 @@ import org.apache.log4j.Logger
 import java.text.SimpleDateFormat
 import java.util.*
 
+@Suppress("UNUSED_ANONYMOUS_PARAMETER")
 /**
  * 【模块】服务模块
  *

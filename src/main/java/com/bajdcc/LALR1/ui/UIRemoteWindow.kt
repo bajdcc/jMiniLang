@@ -37,7 +37,7 @@ class UIRemoteWindow : JFrame() {
     }
 
     private fun setTimer() {
-        Timer(33) { e -> panel.repaint() }.start()
+        Timer(33) { panel.repaint() }.start()
     }
 
     companion object {

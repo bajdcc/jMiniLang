@@ -8,6 +8,7 @@ import java.util.*
 import java.util.concurrent.LinkedBlockingDeque
 import javax.swing.JPanel
 
+@Suppress("UNUSED_ANONYMOUS_PARAMETER")
 /**
  * 【模块】界面
  *

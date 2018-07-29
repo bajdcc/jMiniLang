@@ -1599,13 +1599,55 @@ var import_handle_class = func ~() {
         this."init" := lambda(this, name) {
             this."name" := name;
             this."handle" := g_handle("file|" + name);
-            this."query" := lambda(this) -> g_query_file(this."handle");
-            this."create" := lambda(this) -> g_create_file(this."handle");
-            this."delete" := lambda(this) -> g_delete_file(this."handle");
-            this."read" := lambda(this) -> g_read_file(this."handle");
-            this."write" := lambda(this, data, overwrite, autoCreate) -> g_write_file(this."handle", data, overwrite, autoCreate);
+            this."query" := lambda(this) -> g_query_file_internal(this."handle");
+            this."create" := lambda(this, file) -> g_create_file_internal(this."handle", file);
+            this."delete" := lambda(this) -> g_delete_file_internal(this."handle");
+            this."read" := lambda(this) -> g_read_file_internal(this."handle");
+            this."write" := lambda(this, data, overwrite, autoCreate) -> g_write_file_internal(this."handle", data, overwrite, autoCreate);
         };
     });
+    var g_create_file = func ~(name) {
+        var f = g_new_class("system::file", [], [["init", name]]);
+        var r = f."create"(true);
+        f."destroy"();
+        return r;
+    };
+    export "g_create_file";
+    var g_create_dir = func ~(name) {
+        var f = g_new_class("system::file", [], [["init", name]]);
+        var r = f."create"(false);
+        f."destroy"();
+        return r;
+    };
+    export "g_create_dir";
+    var g_query_file = func ~(name) {
+        var f = g_new_class("system::file", [], [["init", name]]);
+        var r = f."query"();
+        f."destroy"();
+        return r;
+    };
+    export "g_query_file";
+    var g_delete_file = func ~(name) {
+        var f = g_new_class("system::file", [], [["init", name]]);
+        var r = f."delete"();
+        f."destroy"();
+        return r;
+    };
+    export "g_delete_file";
+    var g_read_file = func ~(name) {
+        var f = g_new_class("system::file", [], [["init", name]]);
+        var r = f."read"();
+        f."destroy"();
+        return r;
+    };
+    export "g_read_file";
+    var g_write_file = func ~(name, data, overwrite, autoCreate) {
+        var f = g_new_class("system::file", [], [["init", name]]);
+        var r = f."write"(data, overwrite, autoCreate);
+        f."destroy"();
+        return r;
+    };
+    export "g_write_file";
 };
 
 var import_std_base = func ~() {

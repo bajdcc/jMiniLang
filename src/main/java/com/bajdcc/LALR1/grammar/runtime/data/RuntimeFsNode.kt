@@ -48,7 +48,7 @@ private fun RuntimeFsNode.findNode(path: String): RuntimeFsNode? {
     return node
 }
 
-fun RuntimeFsNode.createNode(path: String): RuntimeFsNode? {
+fun RuntimeFsNode.createNode(path: String, file: Boolean): RuntimeFsNode? {
     val sp = path.split('/')
     if (sp.isEmpty() || sp[0] != "")
         return null
@@ -62,11 +62,14 @@ fun RuntimeFsNode.createNode(path: String): RuntimeFsNode? {
         return null
     val name = sp.last()
     if (!node.children!!.contains(name)) {
-        val newNode = RuntimeFsNode(name, true)
+        val newNode = RuntimeFsNode(name, file)
         node.children!![name] = newNode
         return newNode
     }
-    return node.children!![name]
+    val existNode = node.children!![name]!!
+    if (existNode.isFile == file)
+        return existNode
+    return null
 }
 
 fun RuntimeFsNode.deleteNode(path: String): Boolean {
@@ -93,7 +96,7 @@ fun RuntimeFsNode.read(path: String): ByteArray? = this.findNode(path)?.data
 fun RuntimeFsNode.write(path: String, data: ByteArray, overwrite: Boolean, createIfNotExist: Boolean): Long {
     var node = this.findNode(path)
     if (node == null && createIfNotExist) {
-        node = this.createNode(path) ?: return -1L
+        node = this.createNode(path, true) ?: return -1L
     }
     if (node == null)
         return -2L

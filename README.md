@@ -209,31 +209,47 @@ TASK PROC:
 
 ```javascript
 import "user.base";
+
 var channel = g_pipe("TEST-MUTEX");
 var goods = g_share("TEST-MUTEX#GOOD", g_from([]));
 var index = g_share("TEST-MUTEX#INDEX", 0);
+g_create_dir("/example-mutex");
+
 var new_id = func ~() -> index."set!"(lambda(a) -> a++);
 var enqueue = func ~(id) -> goods."get!"(lambda(a) -> a."push"(id));
 var dequeue = func ~() -> goods."get!"(lambda(a) -> a."pop"());
+
+var consumer_id = func ~(id) -> "/example-mutex/consumer-" + id;
+var producer_id = func ~(id) -> "/example-mutex/producer-" + id;
+
 var consumer = func ~(id) {
-    var obj = g_null;
+    var obj;
+    var now = g_get_timestamp();
     channel."writeln"("消费者 #" + id + " 已启动");
     foreach (var i : g_range(1, 5)) {
         while (g_is_null(obj := dequeue())) {}
         channel."writeln"("消费者 #" + id + " 收到：" + obj);
     }
     channel."writeln"("消费者 #" + id + " 已退出");
+    var span = g_get_timestamp() - now;
+    g_write_file(consumer_id(id), "消费者 #" + id + " 用时 " + span + "ms", true, true);
 };
+
 var producer = func ~(id) {
-    var obj = g_null;
+    var obj;
+    var now = g_get_timestamp();
     channel."writeln"("生产者 #" + id + " 已启动");
     foreach (var i : g_range(1, 5)) {
         enqueue(obj := new_id());
         channel."writeln"("生产者 #" + id + " 发送：" + obj);
     }
     channel."writeln"("生产者 #" + id + " 已退出");
+    var span = g_get_timestamp() - now;
+    g_write_file(producer_id(id), "生产者 #" + id + " 用时 " + span + "ms", true, true);
 };
+
 var child = false;
+
 foreach (var i : g_range(1, 5)) {
     if (g_fork() == -1) {
         consumer(i);
@@ -246,14 +262,37 @@ foreach (var i : g_range(1, 5)) {
         break;
     }
 }
+
 if (child) { return; }
+
+if (g_fork() == -1) {
+    var i = 0;
+    while (i < 10) {
+        foreach (var id : g_range(1, 5)) {
+            if (g_query_file(consumer_id(id)) == 1) {
+                i++;
+                channel."writeln"(g_read_file(consumer_id(id)));
+                g_delete_file(consumer_id(id));
+            }
+            if (g_query_file(producer_id(id)) == 1) {
+                i++;
+                channel."writeln"(g_read_file(producer_id(id)));
+                g_delete_file(producer_id(id));
+            }
+        }
+    }
+    channel."write"(g_noop_true);
+    g_delete_file("/example-mutex");
+    return;
+}
+
 channel."pipe"(g_system_output());
 ```
 
 **Output:**
 
 ```
-运行成功！PID：54
+运行成功！PID：24
 消费者 #1 已启动
 生产者 #1 已启动
 消费者 #2 已启动
@@ -324,8 +363,18 @@ channel."pipe"(g_system_output());
 消费者 #2 收到：24
 消费者 #2 收到：25
 消费者 #2 已退出
+生产者 #1 用时 106ms
+消费者 #2 用时 131ms
+生产者 #2 用时 107ms
+消费者 #3 用时 91ms
+生产者 #3 用时 104ms
+消费者 #4 用时 88ms
+生产者 #4 用时 101ms
+消费者 #5 用时 89ms
+生产者 #5 用时 100ms
+消费者 #1 用时 108ms
 
-远程中止
+正常退出
 ```
 
 ** Online Compiler Example III: Fork **

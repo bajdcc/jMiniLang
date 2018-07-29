@@ -6,6 +6,7 @@ import com.bajdcc.util.ResourceLoader
 import java.math.BigDecimal
 import java.util.*
 
+@Suppress("UNUSED_ANONYMOUS_PARAMETER")
 /**
  * 【模块】数学模块
  *

@@ -6,6 +6,7 @@ import com.bajdcc.LALR1.grammar.runtime.data.RuntimeArray
 import com.bajdcc.LALR1.grammar.runtime.data.RuntimeMap
 import com.bajdcc.util.ResourceLoader
 
+@Suppress("UNUSED_ANONYMOUS_PARAMETER")
 /**
  * 【模块】列表模块
  *

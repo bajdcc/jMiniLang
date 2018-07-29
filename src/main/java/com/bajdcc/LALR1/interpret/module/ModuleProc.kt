@@ -7,6 +7,7 @@ import com.bajdcc.LALR1.grammar.runtime.data.RuntimeFuncObject
 import com.bajdcc.util.ResourceLoader
 import java.util.*
 
+@Suppress("UNUSED_ANONYMOUS_PARAMETER")
 /**
  * 【模块】进程模块
  *
