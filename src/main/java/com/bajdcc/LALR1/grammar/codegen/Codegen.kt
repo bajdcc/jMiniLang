@@ -59,8 +59,8 @@ class Codegen(symbol: SymbolTable) : ICodegen, ICodegenBlock, ICodegenByteWriter
         funcMap.forEach { func ->
             if (func.isExtern) {
                 info.addExports(func.realName, data.codeIndex)
-                info.addExternalFunc(func.realName, CodegenFuncDoc(
-                        func.getDoc(), func.params))
+                info.addExternalFunc(func.realName,
+                        RuntimeDebugExec(paramsDoc = func.params.joinToString(separator = "，", transform = { it.toRealString() })))
             }
             func.genCode(this)
         }
@@ -79,7 +79,7 @@ class Codegen(symbol: SymbolTable) : ICodegen, ICodegenBlock, ICodegenByteWriter
         for (inst in data.insts) {
             inst.gen(this)
         }
-        return RuntimeCodePage(objs, insts, info, itvList)
+        return RuntimeCodePage(objs, insts.toByteArray(), info, itvList)
     }
 
     override fun genFuncEntry(funcName: String) {

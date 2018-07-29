@@ -1,6 +1,5 @@
 package com.bajdcc.LALR1.grammar.runtime
 
-import com.bajdcc.LALR1.grammar.codegen.CodegenFuncDoc
 import com.bajdcc.LALR1.grammar.runtime.data.RuntimeArray
 import java.io.Serializable
 
@@ -13,8 +12,8 @@ class RuntimeDebugInfo : IRuntimeDebugInfo, Serializable {
     override val dataMap = mutableMapOf<String, Any>()
     private val exports = mutableMapOf<String, Int>()
     private val func = mutableMapOf<Int, String>()
-    private val externalValue = mutableMapOf<String, IRuntimeDebugValue>()
-    private val externalExec = mutableMapOf<String, IRuntimeDebugExec>()
+    private val externalValue = mutableMapOf<String, RuntimeDebugValue>()
+    private val externalExec = mutableMapOf<String, RuntimeDebugExec>()
 
     override val externFuncList: List<RuntimeArray>
         get() {
@@ -23,10 +22,7 @@ class RuntimeDebugInfo : IRuntimeDebugInfo, Serializable {
                 val arr = RuntimeArray()
                 arr.add(RuntimeObject(a.key))
                 arr.add(RuntimeObject(exports.getOrDefault(a.key, -1).toLong()))
-                if (a.value is CodegenFuncDoc)
-                    arr.add(RuntimeObject((a.value as CodegenFuncDoc).paramsDoc))
-                else
-                    arr.add(RuntimeObject(argsToString(a.value.argsType)))
+                arr.add(RuntimeObject(a.value.paramsDoc))
                 arr.add(RuntimeObject(a.value.doc))
                 array.add(arr)
             }
@@ -49,28 +45,24 @@ class RuntimeDebugInfo : IRuntimeDebugInfo, Serializable {
         return exports.getOrDefault(name, -1)
     }
 
-    override fun getValueCallByName(name: String): IRuntimeDebugValue? {
+    override fun getValueCallByName(name: String): RuntimeDebugValue? {
         return externalValue.getOrDefault(name, null)
     }
 
-    override fun getExecCallByName(name: String): IRuntimeDebugExec? {
+    override fun getExecCallByName(name: String): RuntimeDebugExec? {
         return externalExec.getOrDefault(name, null)
     }
 
-    override fun addExternalValue(name: String, func: IRuntimeDebugValue): Boolean {
+    override fun addExternalValue(name: String, func: RuntimeDebugValue): Boolean {
         return externalValue.put(name, func) != null
     }
 
-    override fun addExternalFunc(name: String, func: IRuntimeDebugExec): Boolean {
+    override fun addExternalFunc(name: String, func: RuntimeDebugExec): Boolean {
         return externalExec.put(name, func) != null
     }
 
     companion object {
 
         private const val serialVersionUID = 1L
-
-        private fun argsToString(args: Array<RuntimeObjectType>?): String {
-            return args?.joinToString(separator = ", ", transform = { it.desc }) ?: "无"
-        }
     }
 }

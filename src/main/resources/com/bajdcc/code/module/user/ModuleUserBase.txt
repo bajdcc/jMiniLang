@@ -1599,6 +1599,11 @@ var import_handle_class = func ~() {
         this."init" := lambda(this, name) {
             this."name" := name;
             this."handle" := g_handle("file|" + name);
+            this."query" := lambda(this) -> g_query_file(this."handle");
+            this."create" := lambda(this) -> g_create_file(this."handle");
+            this."delete" := lambda(this) -> g_delete_file(this."handle");
+            this."read" := lambda(this) -> g_read_file(this."handle");
+            this."write" := lambda(this, data, overwrite, autoCreate) -> g_write_file(this."handle", data, overwrite, autoCreate);
         };
     });
 };

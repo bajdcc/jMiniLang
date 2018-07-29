@@ -2,7 +2,7 @@ package com.bajdcc.LALR1.grammar.runtime.service
 
 import com.bajdcc.LALR1.grammar.runtime.RuntimeObject
 import com.bajdcc.LALR1.grammar.runtime.RuntimeObjectType
-import com.bajdcc.LALR1.grammar.runtime.data.RuntimeArray
+import com.bajdcc.LALR1.grammar.runtime.data.*
 import org.apache.log4j.Logger
 import sun.reflect.generics.reflectiveObjects.NotImplementedException
 
@@ -13,8 +13,9 @@ import java.util.*
  *
  * @author bajdcc
  */
-class RuntimeUserService internal constructor(private val service: RuntimeService) : IRuntimeUserService, IRuntimeUserService.IRuntimeUserPipeService, IRuntimeUserService.IRuntimeUserShareService, IRuntimeUserService.IRuntimeUserFileService {
+class RuntimeUserService(private val service: RuntimeService) : IRuntimeUserService, IRuntimeUserService.IRuntimeUserPipeService, IRuntimeUserService.IRuntimeUserShareService, IRuntimeUserService.IRuntimeUserFileService {
 
+    private val fsNodeRoot = RuntimeFsNode.root()
     private val mapNames = mutableMapOf<String, Int>()
     private val arrUsers = Array<UserStruct?>(MAX_USER) { null }
     private val setUserId = mutableSetOf<Int>()
@@ -77,7 +78,41 @@ class RuntimeUserService internal constructor(private val service: RuntimeServic
         fun unlock(): Boolean
     }
 
-    internal interface IUserFileHandler
+    internal interface IUserFileHandler {
+
+        /**
+         * 查询文件
+         * @return 0-不存在，1-文件，2-文件夹
+         */
+        fun query(): Long
+
+        /**
+         * 创建文件
+         * @return 是否成功
+         */
+        fun create(): Boolean
+
+        /**
+         * 删除文件
+         * @return 是否成功
+         */
+        fun delete(): Boolean
+
+        /**
+         * 读取文件
+         * @return 是否成功
+         */
+        fun read(): ByteArray?
+
+        /**
+         * 写入文件
+         * @param data 数据
+         * @param overwrite 是否覆盖
+         * @param createIfNotExist 是否自动创建
+         * @return 0-成功，-1:自动创建失败，-2:文件不存在，-3:目标不是文件
+         */
+        fun write(data: ByteArray, overwrite: Boolean, createIfNotExist: Boolean): Long
+    }
 
     internal interface IUserHandler {
 
@@ -215,6 +250,20 @@ class RuntimeUserService internal constructor(private val service: RuntimeServic
 
     internal inner class UserFileHandler(id: Int) : UserHandler(id), IUserFileHandler {
 
+        private val path: String
+            get() = arrUsers[id]?.name ?: "UNKNOWN"
+
+        override fun query() = fsNodeRoot.query(path)
+
+        override fun create() = fsNodeRoot.createNode(path) != null
+
+        override fun delete() = fsNodeRoot.deleteNode(path)
+
+        override fun read() = fsNodeRoot.read(path)
+
+        override fun write(data: ByteArray, overwrite: Boolean, createIfNotExist: Boolean) =
+                fsNodeRoot.write(path, data, overwrite, createIfNotExist)
+
         override val file: IUserFileHandler
             get() = this
     }
@@ -306,6 +355,46 @@ class RuntimeUserService internal constructor(private val service: RuntimeServic
         return user.handler.share.unlock()
     }
 
+    override fun queryFile(id: Int): Long {
+        if (arrUsers[id] == null) {
+            return -1L
+        }
+        val user = arrUsers[id]!!
+        return user.handler.file.query()
+    }
+
+    override fun createFile(id: Int): Boolean {
+        if (arrUsers[id] == null) {
+            return false
+        }
+        val user = arrUsers[id]!!
+        return user.handler.file.create()
+    }
+
+    override fun deleteFile(id: Int): Boolean {
+        if (arrUsers[id] == null) {
+            return false
+        }
+        val user = arrUsers[id]!!
+        return user.handler.file.delete()
+    }
+
+    override fun readFile(id: Int): ByteArray? {
+        if (arrUsers[id] == null) {
+            return null
+        }
+        val user = arrUsers[id]!!
+        return user.handler.file.read()
+    }
+
+    override fun writeFile(id: Int, data: ByteArray, overwrite: Boolean, createIfNotExist: Boolean): Long {
+        if (arrUsers[id] == null) {
+            return -1L
+        }
+        val user = arrUsers[id]!!
+        return user.handler.file.write(data, overwrite, createIfNotExist)
+    }
+
     override fun destroy() {
         val handles = ArrayList(service.processService.ring3.handles)
         handles.forEach { handle ->
@@ -322,11 +411,15 @@ class RuntimeUserService internal constructor(private val service: RuntimeServic
     }
 
     override fun destroy(id: Int): Boolean {
-        if (!mapNames.containsKey(arrUsers[id]!!.name))
+        if (arrUsers[id] == null)
             return false
+        val user = arrUsers[id]!!
+        if (!mapNames.containsKey(user.name))
+            return false
+        logger.debug("${user.type} '${user.name}' #$id destroyed")
         setUserId.remove(id)
-        mapNames.remove(arrUsers[id]!!.name)
-        arrUsers[id]!!.handler.destroy()
+        mapNames.remove(user.name)
+        user.handler.destroy()
         arrUsers[id] = null
         return true
     }
@@ -363,6 +456,7 @@ class RuntimeUserService internal constructor(private val service: RuntimeServic
             return mapNames.getOrDefault(name, -11)
         }
         val id = newId()
+        logger.debug("${UserType.PIPE} '$name' #$id created")
         mapNames[name] = id
         arrUsers[id] = UserStruct(name, page, UserType.PIPE, UserPipeHandler(id))
         return id
@@ -373,6 +467,7 @@ class RuntimeUserService internal constructor(private val service: RuntimeServic
             return mapNames.getOrDefault(name, -21)
         }
         val id = newId()
+        logger.debug("${UserType.SHARE} '$name' #$id created")
         mapNames[name] = id
         arrUsers[id] = UserStruct(name, page, UserType.SHARE, UserShareHandler(id))
         service.processService.ring3.addHandle(id)
@@ -384,6 +479,7 @@ class RuntimeUserService internal constructor(private val service: RuntimeServic
             return mapNames.getOrDefault(name, -31)
         }
         val id = newId()
+        logger.debug("${UserType.FILE} '$name' #$id created")
         mapNames[name] = id
         arrUsers[id] = UserStruct(name, page, UserType.FILE, UserFileHandler(id))
         service.processService.ring3.addHandle(id)

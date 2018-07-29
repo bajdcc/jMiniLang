@@ -30,7 +30,7 @@ open class SpringBootstrap : Thread() {
                 return
             } catch (e: Exception) {
                 e.printStackTrace()
-                ModuleNet.getInstance().resetBootstrap()
+                ModuleNet.instance.resetBootstrap()
             }
 
             try {

@@ -19,7 +19,7 @@ class RuntimeCodePage(
         /**
          * 指令
          */
-        val insts: List<Byte>,
+        val insts: ByteArray,
         /**
          * 调试开发
          */

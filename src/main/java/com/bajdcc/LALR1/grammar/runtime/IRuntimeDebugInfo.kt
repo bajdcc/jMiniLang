@@ -44,7 +44,7 @@ interface IRuntimeDebugInfo {
      * @param name 自定义参数名称
      * @return 本地过程导出接口
      */
-    fun getExecCallByName(name: String): IRuntimeDebugExec?
+    fun getExecCallByName(name: String): RuntimeDebugExec?
 
     /**
      * 根据自定义参数名称找到本地值导出接口
@@ -52,7 +52,7 @@ interface IRuntimeDebugInfo {
      * @param name 自定义参数名称
      * @return 本地值导出接口
      */
-    fun getValueCallByName(name: String): IRuntimeDebugValue?
+    fun getValueCallByName(name: String): RuntimeDebugValue?
 
     /**
      * 添加外部变量
@@ -61,7 +61,7 @@ interface IRuntimeDebugInfo {
      * @param func 调用过程
      * @return 是否冲突
      */
-    fun addExternalValue(name: String, func: IRuntimeDebugValue): Boolean
+    fun addExternalValue(name: String, func: RuntimeDebugValue): Boolean
 
     /**
      * 添加外部过程
@@ -70,5 +70,5 @@ interface IRuntimeDebugInfo {
      * @param func 调用过程
      * @return 是否冲突
      */
-    fun addExternalFunc(name: String, func: IRuntimeDebugExec): Boolean
+    fun addExternalFunc(name: String, func: RuntimeDebugExec): Boolean
 }

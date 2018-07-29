@@ -76,7 +76,46 @@ interface IRuntimeUserService {
         fun unlock(id: Int): Boolean
     }
 
-    interface IRuntimeUserFileService
+    interface IRuntimeUserFileService {
+
+        /**
+         * 查询文件
+         * @param id 句柄
+         * @return 0-不存在，1-文件，2-文件夹
+         */
+        fun queryFile(id: Int): Long
+
+        /**
+         * 创建文件
+         * @param id 句柄
+         * @return 是否成功
+         */
+        fun createFile(id: Int): Boolean
+
+        /**
+         * 删除文件
+         * @param id 句柄
+         * @return 是否成功
+         */
+        fun deleteFile(id: Int): Boolean
+
+        /**
+         * 读取文件
+         * @param id 句柄
+         * @return 是否成功
+         */
+        fun readFile(id: Int): ByteArray?
+
+        /**
+         * 写入文件
+         * @param id 句柄
+         * @param data 数据
+         * @param overwrite 是否覆盖
+         * @param createIfNotExist 是否自动创建
+         * @return 0-成功，-1:自动创建失败，-2:文件不存在，-3:目标不是文件
+         */
+        fun writeFile(id: Int, data: ByteArray, overwrite: Boolean, createIfNotExist: Boolean): Long
+    }
 
     /**
      * 创建用户服务句柄

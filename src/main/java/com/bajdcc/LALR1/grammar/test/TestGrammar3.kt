@@ -37,16 +37,10 @@ object TestGrammar3 {
             val grammar2 = Grammar(b)
             println(grammar2.toString())
             val page2 = grammar2.codePage
-            page2.info.addExternalFunc("g_print", object : IRuntimeDebugExec {
-                override val doc: String
-                    get() = "Print"
-
-                override val argsType: Array<RuntimeObjectType>?
-                    get() = arrayOf(RuntimeObjectType.kObject)
-
-                override fun ExternalProcCall(args: List<RuntimeObject>, status: IRuntimeStatus): RuntimeObject? {
-                    println(args[0].obj)
-                    return null
+            page2.info.addExternalFunc("g_print", RuntimeDebugExec("Print", arrayOf(RuntimeObjectType.kObject)) { arg: List<RuntimeObject>, _: IRuntimeStatus ->
+                run {
+                    println(arg[0].obj)
+                    null
                 }
             })
             println(page2.toString())

@@ -698,9 +698,9 @@ class RuntimeMachine @Throws(Exception::class)
             if (id == -1) {
                 id = loadInt()
                 val name = fetchFromGlobalData(id).string
-                var value: IRuntimeDebugValue? = currentPage.info.getValueCallByName(name)
+                var value: RuntimeDebugValue? = currentPage.info.getValueCallByName(name)
                 if (value != null) {
-                    func.addEnv(id, value.runtimeObject)
+                    func.addEnv(id, value.value())
                     continue
                 }
                 var index = currentPage.info.getAddressOfExportFunc(name)
@@ -712,13 +712,13 @@ class RuntimeMachine @Throws(Exception::class)
                 for (page in refers) {
                     value = page.info.getValueCallByName(name)
                     if (value != null) {
-                        func.addEnv(id, value.runtimeObject)
+                        func.addEnv(id, value.value())
                         continue@FOR_LOOP
                     }
                     index = page.info.getAddressOfExportFunc(name)
                     if (index != -1) {
                         func.addEnv(id, RuntimeObject(RuntimeFuncObject(page.info
-                                .dataMap.get("desc").toString(), index)))
+                                .dataMap["desc"].toString(), index)))
                         continue@FOR_LOOP
                     }
                 }
@@ -920,9 +920,9 @@ class RuntimeMachine @Throws(Exception::class)
         val idx = loadInt()
         val obj = fetchFromGlobalData(idx)
         val name = obj.string
-        var value: IRuntimeDebugValue? = currentPage.info.getValueCallByName(name)
+        var value: RuntimeDebugValue? = currentPage.info.getValueCallByName(name)
         if (value != null) {
-            currentStack.pushData(value.runtimeObject)
+            currentStack.pushData(value.value())
             return
         }
         var index = currentPage.info.getAddressOfExportFunc(name)
@@ -934,7 +934,7 @@ class RuntimeMachine @Throws(Exception::class)
         for (page in refers) {
             value = page.info.getValueCallByName(name)
             if (value != null) {
-                currentStack.pushData(value.runtimeObject)
+                currentStack.pushData(value.value())
                 return
             }
             index = page.info.getAddressOfExportFunc(name)
@@ -1004,13 +1004,13 @@ class RuntimeMachine @Throws(Exception::class)
         for (page in refers) {
             val exec = page.info.getExecCallByName(name) ?: continue
             val argsCount = currentStack.funcArgsCount
-            val types = exec.argsType
-            if (types == null && argsCount != 0 || types != null && types.size != argsCount) {
+            val types = exec.type
+            if (types.size != argsCount) {
                 err(RuntimeError.WRONG_ARGCOUNT, name + " " + argsCount.toString())
             }
             val args = mutableListOf<RuntimeObject>()
             for (i in 0 until argsCount) {
-                val type = if (types == null) RuntimeObjectType.kObject else if (types.size > i) types[i] else RuntimeObjectType.kObject
+                val type = if (types.size > i) types[i] else RuntimeObjectType.kObject
                 val objParam = currentStack.loadFuncArgs(i)
                 if (type != RuntimeObjectType.kObject) {
                     val objType = objParam.type
@@ -1033,7 +1033,7 @@ class RuntimeMachine @Throws(Exception::class)
                     currentStack.reg.execId, currentStack.reg.pageId, name)
             val retVal: RuntimeObject?
             try {
-                retVal = exec.ExternalProcCall(args, this)
+                retVal = exec.call!!(args, this)
             } catch (e: RuntimeException) {
                 if (e.error == RuntimeError.THROWS_EXCEPTION) {
                     opPushObj(RuntimeObject(e.info))
@@ -1155,8 +1155,6 @@ class RuntimeMachine @Throws(Exception::class)
             1 -> opCall()
             2 -> opCallExtern(true)
             3 -> opCallExtern(false)
-            else -> {
-            }
         }
     }
 
@@ -1296,10 +1294,10 @@ class RuntimeMachine @Throws(Exception::class)
 
         init {
             logger.debug("Loading modules...")
-            modulesSystem = mutableListOf(ModuleBase.getInstance(), ModuleMath.getInstance(), ModuleList.getInstance(), ModuleString.getInstance(), ModuleProc.getInstance(), ModuleFunction.getInstance(), ModuleUI.getInstance(), ModuleTask.getInstance(), ModuleRemote.getInstance(), ModuleLisp.getInstance(), ModuleNet.getInstance(), ModuleFile.getInstance(), ModuleClass.getInstance(), ModuleStdBase.getInstance(), ModuleStdShell.getInstance())
+            modulesSystem = mutableListOf(ModuleBase.instance, ModuleMath.instance, ModuleList.instance, ModuleString.instance, ModuleProc.instance, ModuleFunction.instance, ModuleUI.instance, ModuleTask.instance, ModuleRemote.instance, ModuleLisp.instance, ModuleNet.instance, ModuleFile.instance, ModuleClass.instance, ModuleStdBase.instance, ModuleStdShell.instance)
 
             logger.debug("Loading user modules...")
-            modulesUser = mutableListOf(ModuleUserBase.getInstance(), ModuleUserWeb.getInstance(), ModuleUserLisp.getInstance(), ModuleUserCParser.getInstance())
+            modulesUser = mutableListOf(ModuleUserBase.instance, ModuleUserWeb.instance, ModuleUserLisp.instance, ModuleUserCParser.instance)
         }
     }
 }
