@@ -48,7 +48,7 @@ class ExpInvoke : IExp {
     /**
      * 函数名是否为函数表达式
      */
-    var invokeExp: ExpInvoke? = null
+    var invokeExp: IExp? = null
 
     override fun isConstant(): Boolean {
         return false

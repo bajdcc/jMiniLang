@@ -1173,8 +1173,7 @@ var import_linq_class = func ~() {
         this."index" := lambda(this) -> this."__index__";
         this."next" := lambda(this) {
             while (this."__enumerator__"."next"()) {
-                var f = this."__where__";
-                if (f(this."__enumerator__"."current"())) {
+                if (call (this."__where__")(this."__enumerator__"."current"())) {
                     this."__index__"++;
                     return true;
                 }

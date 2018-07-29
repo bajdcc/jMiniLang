@@ -610,10 +610,7 @@ var import_ast = func ~() {
                 return s;
             }
         };
-        this."walk" := lambda(this, node) {
-            var f = this."walk_switch"[node."get_name"()];
-            return f(this, node);
-        };
+        this."walk" := lambda(this, node) -> call (this."walk_switch"[node."get_name"()])(this, node);
     });
     g_class("clib::c::ast::base", "object", lambda(this) {
         this."to_string" := lambda(this) -> "AST= " + this."__type__";

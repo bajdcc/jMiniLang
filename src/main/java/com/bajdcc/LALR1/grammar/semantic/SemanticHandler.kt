@@ -419,12 +419,7 @@ class SemanticHandler {
                         invoke.func = func
                     }
                 } else if (indexed.exists(3)) {
-                    val exp = indexed[3].obj as IExp
-                    if (exp is ExpInvoke) {
-                        invoke.invokeExp = exp
-                    } else {
-                        recorder.add(SemanticError.INVALID_FUNCNAME, indexed[4].token!!)
-                    }
+                    invoke.invokeExp = indexed[3].toExp()
                 } else {
                     invoke.func = indexed[0].toFunc()
                     invoke.name = invoke.func!!.name
@@ -467,7 +462,7 @@ class SemanticHandler {
                 } else {
                     mutableListOf()
                 }
-                exps.add(0, indexed[0].obj as IExp)
+                exps.add(0, indexed[0].toExp())
                 return exps
             }
         }
@@ -499,7 +494,7 @@ class SemanticHandler {
                     val block = Block(stmts)
                     func.block = block
                 } else {
-                    val block = indexed[4].obj as Block
+                    val block = indexed[4].toBlock()
                     val stmts = block.stmts
                     if (func.isYield) {
                         if (stmts.isEmpty()) {
@@ -538,7 +533,7 @@ class SemanticHandler {
                     val block = Block(stmts)
                     func.block = block
                 } else {
-                    val block = indexed[4].obj as Block
+                    val block = indexed[4].toBlock()
                     val stmts = block.stmts
                     if (stmts.isEmpty() || stmts[stmts.size - 1] !is StmtReturn)
                         stmts.add(ret)
@@ -603,7 +598,7 @@ class SemanticHandler {
                     stmt.falseBlock = indexed[2].toBlock()
                 } else if (indexed.exists(3)) {
                     val block = Block()
-                    block.stmts.add(indexed[3].obj as IStmt)
+                    block.stmts.add(indexed[3].toStmt())
                     stmt.falseBlock = block
                 }
                 return stmt
