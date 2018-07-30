@@ -1,0 +1,186 @@
+package com.bajdcc.LALR1.interpret.test
+
+import com.bajdcc.LALR1.grammar.Grammar
+import com.bajdcc.LALR1.grammar.runtime.RuntimeCodePage
+import com.bajdcc.LALR1.grammar.runtime.RuntimeException
+import com.bajdcc.LALR1.interpret.Interpreter
+import com.bajdcc.LALR1.syntax.handler.SyntaxException
+import com.bajdcc.util.lexer.error.RegexException
+
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+
+object TestInterpret4 {
+
+    @JvmStatic
+    fun main(args: Array<String>) {
+        try {
+            val codes = arrayOf(
+
+                    // 高级语言特性之迭代返回，即协程
+                    "import \"sys.base\";\n"
+                            + "var get = yield ~(a, b, c) {\n"
+                            + "    for (var i = a; i < b; i++) {\n"
+                            + "        if (i % c == 0) {\n"
+                            + "            continue;\n"
+                            + "        }\n"
+                            + "        yield i;\n"
+                            + "    }\n"
+                            + "};\n"
+                            + "foreach (var i : call get(0, 10, 2) + 1) {\n"
+                            + "   call g_print(i);\n"
+                            + "}\n",
+
+                    // 高级语言特性之函数闭包
+                    "import \"sys.base\";\n"
+                            + "var gen_eq = func ~(a) {\n"
+                            + "    var eq = func ~(b) -> a == b;\n"
+                            + "    return eq;\n"
+                            + "};\n"
+                            + "var ex_eq = call gen_eq(5);\n" // 函数Curry，保存词法上下文
+
+                            + "call g_print(call ex_eq(6));\n"
+                            + "call g_print(call ex_eq(6));\n",
+
+                    "import \"sys.base\";\n"
+                            + "var lt = call g_curry_1(\"g_lt\", 5);\n"
+                            + "call g_print(call lt(7));\n"
+                            + "call g_println();\n"
+                            + "call g_print(call lt(4));\n"
+                            + "call g_println();\n"
+                            + "\n",
+
+                    "import \"sys.base\";\n"
+                            + "var get = yield ~(a, b, c) {\n"
+                            + "    for (var i = a; i < b; i++) {\n"
+                            + "        if (i % c == 0) {\n"
+                            + "            continue;\n"
+                            + "        }\n"
+                            + "        yield i;\n"
+                            + "    }\n"
+                            + "};\n"
+                            + "foreach (var i : call get(0, 10, 2) * 10) {\n"
+                            + "   call g_print(i);\n"
+                            + "   call g_println();\n"
+                            + "}\n",
+
+                    "import \"sys.base\";\n"
+                            + "var a = 5;\n"
+                            + "var b = 4;\n"
+                            + "\n"
+                            + "    if (a == 5) {\n"
+                            + "       var b = 7;\n"
+                            + "       call g_print(b);\n"
+                            + "    }\n"
+                            + "call g_print(b);\n",
+
+                    "import \"sys.base\";\n"
+                            + "var mod_swap = call g_swap(\"g_mod\");\n"
+                            + "var mod_3 = call g_curry_1(mod_swap, 3);\n"
+                            + "foreach (var i : call g_range(1, 10) * 8) {\n"
+                            + "    if (call mod_3(i)) {\n"
+                            + "       call g_print(i);\n"
+                            + "       call g_println();\n"
+                            + "    }\n"
+                            + "}\n",
+
+                    // 打印质数版本1
+                    "import \"sys.base\";\n"
+                            + "call g_print(\"输入下限：\");\n"
+                            + "var lower_bound = call g_stdin_read_int();\n"
+                            + "call g_print(\"输入上限：\");\n"
+                            + "var upper_bound = call g_stdin_read_int();\n"
+                            + "var prime = func ~(a) {\n"
+                            + "    if (a <= 1) {\n"
+                            + "        return false;\n"
+                            + "    }\n"
+                            + "    var mod_a = call g_curry_1(\"g_mod\", a);\n"
+                            + "    var mod_any = func ~(x) -> call mod_a(x);\n"
+                            + "    if (!call g_range_any(2, a - 1, mod_any)) {\n"
+                            + "        call g_print(a);\n"
+                            + "        call g_println();\n"
+                            + "    }\n"
+                            + "};\n"
+                            + "call g_range_foreach(lower_bound, upper_bound, prime);\n"
+                            + "\n",
+
+                    // 打印质数版本2
+                    "import \"sys.base\";\n"
+                            + "call g_print(\"输入下限：\");\n"
+                            + "var lower_bound = call g_stdin_read_int();\n"
+                            + "call g_print(\"输入上限：\");\n"
+                            + "var upper_bound = call g_stdin_read_int();\n"
+                            + "var mod_swap = call g_swap(\"g_mod\");\n"
+                            + "var prime = func ~(a) {\n"
+                            + "    if (a <= 1) {\n"
+                            + "        return false;\n"
+                            + "    }\n"
+                            + "    foreach (var i : call g_range(2, a - 1)) {\n"
+                            + "        var mod_i = call g_curry_1(mod_swap, i);\n"
+                            + "        if (call mod_i(a)) {\n"
+                            + "            return;"
+                            + "        }\n"
+                            + "    }\n"
+                            + "    call g_print(a);\n"
+                            + "    call g_println();\n"
+                            + "};\n"
+                            + "call g_range_foreach(lower_bound, upper_bound, prime);\n"
+                            + "\n",
+
+                    // 打印质数版本3
+                    "import \"sys.base\";\nimport \"sys.math\";\n"
+                            + "call g_print(\"输入下限：\");\n"
+                            + "var lower_bound = call g_stdin_read_int();\n"
+                            + "call g_print(\"输入上限：\");\n"
+                            + "var upper_bound = call g_stdin_read_int();\n"
+                            + "var print_prime = func ~(a, b) {\n"
+                            + "    for (var i = a; i <= b; i++) {\n"
+                            + "        if (i <= 1) {\n"
+                            + "            continue;\n"
+                            + "        }\n"
+                            + "        var sq = call g_sqrt(i);\n"
+                            + "        for (var j = 2; j <= sq; j++) {\n"
+                            + "            if (i % j == 0) {\n"
+                            + "                break;\n"
+                            + "            }\n"
+                            + "        }\n"
+                            + "        if (j > sq) {\n"
+                            + "            call g_print(i);\n"
+                            + "            call g_println();\n"
+                            + "        }\n"
+                            + "    }\n"
+                            + "};\n"
+                            + "call print_prime(lower_bound, upper_bound);\n"
+                            + "\n")
+
+            val interpreter = Interpreter()
+            val grammar = Grammar(codes[codes.size - 1])
+            println(grammar.toString())
+            val page = grammar.codePage
+            println(page.toString())
+            val baos = ByteArrayOutputStream()
+            RuntimeCodePage.exportFromStream(page, baos)
+            val bais = ByteArrayInputStream(baos.toByteArray())
+            interpreter.run("test_1", bais)
+
+        } catch (e: RegexException) {
+            System.err.println()
+            System.err.println(e.position.toString() + "," + e.message)
+            e.printStackTrace()
+        } catch (e: SyntaxException) {
+            System.err.println()
+            System.err.println(e.position.toString() + "," + e.message + " "
+                    + e.info)
+            e.printStackTrace()
+        } catch (e: RuntimeException) {
+            System.err.println()
+            System.err.println(e.position.toString() + ": " + e.info)
+            e.printStackTrace()
+        } catch (e: Exception) {
+            System.err.println()
+            System.err.println(e.message)
+            e.printStackTrace()
+        }
+
+    }
+}

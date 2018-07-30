@@ -4,7 +4,6 @@ import com.bajdcc.LALR1.syntax.ISyntaxComponentVisitor
 import com.bajdcc.LALR1.syntax.exp.*
 import com.bajdcc.LALR1.syntax.rule.RuleItem
 import com.bajdcc.util.VisitBag
-import java.util.*
 
 /**
  * 求解一个产生式的First集合
@@ -38,8 +37,8 @@ class FirstsetSolver : ISyntaxComponentVisitor {
         if (bZero) {
             return false
         }
-        target.setFirstSetTokens = HashSet(setTokens)
-        target.setFirstSetRules = HashSet(setRules)
+        target.setFirstSetTokens = setTokens.toMutableSet()
+        target.setFirstSetRules = setRules.toMutableSet()
         return true
     }
 

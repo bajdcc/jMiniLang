@@ -1,7 +1,5 @@
 package com.bajdcc.LALR1.grammar.runtime
 
-import java.util.*
-
 /**
  * 【运行时】调用函数基本单位
  *
@@ -138,7 +136,7 @@ class RuntimeFunc {
         func.retPc = retPc
         func.retPage = retPage
         func.tryJmp = tryJmp
-        func.params = ArrayList(params)
+        func.params = params.toMutableList()
         func.tmp = tmp.map { it.entries.associate { it.key to it.value.clone() }.toMutableMap() }.toMutableList()
         func.closure = closure.entries.associate { it.key to it.value.clone() }.toMutableMap()
         func.yields = yields

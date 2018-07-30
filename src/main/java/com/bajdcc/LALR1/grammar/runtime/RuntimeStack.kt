@@ -199,7 +199,7 @@ class RuntimeStack {
         stack.catchState = catchState
         stack.stkData = Stack()
         stkData.forEach { stack.stkData.push(it) }
-        stack.dataTryCounts = ArrayList(dataTryCounts)
+        stack.dataTryCounts = dataTryCounts.toMutableList()
         stack.stkCall = stkCall.map { it.copy() }.toMutableList()
         stack.parent = parent
         stack.level = level

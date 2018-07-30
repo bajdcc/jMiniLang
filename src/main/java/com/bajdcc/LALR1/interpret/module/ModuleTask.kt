@@ -121,9 +121,8 @@ class ModuleTask : IInterpreterModule {
                         return Integer.parseInt(tokens[0].obj!!.toString())
                     }
 
-                    override fun getPatternName(): String {
-                        return "操作数转换"
-                    }
+                    override val patternName: String
+                        get() = "操作数转换"
                 })
                 grammar.addPatternHandler("010", object : IPatternHandler {
                     override fun handle(tokens: List<Token>, symbols: List<Any>): Any {
@@ -148,9 +147,8 @@ class ModuleTask : IInterpreterModule {
                         }
                     }
 
-                    override fun getPatternName(): String {
-                        return "二元运算"
-                    }
+                    override val patternName: String
+                        get() = "二元运算\""
                 })
                 grammar.addPatternHandler("101", object : IPatternHandler {
                     override fun handle(tokens: List<Token>, symbols: List<Any>): Any? {
@@ -162,9 +160,8 @@ class ModuleTask : IInterpreterModule {
                         } else null
                     }
 
-                    override fun getPatternName(): String {
-                        return "括号运算"
-                    }
+                    override val patternName: String
+                        get() = "括号运算"
                 })
                 grammar.infer("E -> E @PLUS T | E @MINUS T | T")
                 grammar.infer("T -> T @TIMES F | T @DIVIDE F | F")

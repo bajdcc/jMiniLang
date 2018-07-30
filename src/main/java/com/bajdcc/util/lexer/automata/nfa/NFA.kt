@@ -352,8 +352,8 @@ open class NFA(protected var expression: IRegexComponent,
      */
     private fun copyENFA(enfa: ENFA): ENFA {
         // 获取状态闭包
-        val srcStatusList = ArrayList(getNFAStatusClosure(
-                BreadthFirstSearch(), enfa.begin!!))
+        val srcStatusList = getNFAStatusClosure(
+                BreadthFirstSearch(), enfa.begin!!).toMutableList()
         /* 复制状态 */
         val dstStatusList = srcStatusList.map { NFAStatus(data = it.data) }
         /* 复制边 */
@@ -367,8 +367,8 @@ open class NFA(protected var expression: IRegexComponent,
         }
         /* 新建ENFA，连接初态和终态 */
         val result = ENFA()
-        result.begin = dstStatusList[srcStatusList.indexOf(enfa.begin)]
-        result.end = dstStatusList[srcStatusList.indexOf(enfa.end)]
+        result.begin = dstStatusList[srcStatusList.indexOf(enfa.begin!!)]
+        result.end = dstStatusList[srcStatusList.indexOf(enfa.end!!)]
         return result
     }
 }

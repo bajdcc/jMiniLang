@@ -5,7 +5,6 @@ import com.bajdcc.LALR1.grammar.runtime.data.RuntimeMap
 import java.net.MalformedURLException
 import java.net.URL
 import java.nio.channels.SelectionKey
-import java.util.*
 import java.util.concurrent.Semaphore
 import java.util.regex.Pattern
 
@@ -29,8 +28,8 @@ class ModuleNetWebContext(val key: SelectionKey) {
     private var version: String? = null
     var url: String? = null
         private set
-    private val mapReqHeaders = HashMap<String, String>()
-    private val mapRespHeaders = HashMap<String, String>()
+    private val mapReqHeaders = mutableMapOf<String, String>()
+    private val mapRespHeaders = mutableMapOf<String, String>()
 
     /**
      * 请求的结构：

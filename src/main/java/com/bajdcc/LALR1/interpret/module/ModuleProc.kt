@@ -5,7 +5,6 @@ import com.bajdcc.LALR1.grammar.runtime.*
 import com.bajdcc.LALR1.grammar.runtime.data.RuntimeArray
 import com.bajdcc.LALR1.grammar.runtime.data.RuntimeFuncObject
 import com.bajdcc.util.ResourceLoader
-import java.util.*
 
 @Suppress("UNUSED_ANONYMOUS_PARAMETER")
 /**
@@ -337,7 +336,7 @@ class ModuleProc : IInterpreterModule {
         }
 
         fun getProcInfo3(status: IRuntimeStatus, pids: List<Int>): List<Array<Any>> {
-            val objs = ArrayList<Array<Any>>()
+            val objs = arrayListOf<Array<Any>>()
             for (pid in pids) {
                 objs.add(status.getProcInfoById(pid))
             }

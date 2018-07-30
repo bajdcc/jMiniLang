@@ -283,7 +283,7 @@ class DFA(exp: IRegexComponent, debug: Boolean) : NFA(exp, debug) {
                     status = dfaStatusList[dfaStatusListMap[hash]!!]
                 } else {// 不存在DFA
                     status = DFAStatus()
-                    status.data.nfaStatus = ArrayList(bag.nfaStatus)
+                    status.data.nfaStatus = bag.nfaStatus.toMutableList()
                     /* 检查终态 */
                     for (nfaStatus in status.data.nfaStatus) {
                         if (nfaStatus.data.bFinal) {
@@ -365,7 +365,7 @@ class DFA(exp: IRegexComponent, debug: Boolean) : NFA(exp, debug) {
                     map[hash] = set
                 }
             }
-            return ArrayList(map.values)
+            return map.values.toMutableList()
         }
     }
 

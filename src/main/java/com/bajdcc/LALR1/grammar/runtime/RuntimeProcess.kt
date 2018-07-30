@@ -43,7 +43,7 @@ constructor(name: String, input: InputStream, private val pageFileMap: Map<Strin
         get() = setProcessId.filter { id -> arrProcess[id]!!.ring == 0 }
 
     val allProcs: List<Int>
-        get() = ArrayList(setProcessId)
+        get() = setProcessId.toList()
 
     override val speed: Double
         get() = stat.speed
@@ -148,7 +148,7 @@ constructor(name: String, input: InputStream, private val pageFileMap: Map<Strin
             isWaitingForUI = false
             return true
         }
-        val pids = ArrayList(setProcessId)
+        val pids = setProcessId.toList()
         val pidNum = pids.count { a -> arrProcess[a]!!.ring < 3 }.toLong()
         val pidUserNum = pids.size - pidNum
         var sleep: Long = 0

@@ -3,7 +3,6 @@ package com.bajdcc.LALR1.ui.drawing
 import org.apache.log4j.Logger
 import java.awt.*
 import java.awt.image.BufferedImage
-import java.util.*
 
 /**
  * 【界面】点阵文字位图
@@ -20,7 +19,7 @@ class UIFontImage(private val width: Int, private val height: Int) {
     private val enableBGColor: Boolean = false
 
     init {
-        this.imagesUnicode = HashMap()
+        this.imagesUnicode = mutableMapOf()
         this.enableColor = false
         this.enableFGColor = false
         this.enableColor = false

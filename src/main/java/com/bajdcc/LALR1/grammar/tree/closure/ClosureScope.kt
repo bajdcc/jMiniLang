@@ -12,7 +12,7 @@ open class ClosureScope : IClosureScope {
 
     protected val closures: Set<Any>?
         get() {
-            val closure = HashSet(ref)
+            val closure = ref.toMutableSet()
             closure.removeAll(decl)
             return if (closure.isEmpty()) null else closure
         }

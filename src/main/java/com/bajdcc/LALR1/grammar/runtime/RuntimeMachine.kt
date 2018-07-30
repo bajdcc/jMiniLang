@@ -228,7 +228,7 @@ class RuntimeMachine @Throws(Exception::class)
         pageMap = machine.pageMap.copy()
         pageRefer = machine.pageRefer.entries.associate { it.key to it.value.toMutableList() }.toMutableMap()
         codeCache = HashMap(machine.codeCache)
-        stkYieldData = ArrayList(machine.stkYieldData)
+        stkYieldData = machine.stkYieldData.toMutableList()
         stkYieldMap = machine.stkYieldMap.copy()
         stack = machine.stack.map { it.copy() }.toMutableList()
         currentStack = stack[machine.stack.indexOf(machine.currentStack)]

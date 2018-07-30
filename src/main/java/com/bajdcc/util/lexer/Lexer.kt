@@ -4,14 +4,12 @@ import com.bajdcc.util.Position
 import com.bajdcc.util.lexer.algorithm.ITokenAlgorithm
 import com.bajdcc.util.lexer.algorithm.TokenAlgorithmCollection
 import com.bajdcc.util.lexer.algorithm.impl.*
-import com.bajdcc.util.lexer.algorithm.impl.StringTokenizer
 import com.bajdcc.util.lexer.error.RegexException
 import com.bajdcc.util.lexer.regex.IRegexStringFilterHost
 import com.bajdcc.util.lexer.regex.IRegexStringIteratorEx
 import com.bajdcc.util.lexer.regex.RegexStringIterator
 import com.bajdcc.util.lexer.token.Token
 import com.bajdcc.util.lexer.token.TokenType
-import java.util.*
 
 /**
  * 【词法分析】词法分析器
@@ -34,7 +32,7 @@ constructor(context: String) : RegexStringIterator(context), IRegexStringFilterH
     /**
      * 丢弃的类型集合
      */
-    private val setDiscardToken = HashSet<TokenType>()
+    private val setDiscardToken = mutableSetOf<TokenType>()
 
     /**
      * 记录当前的单词

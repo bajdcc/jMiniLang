@@ -397,7 +397,7 @@ class RuntimeUserService(private val service: RuntimeService) : IRuntimeUserServ
     }
 
     override fun destroy() {
-        val handles = ArrayList(service.processService.ring3.handles)
+        val handles = service.processService.ring3.handles.toList()
         handles.forEach { handle ->
             destroy(handle)
         }
