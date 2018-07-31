@@ -8,9 +8,9 @@
     <artifactId>jMiniLang</artifactId>
     <packaging>jar</packaging>
     <version>2.3.5</version>
-	<properties>
-		<file_encoding>UTF-8</file_encoding>
-		<start_class>com.bajdcc.LALR1.ui.UIMainFrame</start_class>
+    <properties>
+        <file_encoding>UTF-8</file_encoding>
+        <start_class>com.bajdcc.LALR1.ui.UIMainFrame</start_class>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.compilerVersion>1.8</maven.compiler.compilerVersion>
@@ -207,12 +207,16 @@
                     <execution>
                         <id>java-compile</id>
                         <phase>compile</phase>
-                        <goals> <goal>compile</goal> </goals>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
                     </execution>
                     <execution>
                         <id>java-test-compile</id>
                         <phase>test-compile</phase>
-                        <goals> <goal>testCompile</goal> </goals>
+                        <goals>
+                            <goal>testCompile</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>

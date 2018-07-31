@@ -54,7 +54,11 @@ var import_token = func ~() {
         this."eof" := lambda(this) -> this."token" == "EOF";
         this."to_string" := lambda(this) {
             var s = "[" + this."line" + ":" + this."start" + "-" + this."end"+ "] ";
-            s += this."token" + ", " + this."ordinal"[1];
+            if (this."is_operator"()) {
+                s += this."token" + ", '" + this."ordinal"[1] + "'";
+            } else {
+                s += this."token" + ", " + this."ordinal"[1];
+            }
             if (this."is_literal"() || this."token" == "ILLEGAL" || this."token" == "COMMENT") {
                 s += ", " + this."value";
             }
@@ -553,6 +557,9 @@ var import_scanner = func ~() {
                     var ret = _switch(this, i, ch);
                     if (g_not_null(ret)) { return ret; }
                 }
+                if (!this."available") {
+                    return this."scan"();
+                }
                 return g_new_class("clib::c::token", [["start", i],
                     ["end", this."offset"], ["line", this."lines"."size"()],
                     ["value", this."str"."substr"(i, this."offset")]],
@@ -606,6 +613,12 @@ var import_ast = func ~() {
                     node."params"."stream"()."for_each"(lambda(i_, n_) ->
                         s += "    " + this."walk"(n_) + g_endl);
                 }
+                if (g_not_null(node."block") && !node."block"."empty"()) {
+                    s += g_endl;
+                    s += "    [ BLOCK ]" + g_endl;
+                    node."block"."stream"()."for_each"(lambda(i_, n_) ->
+                        s += "    " + this."walk"(n_) + g_endl);
+                }
                 s += "}";
                 return s;
             }
@@ -629,6 +642,7 @@ var import_ast = func ~() {
         this."type" := _;
         this."id" := _;
         this."params" := _;
+        this."block" := _;
     });
 };
 
@@ -650,6 +664,7 @@ var import_parser = func ~() {
         this."ERROR" := lambda(this) -> this."errors"."to_string"();
         this."init" := lambda(this, str) {
             this."scanner" := g_new_class("clib::c::scanner", [], [["init", str]]);
+            this."token" := g_new_class("clib::c::token", [], [["set_token", "ILLEGAL"]]);
         };
         // ---------------- Main Data ----------------
         this."factory" := g_new_class("clib::c::ast::factory", [], []); // AST工厂
@@ -657,39 +672,50 @@ var import_parser = func ~() {
         this."scopes" := g_from([]); // 块环境
         this."ast" := _; // 抽象语法树
         // ---------------- Public Method ----------------
-        this."expect" := lambda(this, msg) {
-            this."err"(this."token", "expected " + msg + g_endl);
+        this."expect" := lambda(this, from, msg) {
+            this."err"(this."token", from + ": expected " + msg + g_endl);
         };
-        this."expect_token" := lambda(this, token) {
+        this."expect_token" := lambda(this, from, token) {
             if (this."token"."equals"(token)) {
                 this."next"();
             } else {
-                this."expect"(token);
+                this."expect"(from, token);
             }
         };
         this."consume_until" := lambda(this, skip) {
             if (this."eof"()) { return; }
             while (!this."of"(skip) && this."next"()) {}
         };
-        this."assert" := lambda(this, token) {
+        this."assert" := lambda(this, from, token) {
             if (!this."token"."equals"(token)) {
-                this."expect"(token);
+                this."expect"(from, token);
                 this."consume_until"(["SEMI", "RBR"]);
                 return false;
             }
             return true;
         };
-        this."assert_until" := lambda(this, token, skip) {
+        this."verify" := lambda(this, from, token) {
             if (!this."token"."equals"(token)) {
-                this."expect"(token);
+                this."expect"(from, token);
+                return false;
+            }
+            return true;
+        };
+        this."assert_until" := lambda(this, from, token, skip) {
+            if (!this."token"."equals"(token)) {
+                this."expect"(from, token);
                 this."consume_until"(skip);
                 return false;
             }
             return true;
         };
-        this."assert_type" := lambda(this) {
+        this."need" := lambda(this, from, msg, skip) {
+            this."expect"(from, msg);
+            this."consume_until"(skip);
+        };
+        this."assert_type" := lambda(this, from) {
             if (!this."is_type"()) {
-                this."expect"("type");
+                this."expect"(from, "type");
                 this."consume_until"(["SEMI", "RBR"]);
                 return false;
             }
@@ -711,8 +737,15 @@ var import_parser = func ~() {
         this."enter_block" := lambda(this) -> this."scopes"."add"(g_from({}));
         this."leave_block" := lambda(this) -> this."scopes"."pop"();
         this."this_block" := lambda(this) -> this."scopes"."last"();
-        this."next" := lambda(this) ->
-            !(this."token" := this."scanner"."scan"())."eof"();
+        this."next" := lambda(this) {
+            while (!this."token"."eof"()) {
+                this."token" := this."scanner"."scan"();
+                if (!this."is"("COMMENT")) {
+                    break;
+                }
+            }
+            return !this."token"."eof"();
+        };
         this."advance" := lambda(this) {
             var token = this."token";
             this."next"();
@@ -726,7 +759,7 @@ var import_parser = func ~() {
         this."add_ast" := lambda(this, src, type, args) {
             src."add"(this."factory"."new"(type, args));
         };
-        this."ast" := lambda(this, type, args) -> this."factory"."new"(type, args);
+        this."new_ast" := lambda(this, type, args) -> this."factory"."new"(type, args);
         this."parse" := lambda(this) {
             this."ast" := this."#prog"();
             return this."factory"."walk"(this."ast");
@@ -737,18 +770,17 @@ var import_parser = func ~() {
             return this."factory"."new"("prog", [["decls", decls]]);
         };
         this."#decls" := lambda(this) { // 声明列表
-            var token;
             var decls = g_from([]);
             while (this."next"()) {
-                if (!this."assert_type"()) { continue; }
+                if (!this."assert_type"("#decls")) { continue; }
                 this."add"(decls, this."#decl"());
             }
             return decls;
         };
         this."#decl" := lambda(this) { // 声明
             var type = this."advance"();
-            if (!this."assert"("#ID")) {
-                return g_from([this."ast"("var", [["type", type]])]);
+            if (!this."assert"("#decl", "#ID")) {
+                return g_from([this."new_ast"("var", [["type", type]])]);
             }
             var id = this."advance"();
             if (this."is"("LPA")) {
@@ -756,7 +788,7 @@ var import_parser = func ~() {
             } else if (this."of"(["SEMI", "COMMA", "LSQ"])) {
                 return this."#decl!var"(type, id, g_from([]));
             }
-            this."skip"(["SEMI", "RBR"]);
+            this."need"("#decl", "LPA or SEMI, COMMA, LSQ", ["SEMI", "RBR"]);
         };
         this."#decl!fun~args.rec" := lambda(this, params) { // 函数形参
             if (this."is"("COMMA")) {
@@ -774,13 +806,13 @@ var import_parser = func ~() {
                 return params;
             }
             if (this."is"("VOID")) {
-                this."assert"("RPA");
+                this."assert"("#decl!fun~args", "RPA");
                 this."add_ast"(params, "var", [["type", type]]);
                 return params;
             }
-            while (this."assert_type"()) {
+            while (this."assert_type"("#decl!fun~args")) {
                 var type = this."advance"();
-                if (!this."assert_until"("#ID", ["COMMA", "RPA", "SEMI", "RBR"])) {
+                if (!this."assert_until"("#decl!fun~args", "#ID", ["COMMA", "RPA", "SEMI", "RBR"])) {
                     this."add_ast"(params, "var", [["type", type]]);
                     return params;
                 }
@@ -796,7 +828,7 @@ var import_parser = func ~() {
                         break;
                     }
                     this."next"();
-                    if (this."assert"("RSQ")) {
+                    if (this."assert"("#decl!fun~args", "RSQ")) {
                         this."add_ast"(params, "var", [["type", type], ["id", id], ["size", idx]]);
                         return this."#decl!fun~args.rec"(params);
                     }
@@ -814,8 +846,9 @@ var import_parser = func ~() {
             this."enter_block"();
             this."this_block"()."put"("fun", id);
             var params = this."#decl!fun~args"(g_from([]));
-            var suc = this."assert"("RPA");
-            this."add_ast"(funs, "fun", [["suc", suc], ["type", type], ["id", id], ["params", params]]);
+            var suc = this."assert"("#decl!fun", "RPA");
+            var block = this."#block"(g_from([]));
+            this."add_ast"(funs, "fun", [["suc", suc], ["type", type], ["id", id], ["params", params], ["block", block]]);
             this."leave_block"();
             return funs;
         };
@@ -824,9 +857,10 @@ var import_parser = func ~() {
                 var id = this."advance"();
                 return this."#decl!var"(type, id, vars);
             } else if (this."is"("SEMI")) {
+                this."need"("#decl!var~rec", "#ID", ["SEMI", "RBR"]);
                 return vars;
             }
-            this."skip"(["SEMI", "RBR"]);
+            this."need"("#decl!var~rec", "#ID", ["SEMI", "RBR"]);
             return vars;
         };
         this."#decl!var" := lambda(this, type, id, vars) { // 变量声明
@@ -837,18 +871,50 @@ var import_parser = func ~() {
             } else if (this."is"("LSQ")) {
                 this."next"();
                 var idx = this."token";
-                if (!this."assert"("#INT")) {
+                if (!this."assert"("#decl!var", "#INT")) {
                     this."add_ast"(vars, "var", [["type", type], ["id", id]]);
                     return vars;
                 }
                 this."next"();
-                if (this."assert"("RSQ")) {
+                if (this."assert"("#decl!var", "RSQ")) {
                     this."add_ast"(vars, "var", [["type", type], ["id", id], ["size", idx]]);
                     return this."#decl!var~rec"(type, vars);
                 }
             }
             this."add_ast"(vars, "var", [["type", type], ["id", id]]);
             return vars;
+        };
+        this."#block" := lambda(this, stmts) { // 块
+            this."expect_token"("#block", "RPA");
+            if (this."is"("LBR")) {
+                while (this."next"()) {
+                    if (this."is"("RBR")) { break; }
+                    if (this."is"("SEMI")) { continue; }
+                    if (!this."is_type"()) { continue; }
+                    if (!this."#block!decl"(stmts)) { continue; }
+                }
+                this."assert"("#block", "RBR");
+                return stmts;
+            } else if (this."is"("SEMI")) {
+            } else {
+                this."need"("#block", "LBR, SEMI", ["SEMI", "RBR"]);
+            }
+            return stmts;
+        };
+        this."#block!decl" := lambda(this, stmts) { // 声明
+            var type = this."advance"();
+            if (!this."is"("#ID")) {
+                this."assert"("#block!decl", "#ID");
+                this."add_ast"(stmts, "var", [["type", type]]);
+                return false;
+            }
+            var id = this."advance"();
+            if (this."of"(["SEMI", "COMMA", "LSQ"])) {
+                this."#decl!var"(type, id, stmts);
+                return true;
+            }
+            this."need"("#block!decl", "SEMI, COMMA, LSQ", ["SEMI", "RBR"]);
+            return false;
         };
     });
 };

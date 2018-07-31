@@ -47,6 +47,12 @@ int; int char; char a [ ]; 5 [5]; int b[c];
 int a1(int b, float c);
 int a2(int b, float c;
 int a3(; int (; int a4(a, b); int a5(float a,; int a6(float); int a7(char d, int);
+int b1(int a, int b);
+int b2(int a, int b) 4;
+int b3(int a, int b) { ; }
+int b4(int a, int b) {}
+int b5(int a, int b) { int a, ; char , d; }
+int b6(int a, int b) { int a, b; char c, d; }
 \";
 var s = g_new_class(\"clib::c::parser\", [], [[\"init\", code]]);
 g_printn(s.\"parse\"());
