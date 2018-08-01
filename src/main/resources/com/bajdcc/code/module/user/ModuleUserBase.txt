@@ -70,24 +70,12 @@ var g_array_find = func ~(a, b) {
     }
 };
 export "g_array_find";
-var g_sleep_s = func ~(second) {
-    if (second < 1) { return; }
-    var begin = g_get_timestamp();
-    var end = begin + second * 1000;
-    while (begin < end) {
-        begin := g_get_timestamp();
-        g_sleep(500);
-    }
+var g_sleep_s = func ~(s) {
+    g_block(s * 1000);
 };
 export "g_sleep_s";
 var g_sleep_ms = func ~(ms) {
-    if (ms < 1) { return; }
-    var begin = g_get_timestamp();
-    var end = begin + ms;
-    while (begin < end) {
-        begin := g_get_timestamp();
-        g_sleep(20);
-    }
+    g_block(ms);
 };
 export "g_sleep_ms";
 

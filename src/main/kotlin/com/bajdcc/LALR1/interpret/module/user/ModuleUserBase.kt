@@ -60,8 +60,8 @@ class ModuleUserBase : IInterpreterModule {
         private val logger = Logger.getLogger("user")
         private val globalContext = RuntimeObject(RuntimeMap())
 
-        val EXEC_PREFIX = "WEB_EXEC#"
-        val EXEC_PATH_PREFIX = "/web/exec/"
+        const val EXEC_PREFIX = "WEB_EXEC#"
+        private const val EXEC_PATH_PREFIX = "/web/exec/"
 
         private fun buildHandle(info: IRuntimeDebugInfo) {
             info.addExternalFunc("g_handle",
@@ -169,14 +169,6 @@ class ModuleUserBase : IInterpreterModule {
                             val text = args[0].obj.toString()
                             status.ring3.put(text)
                             null
-                        }
-                    })
-            info.addExternalFunc("g_sleep",
-                    RuntimeDebugExec("进程睡眠", arrayOf(RuntimeObjectType.kInt))
-                    { args: List<RuntimeObject>, status: IRuntimeStatus ->
-                        run {
-                            val time = args[0].int
-                            RuntimeObject(status.service.processService.sleep(status.pid, if (time > 0) time else 0).toLong())
                         }
                     })
             info.addExternalFunc("g_env_get",
@@ -367,7 +359,12 @@ class ModuleUserBase : IInterpreterModule {
         }
 
         private fun importFromProc(info: IRuntimeDebugInfo, refer: IRuntimeDebugInfo) {
+            val importProc = arrayOf("g_available_process", "g_block", "g_sleep")
+            for (key in importProc) {
+                info.addExternalFunc(key, refer.getExecCallByName(key)!!)
+            }
             info.addExternalFunc("g_pid", refer.getExecCallByName("g_get_pid")!!)
+            info.addExternalFunc("g_available_process", refer.getExecCallByName("g_available_process")!!)
             info.addExternalFunc("g_res_get_proc",
                     RuntimeDebugExec("进程列表")
                     { args: List<RuntimeObject>, status: IRuntimeStatus ->

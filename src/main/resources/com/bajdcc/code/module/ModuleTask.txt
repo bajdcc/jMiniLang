@@ -162,7 +162,7 @@ var g_task_get_id_by_name = func ~(name) {
 export "g_task_get_id_by_name";
 var g_task_sleep = func ~(second) {
     if (second < 1) { return; }
-    g_task_sleep_ms(second * 1000);
+    g_block(second * 1000);
 };
 export "g_task_sleep";
 var g_task_get_timestamp = func ~() -> g_get_timestamp();

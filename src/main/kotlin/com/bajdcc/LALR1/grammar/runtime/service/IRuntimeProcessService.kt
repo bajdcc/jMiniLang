@@ -38,18 +38,20 @@ interface IRuntimeProcessService {
     /**
      * 进程阻塞
      *
-     * @param pid 进程ID
+     * @param pid   进程ID
+     * @param sleep 是否睡眠
      * @return 成功与否
      */
-    fun block(pid: Int): Boolean
+    fun block(pid: Int, sleep: Boolean = false): Boolean
 
     /**
      * 进程唤醒
      *
-     * @param pid 进程ID
+     * @param pid   进程ID
+     * @param sleep 是否睡眠
      * @return 成功与否
      */
-    fun wakeup(pid: Int): Boolean
+    fun wakeup(pid: Int, sleep: Boolean = false): Boolean
 
     /**
      * 进程休眠（异步唤醒）

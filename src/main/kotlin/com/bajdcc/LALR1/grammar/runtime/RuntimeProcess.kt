@@ -58,7 +58,8 @@ constructor(name: String, input: InputStream, private val pageFileMap: Map<Strin
         var priority: Int = 0
         var sleep: Int = 0
         var ring: Int = 0
-        var runnable: Boolean = false
+        var runnable = false
+        var sleeping = false
         var waitingPids: Queue<Int>
 
         init {
@@ -227,7 +228,7 @@ constructor(name: String, input: InputStream, private val pageFileMap: Map<Strin
                     if (now > recent.ms) {
                         if (didNotWakeSleepProcess)
                             didNotWakeSleepProcess = false
-                        wakeup(recent.pid)
+                        wakeup(recent.pid, true)
                         stat.sleepQueue.poll()
                     } else {
                         break
@@ -333,24 +334,30 @@ constructor(name: String, input: InputStream, private val pageFileMap: Map<Strin
         logger.debug("Process #" + processId + " exit, " + setProcessId.size + " left.")
     }
 
-    override fun block(pid: Int): Boolean {
+    override fun block(pid: Int, sleep: Boolean): Boolean {
         if (!setProcessId.contains(pid)) {
             return false
         }
-        if (arrProcess[pid]!!.runnable) {
-            arrProcess[pid]!!.runnable = false
+        val p = arrProcess[pid]!!
+        if (p.runnable) {
+            p.runnable = false
+            if (sleep)
+                p.sleeping = true
             return true
         }
         logger.warn("Process #$pid is blocked, but previous status was blocked.")
         return false
     }
 
-    override fun wakeup(pid: Int): Boolean {
+    override fun wakeup(pid: Int, sleep: Boolean): Boolean {
         if (!setProcessId.contains(pid)) {
             return false
         }
-        if (!arrProcess[pid]!!.runnable) {
-            arrProcess[pid]!!.runnable = true
+        val p = arrProcess[pid]!!
+        if (!p.runnable) {
+            p.runnable = true
+            if (sleep)
+                p.sleeping = false
             return true
         }
         logger.warn("Process #$pid is running, but previous status was running.")
@@ -364,8 +371,9 @@ constructor(name: String, input: InputStream, private val pageFileMap: Map<Strin
         }
         if (t < 0)
             t = 0
-        arrProcess[pid]!!.sleep += t
-        return arrProcess[pid]!!.sleep
+        val p = arrProcess[pid]!!
+        p.sleep += t
+        return p.sleep
     }
 
     override fun blocks(pid: Int, ms: Int): Long {
@@ -446,7 +454,10 @@ constructor(name: String, input: InputStream, private val pageFileMap: Map<Strin
             service.fileService.addVfs(USER_PROC_FILE_PREFIX + pid, error)
         if (!ring3.isOptionsBool(LOG_PIPE))
             service.pipeService.destroyByName(pid, USER_PROC_PIPE_PREFIX + pid)
-        arrProcess[pid]!!.waitingPids.forEach { id ->
+        val p = arrProcess[pid]!!
+        if (p.sleeping)
+            stat.sleepQueue.removeIf { it.pid == pid }
+        p.waitingPids.forEach { id ->
             wakeup(id)
         }
         setProcessId.remove(pid)
