@@ -1,0 +1,89 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'kotlin'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+group = 'com.bajdcc'
+version = '2.3.5'
+
+description = """
+GLR Compiler and Virtual Machine (Kotlin)
+"""
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    compile 'com.alibaba:fastjson:1.2.47'
+    compile 'log4j:log4j:1.2.17'
+    compile 'io.netty:netty-all:4.1.23.Final'
+    compile 'dom4j:dom4j:1.6.1'
+    compile 'jaxen:jaxen:1.1.6'
+    compile 'org.springframework.boot:spring-boot-starter-web:2.0.3.RELEASE'
+    compile 'org.springframework.boot:spring-boot-starter-thymeleaf:2.0.3.RELEASE'
+    compile 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:2.3.0'
+    compile 'org.webjars:webjars-locator:0.34'
+    compile 'org.webjars:vue:2.5.13'
+    compile 'org.webjars:layui:2.3.0'
+    compile 'org.webjars.npm:vue-resource:1.3.4'
+    compile 'org.webjars.bower:datatables:1.10.19'
+    compile 'com.vladsch.flexmark:flexmark-all:0.34.0'
+    compile 'net.java.dev.jna:jna:4.5.1'
+    compile 'net.java.dev.jna:jna-platform:4.5.1'
+    compile 'org.apache.commons:commons-text:1.3'
+    compile 'com.google.guava:guava:25.0-jre'
+    compile 'com.fasterxml.jackson.module:jackson-module-kotlin:2.9.6'
+    compile 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.51'
+    compile 'org.jetbrains.kotlin:kotlin-reflect:1.2.51'
+    testCompile 'org.jetbrains.kotlin:kotlin-test:1.2.51'
+}
+
+buildscript {
+    ext {
+        kotlinVersion = '1.2.51'
+    }
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.2.51"
+        classpath "org.jetbrains.kotlin:kotlin-allopen:1.2.51"
+        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.4'
+    }
+}
+
+compileKotlin {
+    kotlinOptions {
+        freeCompilerArgs = ["-Xjsr305=strict"]
+        jvmTarget = "1.8"
+    }
+}
+
+compileTestKotlin {
+    kotlinOptions {
+        freeCompilerArgs = ["-Xjsr305=strict"]
+        jvmTarget = "1.8"
+    }
+}
+
+compileKotlin.destinationDir = compileJava.destinationDir
+compileTestKotlin.destinationDir = compileJava.destinationDir
+
+jar {
+    duplicatesStrategy = "EXCLUDE"
+    manifest {
+        attributes(
+                "Manifest-Version": 1.0,
+                "Main-Class": "com.bajdcc.LALR1.ui.UIMainFrame"
+        )
+    }
+}

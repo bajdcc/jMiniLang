@@ -1,4 +1,4 @@
-# jMiniLang - GLR Compiler and Virtual Machine (*Java* and *Kotlin*)
+# jMiniLang - GLR Compiler and Virtual Machine (*Kotlin*)
 
 设计思路：https://zhuanlan.zhihu.com/p/28540783
 

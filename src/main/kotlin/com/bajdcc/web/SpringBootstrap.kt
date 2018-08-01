@@ -45,6 +45,6 @@ open class SpringBootstrap : Thread() {
     }
 
     fun terminate() {
-        ctx!!.close()
+        ctx?.close()
     }
 }
