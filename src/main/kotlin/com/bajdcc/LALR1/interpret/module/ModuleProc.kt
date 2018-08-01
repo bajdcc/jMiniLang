@@ -111,12 +111,23 @@ class ModuleProc : IInterpreterModule {
                         RuntimeObject(status.service.processService.live(pid.toInt()))
                     }
                 })
+        info.addExternalFunc("g_available_process",
+                RuntimeDebugExec("是否还可以创建进程")
+                { args: List<RuntimeObject>, status: IRuntimeStatus -> RuntimeObject(status.service.processService.available()) })
         info.addExternalFunc("g_sleep",
                 RuntimeDebugExec("进程睡眠", arrayOf(RuntimeObjectType.kInt))
                 { args: List<RuntimeObject>, status: IRuntimeStatus ->
                     run {
                         val time = args[0].int
                         RuntimeObject(status.service.processService.sleep(status.pid, if (time > 0) time else 0).toLong())
+                    }
+                })
+        info.addExternalFunc("g_block",
+                RuntimeDebugExec("进程睡眠（阻塞）", arrayOf(RuntimeObjectType.kInt))
+                { args: List<RuntimeObject>, status: IRuntimeStatus ->
+                    run {
+                        val time = args[0].int
+                        RuntimeObject(status.service.processService.blocks(status.pid, if (time > 0) time else 0))
                     }
                 })
         info.addExternalFunc("g_query_usr_proc",
@@ -328,7 +339,7 @@ class ModuleProc : IInterpreterModule {
                     " ", "环", "标识", "名称", "过程", "描述")))
             for (obj in objs) {
                 var name = obj[4].toString()
-                name = name.substring(0, Math.min(name.length, 20))
+                name = name.substring(0, Math.min(name.length, 25))
                 array.add(RuntimeObject(String.format(" %s  %s %5s   %-15s   %-25s   %s",
                         obj[0], obj[1], obj[2], obj[3], name, obj[5])))
             }

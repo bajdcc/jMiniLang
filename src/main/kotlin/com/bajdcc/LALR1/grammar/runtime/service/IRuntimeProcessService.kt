@@ -52,6 +52,15 @@ interface IRuntimeProcessService {
     fun wakeup(pid: Int): Boolean
 
     /**
+     * 进程休眠（异步唤醒）
+     *
+     * @param pid  进程ID
+     * @param ms   毫秒
+     * @return 总休眠毫秒数
+     */
+    fun blocks(pid: Int, ms: Int): Long
+
+    /**
      * 进程休眠
      *
      * @param pid  进程ID
@@ -76,6 +85,13 @@ interface IRuntimeProcessService {
      * @return 是否存活
      */
     fun live(pid: Int): Boolean
+
+    /**
+     * 是否还可以创建进程
+     *
+     * @return 是否可以创建
+     */
+    fun available(): Boolean
 
     /**
      * 添加代码页

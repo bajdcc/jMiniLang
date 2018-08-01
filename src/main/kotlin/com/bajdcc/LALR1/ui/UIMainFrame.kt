@@ -45,7 +45,7 @@ import javax.swing.plaf.FontUIResource
  */
 class UIMainFrame : JFrame() {
 
-    val panel: UIPanel
+    private val panel: UIPanel
     private var isExitNormally = false
     private var interpreter: Interpreter? = null
 

@@ -74,6 +74,7 @@ var g_ui_input = func ~() {
                 g_ui_print(c);
             }
         }
+        g_block(10);
     }
 };
 export "g_ui_input";

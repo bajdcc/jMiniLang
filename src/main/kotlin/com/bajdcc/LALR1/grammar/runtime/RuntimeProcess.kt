@@ -219,11 +219,31 @@ constructor(name: String, input: InputStream, private val pageFileMap: Map<Strin
                         process.sleep -= CLOCK_ONCE_SLEEP
                 }
             }
-            if (sleepUser == pidUserNum)
-                Thread.sleep(TIME_SLEEP_FULL.toLong())
-            else if (stat.ticked) {
-                Thread.sleep(TIME_SLEEP_HALF.toLong())
-                stat.ticked = false
+            var didNotWakeSleepProcess = true
+            if (stat.sleepQueue.isNotEmpty()) {
+                val now = System.currentTimeMillis()
+                while (stat.sleepQueue.isNotEmpty()) {
+                    val recent = stat.sleepQueue.peek()
+                    if (now > recent.ms) {
+                        if (didNotWakeSleepProcess)
+                            didNotWakeSleepProcess = false
+                        wakeup(recent.pid)
+                        stat.sleepQueue.poll()
+                    } else {
+                        break
+                    }
+                }
+            }
+            if (didNotWakeSleepProcess) {
+                if (sleepUser == pidUserNum)
+                    Thread.sleep(TIME_SLEEP_FULL.toLong())
+                else if (stat.ticked) {
+                    Thread.sleep(TIME_SLEEP_HALF.toLong())
+                    stat.ticked = false
+                }
+            } else {
+                if (stat.ticked)
+                    stat.ticked = false
             }
             if (!pipeDeque.isEmpty()) {
                 val pair = pipeDeque.poll()
@@ -348,6 +368,12 @@ constructor(name: String, input: InputStream, private val pageFileMap: Map<Strin
         return arrProcess[pid]!!.sleep
     }
 
+    override fun blocks(pid: Int, ms: Int): Long {
+        block(pid)
+        stat.sleepQueue.add(SleepStruct(pid, System.currentTimeMillis() + ms.toLong()))
+        return System.currentTimeMillis() + ms.toLong()
+    }
+
     override fun join(joined: Int, pid: Int): Boolean {
         if (!setProcessId.contains(pid)) {
             return false
@@ -361,6 +387,10 @@ constructor(name: String, input: InputStream, private val pageFileMap: Map<Strin
 
     override fun live(pid: Int): Boolean {
         return setProcessId.contains(pid)
+    }
+
+    override fun available(): Boolean {
+        return setProcessId.size < MAX_PROCESS
     }
 
     override fun addCodePage(name: String, code: String): Boolean {
@@ -386,11 +416,14 @@ constructor(name: String, input: InputStream, private val pageFileMap: Map<Strin
         highSpeed = mode
     }
 
+    private data class SleepStruct(val pid: Int, val ms: Long)
+
     private inner class SystemStat {
         var speed = 0.toDouble()
         var cycle = 0
         var ticked = false
         var procCache = listOf<Array<Any>>()
+        val sleepQueue = PriorityQueue<SleepStruct>(MAX_PROCESS, Comparator.comparingLong { it.ms })
     }
 
     fun halt() {
@@ -441,7 +474,7 @@ constructor(name: String, input: InputStream, private val pageFileMap: Map<Strin
         private const val TIME_SLEEP_HALF = 10
         private const val CLOCK_ONCE_SLEEP = 50
         private const val CLOCK_WAIT_UI = 500
-        val USER_PROC_FILE_PREFIX = "/proc/"
-        val USER_PROC_PIPE_PREFIX = "!USER_PROC#"
+        const val USER_PROC_FILE_PREFIX = "/proc/"
+        const val USER_PROC_PIPE_PREFIX = "!USER_PROC#"
     }
 }

@@ -15,12 +15,10 @@ import javax.swing.JPanel
  * @author bajdcc
  */
 class UIPanel : JPanel() {
-    val uiGraphics: UIGraphics
-    private val moduleUI: ModuleUI
+    val uiGraphics: UIGraphics = UIGraphics(UIRemotePanel.w, UIRemotePanel.h, 80, 25, 11, 25, 1)
+    private val moduleUI: ModuleUI = ModuleUI.instance
 
     init {
-        this.uiGraphics = UIGraphics(UIRemotePanel.w, UIRemotePanel.h, 80, 25, 11, 25, 1)
-        moduleUI = ModuleUI.instance
         moduleUI.setGraphics(this.uiGraphics)
         moduleUI.setPanel(this)
         this.isFocusable = true

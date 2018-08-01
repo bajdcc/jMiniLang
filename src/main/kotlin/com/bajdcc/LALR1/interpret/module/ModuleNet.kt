@@ -467,8 +467,8 @@ class ModuleNet : IInterpreterModule {
         private val logger = Logger.getLogger("net")
         val instance = ModuleNet()
 
-        private val MSG_QUERY_TIME = 15
-        private val MSG_SEND_TIME = 5
+        private const val MSG_QUERY_TIME = 15
+        private const val MSG_SEND_TIME = 5
 
         private fun parseJsonSafe(text: String): RuntimeObject? {
             try {

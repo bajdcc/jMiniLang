@@ -536,19 +536,30 @@ var stage_font = func ~() {
 // FORK
 
 var stage_fork = func ~() {
-    var fork_proc = func ~() {
+    var fork_proc = func ~(sig) {
         g_set_process_desc("fork job");
         var fork_entry = func ~(arg) {
             g_set_process_desc("fork #" + arg);
-            g_sleep(50);
+            g_task_sleep(1);
             var o = g_create_pipe("FORK#COUNT");
             g_write_pipe(o, '*');
         };
         for (var i = 0; i < 20000; i++) {
-            g_create_user_process_args(fork_entry, i);
+            var s = g_query_share(sig);
+            if (g_is_null(s) || !s) {
+                g_destroy_pipe(g_wait_pipe("FORK#COUNT"));
+                break;
+            }
+            if (g_available_process()) {
+                g_create_user_process_args(fork_entry, i);
+                g_sleep(10);
+                g_task_sleep_ms(10);
+            } else {
+                g_task_sleep(1);
+            }
         }
     };
-    g_create_user_process(fork_proc);
+    g_create_user_process_args(fork_proc, signal);
     var __in = g_create_pipe("FORK#COUNT");
     var count = 0;
     g_read_pipe_args(__in, lambda(ch, out) {

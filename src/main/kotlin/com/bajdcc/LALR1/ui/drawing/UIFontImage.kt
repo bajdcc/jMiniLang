@@ -11,7 +11,7 @@ import java.awt.image.BufferedImage
  */
 class UIFontImage(private val width: Int, private val height: Int) {
     private val imagesASCII = arrayOfNulls<BufferedImage?>(256)
-    private val imagesUnicode: MutableMap<Int, Image>
+    private val imagesUnicode: MutableMap<Int, Image> = mutableMapOf()
     private var fgcolor: Color? = null
     private var bgcolor: Color? = null
     private var enableColor: Boolean = false
@@ -19,7 +19,6 @@ class UIFontImage(private val width: Int, private val height: Int) {
     private val enableBGColor: Boolean = false
 
     init {
-        this.imagesUnicode = mutableMapOf()
         this.enableColor = false
         this.enableFGColor = false
         this.enableColor = false

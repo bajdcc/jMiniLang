@@ -13,13 +13,12 @@ import javax.swing.Timer
  * @author bajdcc
  */
 class UIRemoteWindow : JFrame() {
-    val panel: UIRemotePanel
+    private val panel: UIRemotePanel = UIRemotePanel()
 
     val uiGraphics: UIRemoteGraphics
         get() = this.panel.uiGraphics
 
     init {
-        panel = UIRemotePanel()
         this.title = remoteWndTitle
         this.defaultCloseOperation = JFrame.DO_NOTHING_ON_CLOSE
         this.preferredSize = Dimension(UIRemotePanel.w, UIRemotePanel.h)

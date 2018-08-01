@@ -162,12 +162,7 @@ var g_task_get_id_by_name = func ~(name) {
 export "g_task_get_id_by_name";
 var g_task_sleep = func ~(second) {
     if (second < 1) { return; }
-    var begin = g_task_get_timestamp();
-    var end = begin + second * 1000;
-    while (begin < end) {
-        begin := g_task_get_timestamp();
-        g_sleep(500);
-    }
+    g_task_sleep_ms(second * 1000);
 };
 export "g_task_sleep";
 var g_task_get_timestamp = func ~() -> g_get_timestamp();
@@ -183,18 +178,13 @@ var g_task_sleep_signal = func ~(second, signal) {
             g_printdn("Sleep_s interrupt: #" + g_get_pid() + " -> " + signal);
             break;
         }
-        g_sleep(500);
+        g_block(500);
     }
 };
 export "g_task_sleep_signal";
 var g_task_sleep_ms = func ~(ms) {
     if (ms < 1) { return; }
-    var begin = g_task_get_timestamp();
-    var end = begin + ms;
-    while (begin < end) {
-        begin := g_task_get_timestamp();
-        g_sleep(20);
-    }
+    g_block(ms);
 };
 export "g_task_sleep_ms";
 var g_task_sleep_ms_signal = func ~(ms, signal) {
@@ -208,7 +198,7 @@ var g_task_sleep_ms_signal = func ~(ms, signal) {
             g_printdn("Sleep_ms interrupt: #" + g_get_pid() + " -> " + signal);
             break;
         }
-        g_sleep(20);
+        g_block(1);
     }
 };
 export "g_task_sleep_ms_signal";
