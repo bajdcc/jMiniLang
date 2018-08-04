@@ -3,8 +3,13 @@ package com.bajdcc.LALR1.grammar.runtime.service
 import com.bajdcc.LALR1.grammar.runtime.RuntimeObject
 import com.bajdcc.LALR1.grammar.runtime.RuntimeObjectType
 import com.bajdcc.LALR1.grammar.runtime.data.*
+import com.bajdcc.LALR1.ui.user.UIUserGraphics
+import com.bajdcc.LALR1.ui.user.UIUserWindow
 import org.apache.log4j.Logger
-
+import java.awt.Dimension
+import java.awt.Toolkit
+import java.awt.event.WindowAdapter
+import java.awt.event.WindowEvent
 import java.util.*
 
 /**
@@ -133,6 +138,15 @@ class RuntimeUserService(private val service: RuntimeService) :
          * @return 是否成功
          */
         fun sendMessage(type: Int, param1: Int, param2: Int): Boolean
+
+        /**
+         * SVG 绘图
+         * @param op 类型
+         * @param x X坐标
+         * @param y Y坐标
+         * @return 是否成功
+         */
+        fun svg(op: Char, x: Int, y: Int): Boolean
     }
 
     internal interface IUserHandler {
@@ -294,25 +308,62 @@ class RuntimeUserService(private val service: RuntimeService) :
             get() = this
     }
 
+    enum class MsgType {
+        CREATE,
+        SET_EXIT,
+    }
+
     internal inner class UserWindowHandler(id: Int) : UserHandler(id), IUserWindowHandler {
 
-        init {
-            createWindow()
-        }
+        var userWindow: UIUserWindow? = null
+        var canExit = false
 
         override fun destroy() {
             super.destroy()
             destroyWindow()
         }
 
-        private fun createWindow() {
+        private fun createWindow(param1: Int, param2: Int): Boolean {
+            if (userWindow != null)
+                return false
+            val size = Toolkit.getDefaultToolkit().screenSize
+            userWindow = UIUserWindow(arrUsers[id]!!.name,
+                    Dimension(clamp(param1, 1, size.width),
+                            clamp(param2, 1, size.height)))
+            userWindow!!.addWindowListener(object : WindowAdapter() {
+                override fun windowClosing(e: WindowEvent?) {
+                    if (canExit) {
+                        userWindow!!.dispose()
+                        userWindow = null
+                    }
+                }
+            })
+            return true
         }
 
         private fun destroyWindow() {
+            if (userWindow == null)
+                return
+            canExit = true
+            userWindow!!.dispatchEvent(WindowEvent(userWindow, WindowEvent.WINDOW_CLOSING))
         }
 
         override fun sendMessage(type: Int, param1: Int, param2: Int): Boolean {
+            when (type) {
+                MsgType.CREATE.ordinal -> createWindow(param1, param2)
+                MsgType.SET_EXIT.ordinal -> run {
+                    canExit = param1 != 0
+                    true
+                }
+            }
             return false
+        }
+
+        override fun svg(op: Char, x: Int, y: Int): Boolean {
+            if (userWindow == null)
+                return false
+            userWindow!!.graphics.addSVGInst(UIUserGraphics.SVGInst(op, x, y))
+            return true
         }
 
         override val window: IUserWindowHandler
@@ -391,6 +442,9 @@ class RuntimeUserService(private val service: RuntimeService) :
 
     override fun sendMessage(id: Int, type: Int, param1: Int, param2: Int) =
             optional(arrUsers[id], false) { it.window.sendMessage(type, param1, param2) }
+
+    override fun svg(id: Int, op: Char, x: Int, y: Int) =
+            optional(arrUsers[id], false) { it.window.svg(op, x, y) }
 
     override fun destroy() {
         val handles = service.processService.ring3.handles.toList()
@@ -474,5 +528,8 @@ class RuntimeUserService(private val service: RuntimeService) :
         private fun <T> optional(us: UserStruct?, def: T, select: (IUserHandler) -> T): T =
                 if (us == null) def
                 else select(us.handler)
+
+        private fun <T : Comparable<T>> clamp(v: T, min: T, max: T) =
+                if (v > max) max else if (v < min) min else v
     }
 }

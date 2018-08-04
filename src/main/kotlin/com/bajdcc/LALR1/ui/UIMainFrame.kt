@@ -123,6 +123,7 @@ class UIMainFrame : JFrame() {
             RuntimeCodePage.exportFromStream(page, baos)
             val bais = ByteArrayInputStream(baos.toByteArray())
             interpreter!!.run("@main", bais)
+            System.exit(0)
 
         } catch (e: RegexException) {
             System.err.println()
@@ -149,12 +150,12 @@ class UIMainFrame : JFrame() {
     fun showDelay() {
         Timer().schedule(object : TimerTask() {
             override fun run() {
-                while (System.getProperty("os.desc") != null) {
-                    if (System.getProperty("os.desc").startsWith("Windows")) {
+                while (System.getProperty("os.name") != null) {
+                    if (System.getProperty("os.name").startsWith("Windows")) {
                         val hwnd = User32.INSTANCE.FindWindow("SunAwtFrame", mainWndTitle)
                         if (hwnd != null) {
-                            User32.INSTANCE.SetForegroundWindow(hwnd)
                             User32.INSTANCE.SetFocus(hwnd)
+                            User32.INSTANCE.SetForegroundWindow(hwnd)
                             return
                         }
                     }
@@ -163,7 +164,6 @@ class UIMainFrame : JFrame() {
                     } catch (e: InterruptedException) {
                         e.printStackTrace()
                     }
-
                 }
                 isAlwaysOnTop = true
             }

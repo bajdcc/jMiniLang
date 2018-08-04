@@ -20,7 +20,20 @@ import "sys.base";
 import "sys.proc";
 g_proc_exec("
 import \"user.base\";
-var w = g_window(\"test\");
+for (var i = 1; i <= 10; i++) {
+    var w = g_window(\"test \" + i);
+    var width = 80 * i;
+    var height = 60 * i;
+    var border = 10;
+    w.\"msg\"(0, width, height);
+    w.\"svg\"('M', border, border);
+    w.\"svg\"('L', width - border, border);
+    w.\"svg\"('L', width - border, height - border);
+    w.\"svg\"('L', border, height - border);
+    w.\"svg\"('L', border, border);
+    g_sleep_s(1);
+    w.\"destroy\"();
+}
 ");
 """.trimIndent())
 
@@ -34,6 +47,7 @@ var w = g_window(\"test\");
             RuntimeCodePage.exportFromStream(page, baos)
             val bais = ByteArrayInputStream(baos.toByteArray())
             interpreter.run("test_1", bais)
+            System.exit(0)
 
         } catch (e: RegexException) {
             System.err.println()

@@ -107,6 +107,9 @@ class ModuleUserBase : IInterpreterModule {
             info.addExternalFunc("g_win_send_msg",
                     RuntimeDebugExec("发送消息", arrayOf(RuntimeObjectType.kPtr, RuntimeObjectType.kInt, RuntimeObjectType.kInt, RuntimeObjectType.kInt))
                     { args: List<RuntimeObject>, status: IRuntimeStatus -> RuntimeObject(status.service.userService.window.sendMessage(args[0].int, args[1].int, args[2].int, args[3].int)) })
+            info.addExternalFunc("g_win_svg",
+                    RuntimeDebugExec("SVG 绘图", arrayOf(RuntimeObjectType.kPtr, RuntimeObjectType.kChar, RuntimeObjectType.kInt, RuntimeObjectType.kInt))
+                    { args: List<RuntimeObject>, status: IRuntimeStatus -> RuntimeObject(status.service.userService.window.svg(args[0].int, args[1].char, args[2].int, args[3].int)) })
         }
 
         private fun importFromBase(info: IRuntimeDebugInfo, refer: IRuntimeDebugInfo) {

@@ -132,7 +132,7 @@ class UIRemoteGraphics(width: Int, height: Int) {
                     currentLine.append(words[i])
                 }
             }
-            if (currentLine.toString().trim { it <= ' ' }.length > 0) {
+            if (currentLine.toString().trim { it <= ' ' }.isNotEmpty()) {
                 this.gimage.drawString(currentLine.toString(), x, y1)
             }
         }
@@ -147,34 +147,34 @@ class UIRemoteGraphics(width: Int, height: Int) {
             old_y = y
             when (m.group(1)[0]) {
                 'M' -> {
-                    x = tryParse(arg1)!!
-                    y = tryParse(arg2)!!
+                    x = tryParse(arg1)
+                    y = tryParse(arg2)
                 }
                 'm' -> {
-                    x += tryParse(arg1)!!
-                    y += tryParse(arg2)!!
+                    x += tryParse(arg1)
+                    y += tryParse(arg2)
                 }
                 'L' -> {
-                    x = tryParse(arg1)!!
-                    y = tryParse(arg2)!!
+                    x = tryParse(arg1)
+                    y = tryParse(arg2)
                     drawLine(old_x, old_y, x, y)
                 }
                 'l' -> {
-                    x += tryParse(arg1)!!
-                    y += tryParse(arg2)!!
+                    x += tryParse(arg1)
+                    y += tryParse(arg2)
                     drawLine(old_x, old_y, x, y)
                 }
                 'R' -> {
-                    x = tryParse(arg1)!!
-                    y = tryParse(arg2)!!
+                    x = tryParse(arg1)
+                    y = tryParse(arg2)
                     clear(old_x, old_y, x, y)
                 }
                 'r' -> {
-                    x += tryParse(arg1)!!
-                    y += tryParse(arg2)!!
+                    x += tryParse(arg1)
+                    y += tryParse(arg2)
                     clear(old_x, old_y, x, y)
                 }
-                'W' -> lineWidth = tryParse(arg1)!!
+                'W' -> lineWidth = tryParse(arg1)
             }
         }
     }
@@ -197,15 +197,11 @@ class UIRemoteGraphics(width: Int, height: Int) {
     companion object {
         private val pat = Pattern.compile("(\\w)\\s*([0-9-]+)?\\s*([0-9-]+)?")
 
-        private fun tryParse(str: String): Int? {
-            var retVal: Int?
-            try {
-                retVal = Integer.parseInt(str)
-            } catch (nfe: NumberFormatException) {
-                retVal = 0
-            }
-
-            return retVal
-        }
+        private fun tryParse(str: String) =
+                try {
+                    Integer.parseInt(str)
+                } catch (nfe: NumberFormatException) {
+                    0
+                }
     }
 }

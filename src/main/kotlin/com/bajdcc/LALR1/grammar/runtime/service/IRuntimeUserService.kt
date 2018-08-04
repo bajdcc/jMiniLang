@@ -135,6 +135,16 @@ interface IRuntimeUserService {
          * @return 是否成功
          */
         fun sendMessage(id: Int, type: Int, param1: Int, param2: Int): Boolean
+
+        /**
+         * SVG 绘图
+         * @param id 句柄
+         * @param op 类型
+         * @param x X坐标
+         * @param y Y坐标
+         * @return 是否成功
+         */
+        fun svg(id: Int, op: Char, x: Int, y: Int): Boolean
     }
 
     /**
