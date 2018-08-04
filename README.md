@@ -1,5 +1,7 @@
 # jMiniLang - GLR Compiler and Virtual Machine (*Kotlin*)
 
+[![Build status](https://ci.appveyor.com/api/projects/status/axmcy1gijdbw3rj9?svg=true)](https://ci.appveyor.com/project/bajdcc/jminilang)
+
 设计思路：https://zhuanlan.zhihu.com/p/28540783
 
 视频演示：https://www.bilibili.com/video/av13294962/

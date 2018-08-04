@@ -4,7 +4,7 @@ apply plugin: 'kotlin'
 apply plugin: 'com.github.johnrengelman.shadow'
 
 group = 'com.bajdcc'
-version = '2.3.5'
+version = '2.3.6'
 
 description = """
 GLR Compiler and Virtual Machine (Kotlin)
