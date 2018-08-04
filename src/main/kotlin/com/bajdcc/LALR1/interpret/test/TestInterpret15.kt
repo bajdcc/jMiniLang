@@ -20,8 +20,9 @@ import "sys.base";
 import "sys.proc";
 g_proc_exec("
 import \"user.base\";
+g_fork();
 for (var i = 1; i <= 10; i++) {
-    var w = g_window(\"test \" + i);
+    var w = g_window(g_guid());
     var width = 80 * i;
     var height = 60 * i;
     var border = 10;
@@ -33,6 +34,27 @@ for (var i = 1; i <= 10; i++) {
     w.\"svg\"('L', border, border);
     g_sleep_s(1);
     w.\"destroy\"();
+}
+");
+""".trimIndent(), """
+import "sys.base";
+import "sys.proc";
+g_proc_exec("
+import \"user.base\";
+g_fork();
+for (var i = 0; i < 2; i++) {
+    var w = g_window(g_guid());
+    var width = 800;
+    var height = 600;
+    var border = 10;
+    w.\"msg\"(0, width, height);
+    w.\"svg\"('M', border, border);
+    w.\"svg\"('L', width - border, border);
+    w.\"svg\"('L', width - border, height - border);
+    w.\"svg\"('L', border, height - border);
+    w.\"svg\"('L', border, border);
+    g_sleep_s(1);
+    w.\"msg\"(2, 0, 0);
 }
 ");
 """.trimIndent())

@@ -12,6 +12,7 @@ import org.apache.log4j.Logger
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets.UTF_8
+import java.util.*
 
 @Suppress("UNUSED_ANONYMOUS_PARAMETER")
 /**
@@ -290,6 +291,9 @@ class ModuleUserBase : IInterpreterModule {
             info.addExternalFunc("g_fork",
                     RuntimeDebugExec("进程分叉")
                     { args: List<RuntimeObject>, status: IRuntimeStatus -> RuntimeObject(status.service.processService.ring3.fork().toLong()) })
+            info.addExternalFunc("g_guid",
+                    RuntimeDebugExec("GUID")
+                    { args: List<RuntimeObject>, status: IRuntimeStatus -> RuntimeObject(UUID.randomUUID().toString()) })
         }
 
         private fun importFromString(info: IRuntimeDebugInfo, refer: IRuntimeDebugInfo) {

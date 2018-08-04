@@ -163,7 +163,7 @@ class RuntimeUserService(private val service: RuntimeService) :
 
         fun enqueue(pid: Int)
 
-        fun dequeue()
+        fun dequeue(): Boolean
 
         fun dequeue(pid: Int)
     }
@@ -195,12 +195,13 @@ class RuntimeUserService(private val service: RuntimeService) :
             service.processService.ring3.blockHandle = id
         }
 
-        override fun dequeue() {
+        override fun dequeue(): Boolean {
             if (waitingPids.isEmpty())
-                return
+                return false
             val pid = waitingPids.poll()
             service.processService.ring3.blockHandle = -1
             service.processService.wakeup(pid)
+            return true
         }
 
         override fun dequeue(pid: Int) {
@@ -311,12 +312,14 @@ class RuntimeUserService(private val service: RuntimeService) :
     enum class MsgType {
         CREATE,
         SET_EXIT,
+        WAIT,
     }
 
     internal inner class UserWindowHandler(id: Int) : UserHandler(id), IUserWindowHandler {
 
         var userWindow: UIUserWindow? = null
         var canExit = false
+        var forceExit = false
 
         override fun destroy() {
             super.destroy()
@@ -334,7 +337,10 @@ class RuntimeUserService(private val service: RuntimeService) :
                 override fun windowClosing(e: WindowEvent?) {
                     if (canExit) {
                         userWindow!!.dispose()
-                        userWindow = null
+                        if (!forceExit) {
+                            while (dequeue());
+                            destroy(id)
+                        }
                     }
                 }
             })
@@ -345,6 +351,7 @@ class RuntimeUserService(private val service: RuntimeService) :
             if (userWindow == null)
                 return
             canExit = true
+            forceExit = true
             userWindow!!.dispatchEvent(WindowEvent(userWindow, WindowEvent.WINDOW_CLOSING))
         }
 
@@ -355,8 +362,17 @@ class RuntimeUserService(private val service: RuntimeService) :
                     canExit = param1 != 0
                     true
                 }
+                MsgType.WAIT.ordinal -> waitWindow()
             }
             return false
+        }
+
+        private fun waitWindow(): Boolean {
+            if (!canExit)
+                canExit = true
+            val pid = service.processService.pid
+            enqueue(pid)
+            return true
         }
 
         override fun svg(op: Char, x: Int, y: Int): Boolean {
