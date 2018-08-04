@@ -4,7 +4,6 @@ import com.bajdcc.LALR1.grammar.runtime.RuntimeObject
 import com.bajdcc.LALR1.grammar.runtime.RuntimeObjectType
 import com.bajdcc.LALR1.grammar.runtime.data.*
 import org.apache.log4j.Logger
-import sun.reflect.generics.reflectiveObjects.NotImplementedException
 
 import java.util.*
 
@@ -13,7 +12,12 @@ import java.util.*
  *
  * @author bajdcc
  */
-class RuntimeUserService(private val service: RuntimeService) : IRuntimeUserService, IRuntimeUserService.IRuntimeUserPipeService, IRuntimeUserService.IRuntimeUserShareService, IRuntimeUserService.IRuntimeUserFileService {
+class RuntimeUserService(private val service: RuntimeService) :
+        IRuntimeUserService,
+        IRuntimeUserService.IRuntimeUserPipeService,
+        IRuntimeUserService.IRuntimeUserShareService,
+        IRuntimeUserService.IRuntimeUserFileService,
+        IRuntimeUserService.IRuntimeUserWindowService {
 
     private val fsNodeRoot = RuntimeFsNode.root()
     private val mapNames = mutableMapOf<String, Int>()
@@ -30,10 +34,14 @@ class RuntimeUserService(private val service: RuntimeService) : IRuntimeUserServ
     override val file: IRuntimeUserService.IRuntimeUserFileService
         get() = this
 
+    override val window: IRuntimeUserService.IRuntimeUserWindowService
+        get() = this
+
     internal enum class UserType(var desc: String) {
         PIPE("管道"),
         SHARE("共享"),
-        FILE("文件")
+        FILE("文件"),
+        WINDOW("窗口"),
     }
 
     internal interface IUserPipeHandler {
@@ -115,6 +123,18 @@ class RuntimeUserService(private val service: RuntimeService) : IRuntimeUserServ
         fun write(data: ByteArray, overwrite: Boolean, createIfNotExist: Boolean): Long
     }
 
+    internal interface IUserWindowHandler {
+
+        /**
+         * 发送消息
+         * @param type 消息类型
+         * @param param1 参数1
+         * @param param2 参数2
+         * @return 是否成功
+         */
+        fun sendMessage(type: Int, param1: Int, param2: Int): Boolean
+    }
+
     internal interface IUserHandler {
 
         val pipe: IUserPipeHandler
@@ -122,6 +142,8 @@ class RuntimeUserService(private val service: RuntimeService) : IRuntimeUserServ
         val share: IUserShareHandler
 
         val file: IUserFileHandler
+
+        val window: IUserWindowHandler
 
         fun destroy()
 
@@ -138,13 +160,16 @@ class RuntimeUserService(private val service: RuntimeService) : IRuntimeUserServ
             get() = waitingPids.isEmpty()
 
         override val pipe: IUserPipeHandler
-            get() = throw NotImplementedException()
+            get() = throw NotImplementedError()
 
         override val share: IUserShareHandler
-            get() = throw NotImplementedException()
+            get() = throw NotImplementedError()
 
         override val file: IUserFileHandler
-            get() = throw NotImplementedException()
+            get() = throw NotImplementedError()
+
+        override val window: IUserWindowHandler
+            get() = throw NotImplementedError()
 
         override fun destroy() {
             service.processService.ring3.removeHandle(id)
@@ -269,6 +294,31 @@ class RuntimeUserService(private val service: RuntimeService) : IRuntimeUserServ
             get() = this
     }
 
+    internal inner class UserWindowHandler(id: Int) : UserHandler(id), IUserWindowHandler {
+
+        init {
+            createWindow()
+        }
+
+        override fun destroy() {
+            super.destroy()
+            destroyWindow()
+        }
+
+        private fun createWindow() {
+        }
+
+        private fun destroyWindow() {
+        }
+
+        override fun sendMessage(type: Int, param1: Int, param2: Int): Boolean {
+            return false
+        }
+
+        override val window: IUserWindowHandler
+            get() = this
+    }
+
     internal inner class UserStruct(var name: String, var page: String, var type: UserType, var handler: IUserHandler)
 
     private fun newId(): Int {
@@ -297,104 +347,50 @@ class RuntimeUserService(private val service: RuntimeService) : IRuntimeUserServ
         val sp = name.split("\\|".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
         if (sp.size != 2)
             return -2
-        if (sp[0] == "pipe") {
-            return createPipe(sp[1], page)
+        return when {
+            sp[0] == "pipe" -> createHandle(sp[1], page, UserType.PIPE)
+            sp[0] == "share" -> createHandle(sp[1], page, UserType.SHARE)
+            sp[0] == "file" -> createHandle(sp[1], page, UserType.FILE)
+            sp[0] == "window" -> createHandle(sp[1], page, UserType.WINDOW)
+            else -> -3
         }
-        if (sp[0] == "share") {
-            return createShare(sp[1], page)
-        }
-        return if (sp[0] == "file") {
-            createFile(sp[1], page)
-        } else -3
     }
 
-    override fun read(id: Int): RuntimeObject {
-        if (arrUsers[id] == null) {
-            return RuntimeObject(true, RuntimeObjectType.kNoop)
-        }
-        val user = arrUsers[id]!!
-        return user.handler.pipe.read()
-    }
+    override fun read(id: Int): RuntimeObject =
+            optional(arrUsers[id], RuntimeObject(true, RuntimeObjectType.kNoop)) { it.pipe.read() }
 
-    override fun write(id: Int, obj: RuntimeObject): Boolean {
-        if (arrUsers[id] == null) {
-            return false
-        }
-        val user = arrUsers[id]!!
-        return user.handler.pipe.write(obj)
-    }
+    override fun write(id: Int, obj: RuntimeObject) =
+            optional(arrUsers[id], false) { it.pipe.write(obj) }
 
-    override fun get(id: Int): RuntimeObject? {
-        if (arrUsers[id] == null) {
-            return null
-        }
-        val user = arrUsers[id]!!
-        return user.handler.share.get()
-    }
+    override fun get(id: Int) =
+            optional(arrUsers[id], null) { it.share.get() }
 
-    override fun set(id: Int, obj: RuntimeObject?): RuntimeObject? {
-        if (arrUsers[id] == null) {
-            return null
-        }
-        val user = arrUsers[id]!!
-        return user.handler.share.set(obj)
-    }
+    override fun set(id: Int, obj: RuntimeObject?) =
+            optional(arrUsers[id], null) { it.share.set(obj) }
 
-    override fun lock(id: Int): Boolean {
-        if (arrUsers[id] == null) {
-            return false
-        }
-        val user = arrUsers[id]!!
-        return user.handler.share.lock()
-    }
+    override fun lock(id: Int) =
+            optional(arrUsers[id], false) { it.share.lock() }
 
-    override fun unlock(id: Int): Boolean {
-        if (arrUsers[id] == null) {
-            return false
-        }
-        val user = arrUsers[id]!!
-        return user.handler.share.unlock()
-    }
+    override fun unlock(id: Int) =
+            optional(arrUsers[id], false) { it.share.unlock() }
 
-    override fun queryFile(id: Int): Long {
-        if (arrUsers[id] == null) {
-            return -1L
-        }
-        val user = arrUsers[id]!!
-        return user.handler.file.query()
-    }
+    override fun queryFile(id: Int) =
+            optional(arrUsers[id], -1L) { it.file.query() }
 
-    override fun createFile(id: Int, file: Boolean): Boolean {
-        if (arrUsers[id] == null) {
-            return false
-        }
-        val user = arrUsers[id]!!
-        return user.handler.file.create(file)
-    }
+    override fun createFile(id: Int, file: Boolean) =
+            optional(arrUsers[id], false) { it.file.create(file) }
 
-    override fun deleteFile(id: Int): Boolean {
-        if (arrUsers[id] == null) {
-            return false
-        }
-        val user = arrUsers[id]!!
-        return user.handler.file.delete()
-    }
+    override fun deleteFile(id: Int) =
+            optional(arrUsers[id], false) { it.file.delete() }
 
-    override fun readFile(id: Int): ByteArray? {
-        if (arrUsers[id] == null) {
-            return null
-        }
-        val user = arrUsers[id]!!
-        return user.handler.file.read()
-    }
+    override fun readFile(id: Int) =
+            optional(arrUsers[id], null) { it.file.read() }
 
-    override fun writeFile(id: Int, data: ByteArray, overwrite: Boolean, createIfNotExist: Boolean): Long {
-        if (arrUsers[id] == null) {
-            return -1L
-        }
-        val user = arrUsers[id]!!
-        return user.handler.file.write(data, overwrite, createIfNotExist)
-    }
+    override fun writeFile(id: Int, data: ByteArray, overwrite: Boolean, createIfNotExist: Boolean) =
+            optional(arrUsers[id], -1L) { it.file.write(data, overwrite, createIfNotExist) }
+
+    override fun sendMessage(id: Int, type: Int, param1: Int, param2: Int) =
+            optional(arrUsers[id], false) { it.window.sendMessage(type, param1, param2) }
 
     override fun destroy() {
         val handles = service.processService.ring3.handles.toList()
@@ -452,38 +448,21 @@ class RuntimeUserService(private val service: RuntimeService) : IRuntimeUserServ
         return array
     }
 
-    private fun createPipe(name: String, page: String): Int {
-        if (mapNames.containsKey(name)) {
-            return mapNames.getOrDefault(name, -11)
-        }
-        val id = newId()
-        logger.debug("${UserType.PIPE} '$name' #$id created")
-        mapNames[name] = id
-        arrUsers[id] = UserStruct(name, page, UserType.PIPE, UserPipeHandler(id))
-        return id
+    private fun createHandlerFromType(type: UserType, id: Int): IUserHandler = when (type) {
+        RuntimeUserService.UserType.PIPE -> UserPipeHandler(id)
+        RuntimeUserService.UserType.SHARE -> UserShareHandler(id)
+        RuntimeUserService.UserType.FILE -> UserFileHandler(id)
+        RuntimeUserService.UserType.WINDOW -> UserWindowHandler(id)
     }
 
-    private fun createShare(name: String, page: String): Int {
+    private fun createHandle(name: String, page: String, type: UserType): Int {
         if (mapNames.containsKey(name)) {
-            return mapNames.getOrDefault(name, -21)
+            return mapNames[name]!!
         }
         val id = newId()
-        logger.debug("${UserType.SHARE} '$name' #$id created")
+        logger.debug("$type '$name' #$id created")
         mapNames[name] = id
-        arrUsers[id] = UserStruct(name, page, UserType.SHARE, UserShareHandler(id))
-        service.processService.ring3.addHandle(id)
-        return id
-    }
-
-    private fun createFile(name: String, page: String): Int {
-        if (mapNames.containsKey(name)) {
-            return mapNames.getOrDefault(name, -31)
-        }
-        val id = newId()
-        logger.debug("${UserType.FILE} '$name' #$id created")
-        mapNames[name] = id
-        arrUsers[id] = UserStruct(name, page, UserType.FILE, UserFileHandler(id))
-        service.processService.ring3.addHandle(id)
+        arrUsers[id] = UserStruct(name, page, type, createHandlerFromType(type, id))
         return id
     }
 
@@ -491,5 +470,9 @@ class RuntimeUserService(private val service: RuntimeService) : IRuntimeUserServ
 
         private const val MAX_USER = 1000
         private val logger = Logger.getLogger("user")
+
+        private fun <T> optional(us: UserStruct?, def: T, select: (IUserHandler) -> T): T =
+                if (us == null) def
+                else select(us.handler)
     }
 }

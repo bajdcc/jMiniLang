@@ -28,6 +28,12 @@ interface IRuntimeUserService {
      */
     val file: IRuntimeUserFileService
 
+    /**
+     * 获取服务
+     * @return 窗口服务
+     */
+    val window: IRuntimeUserWindowService
+
     interface IRuntimeUserPipeService {
         /**
          * 读取管道
@@ -116,6 +122,19 @@ interface IRuntimeUserService {
          * @return 0-成功，-1:自动创建失败，-2:文件不存在，-3:目标不是文件
          */
         fun writeFile(id: Int, data: ByteArray, overwrite: Boolean, createIfNotExist: Boolean): Long
+    }
+
+    interface IRuntimeUserWindowService {
+
+        /**
+         * 发送消息
+         * @param id 句柄
+         * @param type 消息类型
+         * @param param1 参数1
+         * @param param2 参数2
+         * @return 是否成功
+         */
+        fun sendMessage(id: Int, type: Int, param1: Int, param2: Int): Boolean
     }
 
     /**

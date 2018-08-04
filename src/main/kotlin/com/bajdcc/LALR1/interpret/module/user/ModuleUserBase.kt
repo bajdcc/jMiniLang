@@ -104,6 +104,9 @@ class ModuleUserBase : IInterpreterModule {
             info.addExternalFunc("g_unlock_share",
                     RuntimeDebugExec("解锁共享", arrayOf(RuntimeObjectType.kPtr))
                     { args: List<RuntimeObject>, status: IRuntimeStatus -> RuntimeObject(status.service.userService.share.unlock(args[0].int)) })
+            info.addExternalFunc("g_win_send_msg",
+                    RuntimeDebugExec("发送消息", arrayOf(RuntimeObjectType.kPtr, RuntimeObjectType.kInt, RuntimeObjectType.kInt, RuntimeObjectType.kInt))
+                    { args: List<RuntimeObject>, status: IRuntimeStatus -> RuntimeObject(status.service.userService.window.sendMessage(args[0].int, args[1].int, args[2].int, args[3].int)) })
         }
 
         private fun importFromBase(info: IRuntimeDebugInfo, refer: IRuntimeDebugInfo) {
