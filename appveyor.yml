@@ -19,7 +19,7 @@ artifacts:
   name: build
 cache:
   - .gradle
-  - %USERPROFILE%\.gradle\caches
+  - C:\Users\appveyor\.gradle\caches
 matrix:
   fast_finish: true
 on_failure:
