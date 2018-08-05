@@ -1646,6 +1646,7 @@ var import_handle_class = func ~() {
             this."handle" := g_handle("window|" + name);
             this."msg" := lambda(this, type, param1, param2) -> g_win_send_msg(this."handle", type, param1, param2);
             this."svg" := lambda(this, op, x, y) -> g_win_svg(this."handle", op, x, y);
+            this."str" := lambda(this, op, str) -> g_win_str(this."handle", op, str);
         };
     });
 };

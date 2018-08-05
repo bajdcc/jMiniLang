@@ -1,6 +1,46 @@
 import "sys.base";
 import "sys.list";
 import "sys.string";
+var g_sleep_s = func ~(second) {
+    if (second < 1) { return; }
+    g_block(second * 1000);
+};
+export "g_sleep_s";
+var g_sleep_signal = func ~(second, signal) {
+    if (second < 1) { return; }
+    var begin = g_get_timestamp();
+    var end = begin + second * 1000;
+    while (begin < end) {
+        begin := g_get_timestamp();
+        var s = g_query_share(signal);
+        if (g_is_null(s) || !s) {
+            g_printdn("Sleep_s interrupt: #" + g_get_pid() + " -> " + signal);
+            break;
+        }
+        g_block(500);
+    }
+};
+export "g_sleep_signal";
+var g_sleep_ms = func ~(ms) {
+    if (ms < 1) { return; }
+    g_block(ms);
+};
+export "g_sleep_ms";
+var g_sleep_ms_signal = func ~(ms, signal) {
+    if (ms < 1) { return; }
+    var begin = g_get_timestamp();
+    var end = begin + ms;
+    while (begin < end) {
+        begin := g_get_timestamp();
+        var s = g_query_share(signal);
+        if (g_is_null(s) || !s) {
+            g_printdn("Sleep_ms interrupt: #" + g_get_pid() + " -> " + signal);
+            break;
+        }
+        g_block(1);
+    }
+};
+export "g_sleep_ms_signal";
 var g_join_process = func ~(pid) {
     if (pid == -1) {
         return false;
@@ -99,6 +139,7 @@ var g_read_pipe_args_timeout = func ~(handle, callback, args, time) {
             callback(data, args);
         }
         begin := g_get_timestamp();
+        g_sleep_ms(10);
     }
     g_printdn("Reading pipe: #" + g_get_pid() + " -> #" + handle + " ok");
 };

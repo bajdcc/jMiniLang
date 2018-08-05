@@ -53,6 +53,13 @@ for (var i = 0; i < 2; i++) {
     w.\"svg\"('L', width - border, height - border);
     w.\"svg\"('L', border, height - border);
     w.\"svg\"('L', border, border);
+    w.\"svg\"('M', border * 2, border * 2);
+    w.\"svg\"('S', width - border * 4, height - border * 4);
+    w.\"str\"(1, g_string_rep(\"Hello world! \", 20));
+    w.\"svg\"('m', 0, 200);
+    w.\"str\"(1, g_string_rep(\"Hello world! \", 20));
+    w.\"svg\"('m', 0, 200);
+    w.\"str\"(0, g_string_rep(\"Hello world! \", 20));
     g_sleep_s(1);
     w.\"msg\"(2, 0, 0);
 }

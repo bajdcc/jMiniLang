@@ -66,7 +66,7 @@ var real_repeat = func ~(_operation, _arg, _start, _end) {
 var word_typewrite0 = func ~(str, span) {
     var print = func ~(a, n) {
         put(g_string_get(a, n));
-        g_task_sleep_ms_signal(span, signal);
+        g_sleep_ms_signal(span, signal);
     };
     real_repeat(print, str, 0, g_string_length(str));
 };
@@ -75,7 +75,7 @@ var word_typewrite0 = func ~(str, span) {
 var word_typewrite = func ~(str, span) {
     foreach (var c : g_range_string(str)) {
         put(c);
-        g_task_sleep_ms_signal(span, signal);
+        g_sleep_ms_signal(span, signal);
     }
     put(g_endl);
 };
@@ -143,7 +143,7 @@ var stage_philo = func ~() {
             g_write_pipe(out, c);
         }
         g_write_pipe(out, '\n');
-        g_task_sleep_ms_signal(100, signal);
+        g_sleep_ms_signal(100, signal);
         g_unlock_mutex(pm);
     };
     foreach (var j : g_range(1, 5)) {
@@ -156,7 +156,7 @@ var stage_philo = func ~() {
         };
         var h = g_create_user_process_args(philo, args);
         g_array_add(handles, h);
-        g_task_sleep(1);
+        g_sleep_s(1);
     }
     g_join_process_array(handles);
     foreach (var k : g_range(1, 5)) {
@@ -251,7 +251,7 @@ var stage_philo2 = func ~() {
             g_write_pipe(out, c);
         }
         g_write_pipe(out, '\n');
-        g_task_sleep_ms_signal(100, signal);
+        g_sleep_ms_signal(100, signal);
         g_unlock_mutex(pm);
     };
     foreach (var j : g_range(1, 5)) {
@@ -433,7 +433,7 @@ var word_typewrite_fast = func ~(span, str) {
     puts(g_string_rep(" ", space));
     foreach (var c : g_range_string(str)) {
         put(c);
-        g_task_sleep_ms_signal(span, signal);
+        g_sleep_ms_signal(span, signal);
     }
     put(g_endl);
 };
@@ -540,7 +540,7 @@ var stage_fork = func ~() {
         g_set_process_desc("fork job");
         var fork_entry = func ~(arg) {
             g_set_process_desc("fork #" + arg);
-            g_task_sleep(1);
+            g_sleep_s(1);
             var o = g_create_pipe("FORK#COUNT");
             g_write_pipe(o, '*');
         };
@@ -553,9 +553,9 @@ var stage_fork = func ~() {
             if (g_available_process()) {
                 g_create_user_process_args(fork_entry, i);
                 g_sleep(10);
-                g_task_sleep_ms(10);
+                g_sleep_ms(10);
             } else {
-                g_task_sleep(1);
+                g_sleep_s(1);
             }
         }
     };
@@ -731,7 +731,7 @@ var stage_bash = func ~() {
     var exec = func ~(cmd) {
         g_write_pipe_n(out, g_endl + "# " + cmd + g_endl);
         shell."exec"(cmd);
-        g_task_sleep_ms_signal(600, signal);
+        g_sleep_ms_signal(600, signal);
     };
     exec("@ui on monitor");
     exec("range 1 10");
@@ -851,7 +851,7 @@ var stage_badapple = func ~() {
     g_write_pipe(out, "\f");
     g_write_pipe(out, "\uffe1");
     g_set_rapid(true);
-    g_task_sleep_ms_signal(100, signal);
+    g_sleep_ms_signal(100, signal);
     if (!g_read_file_utf8_args("!/com/bajdcc/code/fs/badapple.txt", callback, out)) {
         g_set_rapid(false);
         g_write_pipe(out, "\uffe1");
@@ -985,7 +985,7 @@ var stage_proc = func ~(def) {
                 g_task_get_fast_arg("proc", "kill", pid);
             }
             g_read_pipe_args_timeout(user_pipe, lambda(ch, out) -> g_write_pipe(out, ch), out, 100);
-            //g_task_sleep_signal(1, signal);
+            //g_sleep_signal(1, signal);
         }
         var ret = g_task_get_fast_arg("proc", "info", pid);
         if (!g_is_null(ret)) {
@@ -1063,11 +1063,11 @@ var stage_web = func ~() {
     }
     var port = "8088";
     g_task_get_fast_arg("net", "start_web", port);
-    g_task_sleep_signal(1, signal);
+    g_sleep_signal(1, signal);
     var timed = 0;
     while (!g_net_query_web() && timed < 2) {
         timed++;
-        g_task_sleep_signal(1, signal);
+        g_sleep_signal(1, signal);
     }
     if (!g_net_query_web()) {
         putn(g_ui_fg(255, 0, 0) + "启动失败" + g_ui_fgc());
@@ -1095,6 +1095,45 @@ var stage_web = func ~() {
     g_task_get_fast("net", "stop_web");
     while (g_net_query_web()) { g_sleep(50); }
     g_destroy_semaphore(mutex);
+};
+
+// ---------------------------------------------
+// USER WINDOW HANDLE EXAMPLE
+
+var stage_window = func ~() {
+    if (!g_query_file("$/test/window")) {
+        g_write_file_s_utf8("$/test/window", g_read_file_utf8_all("!/com/bajdcc/code/fs/window.txt"));
+    }
+    var pid = g_task_get_fast_arg("proc", "exec_file", "$/test/window");
+    if (g_is_null(pid)) {
+        putn(g_ui_fg(255, 0, 0) + "出错" + g_ui_fgc());
+        putln();
+        return;
+    }
+    if (pid["error"]) {
+        putn("编译出错");
+        putn(g_ui_fg(255, 0, 0) + pid["val"] + g_ui_fgc());
+        putln();
+        return;
+    }
+    pid := pid["val"];
+    var user_pipe = g_create_pipe("!USER_PROC#" + pid);
+    putn("运行成功，PID：" + pid);
+    var begin = g_task_get_timestamp();
+    for (var i = 0; g_live_process(pid); i++) {
+        if (g_query_share(signal)) {
+            var now = g_task_get_timestamp();
+            var span = (now - begin) / 1000;
+            put("已等待" + span + "秒\r");
+        } else {
+            putln();
+            g_task_get_fast_arg("proc", "kill", pid);
+            return;
+        }
+        g_read_pipe_args_timeout(user_pipe, lambda(ch, out) -> g_write_pipe(out, ch), out, 100);
+        g_sleep_signal(1, signal);
+    }
+    putln();
 };
 
 var name = args[0];
@@ -1129,6 +1168,8 @@ if (g_is_null(name)) {
     stage_proc(false);
 } else if (name == "web") {
     stage_web();
+} else if (name == "window") {
+    stage_window();
 } else {
     g_read_pipe_args(in, lambda(ch, out) -> g_write_pipe(out, ch), out);
 }

@@ -56,9 +56,6 @@ class ModuleTask : IInterpreterModule {
                         RuntimeObject(SimpleDateFormat(format).format(Date()))
                     }
                 })
-        info.addExternalFunc("g_task_get_timestamp",
-                RuntimeDebugExec("获取当前时间戳")
-                { args: List<RuntimeObject>, status: IRuntimeStatus -> RuntimeObject(System.currentTimeMillis()) })
         info.addExternalFunc("g_task_get_pipe_stat",
                 RuntimeDebugExec("获取管道信息")
                 { args: List<RuntimeObject>, status: IRuntimeStatus -> RuntimeObject(status.service.pipeService.stat(false)) })

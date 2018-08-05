@@ -31,13 +31,13 @@ var msg_receive = func ~(out, signal, port, log) {
     while (g_query_share(signal)) {
         var s = g_net_msg_get_server_msg();
         if (g_is_null(s)) {
-            g_task_sleep_signal(1, signal);
+            g_sleep_signal(1, signal);
             continue;
         }
         g_printdn("Received msg: " + s);
         var obj = g_net_parse_json(s);
         if (g_is_null(obj)) {
-            g_task_sleep_signal(1, signal);
+            g_sleep_signal(1, signal);
             continue;
         }
         var type = obj["type"];
@@ -99,14 +99,14 @@ var msg_send = func ~(in, out, signal, addr) {
     while (g_query_share(signal) && i < 2) {
         var s = g_net_msg_get_client_msg();
         if (g_is_null(s)) {
-            g_task_sleep_signal(1, signal);
+            g_sleep_signal(1, signal);
             i++;
             continue;
         }
         g_printdn("Received msg: " + s);
         var obj = g_net_parse_json(s);
         if (g_is_null(obj)) {
-            g_task_sleep_signal(1, signal);
+            g_sleep_signal(1, signal);
             continue;
         }
         var type = obj["type"];
@@ -217,13 +217,13 @@ var sshd_msg_receive = func ~(port) {
         }
         var s = g_net_msg_get_server_msg();
         if (g_is_null(s)) {
-            g_task_sleep(1);
+            g_sleep_s(1);
             continue;
         }
         g_printdn("Received msg: " + s);
         var obj = g_net_parse_json(s);
         if (g_is_null(obj)) {
-            g_task_sleep(1);
+            g_sleep_s(1);
             continue;
         }
         var type = obj["type"];
@@ -335,14 +335,14 @@ var ssh_msg_recv = func ~(address) {
         // RECV
         var s = g_net_msg_get_client_msg();
         if (g_is_null(s)) {
-            g_task_sleep(1);
+            g_sleep_s(1);
             i++;
             continue;
         }
         g_printdn("Received msg: " + s);
         var obj = g_net_parse_json(s);
         if (g_is_null(obj)) {
-            g_task_sleep(1);
+            g_sleep_s(1);
             i++;
             continue;
         }

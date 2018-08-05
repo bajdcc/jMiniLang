@@ -58,20 +58,24 @@ var g_ui_input = func ~() {
             g_array_add(h, s);
             return s;
         }
-        var c = g_ui_print_input();
-        if (!g_is_null(c)) {
-            if (c == '\ufff0') {
-                if (!g_array_empty(h)) {
-                    var old = g_array_pop(h);
-                    g_ui_fallback();
-                    g_ui_input_queue(old);
+        while (true) {
+            var c = g_ui_print_input();
+            if (!g_is_null(c)) {
+                if (c == '\ufff0') {
+                    if (!g_array_empty(h)) {
+                        var old = g_array_pop(h);
+                        g_ui_fallback();
+                        g_ui_input_queue(old);
+                    }
+                } else if (c == '\uffee') {
+                    while (!g_ui_caret(false)) {};
+                    g_ui_println();
+                    return g_ui_input_im();
+                } else {
+                    g_ui_print(c);
                 }
-            } else if (c == '\uffee') {
-                while (!g_ui_caret(false)) {};
-                g_ui_println();
-                return g_ui_input_im();
             } else {
-                g_ui_print(c);
+                break;
             }
         }
         g_block(10);

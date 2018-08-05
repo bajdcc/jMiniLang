@@ -57,7 +57,7 @@ var time = func ~(msg, caller) {
         if (!g_is_null(g_query_share("SSHD#EXIT"))) {
             g_net_msg_server_send_error("Server shutdown");
             g_ui_printn("Server shutdown!");
-            g_task_sleep(3);
+            g_sleep_s(3);
             g_create_share("SSHD#EXIT", true);
             g_map_put(msg, "val", "Success");
         } else {

@@ -999,7 +999,7 @@ if (!g_array_empty(args)) {
 
 while (g_query_share(signal)) {
     test."tick"();
-    g_task_sleep_ms_signal(60, signal);
+    g_sleep_ms_signal(60, signal);
 }
 
 g_task_get_fast_args("store", "put", ["APP#PC#LOCK", false]);

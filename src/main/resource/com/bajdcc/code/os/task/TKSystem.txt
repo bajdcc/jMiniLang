@@ -63,7 +63,7 @@ var time = func ~(msg, caller) {
         if (g_is_null(second)) { second := -1; }
         else { second := g_string_atoi(second); }
         if (second < 0) { second := 1; }
-        g_task_sleep(second);
+        g_sleep_s(second);
         g_map_put(msg, "val", "Slept " + g_to_string(second) + "s.");
     } else if (id == "halt") {
         g_ui_printn("** System is going to power off! **");

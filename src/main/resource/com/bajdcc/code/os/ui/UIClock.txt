@@ -30,7 +30,7 @@ var draw = func ~() {
     }
     var time = g_task_get_fast("system", "now");
     g_task_get_fast_arg("ui", "path", "\uffeeM 110 110\uffee\uffeeR 390 140\uffee\uffeeM 140 130\uffee\uffed" + time + "\uffed");
-    g_task_sleep_signal(1, "TASK#SLEEP");
+    g_sleep_signal(1, "TASK#SLEEP");
 };
 var clear = func ~() {
     if (first) {

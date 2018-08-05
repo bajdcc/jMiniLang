@@ -575,7 +575,7 @@ machine."start"(output);
 var typewrite = lambda(out, ch) {
     if (ch == '\ufff8') {
         g_write_pipe(out, '.');
-        g_task_sleep_signal(1, signal);
+        g_sleep_signal(1, signal);
         return;
     }
     g_write_pipe(out, ch);

@@ -145,6 +145,15 @@ interface IRuntimeUserService {
          * @return 是否成功
          */
         fun svg(id: Int, op: Char, x: Int, y: Int): Boolean
+
+        /**
+         * 设置字符串
+         * @param id 句柄
+         * @param op 类型
+         * @param str 字符串
+         * @return 是否成功
+         */
+        fun str(id: Int, op: Int, str: String): Boolean
     }
 
     /**

@@ -149,6 +149,14 @@ class RuntimeUserService(private val service: RuntimeService) :
          * @return 是否成功
          */
         fun svg(op: Char, x: Int, y: Int): Boolean
+
+        /**
+         * 设置字符串
+         * @param op 类型
+         * @param str 字符串
+         * @return 是否成功
+         */
+        fun str(op: Int, str: String): Boolean
     }
 
     internal interface IUserHandler {
@@ -382,6 +390,13 @@ class RuntimeUserService(private val service: RuntimeService) :
             return true
         }
 
+        override fun str(op: Int, str: String): Boolean {
+            if (userWindow == null)
+                return false
+            userWindow!!.graphics.addStrInst(UIUserGraphics.StrInst(op, str))
+            return true
+        }
+
         override val window: IUserWindowHandler
             get() = this
     }
@@ -461,6 +476,9 @@ class RuntimeUserService(private val service: RuntimeService) :
 
     override fun svg(id: Int, op: Char, x: Int, y: Int) =
             optional(arrUsers[id], false) { it.window.svg(op, x, y) }
+
+    override fun str(id: Int, op: Int, str: String) =
+            optional(arrUsers[id], false) { it.window.str(op, str) }
 
     override fun destroy() {
         val handles = service.processService.ring3.handles.toList()

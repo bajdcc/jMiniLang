@@ -29,11 +29,11 @@ var draw = func ~() {
         first := true;
     }
     var obj = g_task_get_fast_arg("net", "get_json", "http://api.hitokoto.cn/?c=a&encode=json");
-    if (g_is_null(obj)) { g_task_sleep(10); return; }
+    if (g_is_null(obj)) { g_sleep_s(10); return; }
     var text = " —— " + obj["from"] + " —— \n" + obj["hitokoto"];
     //var text = "test string for debug";
     g_task_get_fast_arg("ui", "path", "\uffeeM 101 201\uffee\uffeeR 599 349\uffee\uffeeM 140 230\uffee\uffeeW 450\uffee\uffec" + text + "\uffec");
-    g_task_sleep_signal(8, "TASK#SLEEP");
+    g_sleep_signal(8, "TASK#SLEEP");
 };
 var clear = func ~() {
     if (first) {

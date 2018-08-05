@@ -724,7 +724,7 @@ test."init"(log);
 
 while (g_query_share(signal)) {
     test."tick"();
-    g_task_sleep_ms_signal(60, signal);
+    g_sleep_ms_signal(60, signal);
 }
 
 g_stop_share(signal);
