@@ -2,6 +2,7 @@ package com.bajdcc.LALR1.grammar.runtime.service
 
 import com.bajdcc.LALR1.grammar.runtime.RuntimeObject
 import com.bajdcc.LALR1.grammar.runtime.RuntimeObjectType
+import com.bajdcc.LALR1.grammar.runtime.RuntimeProcess
 import com.bajdcc.LALR1.grammar.runtime.data.*
 import com.bajdcc.LALR1.ui.user.UIUserGraphics
 import com.bajdcc.LALR1.ui.user.UIUserWindow
@@ -11,6 +12,7 @@ import java.awt.Toolkit
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import java.util.*
+import javax.swing.JFrame
 
 /**
  * 【运行时】运行时用户服务
@@ -319,11 +321,19 @@ class RuntimeUserService(private val service: RuntimeService) :
 
         var userWindow: UIUserWindow? = null
         var canExit = false
-        var forceExit = false
 
         override fun destroy() {
             super.destroy()
             destroyWindow()
+            while (dequeue());
+        }
+
+        private val adapter = object : WindowAdapter() {
+            override fun windowClosing(e: WindowEvent?) {
+                if (canExit) {
+                    RuntimeProcess.addUserDelayDestroy(id)
+                }
+            }
         }
 
         private fun createWindow(param1: Int, param2: Int): Boolean {
@@ -333,25 +343,15 @@ class RuntimeUserService(private val service: RuntimeService) :
             userWindow = UIUserWindow(arrUsers[id]!!.name,
                     Dimension(clamp(param1, 1, size.width),
                             clamp(param2, 1, size.height)))
-            userWindow!!.addWindowListener(object : WindowAdapter() {
-                override fun windowClosing(e: WindowEvent?) {
-                    if (canExit) {
-                        userWindow!!.dispose()
-                        if (!forceExit) {
-                            while (dequeue());
-                            destroy(id)
-                        }
-                    }
-                }
-            })
+            userWindow!!.addWindowListener(adapter)
             return true
         }
 
         private fun destroyWindow() {
             if (userWindow == null)
                 return
-            canExit = true
-            forceExit = true
+            userWindow!!.removeWindowListener(adapter)
+            userWindow!!.defaultCloseOperation = JFrame.DISPOSE_ON_CLOSE
             userWindow!!.dispatchEvent(WindowEvent(userWindow, WindowEvent.WINDOW_CLOSING))
         }
 
@@ -495,24 +495,30 @@ class RuntimeUserService(private val service: RuntimeService) :
         val array = RuntimeArray()
         if (api) {
             mapNames.values.sortedBy { it }
-                    .forEach { value ->
+                    .asSequence()
+                    .map { Pair(it, arrUsers[it]!!) }
+                    .forEach {
                         val item = RuntimeArray()
-                        item.add(RuntimeObject(value.toLong()))
-                        item.add(RuntimeObject(arrUsers[value]!!.type.desc))
-                        item.add(RuntimeObject(arrUsers[value]!!.name))
-                        item.add(RuntimeObject(arrUsers[value]!!.page))
-                        item.add(RuntimeObject(arrUsers[value]!!.handler.toString()))
+                        item.add(RuntimeObject(it.first.toLong()))
+                        item.add(RuntimeObject(it.second.type.desc))
+                        item.add(RuntimeObject(it.second.name))
+                        item.add(RuntimeObject(it.second.page))
+                        item.add(RuntimeObject(it.second.handler.toString()))
                         array.add(RuntimeObject(item))
                     }
         } else {
             array.add(RuntimeObject(String.format("   %-5s   %-15s   %-15s   %-20s",
                     "Id", "Name", "Type", "Description")))
             mapNames.values.sortedBy { it }
-                    .forEach { value ->
+                    .asSequence()
+                    .map { Pair(it, arrUsers[it]!!) }
+                    .forEach {
                         array.add(
                                 RuntimeObject(String.format("   %-5s   %-15s   %-15s   %-20s",
-                                        value.toLong(), arrUsers[value]!!.name,
-                                        arrUsers[value]!!.type.toString(), arrUsers[value]!!.handler.toString())))
+                                        it.first.toLong(),
+                                        it.second.name,
+                                        it.second.type.toString(),
+                                        it.second.handler.toString())))
                     }
         }
         return array

@@ -199,22 +199,29 @@ class RuntimePipeService(private val service: RuntimeService) : IRuntimePipeServ
         val array = RuntimeArray()
         if (api) {
             mapPipeNames.values.sortedBy { it }
-                    .forEach { value ->
+                    .asSequence()
+                    .map { Pair(it, arrPipes[it]!!) }
+                    .forEach {
                         val item = RuntimeArray()
-                        item.add(RuntimeObject(value.toString()))
-                        item.add(RuntimeObject(arrPipes[value]!!.name))
-                        item.add(RuntimeObject(arrPipes[value]!!.page))
-                        item.add(RuntimeObject(arrPipes[value]!!.queue.size))
-                        item.add(RuntimeObject(arrPipes[value]!!.waiting_pids.size))
+                        item.add(RuntimeObject(it.first.toString()))
+                        item.add(RuntimeObject(it.second.name))
+                        item.add(RuntimeObject(it.second.page))
+                        item.add(RuntimeObject(it.second.queue.size))
+                        item.add(RuntimeObject(it.second.waiting_pids.size))
                         array.add(RuntimeObject(item))
                     }
         } else {
             array.add(RuntimeObject(String.format("   %-5s   %-20s   %-15s   %-15s",
                     "Id", "Name", "Queue", "Waiting")))
             mapPipeNames.values.sortedBy { it }
-                    .forEach { value ->
+                    .asSequence()
+                    .map { Pair(it, arrPipes[it]!!) }
+                    .forEach {
                         array.add(RuntimeObject(String.format("   %-5s   %-20s   %-15d   %-15d",
-                                value.toString(), arrPipes[value]!!.name, arrPipes[value]!!.queue.size, arrPipes[value]!!.waiting_pids.size)))
+                                it.first.toString(),
+                                it.second.name,
+                                it.second.queue.size,
+                                it.second.waiting_pids.size)))
                     }
         }
         return array

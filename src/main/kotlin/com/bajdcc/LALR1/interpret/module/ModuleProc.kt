@@ -322,6 +322,9 @@ class ModuleProc : IInterpreterModule {
                         RuntimeObject(status.service.processService.ring3Kill(pid.toInt(), "强制退出").toLong())
                     }
                 })
+        info.addExternalFunc("g_proc_kill_all",
+                RuntimeDebugExec("强制结束所有用户态进程")
+                { args: List<RuntimeObject>, status: IRuntimeStatus -> RuntimeObject(status.service.processService.ring3Kill(-1, "强制退出").toLong()) })
     }
 
     internal object ProcInfoHelper {

@@ -125,7 +125,7 @@ interface IRuntimeProcessService {
 
     /**
      * 强制结束用户态进程
-     * @param pid PID
+     * @param pid PID(-1为所有)
      * @param error 错误原因
      * @return 状态码
      */

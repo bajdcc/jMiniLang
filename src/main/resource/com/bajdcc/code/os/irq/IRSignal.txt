@@ -16,6 +16,9 @@ g_printn("Running...");
 var destroy_int = func ~() {
     var tt = g_query_share("TASK#TABLE");
     var tn = g_query_share("TASK#NAMELIST");
+    // 确保用户进程退出
+    g_printn("Stopping user process...");
+    g_proc_kill_all();
     // 确保任务和中断依次退出
     // 1. stop task
     g_printn("Stopping service...");

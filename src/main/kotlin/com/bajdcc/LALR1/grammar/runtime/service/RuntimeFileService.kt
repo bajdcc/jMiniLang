@@ -164,6 +164,7 @@ class RuntimeFileService(private val service: RuntimeService) : IRuntimeFileServ
         val array = RuntimeArray()
         if (api) {
             mapFileNames.values.sortedBy { it }
+                    .asSequence()
                     .map { a -> arrFiles[a]!! }
                     .forEach { value ->
                         val item = RuntimeArray()
@@ -180,6 +181,7 @@ class RuntimeFileService(private val service: RuntimeService) : IRuntimeFileServ
                     "Name", "Mode", "Status", "Encoding")))
             mapFileNames.values.sortedBy { it }
                     .map { a -> arrFiles[a]!! }
+                    .asSequence()
                     .forEach { value ->
                         array.add(RuntimeObject(String.format("   %-30s   %-5s   %-10s   %-10s",
                                 value.name, value.mode, value.status.toString(), value.encoding)))

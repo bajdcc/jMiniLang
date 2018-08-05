@@ -250,6 +250,10 @@ constructor(name: String, input: InputStream, private val pageFileMap: Map<Strin
                 val pair = pipeDeque.poll()
                 service.pipeService.writeStringNew(pair.key, pair.value)
             }
+            if (!userHandleDelayDestroy.isEmpty()) {
+                val id = userHandleDelayDestroy.poll()
+                service.userService.destroy(id)
+            }
         }
         return true
     }
@@ -439,6 +443,14 @@ constructor(name: String, input: InputStream, private val pageFileMap: Map<Strin
     }
 
     override fun ring3Kill(pid: Int, error: String): Int {
+        if (pid == -1) {
+            arrProcess.asSequence()
+                    .mapIndexed { index, schdProcess -> Pair(index, schdProcess) }
+                    .filter { it.value?.machine?.ring3?.isRing3 == true }
+                    .map { it.key }
+                    .forEach { ring3Kill(it, error) }
+            return 0
+        }
         if (!setProcessId.contains(pid)) {
             return -1
         }
@@ -473,9 +485,14 @@ constructor(name: String, input: InputStream, private val pageFileMap: Map<Strin
     companion object {
 
         private val pipeDeque = ConcurrentLinkedDeque<Pair<String, String>>()
+        private val userHandleDelayDestroy = ConcurrentLinkedDeque<Int>()
 
         fun writePipe(name: String, msg: String) {
             pipeDeque.add(Pair(name, msg))
+        }
+
+        fun addUserDelayDestroy(id: Int) {
+            userHandleDelayDestroy.add(id)
         }
 
         private val logger = Logger.getLogger("proc")
