@@ -140,7 +140,7 @@ class UIFontImage(private val width: Int, private val height: Int) {
 
         private val logger = Logger.getLogger("font")
 
-        internal val asciiFont = Font(Font.MONOSPACED, Font.PLAIN, 18)
+        internal val asciiFont = Font("Courier New", Font.PLAIN, 18)
         internal val unicodeFont = Font("楷体", Font.PLAIN, 18)
 
         fun isWideChar(c: Char): Boolean {
