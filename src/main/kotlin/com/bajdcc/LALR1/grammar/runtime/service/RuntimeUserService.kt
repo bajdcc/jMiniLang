@@ -459,8 +459,8 @@ class RuntimeUserService(private val service: RuntimeService) :
             if (running) {
                 cancel = true
                 call?.cancel()
-                while (dequeue());
             }
+            while (dequeue());
         }
 
         override fun http(method: Int, json: Boolean, data: String): RuntimeObject {
@@ -469,6 +469,7 @@ class RuntimeUserService(private val service: RuntimeService) :
             if (finish) {
                 running = false
                 finish = false
+                while (dequeue());
                 return RuntimeObject(str)
             }
             val newUrl = url ?: return RuntimeObject(-2L)

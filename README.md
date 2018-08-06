@@ -181,16 +181,31 @@ LINQ:
 
 TASK PROC:
 
-- exec
-- kill
-- info
+- exec：执行代码
+- exec_file：读文件执行代码
+- kill：中止用户进程
+- info：取得用户进程状态（用于浏览器远程回调）
 
-USER HANDLE:（用户级进程支持的句柄种类）
+[USER HANDLE](https://github.com/bajdcc/jMiniLang/blob/master/src/main/kotlin/com/bajdcc/LALR1/grammar/runtime/service/IRuntimeUserService.kt):（用户级进程支持的句柄种类）
 
-- pipe
-- share
-- file
-- window
+- pipe：管道，类似Go中的chan，用于跨进程同步，读阻塞，写不阻塞。
+- share：共享，同步跨进程数据共享。
+- file：文件，虚拟文件接口，同步操作。
+- window：窗口，创建JFrame窗口，异步，包括绘制、消息。
+- net：网络，包括HTTP请求，OkHttp实现，异步。
+
+Dependencies:（使用的开源库，下面为部分）
+
+- JSON格式化：fastjson
+- 实现远程命令SSH：netty
+- 后端及API：spring-boot
+- 网页模版：thymeleaf
+- 前端交互：vue
+- 前端样式：layui
+- Markdown文档转换：flexmark
+- 数据结构：guava
+- HTTP请求：okhttp
+- JAR打包：shadow
 
 #### Manual
 
