@@ -1,5 +1,8 @@
 package com.bajdcc.LALR1.interpret.module.user
 
+import com.alibaba.fastjson.JSON
+import com.alibaba.fastjson.JSONArray
+import com.alibaba.fastjson.JSONObject
 import com.bajdcc.LALR1.grammar.Grammar
 import com.bajdcc.LALR1.grammar.runtime.*
 import com.bajdcc.LALR1.grammar.runtime.RuntimeMachine.Ring3Option.LOG_FILE
@@ -11,8 +14,8 @@ import com.bajdcc.util.ResourceLoader
 import org.apache.log4j.Logger
 import java.io.BufferedReader
 import java.io.InputStreamReader
-import java.nio.charset.StandardCharsets.UTF_8
 import java.util.*
+import kotlin.text.Charsets.UTF_8
 
 @Suppress("UNUSED_ANONYMOUS_PARAMETER")
 /**
@@ -402,6 +405,15 @@ class ModuleUserBase : IInterpreterModule {
         private fun importFromNet(info: IRuntimeDebugInfo, refer: IRuntimeDebugInfo) {
             info.addExternalFunc("g_info_get_ip", refer.getExecCallByName("g_web_get_ip")!!)
             info.addExternalFunc("g_info_get_hostname", refer.getExecCallByName("g_web_get_hostname")!!)
+            info.addExternalFunc("g_net_http",
+                    RuntimeDebugExec("HTTP请求", arrayOf(RuntimeObjectType.kPtr, RuntimeObjectType.kInt, RuntimeObjectType.kBool, RuntimeObjectType.kString))
+                    { args: List<RuntimeObject>, status: IRuntimeStatus -> status.service.userService.net.http(args[0].int, args[1].int, args[2].bool, args[3].string) })
+            info.addExternalFunc("g_to_json",
+                    RuntimeDebugExec("HTTP请求", arrayOf(RuntimeObjectType.kObject))
+                    { args: List<RuntimeObject>, status: IRuntimeStatus -> RuntimeObject(args[0].toJsonString()) })
+            info.addExternalFunc("g_parse_json",
+                    RuntimeDebugExec("HTTP请求", arrayOf(RuntimeObjectType.kString))
+                    { args: List<RuntimeObject>, status: IRuntimeStatus -> args[0].string.parseJson() })
         }
 
         private fun importFromFile(info: IRuntimeDebugInfo, refer: IRuntimeDebugInfo) {
@@ -429,7 +441,10 @@ class ModuleUserBase : IInterpreterModule {
                     { args: List<RuntimeObject>, status: IRuntimeStatus -> RuntimeObject(status.service.userService.file.deleteFile(args[0].int)) })
             info.addExternalFunc("g_read_file_internal",
                     RuntimeDebugExec("读取文件", arrayOf(RuntimeObjectType.kPtr))
-                    { args: List<RuntimeObject>, status: IRuntimeStatus -> RuntimeObject(String(status.service.userService.file.readFile(args[0].int) ?: ByteArray(0), Charsets.UTF_8)) })
+                    { args: List<RuntimeObject>, status: IRuntimeStatus ->
+                        RuntimeObject(String(status.service.userService.file.readFile(args[0].int)
+                                ?: ByteArray(0), Charsets.UTF_8))
+                    })
             info.addExternalFunc("g_write_file_internal",
                     RuntimeDebugExec("写入文件", arrayOf(RuntimeObjectType.kPtr, RuntimeObjectType.kString, RuntimeObjectType.kBool, RuntimeObjectType.kBool))
                     { args: List<RuntimeObject>, status: IRuntimeStatus -> RuntimeObject(status.service.userService.file.writeFile(args[0].int, args[1].string.toByteArray(Charsets.UTF_8), args[2].bool, args[3].bool)) })
@@ -446,5 +461,39 @@ class ModuleUserBase : IInterpreterModule {
                 info.addExternalFunc(key, refer.getExecCallByName(key)!!)
             }
         }
+
+        private fun String.parseJson(): RuntimeObject {
+            try {
+                val o = JSON.parseObject(this)
+                return parseJson(o)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+            return RuntimeObject(null)
+        }
+
+        private fun parseJson(o: Any): RuntimeObject =
+                when (o) {
+                    is JSONObject -> RuntimeObject(RuntimeMap(o.asSequence().associate { it.key to parseJson(it.value) }))
+                    is JSONArray -> RuntimeObject(RuntimeArray(o.map { parseJson(it) }))
+                    is Int -> RuntimeObject(o.toLong())
+                    is Float -> RuntimeObject(o.toDouble())
+                    else -> RuntimeObject(o)
+                }
+
+        private fun toJsonObject(o: RuntimeObject): Any? =
+                with(o.obj) {
+                    when (this) {
+                        null -> null
+                        is RuntimeMap -> JSONObject(this.getMap().asSequence().filter { it.value.type != RuntimeObjectType.kNull }.associate { it.key to toJsonObject(it.value) })
+                        is RuntimeArray -> JSONArray(this.getArray().map { toJsonObject(it) })
+                        is Long -> this.toInt()
+                        is Float -> this.toDouble()
+                        else -> this
+                    }
+                }
+
+        private fun RuntimeObject.toJsonString(): String? =
+                toJsonObject(this)?.toString()
     }
 }

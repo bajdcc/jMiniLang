@@ -6,13 +6,17 @@ import com.bajdcc.LALR1.grammar.runtime.RuntimeProcess
 import com.bajdcc.LALR1.grammar.runtime.data.*
 import com.bajdcc.LALR1.ui.user.UIUserGraphics
 import com.bajdcc.LALR1.ui.user.UIUserWindow
+import okhttp3.*
 import org.apache.log4j.Logger
 import java.awt.Dimension
 import java.awt.Toolkit
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
+import java.io.IOException
 import java.util.*
+import java.util.concurrent.TimeUnit
 import javax.swing.JFrame
+
 
 /**
  * 【运行时】运行时用户服务
@@ -24,7 +28,13 @@ class RuntimeUserService(private val service: RuntimeService) :
         IRuntimeUserService.IRuntimeUserPipeService,
         IRuntimeUserService.IRuntimeUserShareService,
         IRuntimeUserService.IRuntimeUserFileService,
-        IRuntimeUserService.IRuntimeUserWindowService {
+        IRuntimeUserService.IRuntimeUserWindowService,
+        IRuntimeUserService.IRuntimeUserNetService {
+
+    enum class UserSignal {
+        DESTROY,
+        WAKEUP,
+    }
 
     private val fsNodeRoot = RuntimeFsNode.root()
     private val mapNames = mutableMapOf<String, Int>()
@@ -44,11 +54,15 @@ class RuntimeUserService(private val service: RuntimeService) :
     override val window: IRuntimeUserService.IRuntimeUserWindowService
         get() = this
 
+    override val net: IRuntimeUserService.IRuntimeUserNetService
+        get() = this
+
     internal enum class UserType(var desc: String) {
         PIPE("管道"),
         SHARE("共享"),
         FILE("文件"),
         WINDOW("窗口"),
+        NET("网络"),
     }
 
     internal interface IUserPipeHandler {
@@ -159,6 +173,18 @@ class RuntimeUserService(private val service: RuntimeService) :
         fun str(op: Int, str: String): Boolean
     }
 
+    internal interface IUserNetHandler {
+
+        /**
+         * HTTP请求返回内容
+         * @param method 请求方法（GET、POST等）
+         * @param json 是否为JSON
+         * @param data 数据
+         * @return 响应数据
+         */
+        fun http(method: Int, json: Boolean, data: String): RuntimeObject
+    }
+
     internal interface IUserHandler {
 
         val pipe: IUserPipeHandler
@@ -169,6 +195,8 @@ class RuntimeUserService(private val service: RuntimeService) :
 
         val window: IUserWindowHandler
 
+        val net: IUserNetHandler
+
         fun destroy()
 
         fun enqueue(pid: Int)
@@ -176,6 +204,8 @@ class RuntimeUserService(private val service: RuntimeService) :
         fun dequeue(): Boolean
 
         fun dequeue(pid: Int)
+
+        fun signal(type: UserSignal)
     }
 
     internal open inner class UserHandler(protected var id: Int, private val waitingPids: Deque<Int> = ArrayDeque<Int>()) : IUserHandler {
@@ -193,6 +223,9 @@ class RuntimeUserService(private val service: RuntimeService) :
             get() = throw NotImplementedError()
 
         override val window: IUserWindowHandler
+            get() = throw NotImplementedError()
+
+        override val net: IUserNetHandler
             get() = throw NotImplementedError()
 
         override fun destroy() {
@@ -216,6 +249,14 @@ class RuntimeUserService(private val service: RuntimeService) :
 
         override fun dequeue(pid: Int) {
             waitingPids.remove(pid)
+        }
+
+        override fun signal(type: UserSignal) {
+            when (type) {
+                UserSignal.DESTROY -> {
+                }
+                UserSignal.WAKEUP -> while (dequeue());
+            }
         }
 
         override fun toString(): String {
@@ -339,7 +380,7 @@ class RuntimeUserService(private val service: RuntimeService) :
         private val adapter = object : WindowAdapter() {
             override fun windowClosing(e: WindowEvent?) {
                 if (canExit) {
-                    RuntimeProcess.addUserDelayDestroy(id)
+                    RuntimeProcess.sendUserSignal(id, UserSignal.DESTROY)
                 }
             }
         }
@@ -401,6 +442,73 @@ class RuntimeUserService(private val service: RuntimeService) :
             get() = this
     }
 
+    private val mediaTypeJson = MediaType.parse("application/x-www-form-urlencoded; charset=utf-8")
+
+    internal inner class UserNetHandler(id: Int) : UserHandler(id), IUserNetHandler {
+
+        private var running = false
+        private var finish = false
+        private var cancel = false
+        private var str: String? = null
+        private var call: Call? = null
+        private val url: String?
+            get() = arrUsers[id]?.name
+
+        override fun destroy() {
+            super.destroy()
+            if (running) {
+                cancel = true
+                call?.cancel()
+                while (dequeue());
+            }
+        }
+
+        override fun http(method: Int, json: Boolean, data: String): RuntimeObject {
+            if (running && !finish)
+                return RuntimeObject(-1L)
+            if (finish) {
+                running = false
+                finish = false
+                return RuntimeObject(str)
+            }
+            val newUrl = url ?: return RuntimeObject(-2L)
+            val build = when (method) {
+                0 -> { b: Request.Builder -> b.url(newUrl).get() }
+                1 -> { b: Request.Builder ->
+                    b.post(RequestBody.create(mediaTypeJson, data))
+                }
+                else -> { b: Request.Builder -> b }
+            }
+            val request = Request.Builder()
+                    .url(newUrl)
+                    .apply { build(this) }
+                    .build()
+            running = true
+            val pid = service.processService.pid
+            enqueue(pid)
+            httpClient.newCall(request).also { call = it }.enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    e.printStackTrace()
+                    if (!cancel) {
+                        finish = true
+                        RuntimeProcess.sendUserSignal(id, UserSignal.WAKEUP)
+                    }
+                }
+
+                @Throws(IOException::class)
+                override fun onResponse(call: Call, response: Response) {
+                    finish = true
+                    str = response.body()?.string()
+                    RuntimeProcess.sendUserSignal(id, UserSignal.WAKEUP)
+                }
+            })
+            return RuntimeObject(0L)
+        }
+
+        override val net: IUserNetHandler
+            get() = this
+    }
+
     internal inner class UserStruct(var name: String, var page: String, var type: UserType, var handler: IUserHandler)
 
     private fun newId(): Int {
@@ -426,59 +534,61 @@ class RuntimeUserService(private val service: RuntimeService) :
         if (setUserId.size >= MAX_USER) {
             return -1
         }
-        val sp = name.split("\\|".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        if (sp.size != 2)
+        val splitIndex = name.indexOf('|')
+        if (splitIndex <= 0 || splitIndex == name.length - 1)
             return -2
-        return when {
-            sp[0] == "pipe" -> createHandle(sp[1], page, UserType.PIPE)
-            sp[0] == "share" -> createHandle(sp[1], page, UserType.SHARE)
-            sp[0] == "file" -> createHandle(sp[1], page, UserType.FILE)
-            sp[0] == "window" -> createHandle(sp[1], page, UserType.WINDOW)
-            else -> -3
-        }
+        val type = name.substring(0 until splitIndex)
+        val newType = userTypeNames[type.toUpperCase()] ?: return -3
+        val newName = name.substring(splitIndex + 1)
+        return createHandle(newName, page, newType)
     }
 
+    private fun getUser(id: Int) = if (id in 0 until MAX_USER) arrUsers[id] else null
+
     override fun read(id: Int): RuntimeObject =
-            optional(arrUsers[id], RuntimeObject(true, RuntimeObjectType.kNoop)) { it.pipe.read() }
+            optional(getUser(id), RuntimeObject(true, RuntimeObjectType.kNoop)) { it.pipe.read() }
 
     override fun write(id: Int, obj: RuntimeObject) =
-            optional(arrUsers[id], false) { it.pipe.write(obj) }
+            optional(getUser(id), false) { it.pipe.write(obj) }
 
     override fun get(id: Int) =
-            optional(arrUsers[id], null) { it.share.get() }
+            optional(getUser(id), null) { it.share.get() }
 
     override fun set(id: Int, obj: RuntimeObject?) =
-            optional(arrUsers[id], null) { it.share.set(obj) }
+            optional(getUser(id), null) { it.share.set(obj) }
 
     override fun lock(id: Int) =
-            optional(arrUsers[id], false) { it.share.lock() }
+            optional(getUser(id), false) { it.share.lock() }
 
     override fun unlock(id: Int) =
-            optional(arrUsers[id], false) { it.share.unlock() }
+            optional(getUser(id), false) { it.share.unlock() }
 
     override fun queryFile(id: Int) =
-            optional(arrUsers[id], -1L) { it.file.query() }
+            optional(getUser(id), -1L) { it.file.query() }
 
     override fun createFile(id: Int, file: Boolean) =
-            optional(arrUsers[id], false) { it.file.create(file) }
+            optional(getUser(id), false) { it.file.create(file) }
 
     override fun deleteFile(id: Int) =
-            optional(arrUsers[id], false) { it.file.delete() }
+            optional(getUser(id), false) { it.file.delete() }
 
     override fun readFile(id: Int) =
-            optional(arrUsers[id], null) { it.file.read() }
+            optional(getUser(id), null) { it.file.read() }
 
     override fun writeFile(id: Int, data: ByteArray, overwrite: Boolean, createIfNotExist: Boolean) =
-            optional(arrUsers[id], -1L) { it.file.write(data, overwrite, createIfNotExist) }
+            optional(getUser(id), -1L) { it.file.write(data, overwrite, createIfNotExist) }
 
     override fun sendMessage(id: Int, type: Int, param1: Int, param2: Int) =
-            optional(arrUsers[id], false) { it.window.sendMessage(type, param1, param2) }
+            optional(getUser(id), false) { it.window.sendMessage(type, param1, param2) }
 
     override fun svg(id: Int, op: Char, x: Int, y: Int) =
-            optional(arrUsers[id], false) { it.window.svg(op, x, y) }
+            optional(getUser(id), false) { it.window.svg(op, x, y) }
 
     override fun str(id: Int, op: Int, str: String) =
-            optional(arrUsers[id], false) { it.window.str(op, str) }
+            optional(getUser(id), false) { it.window.str(op, str) }
+
+    override fun http(id: Int, method: Int, json: Boolean, data: String) =
+            optional(getUser(id), RuntimeObject(null)) { it.net.http(method, json, data) }
 
     override fun destroy() {
         val handles = service.processService.ring3.handles.toList()
@@ -493,9 +603,12 @@ class RuntimeUserService(private val service: RuntimeService) :
                 us.handler.dequeue(service.processService.pid)
             }
         }
+        httpClient.dispatcher().executorService().shutdown()
     }
 
     override fun destroy(id: Int): Boolean {
+        if (id !in 0 until MAX_USER)
+            return false
         if (arrUsers[id] == null)
             return false
         val user = arrUsers[id]!!
@@ -542,16 +655,25 @@ class RuntimeUserService(private val service: RuntimeService) :
         return array
     }
 
+    override fun signal(id: Int, type: UserSignal) {
+        when (type) {
+            RuntimeUserService.UserSignal.DESTROY -> destroy(id)
+            else -> getUser(id)?.handler?.signal(type)
+        }
+    }
+
     private fun createHandlerFromType(type: UserType, id: Int): IUserHandler = when (type) {
         RuntimeUserService.UserType.PIPE -> UserPipeHandler(id)
         RuntimeUserService.UserType.SHARE -> UserShareHandler(id)
         RuntimeUserService.UserType.FILE -> UserFileHandler(id)
         RuntimeUserService.UserType.WINDOW -> UserWindowHandler(id)
+        RuntimeUserService.UserType.NET -> UserNetHandler(id)
     }
 
     private fun createHandle(name: String, page: String, type: UserType): Int {
-        if (mapNames.containsKey(name)) {
-            return mapNames[name]!!
+        val h = mapNames[name]
+        if (h != null) {
+            return h
         }
         val id = newId()
         logger.debug("$type '$name' #$id created")
@@ -564,6 +686,12 @@ class RuntimeUserService(private val service: RuntimeService) :
 
         private const val MAX_USER = 1000
         private val logger = Logger.getLogger("user")
+        private val userTypeNames = UserType.values().associate { it.toString() to it }
+        private val httpClient = OkHttpClient.Builder()
+                .connectTimeout(5, TimeUnit.SECONDS)
+                .readTimeout(5, TimeUnit.SECONDS)
+                .writeTimeout(5, TimeUnit.SECONDS)
+                .build()
 
         private fun <T> optional(us: UserStruct?, def: T, select: (IUserHandler) -> T): T =
                 if (us == null) def

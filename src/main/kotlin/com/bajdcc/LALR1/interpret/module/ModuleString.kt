@@ -55,7 +55,7 @@ class ModuleString : IInterpreterModule {
                     run {
                         val str = args[0].string
                         val split = args[1].string
-                        RuntimeObject(RuntimeArray(str.split(split.toRegex(), Integer.MAX_VALUE).toTypedArray().map { RuntimeObject(it) }.toMutableList()))
+                        RuntimeObject(RuntimeArray(str.split(split.toRegex(), Integer.MAX_VALUE).toTypedArray().map { RuntimeObject(it) }))
                     }
                 })
         info.addExternalFunc("g_string_splitn",
@@ -65,7 +65,7 @@ class ModuleString : IInterpreterModule {
                         val str = args[0].string
                         val split = args[1].string
                         val n = args[1].long.toInt()
-                        RuntimeObject(RuntimeArray(str.split(split.toRegex(), n.coerceAtLeast(0)).toTypedArray().map { RuntimeObject(it) }.toMutableList()))
+                        RuntimeObject(RuntimeArray(str.split(split.toRegex(), n.coerceAtLeast(0)).toTypedArray().map { RuntimeObject(it) }))
                     }
                 })
         info.addExternalFunc("g_string_trim",

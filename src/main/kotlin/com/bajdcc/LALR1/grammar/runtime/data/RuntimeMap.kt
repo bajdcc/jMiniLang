@@ -1,7 +1,6 @@
 package com.bajdcc.LALR1.grammar.runtime.data
 
 import com.bajdcc.LALR1.grammar.runtime.RuntimeObject
-import java.util.*
 
 /**
  * 【运行时】运行时数组
@@ -14,6 +13,10 @@ class RuntimeMap : Cloneable {
 
     constructor(obj: RuntimeMap) {
         copyFrom(obj)
+    }
+
+    constructor(obj: Map<String, RuntimeObject>) {
+        map = obj.toMutableMap()
     }
 
     private var map = mutableMapOf<String, RuntimeObject>()
@@ -32,9 +35,7 @@ class RuntimeMap : Cloneable {
     }
 
     operator fun get(key: String): RuntimeObject? {
-        return if (map.containsKey(key)) {
-            map[key]
-        } else null
+        return map[key]
     }
 
     fun size(): RuntimeObject {
@@ -46,9 +47,7 @@ class RuntimeMap : Cloneable {
     }
 
     fun remove(key: String): RuntimeObject? {
-        return if (map.containsKey(key)) {
-            map.remove(key)
-        } else null
+        return map.remove(key)
     }
 
     fun clear() {
@@ -69,7 +68,7 @@ class RuntimeMap : Cloneable {
     }
 
     fun getMap(): Map<String, RuntimeObject> {
-        return Collections.unmodifiableMap(map)
+        return map.toMap()
     }
 
     override fun toString(): String {

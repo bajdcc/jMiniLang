@@ -64,6 +64,21 @@ for (var i = 0; i < 2; i++) {
     w.\"msg\"(2, 0, 0);
 }
 ");
+""".trimIndent(), """
+import "sys.base";
+import "sys.proc";
+g_proc_exec("
+import \"user.base\";
+if (g_fork() == -1) {
+    g_printn(g_http_get(\"http://www.baidu.com\"));
+} else {
+    var w = g_window(\"test\");
+    var width = 400;
+    var height = 300;
+    w.\"msg\"(0, width, height);
+    w.\"msg\"(2, 0, 0);
+}
+");
 """.trimIndent())
 
             println(codes[codes.size - 1])

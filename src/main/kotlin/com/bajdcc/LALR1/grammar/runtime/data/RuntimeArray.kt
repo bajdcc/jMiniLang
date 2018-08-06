@@ -22,8 +22,8 @@ class RuntimeArray : Cloneable {
         copyFrom(obj)
     }
 
-    constructor(array: MutableList<RuntimeObject>) {
-        this.array = array
+    constructor(array: List<RuntimeObject>) {
+        this.array = array.toMutableList()
     }
 
     fun add(obj: RuntimeObject) {
@@ -53,7 +53,7 @@ class RuntimeArray : Cloneable {
     }
 
     fun distinct(): RuntimeArray {
-        return RuntimeArray(array.distinct().toMutableList())
+        return RuntimeArray(array.distinct())
     }
 
     operator fun get(index: Int): RuntimeObject {

@@ -5,6 +5,7 @@ import com.bajdcc.LALR1.grammar.runtime.RuntimeMachine.Ring3Option.LOG_FILE
 import com.bajdcc.LALR1.grammar.runtime.RuntimeMachine.Ring3Option.LOG_PIPE
 import com.bajdcc.LALR1.grammar.runtime.service.IRuntimeProcessService
 import com.bajdcc.LALR1.grammar.runtime.service.RuntimeService
+import com.bajdcc.LALR1.grammar.runtime.service.RuntimeUserService
 import com.bajdcc.LALR1.syntax.handler.SyntaxException
 import javafx.util.Pair
 import org.apache.log4j.Logger
@@ -113,10 +114,12 @@ constructor(name: String, input: InputStream, private val pageFileMap: Map<Strin
     @Throws(Exception::class)
     fun getPage(name: String): RuntimeCodePage? {
         val vfs = service.fileService.getVfs(name)
-        if (arrCodes.containsKey(name) || vfs != "") {
-            val code = if (vfs != "") vfs else arrCodes[name]!!
-            if (arrPages.containsKey(code)) {
-                return arrPages[code]
+        val c = arrCodes[name]
+        if (c != null || vfs != "") {
+            val code = if (vfs != "") vfs else c!!
+            val p = arrPages[code]
+            if (p != null) {
+                return p
             } else {
                 logger.debug("Loading page: $name")
                 try {
@@ -250,9 +253,9 @@ constructor(name: String, input: InputStream, private val pageFileMap: Map<Strin
                 val pair = pipeDeque.poll()
                 service.pipeService.writeStringNew(pair.key, pair.value)
             }
-            if (!userHandleDelayDestroy.isEmpty()) {
-                val id = userHandleDelayDestroy.poll()
-                service.userService.destroy(id)
+            if (!userHandleCallbackQueue.isEmpty()) {
+                val pair = userHandleCallbackQueue.poll()!!
+                service.userService.signal(pair.key, pair.value)
             }
         }
         return true
@@ -305,7 +308,10 @@ constructor(name: String, input: InputStream, private val pageFileMap: Map<Strin
         while (true) {
             if (arrProcess[cyclePtr] == null) {
                 if (ring == 3) {
-                    newName = USER_PROC_FILE_PREFIX + cyclePtr
+                    newName = if (newName.startsWith('$'))
+                        newName.substring(1)
+                    else
+                        USER_PROC_FILE_PREFIX + cyclePtr
                 }
                 val machine = RuntimeMachine(newName, ring, cyclePtr, creatorId, this)
                 if (pc >= 0)
@@ -485,14 +491,15 @@ constructor(name: String, input: InputStream, private val pageFileMap: Map<Strin
     companion object {
 
         private val pipeDeque = ConcurrentLinkedDeque<Pair<String, String>>()
-        private val userHandleDelayDestroy = ConcurrentLinkedDeque<Int>()
+
+        private val userHandleCallbackQueue = ConcurrentLinkedDeque<Pair<Int, RuntimeUserService.UserSignal>>()
 
         fun writePipe(name: String, msg: String) {
             pipeDeque.add(Pair(name, msg))
         }
 
-        fun addUserDelayDestroy(id: Int) {
-            userHandleDelayDestroy.add(id)
+        fun sendUserSignal(id: Int, type: RuntimeUserService.UserSignal) {
+            userHandleCallbackQueue.add(Pair(id, type))
         }
 
         private val logger = Logger.getLogger("proc")

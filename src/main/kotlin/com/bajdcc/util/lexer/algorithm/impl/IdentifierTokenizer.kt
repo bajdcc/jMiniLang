@@ -37,13 +37,6 @@ constructor() : TokenAlgorithm(regexString, null) {
         }
     }
 
-    /*
-	 * （非 Javadoc）
-	 *
-	 * @see
-	 * com.bajdcc.lexer.algorithm.ITokenAlgorithm#getToken(java.lang.String,
-	 * com.bajdcc.lexer.token.Token)
-	 */
     override fun getToken(string: String, token: Token, iterator: IRegexStringIterator): Token {
         if (mapKeywords.containsKey(string)) {
             val kw = mapKeywords[string]

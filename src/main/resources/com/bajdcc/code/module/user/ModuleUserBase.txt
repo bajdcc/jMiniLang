@@ -1522,7 +1522,11 @@ var import_handle_class = func ~() {
         this."handle" := g_nullptr;
         this."name" := g_null;
         this."is_valid" := lambda(this) -> g_is_valid_handle(this."handle");
-        this."destroy" := lambda(this) -> g_destroy_handle(this."handle");
+        this."destroy" := lambda(this) {
+            if (this."is_valid"()) {
+                g_destroy_handle(this."handle");
+            }
+        };
     });
 
     var g_pipe = func ~(name) {
@@ -1649,6 +1653,40 @@ var import_handle_class = func ~() {
             this."str" := lambda(this, op, str) -> g_win_str(this."handle", op, str);
         };
     });
+
+    var g_net = func ~(name) {
+        return g_new_class("system::net", [], [["init", name]]);
+    };
+    export "g_net";
+    g_class("system::net", "system::handle", lambda(this) {
+        this."init" := lambda(this, name) {
+            this."name" := name;
+            this."handle" := g_handle("net|" + name);
+            this."http" := lambda(this, method, json, data) -> g_net_http(this."handle", method, json, data);
+        };
+    });
+    var http = func ~(method, json, url, data) {
+        var f = g_net(url);
+        var r = f."http"(method, json, data);
+        if (r < 0) {
+            r := g_null;
+        } else {
+            r := f."http"(method, json, data);
+            if (g_not_null(r) && json) {
+                r := g_parse_json(r);
+            }
+        }
+        f."destroy"();
+        return r;
+    };
+    var g_http_get = func ~(url) -> http(0, false, url, {});
+    export "g_http_get";
+    var g_http_get_json = func ~(url) -> http(0, true, url, {});
+    export "g_http_get_json";
+    var g_http_post = func ~(url, data) -> http(1, false, url, data);
+    export "g_http_post";
+    var g_http_post_json = func ~(url, data) -> http(1, true, url, data);
+    export "g_http_post_json";
 };
 
 var import_std_base = func ~() {

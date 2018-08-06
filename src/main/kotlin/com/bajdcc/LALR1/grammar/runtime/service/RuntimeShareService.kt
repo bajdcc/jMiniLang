@@ -37,8 +37,8 @@ class RuntimeShareService(private val service: RuntimeService) : IRuntimeShareSe
     }
 
     override fun getSharing(name: String, reference: Boolean): RuntimeObject {
-        if (mapShares.containsKey(name)) {
-            val ss = mapShares[name]!!
+        val ss = mapShares[name]
+        if (ss != null) {
             if (reference)
                 ss.reference++
             return ss.obj

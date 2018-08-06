@@ -148,10 +148,7 @@ class RuntimePipeService(private val service: RuntimeService) : IRuntimePipeServ
     }
 
     override fun readAndDestroy(name: String): String? {
-        if (!mapPipeNames.containsKey(name)) {
-            return null
-        }
-        val h = mapPipeNames[name]!!
+        val h = mapPipeNames[name] ?: return null
         val ps = arrPipes[h]!!
         if (ps.queue.isEmpty()) {
             destroy(encodeHandle(h))
@@ -166,10 +163,7 @@ class RuntimePipeService(private val service: RuntimeService) : IRuntimePipeServ
     }
 
     override fun readAll(name: String): String? {
-        if (!mapPipeNames.containsKey(name)) {
-            return null
-        }
-        val h = mapPipeNames[name]!!
+        val h = mapPipeNames[name] ?: return null
         val ps = arrPipes[h]!!
         if (ps.queue.isEmpty()) {
             return ""

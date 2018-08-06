@@ -22,9 +22,7 @@ import com.bajdcc.util.lexer.error.RegexException
 import com.bajdcc.util.lexer.token.Token
 import com.bajdcc.util.lexer.token.TokenType
 import org.apache.log4j.Logger
-
-import java.io.BufferedReader
-import java.io.FileReader
+import java.io.File
 import java.io.InputStream
 
 /**
@@ -245,33 +243,17 @@ class RuntimeMachine @Throws(Exception::class)
 
     @Throws(Exception::class)
     override fun runPage(name: String) {
-        val br = BufferedReader(FileReader(name))
-        val sb = StringBuilder()
-        var line = br.readLine()
-        while (line != null) {
-            sb.append(line)
-            sb.append(System.lineSeparator())
-            line = br.readLine()
-        }
-        br.close()
+        val txt = File(name).readLines().joinToString(System.lineSeparator())
         logger.debug("Loading file: $name")
-        val grammar = Grammar(sb.toString())
+        val grammar = Grammar(txt)
         run(name, grammar.codePage)
     }
 
     @Throws(Exception::class)
     override fun runProcess(name: String): Int {
-        val br = BufferedReader(FileReader(name))
-        val sb = StringBuilder()
-        var line = br.readLine()
-        while (line != null) {
-            sb.append(line)
-            sb.append(System.lineSeparator())
-            line = br.readLine()
-        }
-        br.close()
+        val txt = File(name).readLines().joinToString(System.lineSeparator())
         logger.debug("Loading file: $name")
-        val grammar = Grammar(sb.toString())
+        val grammar = Grammar(txt)
         return process!!.createProcess(pid, 0, name, grammar.codePage, 0, null)
     }
 
@@ -283,16 +265,8 @@ class RuntimeMachine @Throws(Exception::class)
 
     @Throws(Exception::class)
     override fun runUsrProcess(name: String): Int {
-        val br = BufferedReader(FileReader(name))
-        val sb = StringBuilder()
-        var line = br.readLine()
-        while (line != null) {
-            sb.append(line)
-            sb.append(System.lineSeparator())
-            line = br.readLine()
-        }
-        br.close()
-        val grammar = Grammar(sb.toString())
+        val txt = File(name).readLines().joinToString(System.lineSeparator())
+        val grammar = Grammar(txt)
         return process!!.createProcess(pid, 1, name, grammar.codePage, 0, null)
     }
 
@@ -573,12 +547,8 @@ class RuntimeMachine @Throws(Exception::class)
     @Throws(Exception::class)
     override fun execFile(filename: String, code: String): Int {
         try {
-            val page: RuntimeCodePage
-            if (codeCache.containsKey(filename))
-                page = codeCache[filename]!!
-            else
-                page = Grammar(code).codePage
-            return process!!.createProcess(pid, 3, filename.substring(1), page, 0, null)
+            val page = codeCache[filename] ?: Grammar(code).codePage
+            return process!!.createProcess(pid, 3, filename, page, 0, null)
         } catch (e: RegexException) {
             e.printStackTrace()
             errRT(RuntimeError.THROWS_EXCEPTION, e.position.toString() + ", " + e.message)

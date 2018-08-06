@@ -242,9 +242,10 @@ class RuntimeFileService(private val service: RuntimeService) : IRuntimeFileServ
             this.vfs = false
             if (mode == 1) { // read
                 if (name.startsWith(VFS_PREFIX)) {
-                    if (mapVfs.containsKey(name)) {
+                    val v = mapVfs[name]
+                    if (v != null) {
                         try {
-                            val bais = ByteArrayInputStream(mapVfs[name]!!.data!!)
+                            val bais = ByteArrayInputStream(v.data!!)
                             val isr = InputStreamReader(bais, encoding)
                             reader = BufferedReader(isr)
                             this.status = FileStatus.READING
@@ -252,7 +253,6 @@ class RuntimeFileService(private val service: RuntimeService) : IRuntimeFileServ
                         } catch (e: Exception) {
                             e.printStackTrace()
                         }
-
                     }
                 } else {
                     try {

@@ -34,6 +34,12 @@ interface IRuntimeUserService {
      */
     val window: IRuntimeUserWindowService
 
+    /**
+     * 获取服务
+     * @return 网络服务
+     */
+    val net: IRuntimeUserNetService
+
     interface IRuntimeUserPipeService {
         /**
          * 读取管道
@@ -156,6 +162,19 @@ interface IRuntimeUserService {
         fun str(id: Int, op: Int, str: String): Boolean
     }
 
+    interface IRuntimeUserNetService {
+
+        /**
+         * HTTP请求返回内容
+         * @param id 句柄
+         * @param method 请求方法（GET、POST等）
+         * @param json 是否为JSON
+         * @param data 数据
+         * @return 响应数据
+         */
+        fun http(id: Int, method: Int, json: Boolean, data: String): RuntimeObject
+    }
+
     /**
      * 创建用户服务句柄
      *
@@ -184,4 +203,12 @@ interface IRuntimeUserService {
      * @return 列表
      */
     fun stat(api: Boolean): RuntimeArray
+
+    /**
+     * 发送信号
+     *
+     * @param id 句柄
+     * @param type 信号类型
+     */
+    fun signal(id: Int, type: RuntimeUserService.UserSignal)
 }
